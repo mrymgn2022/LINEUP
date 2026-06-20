@@ -1,0 +1,3282 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>STARTING XI — 戦術ボード</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --bg:#0a0e0c;
+  --panel:#111714;
+  --panel2:#171f1b;
+  --line:#243029;
+  --grass-a:#15493a;
+  --grass-b:#12402f;
+  --lime:#caff3a;
+  --lime-dim:#9ec92a;
+  --ink:#eafff0;
+  --mut:#7d9389;
+  --red:#ff5b6e;
+  --gold:#ffd166;
+  --shadow:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:
+    radial-gradient(120% 80% at 50% -10%, #16221c 0%, var(--bg) 55%) fixed;
+  color:var(--ink);
+  font-family:'Manrope',system-ui,sans-serif;
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+}
+.app{display:flex;flex-direction:column;height:100dvh;max-width:560px;margin:0 auto;position:relative;overflow:hidden}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+
+/* ---------- Header ---------- */
+header{
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 8px;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.brand{min-width:0;flex-shrink:1}
+.logo{font-family:'Bebas Neue';font-size:25px;letter-spacing:1.5px;line-height:.9;color:var(--ink);white-space:nowrap}
+.logo b{color:var(--lime)}
+.tag{font-size:9px;letter-spacing:3px;color:var(--mut);text-transform:uppercase;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
+.tag.team{
+  letter-spacing:.3px;text-transform:none;font-size:11px;font-weight:800;color:#0a0e0c;
+  background:var(--lime);display:inline-flex;align-items:center;gap:4px;
+  padding:2px 9px;border-radius:999px;
+}
+.tag.team::before{content:'●';font-size:7px}
+.hbtn{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
+.icon{
+  width:36px;height:36px;border-radius:11px;border:1px solid var(--line);
+  background:var(--panel);color:var(--ink);font-size:15px;display:grid;place-items:center;
+  cursor:pointer;transition:.15s;
+}
+.icon:active{transform:scale(.92);background:var(--panel2)}
+.icon svg{width:19px;height:19px;display:block}
+
+/* ---------- Formation bar ---------- */
+.fbar{display:flex;gap:7px;overflow-x:auto;padding:4px 14px 10px;flex-shrink:0;scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+  background:var(--panel);font-family:'Bebas Neue';font-size:16px;letter-spacing:1.5px;
+  color:var(--mut);cursor:pointer;transition:.15s;white-space:nowrap;
+}
+.chip.on{background:var(--lime);color:#0a0e0c;border-color:var(--lime);box-shadow:0 4px 14px rgba(202,255,58,.25)}
+.chip:active{transform:scale(.95)}
+
+/* ---------- Pitch ---------- */
+.pitchwrap{padding:8px 12px 8px;position:relative}
+.pitch{
+  position:relative;width:100%;height:min(70vh,580px);border-radius:18px;overflow:hidden;
+  background:
+    repeating-linear-gradient(0deg, var(--grass-a) 0 9.09%, var(--grass-b) 9.09% 18.18%);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.10), var(--shadow);
+}
+.pitch .markings{position:absolute;inset:0;pointer-events:none}
+.mk{position:absolute;border:2px solid rgba(255,255,255,.16)}
+.mk.center-line{left:5%;right:5%;top:50%;height:0;border-width:2px 0 0 0}
+.mk.center-circle{left:50%;top:50%;width:34%;padding-bottom:34%;height:0;border-radius:50%;transform:translate(-50%,-50%)}
+.mk.spot{width:5px;height:5px;background:rgba(255,255,255,.4);border:0;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%)}
+.mk.box-top{left:24%;right:24%;top:0;height:14%;border-top:0}
+.mk.box-top-s{left:36%;right:36%;top:0;height:6%;border-top:0}
+.mk.box-bot{left:24%;right:24%;bottom:0;height:14%;border-bottom:0}
+.mk.box-bot-s{left:36%;right:36%;bottom:0;height:6%;border-bottom:0}
+
+/* ---------- Player token ---------- */
+.tok{
+  position:absolute;width:64px;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:none;z-index:2;
+}
+.tok.drag{z-index:30;cursor:grabbing}
+.disc{
+  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:linear-gradient(160deg,#1d2722,#10160f);
+  border:2px solid var(--lime);box-shadow:0 5px 14px rgba(0,0,0,.5);
+  font-weight:800;font-size:13px;color:var(--ink);
+}
+.tok.drag .disc{transform:scale(1.12);border-color:#fff}
+.disc.empty{border-style:dashed;border-color:var(--mut);background:rgba(255,255,255,.03);color:var(--mut);font-weight:600;font-size:20px}
+.disc svg{width:23px;height:23px;opacity:.9}
+.disc.photo{background-size:cover;background-position:center 20%}
+.disc.photo svg{display:none}
+.disc .val{position:absolute;bottom:-6px;right:-6px;background:var(--lime);color:#0a0e0c;font-size:8px;font-weight:800;padding:1px 4px;border-radius:6px;border:1px solid #0a0e0c}
+.role{margin-top:13px;font-family:'Bebas Neue';font-size:11px;letter-spacing:1px;color:var(--lime-dim);line-height:1}
+.pname{margin-top:2px;font-size:10px;font-weight:700;max-width:74px;text-align:center;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
+.psub{margin-top:1px;font-size:8.5px;font-weight:700;max-width:78px;text-align:center;color:#ffc46b;opacity:.92;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
+.psub::before{content:'▸';font-size:7px;margin-right:2px;opacity:.7}
+.flag{font-size:9px}
+.disc .capt{position:absolute;top:-6px;left:-6px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:#0a0e0c;font-size:9px;font-weight:800;display:grid;place-items:center;border:1.5px solid #0a0e0c}
+
+/* ---------- Club emblem ---------- */
+.emblem{
+  flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+  display:inline-grid;place-items:center;
+  font-family:'Bebas Neue';font-size:9px;letter-spacing:.3px;color:#fff;
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25);
+}
+.prow .nm .emblem{vertical-align:middle;margin-right:6px}
+
+/* ---------- Bottom info ---------- */
+.statbar{
+  flex-shrink:0;display:flex;gap:8px;padding:6px 14px calc(env(safe-area-inset-bottom) + 12px);
+  align-items:stretch;cursor:pointer;
+}
+.statbar:active{opacity:.85}
+.statmore{flex:0 0 auto;display:grid;place-items:center;width:42px;border:1px solid var(--line);border-radius:13px;background:var(--panel);font-size:18px}
+.stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:8px 10px}
+.stat .k{font-size:9px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.stat .v{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:var(--lime);line-height:1}
+.stat .v small{font-size:12px;color:var(--mut);font-family:'Manrope';font-weight:600}
+
+/* ---------- Bench ---------- */
+.bench{padding:2px 14px calc(env(safe-area-inset-bottom) + 30px)}
+.bench .bh{display:flex;align-items:baseline;gap:9px;margin:8px 2px 11px}
+.bench .bh b{font-family:'Bebas Neue';font-size:21px;letter-spacing:1.5px;color:var(--ink)}
+.bench .bh span{font-size:11px;color:var(--mut)}
+.bench .bh i{margin-left:auto;font-style:normal;font-size:10px;color:var(--lime-dim);letter-spacing:1px}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px}
+.bcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:11px 7px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:.12s}
+.bcard:active{transform:scale(.95);background:var(--panel2)}
+.bav{width:46px;height:46px;border-radius:50%;background:linear-gradient(160deg,#1d2722,#10160f);border:2px solid var(--line);display:grid;place-items:center;color:var(--mut);overflow:hidden}
+.bav svg{width:22px;height:22px;opacity:.85}
+.bav.photo{background-size:cover;background-position:center 20%;border-color:var(--lime)}
+.bav.photo svg{display:none}
+.bcard .bn{font-size:11px;font-weight:800;text-align:center;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
+.bcard .bv{font-size:10px;color:var(--mut);font-weight:700}
+.bcard[data-pid]{touch-action:none}
+.bcard.dragging{opacity:.35}
+.bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:96px}
+.bcard.add:active{background:rgba(255,255,255,.03)}
+.bcard.add .addplus{font-size:28px;font-weight:800;line-height:1;color:var(--lime)}
+.bcard.add .addlbl{font-size:10px;color:var(--mut);font-weight:700}
+.benchghost{position:fixed;left:0;top:0;transform:translate(-50%,-50%);z-index:200;pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.tok.droptarget .disc{box-shadow:0 0 0 4px var(--lime),0 5px 14px rgba(0,0,0,.5)!important;border-color:#fff!important}
+.benchfoot{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;color:var(--mut);font-size:12px;padding:12px 4px 6px}
+.benchfoot b{color:var(--ink);font-family:'Bebas Neue';font-size:19px;letter-spacing:.5px;margin:0 1px}
+.benchfoot small{font-size:10px;margin-left:1px}
+.benchfoot span{font-size:11px;opacity:.85}
+.benchEmpty{color:var(--mut);font-size:12px;padding:6px 4px 24px;line-height:1.8}
+.scrollcue{text-align:center;color:var(--mut);font-size:10px;letter-spacing:2px;padding:2px 0 6px;opacity:.8}
+
+/* ---------- Sheet / Modal ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:50;opacity:0;pointer-events:none;transition:.2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;z-index:60;
+  background:var(--panel);border-radius:22px 22px 0 0;border-top:1px solid var(--line);
+  transform:translateY(110%);transition:transform .28s cubic-bezier(.3,.9,.3,1);
+  max-height:86dvh;display:flex;flex-direction:column;box-shadow:0 -16px 40px rgba(0,0,0,.5);
+}
+.sheet.on{transform:translateY(0)}
+.sheet.expanded{max-height:96dvh}
+#sheetBody{display:flex;flex-direction:column;min-height:0;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#sheetBody>h2,#sheetBody>.controls{flex:0 0 auto}
+.grabzone{flex:0 0 auto;display:flex;justify-content:center;align-items:center;height:30px;cursor:grab;touch-action:none}
+.grabzone:active{cursor:grabbing}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);transition:width .15s,background .15s}
+.grabzone:active .grab,.sheet.expanded .grab{width:64px;background:var(--mut)}
+.sheet h2{font-family:'Bebas Neue';font-size:24px;letter-spacing:1.5px;margin:4px 16px 8px;display:flex;align-items:center;gap:8px}
+.sheet h2 span{font-size:11px;font-family:'Manrope';font-weight:700;color:var(--lime);background:rgba(202,255,58,.12);padding:3px 9px;border-radius:999px;margin-left:auto}
+
+/* search + filters */
+.controls{padding:0 16px 8px}
+.search{
+  width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+  padding:11px 13px;color:var(--ink);font-size:15px;font-family:'Manrope';outline:none;
+}
+.search::placeholder{color:var(--mut)}
+.filters{display:flex;gap:6px;overflow-x:auto;padding:9px 0 2px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.fchip{flex:0 0 auto;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);color:var(--mut);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.fchip.on{background:var(--ink);color:#0a0e0c;border-color:var(--ink)}
+.fchip.subchip.on{background:var(--lime);color:#0a0e0c;border-color:var(--lime)}
+.filters .fchipdiv{flex:0 0 auto;width:1px;align-self:center;height:18px;background:var(--line);margin:0 5px}
+
+/* list */
+.list{overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;padding:4px 12px calc(env(safe-area-inset-bottom) + 18px);flex:1;min-height:0}
+.prow{
+  display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:13px;cursor:pointer;transition:.12s;
+}
+.prow:active{background:var(--panel2)}
+.prow .pos{flex:0 0 40px;text-align:center;font-family:'Bebas Neue';font-size:14px;letter-spacing:.5px;color:#0a0e0c;background:var(--lime);border-radius:8px;padding:5px 0}
+.prow .pos.gk{background:var(--gold)}
+.prow .pos.df{background:#4fc3f7}
+.prow .pos.mf{background:#caff3a}
+.prow .pos.fw{background:#ff8a65}
+.prow .meta{flex:1;min-width:0}
+.prow .nm{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow .sub{font-size:11px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow .price{font-family:'Bebas Neue';font-size:17px;color:var(--lime);letter-spacing:.5px}
+.prow.inxi{opacity:.4}
+.prow .badge{font-size:9px;color:var(--gold);font-weight:800}
+.empty-msg{text-align:center;color:var(--mut);padding:40px 20px;font-size:13px}
+
+/* action menu */
+.menu{padding:6px 14px calc(env(safe-area-inset-bottom) + 16px)}
+.mitem{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:13px;font-weight:700;font-size:15px;cursor:pointer}
+.mitem:active{background:var(--panel2)}
+.mitem .mi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--panel2);font-size:15px}
+.mitem.danger{color:var(--red)}
+.mitem.danger .mi{color:var(--red)}
+
+/* detail */
+.detail{padding:0 18px calc(env(safe-area-inset-bottom) + 20px)}
+.dhead{display:flex;align-items:center;gap:14px;padding:6px 0 14px}
+.davatar{width:62px;height:62px;border-radius:50%;background:linear-gradient(160deg,#1d2722,#10160f);border:2px solid var(--lime);display:grid;place-items:center;font-family:'Bebas Neue';font-size:24px;color:var(--lime);overflow:hidden}
+.davatar.photo{background-size:cover;background-position:center 20%}
+.davatar.photo svg{display:none}
+.davatar svg{width:30px;height:30px}
+.dname{font-family:'Bebas Neue';font-size:30px;letter-spacing:1px;line-height:.95}
+.dclub{font-size:13px;color:var(--mut);font-weight:600;margin-top:3px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:4px}
+.dcell{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:11px 13px}
+.dcell .dk{font-size:10px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
+.dcell .dv{font-family:'Bebas Neue';font-size:23px;letter-spacing:1px;margin-top:2px}
+.dcell.full{grid-column:1/3}
+.dcell .dv.lime{color:var(--lime)}
+.bigbtn{
+  width:100%;margin-top:14px;padding:15px;border-radius:14px;border:0;cursor:pointer;
+  font-family:'Bebas Neue';font-size:20px;letter-spacing:1.5px;background:var(--lime);color:#0a0e0c;
+}
+.bigbtn:active{transform:scale(.98)}
+.bigbtn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+
+.toast{
+  position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#0a0e0c;padding:11px 18px;border-radius:999px;font-weight:800;font-size:13px;
+  z-index:90;opacity:0;transition:.25s;pointer-events:none;box-shadow:var(--shadow);max-width:90%;text-align:center;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.hint{position:absolute;left:50%;top:46%;transform:translateX(-50%);text-align:center;color:rgba(255,255,255,.5);font-size:12px;pointer-events:none;width:80%}
+
+/* ---------- Load more sentinel ---------- */
+.loadmore{
+  text-align:center;color:var(--mut);font-size:10px;letter-spacing:1.5px;
+  padding:14px 8px 6px;opacity:.8;
+}
+
+/* ---------- Bench mode switcher ---------- */
+.bench-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;color:var(--mut);font-weight:700;
+  padding:2px 0;margin-bottom:4px;
+}
+.bench-badge b{color:var(--lime)}
+
+/* ---------- Share preview ---------- */
+.shareprev{border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:10px;background:#000}
+.shareprev img{display:block;width:100%;height:auto}
+.sharecap{font-size:13px;color:var(--ink);line-height:1.5;margin:2px 2px 8px}
+.sharelink{margin:0 2px 12px;overflow:hidden;white-space:nowrap}
+.sharelink .sl{
+  color:#4ea1ff;font-size:14px;font-weight:600;
+  text-overflow:clip;          /* 見切れさせる（…を出さない） */
+  display:inline-block;max-width:62%;overflow:hidden;white-space:nowrap;vertical-align:bottom;
+}
+
+/* ---------- Original team profile form ---------- */
+.formfield{margin-bottom:11px}
+.formfield label{display:block;font-size:11px;letter-spacing:1px;color:var(--mut);text-transform:uppercase;margin:0 2px 5px}
+.formfield label i{font-style:normal;color:var(--lime-dim);margin-left:6px;letter-spacing:0;text-transform:none}
+.colorrow{display:flex;gap:9px;flex-wrap:wrap;padding:2px}
+.cdot2{width:30px;height:30px;border-radius:50%;cursor:pointer;box-shadow:inset 0 0 0 2px rgba(0,0,0,.25);transition:.12s}
+.cdot2.on{box-shadow:0 0 0 3px var(--ink),inset 0 0 0 2px rgba(0,0,0,.25);transform:scale(1.08)}
+
+/* ---------- Original team button ---------- */
+.origbtn{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:13px;border-radius:13px;margin-bottom:4px;cursor:pointer;
+  font-weight:800;font-size:14px;color:#0a0e0c;
+  background:linear-gradient(120deg,var(--lime),var(--lime-dim));
+  box-shadow:0 4px 14px rgba(202,255,58,.22);
+}
+.origbtn:active{transform:scale(.98)}
+
+</style>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">STARTING <b>XI</b></div>
+      <div class="tag" id="teamTag">tactics board</div>
+    </div>
+    <div class="hbtn">
+      <div class="icon" id="btnShare" title="共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 17 20 12 15 7"/><path d="M4 19v-3a4 4 0 0 1 4-4h12"/></svg></div>
+      <div class="icon" id="btnLoad" title="クラブ読込">⬇</div>
+      <div class="icon" id="btnMarket" title="移籍市場">⇄</div>
+      <div class="icon" id="btnReset" title="整列リセット">⟲</div>
+    </div>
+  </header>
+
+  <div class="fbar" id="fbar"></div>
+
+  <div class="scroll" id="scroll">
+    <div class="pitchwrap">
+      <div class="pitch" id="pitch">
+        <div class="markings">
+          <div class="mk center-line"></div>
+          <div class="mk center-circle"></div>
+          <div class="mk spot"></div>
+          <div class="mk box-top"></div>
+          <div class="mk box-top-s"></div>
+          <div class="mk box-bot"></div>
+          <div class="mk box-bot-s"></div>
+        </div>
+        <div class="hint" id="hint">空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え</div>
+      </div>
+    </div>
+
+    <div class="statbar" id="statbar" title="タップで詳細分析">
+      <div class="stat"><div class="k">Avg age</div><div class="v" id="sAge">–</div></div>
+      <div class="stat"><div class="k">Players</div><div class="v" id="sCnt">0<small>/11</small></div></div>
+      <div class="statmore">📊</div>
+    </div>
+
+    <div class="scrollcue" id="scrollcue">▾ 下にスクロールでベンチ ▾</div>
+    <div class="bench" id="bench"></div>
+  </div>
+</div>
+
+<input type="file" accept="image/*" id="photoInput" style="display:none">
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet"><div class="grabzone" id="grabzone"><div class="grab"></div></div><div id="sheetBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   選手データ（5大リーグ主要クラブ／実在選手）
+   形式: [名前, ポジション, 年齢, "🏳 国籍", クラブ, リーグ]
+   プレミアリーグは公開ロスター情報を参照（2025/26）。
+   ========================================================= */
+const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン"};
+const P=[
+// ---- Manchester City (PL) ----
+["Gianluigi Donnarumma","GK",27,"🇮🇹 ITA","Manchester City","PL"],
+["James Trafford","GK",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Marcus Bettinelli","GK",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Marc Guéhi","CB",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Josko Gvardiol","CB",24,"🇭🇷 CRO","Manchester City","PL"],
+["Rúben Dias","CB",29,"🇵🇹 POR","Manchester City","PL"],
+["Abdukodir Khusanov","CB",22,"🇺🇿 UZB","Manchester City","PL"],
+["Nathan Aké","CB",31,"🇳🇱 NED","Manchester City","PL"],
+["Max Alleyne","CB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Nico O'Reilly","LB",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Rayan Aït-Nouri","LB",25,"🇩🇿 ALG","Manchester City","PL"],
+["Matheus Nunes","RB",27,"🇵🇹 POR","Manchester City","PL"],
+["Rico Lewis","RB",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Rodri","CDM",29,"🇪🇸 ESP","Manchester City","PL"],
+["Nico González","CDM",24,"🇪🇸 ESP","Manchester City","PL"],
+["Kalvin Phillips","CDM",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Tijjani Reijnders","CM",27,"🇳🇱 NED","Manchester City","PL"],
+["Sverre Nypan","CM",19,"🇳🇴 NOR","Manchester City","PL"],
+["Mateo Kovacic","CM",32,"🇭🇷 CRO","Manchester City","PL"],
+["Rayan Cherki","CAM",22,"🇫🇷 FRA","Manchester City","PL"],
+["Phil Foden","CAM",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester City","PL"],
+["Jérémy Doku","LW",24,"🇧🇪 BEL","Manchester City","PL"],
+["Savinho","LW",22,"🇧🇷 BRA","Manchester City","PL"],
+["Antoine Semenyo","RW",26,"🇬🇭 GHA","Manchester City","PL"],
+["Erling Haaland","ST",25,"🇳🇴 NOR","Manchester City","PL"],
+["Omar Marmoush","ST",27,"🇪🇬 EGY","Manchester City","PL"],
+// ---- Arsenal (PL) ----
+["David Raya","GK",30,"🇪🇸 ESP","Arsenal","PL"],
+["Kepa Arrizabalaga","GK",31,"🇪🇸 ESP","Arsenal","PL"],
+["William Saliba","CB",25,"🇫🇷 FRA","Arsenal","PL"],
+["Gabriel","CB",28,"🇧🇷 BRA","Arsenal","PL"],
+["Cristhian Mosquera","CB",21,"🇪🇸 ESP","Arsenal","PL"],
+["Riccardo Calafiori","LB",24,"🇮🇹 ITA","Arsenal","PL"],
+["Jurriën Timber","RB",25,"🇳🇱 NED","Arsenal","PL"],
+["Ben White","RB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Martín Zubimendi","CDM",27,"🇪🇸 ESP","Arsenal","PL"],
+["Christian Nørgaard","CDM",32,"🇩🇰 DEN","Arsenal","PL"],
+["Declan Rice","CM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Myles Lewis-Skelly","CM",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Mikel Merino","CM",29,"🇪🇸 ESP","Arsenal","PL"],
+["Martin Ødegaard","CAM",27,"🇳🇴 NOR","Arsenal","PL"],
+["Eberechi Eze","CAM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Gabriel Martinelli","LW",25,"🇧🇷 BRA","Arsenal","PL"],
+["Leandro Trossard","LW",31,"🇧🇪 BEL","Arsenal","PL"],
+["Bukayo Saka","RW",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Noni Madueke","RW",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Max Dowman","RW",16,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Arsenal","PL"],
+["Viktor Gyökeres","ST",28,"🇸🇪 SWE","Arsenal","PL"],
+["Kai Havertz","ST",27,"🇩🇪 GER","Arsenal","PL"],
+["Gabriel Jesus","ST",29,"🇧🇷 BRA","Arsenal","PL"],
+// ---- Chelsea (PL) ----
+["Robert Sánchez","GK",28,"🇪🇸 ESP","Chelsea","PL"],
+["Filip Jørgensen","GK",24,"🇩🇰 DEN","Chelsea","PL"],
+["Gabriel Slonina","GK",22,"🇺🇸 USA","Chelsea","PL"],
+["Teddy Sharman-Lowe","GK",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Levi Colwill","CB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Trevoh Chalobah","CB",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Wesley Fofana","CB",25,"🇫🇷 FRA","Chelsea","PL"],
+["Mamadou Sarr","CB",20,"🇸🇳 SEN","Chelsea","PL"],
+["Tosin Adarabioyo","CB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Benoît Badiashile","CB",25,"🇫🇷 FRA","Chelsea","PL"],
+["Jorrel Hato","LB",20,"🇳🇱 NED","Chelsea","PL"],
+["Caleb Wiley","LB",21,"🇺🇸 USA","Chelsea","PL"],
+["Reece James","RB",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Malo Gusto","RB",23,"🇫🇷 FRA","Chelsea","PL"],
+["Josh Acheampong","RB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Moisés Caicedo","CDM",24,"🇪🇨 ECU","Chelsea","PL"],
+["Roméo Lavia","CDM",22,"🇧🇪 BEL","Chelsea","PL"],
+["Dário Essugo","CDM",21,"🇵🇹 POR","Chelsea","PL"],
+["Enzo Fernández","CM",25,"🇦🇷 ARG","Chelsea","PL"],
+["Andrey Santos","CM",22,"🇧🇷 BRA","Chelsea","PL"],
+["Cole Palmer","CAM",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Jamie Gittens","LW",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Alejandro Garnacho","LW",21,"🇦🇷 ARG","Chelsea","PL"],
+["Mykhaylo Mudryk","LW",25,"🇺🇦 UKR","Chelsea","PL"],
+["Estêvão","RW",19,"🇧🇷 BRA","Chelsea","PL"],
+["Pedro Neto","RW",26,"🇵🇹 POR","Chelsea","PL"],
+["João Pedro","ST",24,"🇧🇷 BRA","Chelsea","PL"],
+["Liam Delap","ST",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
+["Marc Guiu","ST",20,"🇪🇸 ESP","Chelsea","PL"],
+// ---- Liverpool (PL) ----
+["Giorgi Mamardashvili","GK",25,"🇬🇪 GEO","Liverpool","PL"],
+["Alisson","GK",33,"🇧🇷 BRA","Liverpool","PL"],
+["Freddie Woodman","GK",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Harvey Davies","GK",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Giovanni Leoni","CB",19,"🇮🇹 ITA","Liverpool","PL"],
+["Virgil van Dijk","CB",34,"🇳🇱 NED","Liverpool","PL"],
+["Joe Gomez","CB",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Milos Kerkez","LB",22,"🇭🇺 HUN","Liverpool","PL"],
+["Jeremie Frimpong","RB",25,"🇳🇱 NED","Liverpool","PL"],
+["Conor Bradley","RB",22,"🇬🇧 NIR","Liverpool","PL"],
+["Calvin Ramsay","RB",22,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Liverpool","PL"],
+["Ryan Gravenberch","CDM",24,"🇳🇱 NED","Liverpool","PL"],
+["Wataru Endo","CDM",33,"🇯🇵 JPN","Liverpool","PL"],
+["Stefan Bajcetic","CDM",21,"🇪🇸 ESP","Liverpool","PL"],
+["Alexis Mac Allister","CM",27,"🇦🇷 ARG","Liverpool","PL"],
+["Curtis Jones","CM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Trey Nyoni","CM",18,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Florian Wirtz","CAM",23,"🇩🇪 GER","Liverpool","PL"],
+["Dominik Szoboszlai","CAM",25,"🇭🇺 HUN","Liverpool","PL"],
+["Cody Gakpo","LW",27,"🇳🇱 NED","Liverpool","PL"],
+["Rio Ngumoha","LW",17,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
+["Federico Chiesa","RW",28,"🇮🇹 ITA","Liverpool","PL"],
+["Alexander Isak","ST",26,"🇸🇪 SWE","Liverpool","PL"],
+["Hugo Ekitiké","ST",24,"🇫🇷 FRA","Liverpool","PL"],
+// ---- Manchester United (PL) ----
+["Senne Lammens","GK",23,"🇧🇪 BEL","Manchester United","PL"],
+["Altay Bayındır","GK",28,"🇹🇷 TUR","Manchester United","PL"],
+["Tom Heaton","GK",40,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Leny Yoro","CB",20,"🇫🇷 FRA","Manchester United","PL"],
+["Lisandro Martínez","CB",28,"🇦🇷 ARG","Manchester United","PL"],
+["Matthijs de Ligt","CB",26,"🇳🇱 NED","Manchester United","PL"],
+["Ayden Heaven","CB",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Harry Maguire","CB",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Tyler Fredricson","CB",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Luke Shaw","LB",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Diogo Dalot","RB",27,"🇵🇹 POR","Manchester United","PL"],
+["Noussair Mazraoui","RB",28,"🇲🇦 MAR","Manchester United","PL"],
+["Manuel Ugarte","CDM",25,"🇺🇾 URU","Manchester United","PL"],
+["Kobbie Mainoo","CM",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Bruno Fernandes","CAM",31,"🇵🇹 POR","Manchester United","PL"],
+["Mason Mount","CAM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
+["Patrick Dorgu","LW",21,"🇩🇰 DEN","Manchester United","PL"],
+["Bryan Mbeumo","RW",26,"🇨🇲 CMR","Manchester United","PL"],
+["Amad Diallo","RW",23,"🇨🇮 CIV","Manchester United","PL"],
+["Matheus Cunha","ST",27,"🇧🇷 BRA","Manchester United","PL"],
+["Benjamin Sesko","ST",23,"🇸🇮 SVN","Manchester United","PL"],
+["Joshua Zirkzee","ST",25,"🇳🇱 NED","Manchester United","PL"],
+["Chido Obi","ST",18,"🇩🇰 DEN","Manchester United","PL"],
+// ---- Tottenham (PL) ----
+["Guglielmo Vicario","GK",29,"🇮🇹 ITA","Tottenham","PL"],
+["Antonín Kinský","GK",23,"🇨🇿 CZE","Tottenham","PL"],
+["Brandon Austin","GK",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Micky van de Ven","CB",25,"🇳🇱 NED","Tottenham","PL"],
+["Cristian Romero","CB",28,"🇦🇷 ARG","Tottenham","PL"],
+["Kevin Danso","CB",27,"🇦🇹 AUT","Tottenham","PL"],
+["Radu Drăgușin","CB",24,"🇷🇴 ROU","Tottenham","PL"],
+["Ashley Phillips","CB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Ben Davies","CB",33,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Tottenham","PL"],
+["Destiny Udogie","LB",23,"🇮🇹 ITA","Tottenham","PL"],
+["Djed Spence","LB",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Souza","LB",20,"🇧🇷 BRA","Tottenham","PL"],
+["Pedro Porro","RB",26,"🇪🇸 ESP","Tottenham","PL"],
+["Rodrigo Bentancur","CDM",28,"🇺🇾 URU","Tottenham","PL"],
+["Archie Gray","CM",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Lucas Bergvall","CM",20,"🇸🇪 SWE","Tottenham","PL"],
+["Conor Gallagher","CM",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Pape Matar Sarr","CM",23,"🇸🇳 SEN","Tottenham","PL"],
+["Xavi Simons","CAM",23,"🇳🇱 NED","Tottenham","PL"],
+["James Maddison","CAM",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Dejan Kulusevski","CAM",26,"🇸🇪 SWE","Tottenham","PL"],
+["Wilson Odobert","LW",21,"🇫🇷 FRA","Tottenham","PL"],
+["Mohammed Kudus","RW",25,"🇬🇭 GHA","Tottenham","PL"],
+["Dominic Solanke","ST",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+["Richarlison","ST",29,"🇧🇷 BRA","Tottenham","PL"],
+["Mathys Tel","ST",21,"🇫🇷 FRA","Tottenham","PL"],
+["Dane Scarlett","ST",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Tottenham","PL"],
+// ---- Newcastle United (PL) ----
+["Nick Pope","GK",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Mark Gillespie","GK",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Malick Thiaw","CB",24,"🇩🇪 GER","Newcastle United","PL"],
+["Sven Botman","CB",26,"🇳🇱 NED","Newcastle United","PL"],
+["Fabian Schär","CB",34,"🇨🇭 SUI","Newcastle United","PL"],
+["Dan Burn","CB",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Lewis Hall","LB",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Alex Murphy","LB",21,"🇮🇪 IRL","Newcastle United","PL"],
+["Tino Livramento","RB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Harrison Ashby","RB",24,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Newcastle United","PL"],
+["Sandro Tonali","CDM",26,"🇮🇹 ITA","Newcastle United","PL"],
+["Bruno Guimarães","CM",28,"🇧🇷 BRA","Newcastle United","PL"],
+["Jacob Ramsey","CM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Joelinton","CM",29,"🇧🇷 BRA","Newcastle United","PL"],
+["Lewis Miley","CM",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Joe Willock","CM",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Joe White","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Harvey Barnes","LW",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Anthony Elanga","RW",24,"🇸🇪 SWE","Newcastle United","PL"],
+["Jacob Murphy","RW",31,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
+["Nick Woltemade","ST",24,"🇩🇪 GER","Newcastle United","PL"],
+["William Osula","ST",22,"🇩🇰 DEN","Newcastle United","PL"],
+["Yoane Wissa","ST",29,"🇨🇩 COD","Newcastle United","PL"],
+// ---- Nottingham Forest (PL) ----
+["John Victor","GK",30,"🇧🇷 BRA","Nottingham Forest","PL"],
+["Matz Sels","GK",34,"🇧🇪 BEL","Nottingham Forest","PL"],
+["Murillo","CB",23,"🇧🇷 BRA","Nottingham Forest","PL"],
+["Nikola Milenković","CB",28,"🇷🇸 SRB","Nottingham Forest","PL"],
+["Jair Cunha","CB",21,"🇧🇷 BRA","Nottingham Forest","PL"],
+["Morato","CB",24,"🇧🇷 BRA","Nottingham Forest","PL"],
+["Zach Abbott","CB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Neco Williams","LB",25,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Nottingham Forest","PL"],
+["Luca Netz","LB",23,"🇩🇪 GER","Nottingham Forest","PL"],
+["Ola Aina","RB",29,"🇳🇬 NGA","Nottingham Forest","PL"],
+["Nicolò Savona","RB",23,"🇮🇹 ITA","Nottingham Forest","PL"],
+["Eric da Silva Moreira","RB",20,"🇩🇪 GER","Nottingham Forest","PL"],
+["Ibrahim Sangaré","CDM",28,"🇨🇮 CIV","Nottingham Forest","PL"],
+["Elliot Anderson","CM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Nicolás Domínguez","CM",27,"🇦🇷 ARG","Nottingham Forest","PL"],
+["Ryan Yates","CM",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Morgan Gibbs-White","CAM",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Omari Hutchinson","CAM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["James McAtee","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Callum Hudson-Odoi","LW",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Nottingham Forest","PL"],
+["Dan Ndoye","RW",25,"🇨🇭 SUI","Nottingham Forest","PL"],
+["Dilane Bakwa","RW",23,"🇫🇷 FRA","Nottingham Forest","PL"],
+["Igor Jesus","ST",25,"🇧🇷 BRA","Nottingham Forest","PL"],
+["Taiwo Awoniyi","ST",28,"🇳🇬 NGA","Nottingham Forest","PL"],
+["Chris Wood","ST",34,"🇳🇿 NZL","Nottingham Forest","PL"],
+// ---- Brighton (PL) ----
+["Bart Verbruggen","GK",23,"🇳🇱 NED","Brighton","PL"],
+["Carl Rushworth","GK",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["James Beadle","GK",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Jason Steele","GK",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Tom McGill","GK",26,"🇨🇦 CAN","Brighton","PL"],
+["Olivier Boscagli","CB",28,"🇫🇷 FRA","Brighton","PL"],
+["Igor Julio","CB",28,"🇧🇷 BRA","Brighton","PL"],
+["Eiran Cashin","CB",24,"🇮🇪 IRL","Brighton","PL"],
+["Lewis Dunk","CB",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Ferdi Kadıoğlu","LB",26,"🇹🇷 TUR","Brighton","PL"],
+["Maxim De Cuyper","LB",25,"🇧🇪 BEL","Brighton","PL"],
+["Mats Wieffer","RB",26,"🇳🇱 NED","Brighton","PL"],
+["Carlos Baleba","CDM",22,"🇨🇲 CMR","Brighton","PL"],
+["Jack Hinshelwood","CDM",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Yasin Ayari","CM",22,"🇸🇪 SWE","Brighton","PL"],
+["Diego Gómez","CM",23,"🇵🇾 PAR","Brighton","PL"],
+["Matt O'Riley","CM",25,"🇩🇰 DEN","Brighton","PL"],
+["Malick Yalcouyé","CM",20,"🇨🇮 CIV","Brighton","PL"],
+["Pascal Groß","CM",35,"🇩🇪 GER","Brighton","PL"],
+["Kaoru Mitoma","LW",29,"🇯🇵 JPN","Brighton","PL"],
+["Ibrahim Osman","LW",21,"🇬🇭 GHA","Brighton","PL"],
+["Tom Watson","LW",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Yankuba Minteh","RW",21,"🇬🇲 GAM","Brighton","PL"],
+["Amario Cozier-Duberry","RW",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+["Georginio Rutter","ST",24,"🇫🇷 FRA","Brighton","PL"],
+["Charalampos Kostoulas","ST",19,"🇬🇷 GRE","Brighton","PL"],
+["Stefanos Tzimas","ST",20,"🇬🇷 GRE","Brighton","PL"],
+["Danny Welbeck","ST",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brighton","PL"],
+// ---- Bournemouth (PL) ----
+["Djordje Petrovic","GK",26,"🇷🇸 SRB","Bournemouth","PL"],
+["Fraser Forster","GK",38,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Bafodé Diakité","CB",25,"🇫🇷 FRA","Bournemouth","PL"],
+["James Hill","CB",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Veljko Milosavljevic","CB",18,"🇷🇸 SRB","Bournemouth","PL"],
+["Matai Akinmboni","CB",19,"🇺🇸 USA","Bournemouth","PL"],
+["Adrien Truffert","LB",24,"🇫🇷 FRA","Bournemouth","PL"],
+["Julio Soler","LB",21,"🇦🇷 ARG","Bournemouth","PL"],
+["Adam Smith","RB",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Tyler Adams","CDM",27,"🇺🇸 USA","Bournemouth","PL"],
+["Alex Scott","CM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Alex Tóth","CM",20,"🇭🇺 HUN","Bournemouth","PL"],
+["Lewis Cook","CM",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Ryan Christie","CM",31,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Bournemouth","PL"],
+["Marcus Tavernier","CAM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bournemouth","PL"],
+["Justin Kluivert","CAM",27,"🇳🇱 NED","Bournemouth","PL"],
+["Amine Adli","LW",26,"🇲🇦 MAR","Bournemouth","PL"],
+["Rayan","RW",19,"🇧🇷 BRA","Bournemouth","PL"],
+["Ben Gannon-Doak","RW",20,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Bournemouth","PL"],
+["David Brooks","RW",28,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Bournemouth","PL"],
+["Junior Kroupi","ST",19,"🇫🇷 FRA","Bournemouth","PL"],
+["Evanilson","ST",26,"🇧🇷 BRA","Bournemouth","PL"],
+["Enes Ünal","ST",29,"🇹🇷 TUR","Bournemouth","PL"],
+// ---- Crystal Palace (PL) ----
+["Dean Henderson","GK",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Walter Benítez","GK",33,"🇦🇷 ARG","Crystal Palace","PL"],
+["Remi Matthews","GK",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Maxence Lacroix","CB",26,"🇫🇷 FRA","Crystal Palace","PL"],
+["Jaydee Canvot","CB",19,"🇫🇷 FRA","Crystal Palace","PL"],
+["Chris Richards","CB",26,"🇺🇸 USA","Crystal Palace","PL"],
+["Chadi Riad","CB",23,"🇲🇦 MAR","Crystal Palace","PL"],
+["Tyrick Mitchell","LB",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Borna Sosa","LB",28,"🇭🇷 CRO","Crystal Palace","PL"],
+["Rio Cardines","LB",19,"🇹🇹 TRI","Crystal Palace","PL"],
+["Daniel Muñoz","RB",30,"🇨🇴 COL","Crystal Palace","PL"],
+["Caleb Kporha","RB",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Nathaniel Clyne","RB",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Adam Wharton","CDM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Cheick Doucouré","CDM",26,"🇲🇱 MLI","Crystal Palace","PL"],
+["Jefferson Lerma","CDM",31,"🇨🇴 COL","Crystal Palace","PL"],
+["David Ozoh","CDM",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Will Hughes","CM",31,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Justin Devenny","CAM",22,"🇬🇧 NIR","Crystal Palace","PL"],
+["Daichi Kamada","CAM",29,"🇯🇵 JPN","Crystal Palace","PL"],
+["Ismaïla Sarr","RW",28,"🇸🇳 SEN","Crystal Palace","PL"],
+["Yéremy Pino","RW",23,"🇪🇸 ESP","Crystal Palace","PL"],
+["Brennan Johnson","RW",25,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Crystal Palace","PL"],
+["Romain Esse","RW",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+["Jesurun Rak-Sakyi","RW",23,"🇬🇭 GHA","Crystal Palace","PL"],
+["Jørgen Strand Larsen","ST",26,"🇳🇴 NOR","Crystal Palace","PL"],
+["Jean-Philippe Mateta","ST",28,"🇫🇷 FRA","Crystal Palace","PL"],
+["Eddie Nketiah","ST",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Crystal Palace","PL"],
+// ---- Aston Villa (PL) ----
+["Emiliano Martínez","GK",33,"🇦🇷 ARG","Aston Villa","PL"],
+["Marco Bizot","GK",35,"🇳🇱 NED","Aston Villa","PL"],
+["Ezri Konsa","CB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Pau Torres","CB",29,"🇪🇸 ESP","Aston Villa","PL"],
+["Victor Lindelöf","CB",31,"🇸🇪 SWE","Aston Villa","PL"],
+["Tyrone Mings","CB",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Ian Maatsen","LB",24,"🇳🇱 NED","Aston Villa","PL"],
+["Lucas Digne","LB",32,"🇫🇷 FRA","Aston Villa","PL"],
+["Matty Cash","RB",28,"🇵🇱 POL","Aston Villa","PL"],
+["Andrés García","RB",23,"🇪🇸 ESP","Aston Villa","PL"],
+["Amadou Onana","CDM",24,"🇧🇪 BEL","Aston Villa","PL"],
+["Boubacar Kamara","CDM",26,"🇫🇷 FRA","Aston Villa","PL"],
+["Lamare Bogarde","CDM",22,"🇳🇱 NED","Aston Villa","PL"],
+["Youri Tielemans","CM",29,"🇧🇪 BEL","Aston Villa","PL"],
+["John McGinn","CM",31,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Aston Villa","PL"],
+["Ross Barkley","CM",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Morgan Rogers","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Emiliano Buendía","LW",29,"🇦🇷 ARG","Aston Villa","PL"],
+["Lewis Dobbin","LW",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Leon Bailey","RW",28,"🇯🇲 JAM","Aston Villa","PL"],
+["Alysson","RW",20,"🇧🇷 BRA","Aston Villa","PL"],
+["Ollie Watkins","ST",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Tammy Abraham","ST",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+// ---- Brentford (PL) ----
+["Caoimhín Kelleher","GK",27,"🇮🇪 IRL","Brentford","PL"],
+["Hákon Valdimarsson","GK",24,"🇮🇸 ISL","Brentford","PL"],
+["Matthew Cox","GK",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Ellery Balcombe","GK",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Julian Eyestone","GK",20,"🇺🇸 USA","Brentford","PL"],
+["Sepp van den Berg","CB",24,"🇳🇱 NED","Brentford","PL"],
+["Nathan Collins","CB",25,"🇮🇪 IRL","Brentford","PL"],
+["Kristoffer Ajer","CB",28,"🇳🇴 NOR","Brentford","PL"],
+["Ethan Pinnock","CB",33,"🇯🇲 JAM","Brentford","PL"],
+["Rico Henry","LB",28,"🇯🇲 JAM","Brentford","PL"],
+["Jayden Meghoma","LB",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Michael Kayode","RB",21,"🇮🇹 ITA","Brentford","PL"],
+["Aaron Hickey","RB",24,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Brentford","PL"],
+["Vitaly Janelt","CDM",28,"🇩🇪 GER","Brentford","PL"],
+["Yunus Konak","CDM",20,"🇹🇷 TUR","Brentford","PL"],
+["Jordan Henderson","CDM",36,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Yegor Yarmolyuk","CM",22,"🇺🇦 UKR","Brentford","PL"],
+["Mathias Jensen","CM",30,"🇩🇰 DEN","Brentford","PL"],
+["Frank Onyeka","CM",28,"🇳🇬 NGA","Brentford","PL"],
+["Josh Dasilva","CM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Keane Lewis-Potter","LW",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Mikkel Damsgaard","CAM",25,"🇩🇰 DEN","Brentford","PL"],
+["Antoni Milambo","CAM",21,"🇳🇱 NED","Brentford","PL"],
+["Fábio Carvalho","CAM",23,"🇵🇹 POR","Brentford","PL"],
+["Kevin Schade","LW",24,"🇩🇪 GER","Brentford","PL"],
+["Dango Ouattara","RW",24,"🇧🇫 BFA","Brentford","PL"],
+["Romelle Donovan","RW",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Brentford","PL"],
+["Igor Thiago","ST",24,"🇧🇷 BRA","Brentford","PL"],
+["Kaye Furo","ST",19,"🇧🇪 BEL","Brentford","PL"],
+// ---- Everton (PL) ----
+["Jordan Pickford","GK",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Mark Travers","GK",27,"🇮🇪 IRL","Everton","PL"],
+["Tom King","GK",31,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Everton","PL"],
+["Jarrad Branthwaite","CB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["James Tarkowski","CB",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Michael Keane","CB",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Vitaliy Mykolenko","LB",27,"🇺🇦 UKR","Everton","PL"],
+["Adam Aznou","LB",20,"🇲🇦 MAR","Everton","PL"],
+["Jake O'Brien","RB",25,"🇮🇪 IRL","Everton","PL"],
+["Nathan Patterson","RB",24,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Everton","PL"],
+["James Garner","CDM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Kiernan Dewsbury-Hall","CM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Tim Iroegbunam","CM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Carlos Alcaraz","CM",23,"🇦🇷 ARG","Everton","PL"],
+["Harrison Armstrong","CM",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Dwight McNeil","LW",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Iliman Ndiaye","RW",26,"🇸🇳 SEN","Everton","PL"],
+["Tyler Dibling","RW",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Everton","PL"],
+["Thierno Barry","ST",23,"🇫🇷 FRA","Everton","PL"],
+["Beto","ST",28,"🇬🇼 GNB","Everton","PL"],
+// ---- Sunderland (PL) ----
+["Robin Roefs","GK",23,"🇳🇱 NED","Sunderland","PL"],
+["Melker Ellborg","GK",23,"🇸🇪 SWE","Sunderland","PL"],
+["Simon Moore","GK",36,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Sunderland","PL"],
+["Dan Ballard","CB",26,"🇬🇧 NIR","Sunderland","PL"],
+["Omar Alderete","CB",29,"🇵🇾 PAR","Sunderland","PL"],
+["Luke O'Nien","CB",31,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Sunderland","PL"],
+["Reinildo Mandava","LB",32,"🇲🇿 MOZ","Sunderland","PL"],
+["Trai Hume","RB",24,"🇬🇧 NIR","Sunderland","PL"],
+["Nordi Mukiele","RB",28,"🇫🇷 FRA","Sunderland","PL"],
+["Granit Xhaka","CDM",33,"🇨🇭 SUI","Sunderland","PL"],
+["Habib Diarra","CM",22,"🇸🇳 SEN","Sunderland","PL"],
+["Noah Sadiki","CM",21,"🇨🇩 COD","Sunderland","PL"],
+["Enzo Le Fée","CM",26,"🇫🇷 FRA","Sunderland","PL"],
+["Abdoullah Ba","RW",22,"🇫🇷 FRA","Sunderland","PL"],
+["Chris Rigg","CAM",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Sunderland","PL"],
+["Nilson Angulo","LW",23,"🇪🇨 ECU","Sunderland","PL"],
+["Romaine Mundle","LW",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Sunderland","PL"],
+["Chemsdine Talbi","RW",21,"🇲🇦 MAR","Sunderland","PL"],
+["Jocelin Ta Bi","RW",21,"🇨🇮 CIV","Sunderland","PL"],
+["Brian Brobbey","ST",24,"🇳🇱 NED","Sunderland","PL"],
+["Wilson Isidor","ST",25,"🇭🇹 HAI","Sunderland","PL"],
+["Eliezer Mayenda","ST",21,"🇪🇸 ESP","Sunderland","PL"],
+["Ahmed Abdullahi","ST",22,"🇳🇬 NGA","Sunderland","PL"],
+// ---- West Ham United (PL) ----
+["Mads Hermansen","GK",25,"🇩🇰 DEN","West Ham United","PL"],
+["Alphonse Areola","GK",33,"🇫🇷 FRA","West Ham United","PL"],
+["Jean-Clair Todibo","CB",26,"🇫🇷 FRA","West Ham United","PL"],
+["Konstantinos Mavropanos","CB",28,"🇬🇷 GRE","West Ham United","PL"],
+["Maximilian Kilman","CB",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+["El Hadji Malick Diouf","LB",21,"🇸🇳 SEN","West Ham United","PL"],
+["Oliver Scarles","LB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+["Aaron Wan-Bissaka","RB",28,"🇨🇩 COD","West Ham United","PL"],
+["Kyle Walker-Peters","RB",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+["Soungoutou Magassa","CDM",22,"🇫🇷 FRA","West Ham United","PL"],
+["Tomáš Souček","CDM",31,"🇨🇿 CZE","West Ham United","PL"],
+["Freddie Potts","CDM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+["Mohamadou Kanté","CDM",20,"🇫🇷 FRA","West Ham United","PL"],
+["Mateus Fernandes","CM",21,"🇵🇹 POR","West Ham United","PL"],
+["Crysencio Summerville","LW",24,"🇳🇱 NED","West Ham United","PL"],
+["Jarrod Bowen","RW",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+["Taty Castellanos","ST",27,"🇦🇷 ARG","West Ham United","PL"],
+["Pablo","ST",22,"🇧🇷 BRA","West Ham United","PL"],
+["Callum Wilson","ST",34,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","West Ham United","PL"],
+// ---- Leeds United (PL) ----
+["Lucas Perri","GK",28,"🇧🇷 BRA","Leeds United","PL"],
+["Karl Darlow","GK",35,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leeds United","PL"],
+["Alex Cairns","GK",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["Pascal Struijk","CB",26,"🇳🇱 NED","Leeds United","PL"],
+["Jaka Bijol","CB",27,"🇸🇮 SVN","Leeds United","PL"],
+["Joe Rodon","CB",28,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leeds United","PL"],
+["Sebastiaan Bornauw","CB",27,"🇧🇪 BEL","Leeds United","PL"],
+["Gabriel Gudmundsson","LB",27,"🇸🇪 SWE","Leeds United","PL"],
+["Sam Byram","LB",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["Jayden Bogle","RB",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["James Justin","RB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["Ethan Ampadu","CDM",25,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leeds United","PL"],
+["Anton Stach","CDM",27,"🇩🇪 GER","Leeds United","PL"],
+["Ilia Gruev","CDM",26,"🇧🇬 BUL","Leeds United","PL"],
+["Charlie Crew","CDM",20,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leeds United","PL"],
+["Sean Longstaff","CM",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["Ao Tanaka","CM",27,"🇯🇵 JPN","Leeds United","PL"],
+["Brenden Aaronson","CAM",25,"🇺🇸 USA","Leeds United","PL"],
+["Noah Okafor","LW",26,"🇨🇭 SUI","Leeds United","PL"],
+["Wilfried Gnonto","RW",22,"🇮🇹 ITA","Leeds United","PL"],
+["Daniel James","RW",28,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leeds United","PL"],
+["Dominic Calvert-Lewin","ST",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leeds United","PL"],
+["Joël Piroe","ST",26,"🇸🇷 SUR","Leeds United","PL"],
+["Lukas Nmecha","ST",27,"🇩🇪 GER","Leeds United","PL"],
+// ---- Fulham (PL) ----
+["Bernd Leno","GK",34,"🇩🇪 GER","Fulham","PL"],
+["Benjamin Lecomte","GK",35,"🇫🇷 FRA","Fulham","PL"],
+["Calvin Bassey","CB",26,"🇳🇬 NGA","Fulham","PL"],
+["Joachim Andersen","CB",30,"🇩🇰 DEN","Fulham","PL"],
+["Jorge Cuenca","CB",26,"🇪🇸 ESP","Fulham","PL"],
+["Issa Diop","CB",29,"🇲🇦 MAR","Fulham","PL"],
+["Ryan Sessegnon","LB",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Fulham","PL"],
+["Antonee Robinson","LB",28,"🇺🇸 USA","Fulham","PL"],
+["Kenny Tete","RB",30,"🇳🇱 NED","Fulham","PL"],
+["Timothy Castagne","RB",30,"🇧🇪 BEL","Fulham","PL"],
+["Sander Berge","CDM",28,"🇳🇴 NOR","Fulham","PL"],
+["Saša Lukić","CM",29,"🇷🇸 SRB","Fulham","PL"],
+["Harrison Reed","CM",31,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Fulham","PL"],
+["Tom Cairney","CM",35,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Fulham","PL"],
+["Josh King","CAM",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Fulham","PL"],
+["Emile Smith Rowe","CAM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Fulham","PL"],
+["Luke Harris","CAM",21,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Fulham","PL"],
+["Kevin","LW",23,"🇧🇷 BRA","Fulham","PL"],
+["Alex Iwobi","LW",30,"🇳🇬 NGA","Fulham","PL"],
+["Oscar Bobb","RW",22,"🇳🇴 NOR","Fulham","PL"],
+["Harry Wilson","RW",29,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Fulham","PL"],
+["Rodrigo Muniz","ST",25,"🇧🇷 BRA","Fulham","PL"],
+// ---- Wolverhampton (PL) ----
+["José Sá","GK",33,"🇵🇹 POR","Wolverhampton","PL"],
+["Sam Johnstone","GK",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
+["Daniel Bentley","GK",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
+["Toti","CB",27,"🇵🇹 POR","Wolverhampton","PL"],
+["Yerson Mosquera","CB",25,"🇨🇴 COL","Wolverhampton","PL"],
+["Santiago Bueno","CB",27,"🇺🇾 URU","Wolverhampton","PL"],
+["Nasser Djiga","CB",23,"🇧🇫 BFA","Wolverhampton","PL"],
+["Hugo Bueno","LB",23,"🇪🇸 ESP","Wolverhampton","PL"],
+["David Møller Wolfe","LB",24,"🇳🇴 NOR","Wolverhampton","PL"],
+["Jackson Tchatchoua","RB",24,"🇨🇲 CMR","Wolverhampton","PL"],
+["Pedro Lima","RB",19,"🇧🇷 BRA","Wolverhampton","PL"],
+["Ki-Jana Hoever","RB",24,"🇳🇱 NED","Wolverhampton","PL"],
+["André","CDM",24,"🇧🇷 BRA","Wolverhampton","PL"],
+["João Gomes","CM",25,"🇧🇷 BRA","Wolverhampton","PL"],
+["Jean-Ricner Bellegarde","CM",27,"🇭🇹 HAI","Wolverhampton","PL"],
+["Tommy Doyle","CM",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
+["Rodrigo Gomes","LW",22,"🇵🇹 POR","Wolverhampton","PL"],
+["Mateus Mané","CAM",18,"🇵🇹 POR","Wolverhampton","PL"],
+["Tawanda Chirewa","CAM",22,"🇿🇼 ZIM","Wolverhampton","PL"],
+["Enso González","LW",21,"🇵🇾 PAR","Wolverhampton","PL"],
+["Tolu Arokodare","ST",25,"🇳🇬 NGA","Wolverhampton","PL"],
+["Adam Armstrong","ST",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
+["Hee-chan Hwang","ST",30,"🇰🇷 KOR","Wolverhampton","PL"],
+["Nathan Fraser","ST",21,"🇮🇪 IRL","Wolverhampton","PL"],
+// ---- Burnley (PL) ----
+["Max Weiß","GK",22,"🇩🇪 GER","Burnley","PL"],
+["Maxime Estève","CB",24,"🇫🇷 FRA","Burnley","PL"],
+["Bashir Humphreys","CB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Axel Tuanzebe","CB",28,"🇨🇩 COD","Burnley","PL"],
+["Hjalmar Ekdal","CB",27,"🇸🇪 SWE","Burnley","PL"],
+["Joe Worrall","CB",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Jordan Beyer","CB",26,"🇩🇪 GER","Burnley","PL"],
+["Quilindschy Hartman","LB",24,"🇳🇱 NED","Burnley","PL"],
+["Lucas Pires","LB",25,"🇧🇷 BRA","Burnley","PL"],
+["Kyle Walker","RB",36,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Connor Roberts","RB",30,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Burnley","PL"],
+["Lesley Ugochukwu","CDM",22,"🇫🇷 FRA","Burnley","PL"],
+["Josh Cullen","CM",30,"🇮🇪 IRL","Burnley","PL"],
+["Josh Laurent","CM",31,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Hannibal","CAM",23,"🇹🇳 TUN","Burnley","PL"],
+["Aaron Ramsey","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Mike Tresor","CAM",27,"🇧🇪 BEL","Burnley","PL"],
+["Jaidon Anthony","LW",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Jacob Bruun Larsen","LW",27,"🇩🇰 DEN","Burnley","PL"],
+["Loum Tchaouna","RW",22,"🇫🇷 FRA","Burnley","PL"],
+["Marcus Edwards","RW",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+["Zian Flemming","ST",27,"🇳🇱 NED","Burnley","PL"],
+["Lyle Foster","ST",25,"🇿🇦 RSA","Burnley","PL"],
+["Zeki Amdouni","ST",25,"🇨🇭 SUI","Burnley","PL"],
+["Armando Broja","ST",24,"🇦🇱 ALB","Burnley","PL"],
+["Michael Obafemi","ST",25,"🇮🇪 IRL","Burnley","PL"],
+["Ashley Barnes","ST",36,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Burnley","PL"],
+// ---- Real Madrid (LL) ----
+["Thibaut Courtois","GK",33,"🇧🇪 BEL","Real Madrid","LL"],
+["Antonio Rüdiger","CB",32,"🇩🇪 GER","Real Madrid","LL"],
+["Éder Militão","CB",28,"🇧🇷 BRA","Real Madrid","LL"],
+["Dean Huijsen","CB",20,"🇪🇸 ESP","Real Madrid","LL"],
+["Trent Alexander-Arnold ","RB",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Real Madrid","LL"],
+["Ferland Mendy","LB",30,"🇫🇷 FRA","Real Madrid","LL"],
+["Aurélien Tchouaméni","CDM",26,"🇫🇷 FRA","Real Madrid","LL"],
+["Federico Valverde","CM",27,"🇺🇾 URU","Real Madrid","LL"],
+["Jude Bellingham","CAM",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Real Madrid","LL"],
+["Vinícius Júnior","LW",25,"🇧🇷 BRA","Real Madrid","LL"],
+["Rodrygo","RW",25,"🇧🇷 BRA","Real Madrid","LL"],
+["Kylian Mbappé","ST",27,"🇫🇷 FRA","Real Madrid","LL"],
+["Arda Güler","CAM",21,"🇹🇷 TUR","Real Madrid","LL"],
+["Andriy Lunin","GK",27,"🇺🇦 UKR","Real Madrid","LL"],
+["Fran García","LB",26,"🇪🇸 ESP","Real Madrid","LL"],
+["David Alaba","CB",33,"🇦🇹 AUT","Real Madrid","LL"],
+["Endrick","ST",19,"🇧🇷 BRA","Real Madrid","LL"],
+["Álvaro Carreras","LB",23,"🇪🇸 ESP","Real Madrid","LL"],
+["Franco Mastantuono","CAM",18,"🇦🇷 ARG","Real Madrid","LL"],
+// ---- Barcelona (LL) ----
+["Joan García","GK",24,"🇪🇸 ESP","Barcelona","LL"],
+["Pau Cubarsí","CB",19,"🇪🇸 ESP","Barcelona","LL"],
+["Ronald Araújo","CB",26,"🇺🇾 URU","Barcelona","LL"],
+["Jules Koundé","RB",27,"🇫🇷 FRA","Barcelona","LL"],
+["Alejandro Balde","LB",22,"🇪🇸 ESP","Barcelona","LL"],
+["Frenkie de Jong","CM",28,"🇳🇱 NED","Barcelona","LL"],
+["Pedri","CM",23,"🇪🇸 ESP","Barcelona","LL"],
+["Gavi","CM",21,"🇪🇸 ESP","Barcelona","LL"],
+["Lamine Yamal","RW",18,"🇪🇸 ESP","Barcelona","LL"],
+["Raphinha","LW",29,"🇧🇷 BRA","Barcelona","LL"],
+["Robert Lewandowski","ST",37,"🇵🇱 POL","Barcelona","LL"],
+["Dani Olmo","CAM",27,"🇪🇸 ESP","Barcelona","LL"],
+["Ferran Torres","ST",26,"🇪🇸 ESP","Barcelona","LL"],
+["Wojciech Szczęsny","GK",35,"🇵🇱 POL","Barcelona","LL"],
+["Andreas Christensen","CB",29,"🇩🇰 DEN","Barcelona","LL"],
+["Marc Casadó","CDM",22,"🇪🇸 ESP","Barcelona","LL"],
+["Fermín López","CAM",22,"🇪🇸 ESP","Barcelona","LL"],
+// ---- Atlético Madrid (LL) ----
+["Jan Oblak","GK",33,"🇸🇮 SVN","Atlético Madrid","LL"],
+["Robin Le Normand","CB",29,"🇪🇸 ESP","Atlético Madrid","LL"],
+["José María Giménez","CB",31,"🇺🇾 URU","Atlético Madrid","LL"],
+["Nahuel Molina","RB",27,"🇦🇷 ARG","Atlético Madrid","LL"],
+["Marcos Llorente","RB",31,"🇪🇸 ESP","Atlético Madrid","LL"],
+["Pablo Barrios","CM",22,"🇪🇸 ESP","Atlético Madrid","LL"],
+["Giuliano Simeone","RW",23,"🇦🇷 ARG","Atlético Madrid","LL"],
+["Antoine Griezmann","CAM",34,"🇫🇷 FRA","Atlético Madrid","LL"],
+["Julián Álvarez","ST",26,"🇦🇷 ARG","Atlético Madrid","LL"],
+["Alexander Sørloth","ST",30,"🇳🇴 NOR","Atlético Madrid","LL"],
+["Conor Gallagher","CM",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Atlético Madrid","LL"],
+["Juan Musso","GK",31,"🇦🇷 ARG","Atlético Madrid","LL"],
+["Clément Lenglet","CB",30,"🇫🇷 FRA","Atlético Madrid","LL"],
+["Rodrigo De Paul","CM",31,"🇦🇷 ARG","Atlético Madrid","LL"],
+["Koke","CM",33,"🇪🇸 ESP","Atlético Madrid","LL"],
+["Samuel Lino","LW",26,"🇧🇷 BRA","Atlético Madrid","LL"],
+// ---- Athletic Club (LL) ----
+["Unai Simón","GK",28,"🇪🇸 ESP","Athletic Club","LL"],
+["Dani Vivian","CB",26,"🇪🇸 ESP","Athletic Club","LL"],
+["Aitor Paredes","CB",25,"🇪🇸 ESP","Athletic Club","LL"],
+["Óscar de Marcos","RB",36,"🇪🇸 ESP","Athletic Club","LL"],
+["Mikel Jauregizar","CDM",21,"🇪🇸 ESP","Athletic Club","LL"],
+["Oihan Sancet","CAM",25,"🇪🇸 ESP","Athletic Club","LL"],
+["Iñaki Williams","RW",31,"🇬🇭 GHA","Athletic Club","LL"],
+["Nico Williams","LW",23,"🇪🇸 ESP","Athletic Club","LL"],
+["Gorka Guruzeta","ST",29,"🇪🇸 ESP","Athletic Club","LL"],
+["Robert Navarro","CAM",23,"🇪🇸 ESP","Athletic Club","LL"],
+["Julen Agirrezabala","GK",25,"🇪🇸 ESP","Athletic Club","LL"],
+["Yeray Álvarez","CB",31,"🇪🇸 ESP","Athletic Club","LL"],
+["Iñigo Lekue","RB",32,"🇪🇸 ESP","Athletic Club","LL"],
+["Beñat Prados","CM",24,"🇪🇸 ESP","Athletic Club","LL"],
+["Álex Berenguer","LW",30,"🇪🇸 ESP","Athletic Club","LL"],
+// ---- Sevilla (LL) ----
+["Ørjan Nyland","GK",35,"🇳🇴 NOR","Sevilla","LL"],
+["Juanlu Sánchez","RB",22,"🇪🇸 ESP","Sevilla","LL"],
+["Loïc Badé","CB",25,"🇫🇷 FRA","Sevilla","LL"],
+["Kike Salas","CB",23,"🇪🇸 ESP","Sevilla","LL"],
+["Marcão","CB",29,"🇧🇷 BRA","Sevilla","LL"],
+["Adrià Pedrosa","LB",27,"🇪🇸 ESP","Sevilla","LL"],
+["Lucien Agoumé","CDM",23,"🇫🇷 FRA","Sevilla","LL"],
+["Djibril Sow","CM",28,"🇨🇭 SUI","Sevilla","LL"],
+["Saúl Ñíguez","CM",31,"🇪🇸 ESP","Sevilla","LL"],
+["Dodi Lukébakio","RW",28,"🇧🇪 BEL","Sevilla","LL"],
+["Rubén Vargas","LW",27,"🇨🇭 SUI","Sevilla","LL"],
+["Isaac Romero","ST",25,"🇪🇸 ESP","Sevilla","LL"],
+["Akor Adams","ST",25,"🇳🇬 NGA","Sevilla","LL"],
+// ---- Real Betis (LL) ----
+["Adrián","GK",39,"🇪🇸 ESP","Real Betis","LL"],
+["Héctor Bellerín","RB",30,"🇪🇸 ESP","Real Betis","LL"],
+["Marc Bartra","CB",34,"🇪🇸 ESP","Real Betis","LL"],
+["Diego Llorente","CB",32,"🇪🇸 ESP","Real Betis","LL"],
+["Romain Perraud","LB",28,"🇫🇷 FRA","Real Betis","LL"],
+["Natan","CB",24,"🇧🇷 BRA","Real Betis","LL"],
+["Marc Roca","CDM",29,"🇪🇸 ESP","Real Betis","LL"],
+["Johnny Cardoso","CDM",24,"🇺🇸 USA","Real Betis","LL"],
+["Isco","CAM",34,"🇪🇸 ESP","Real Betis","LL"],
+["Giovani Lo Celso","CAM",29,"🇦🇷 ARG","Real Betis","LL"],
+["Antony","RW",26,"🇧🇷 BRA","Real Betis","LL"],
+["Ez Abde","LW",24,"🇲🇦 MAR","Real Betis","LL"],
+["Cucho Hernández","ST",26,"🇨🇴 COL","Real Betis","LL"],
+["Cédric Bakambu","ST",34,"🇨🇩 COD","Real Betis","LL"],
+// ---- Villarreal (LL) ----
+["Diego Conde","GK",26,"🇪🇸 ESP","Villarreal","LL"],
+["Kiko Femenía","RB",34,"🇪🇸 ESP","Villarreal","LL"],
+["Rafa Marín","CB",23,"🇪🇸 ESP","Villarreal","LL"],
+["Logan Costa","CB",24,"🇨🇻 CPV","Villarreal","LL"],
+["Sergi Cardona","LB",26,"🇪🇸 ESP","Villarreal","LL"],
+["Juan Foyth","RB",27,"🇦🇷 ARG","Villarreal","LL"],
+["Dani Parejo","CM",36,"🇪🇸 ESP","Villarreal","LL"],
+["Santi Comesaña","CM",29,"🇪🇸 ESP","Villarreal","LL"],
+["Pape Gueye","CDM",26,"🇸🇳 SEN","Villarreal","LL"],
+["Yeremy Pino","RW",23,"🇪🇸 ESP","Villarreal","LL"],
+["Álex Baena","CAM",24,"🇪🇸 ESP","Villarreal","LL"],
+["Gerard Moreno","ST",33,"🇪🇸 ESP","Villarreal","LL"],
+["Ayoze Pérez","ST",32,"🇪🇸 ESP","Villarreal","LL"],
+["Nicolas Pépé","RW",30,"🇨🇮 CIV","Villarreal","LL"],
+// ---- Real Sociedad (LL) ----
+["Álex Remiro","GK",30,"🇪🇸 ESP","Real Sociedad","LL"],
+["Hamari Traoré","RB",33,"🇲🇱 MLI","Real Sociedad","LL"],
+["Igor Zubeldia","CB",28,"🇪🇸 ESP","Real Sociedad","LL"],
+["Aritz Elustondo","CB",31,"🇪🇸 ESP","Real Sociedad","LL"],
+["Aihen Muñoz","LB",28,"🇪🇸 ESP","Real Sociedad","LL"],
+["Nayef Aguerd","CB",29,"🇲🇦 MAR","Real Sociedad","LL"],
+["Beñat Turrientes","CDM",23,"🇪🇸 ESP","Real Sociedad","LL"],
+["Brais Méndez","CAM",28,"🇪🇸 ESP","Real Sociedad","LL"],
+["Luka Sučić","CM",23,"🇦🇹 AUT","Real Sociedad","LL"],
+["Takefusa Kubo","RW",24,"🇯🇵 JPN","Real Sociedad","LL"],
+["Mikel Oyarzabal","ST",28,"🇪🇸 ESP","Real Sociedad","LL"],
+["André Silva","ST",30,"🇵🇹 POR","Real Sociedad","LL"],
+["Sheraldo Becker","LW",30,"🇸🇷 SUR","Real Sociedad","LL"],
+// ---- Girona (LL) ----
+["Paulo Gazzaniga","GK",33,"🇦🇷 ARG","Girona","LL"],
+["Arnau Martínez","RB",22,"🇪🇸 ESP","Girona","LL"],
+["Daley Blind","CB",35,"🇳🇱 NED","Girona","LL"],
+["David López","CB",35,"🇪🇸 ESP","Girona","LL"],
+["Miguel Gutiérrez","LB",24,"🇪🇸 ESP","Girona","LL"],
+["Ladislav Krejčí","CB",26,"🇨🇿 CZE","Girona","LL"],
+["Yangel Herrera","CM",27,"🇻🇪 VEN","Girona","LL"],
+["Iván Martín","CM",26,"🇪🇸 ESP","Girona","LL"],
+["Oriol Romeu","CDM",34,"🇪🇸 ESP","Girona","LL"],
+["Bryan Gil","LW",24,"🇪🇸 ESP","Girona","LL"],
+["Yáser Asprilla","CAM",22,"🇨🇴 COL","Girona","LL"],
+["Cristhian Stuani","ST",39,"🇺🇾 URU","Girona","LL"],
+["Bojan Miovski","ST",26,"🇲🇰 MKD","Girona","LL"],
+["Portu","RW",33,"🇪🇸 ESP","Girona","LL"],
+// ---- Valencia (LL) ----
+["Stole Dimitrievski","GK",32,"🇲🇰 MKD","Valencia","LL"],
+["Thierry Rendall","RB",28,"🇨🇻 CPV","Valencia","LL"],
+["Mouctar Diakhaby","CB",29,"🇬🇳 GUI","Valencia","LL"],
+["César Tárrega","CB",23,"🇪🇸 ESP","Valencia","LL"],
+["José Gayà","LB",30,"🇪🇸 ESP","Valencia","LL"],
+["Dimitri Foulquier","RB",32,"🇫🇷 FRA","Valencia","LL"],
+["Pepelu","CDM",27,"🇪🇸 ESP","Valencia","LL"],
+["Javi Guerra","CM",22,"🇪🇸 ESP","Valencia","LL"],
+["André Almeida","CM",25,"🇵🇹 POR","Valencia","LL"],
+["Filip Ugrinic","CM",26,"🇨🇭 SUI","Valencia","LL"],
+["Diego López","RW",23,"🇪🇸 ESP","Valencia","LL"],
+["Luis Rioja","LW",32,"🇪🇸 ESP","Valencia","LL"],
+["Hugo Duro","ST",26,"🇪🇸 ESP","Valencia","LL"],
+["Dani Gómez","ST",27,"🇪🇸 ESP","Valencia","LL"],
+// ---- Celta Vigo (LL) ----
+["Ionut Radu","GK",28,"🇷🇴 ROU","Celta Vigo","LL"],
+["Óscar Mingueza","RB",26,"🇪🇸 ESP","Celta Vigo","LL"],
+["Carl Starfelt","CB",30,"🇸🇪 SWE","Celta Vigo","LL"],
+["Marcos Alonso","CB",34,"🇪🇸 ESP","Celta Vigo","LL"],
+["Carlos Domínguez","CB",24,"🇪🇸 ESP","Celta Vigo","LL"],
+["Javi Rodríguez","LB",23,"🇪🇸 ESP","Celta Vigo","LL"],
+["Fran Beltrán","CDM",26,"🇪🇸 ESP","Celta Vigo","LL"],
+["Ilaix Moriba","CM",23,"🇬🇳 GUI","Celta Vigo","LL"],
+["Hugo Sotelo","CM",21,"🇪🇸 ESP","Celta Vigo","LL"],
+["Williot Swedberg","LW",21,"🇸🇪 SWE","Celta Vigo","LL"],
+["Bryan Zaragoza","RW",24,"🇪🇸 ESP","Celta Vigo","LL"],
+["Borja Iglesias","ST",32,"🇪🇸 ESP","Celta Vigo","LL"],
+["Pablo Durán","ST",21,"🇪🇸 ESP","Celta Vigo","LL"],
+["Iago Aspas","ST",38,"🇪🇸 ESP","Celta Vigo","LL"],
+// ---- Rayo Vallecano (LL) ----
+["Augusto Batalla","GK",29,"🇦🇷 ARG","Rayo Vallecano","LL"],
+["Andrei Ratiu","RB",27,"🇷🇴 ROU","Rayo Vallecano","LL"],
+["Florian Lejeune","CB",34,"🇫🇷 FRA","Rayo Vallecano","LL"],
+["Abdul Mumin","CB",27,"🇬🇭 GHA","Rayo Vallecano","LL"],
+["Pep Chavarría","LB",27,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Aridane Hernández","CB",36,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Pathé Ciss","CDM",31,"🇸🇳 SEN","Rayo Vallecano","LL"],
+["Óscar Valentín","CDM",31,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Unai López","CM",30,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Isi Palazón","RW",30,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Álvaro García","LW",32,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Jorge de Frutos","RW",28,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Sergio Camello","ST",24,"🇪🇸 ESP","Rayo Vallecano","LL"],
+["Randy Nteka","ST",27,"🇦🇴 ANG","Rayo Vallecano","LL"],
+// ---- Osasuna (LL) ----
+["Sergio Herrera","GK",32,"🇪🇸 ESP","Osasuna","LL"],
+["Jesús Areso","RB",26,"🇪🇸 ESP","Osasuna","LL"],
+["Alejandro Catena","CB",31,"🇪🇸 ESP","Osasuna","LL"],
+["Enzo Boyomo","CB",24,"🇨🇲 CMR","Osasuna","LL"],
+["Juan Cruz","LB",28,"🇪🇸 ESP","Osasuna","LL"],
+["Unai García","CB",32,"🇪🇸 ESP","Osasuna","LL"],
+["Lucas Torró","CDM",31,"🇪🇸 ESP","Osasuna","LL"],
+["Jon Moncayola","CM",27,"🇪🇸 ESP","Osasuna","LL"],
+["Aimar Oroz","CAM",24,"🇪🇸 ESP","Osasuna","LL"],
+["Rubén García","LW",32,"🇪🇸 ESP","Osasuna","LL"],
+["Iker Benito","RW",22,"🇪🇸 ESP","Osasuna","LL"],
+["Ante Budimir","ST",34,"🇭🇷 CRO","Osasuna","LL"],
+["Raúl García de Haro","ST",26,"🇪🇸 ESP","Osasuna","LL"],
+["Abel Bretones","LB",25,"🇪🇸 ESP","Osasuna","LL"],
+// ---- Getafe (LL) ----
+["David Soria","GK",32,"🇪🇸 ESP","Getafe","LL"],
+["Juan Iglesias","RB",27,"🇪🇸 ESP","Getafe","LL"],
+["Domingos Duarte","CB",30,"🇵🇹 POR","Getafe","LL"],
+["Abdel Abqar","CB",26,"🇲🇦 MAR","Getafe","LL"],
+["Diego Rico","LB",32,"🇪🇸 ESP","Getafe","LL"],
+["Davinchi","CB",24,"🇪🇸 ESP","Getafe","LL"],
+["Mauro Arambarri","CM",30,"🇺🇾 URU","Getafe","LL"],
+["Luis Milla","CDM",28,"🇪🇸 ESP","Getafe","LL"],
+["Christantus Uche","CAM",22,"🇳🇬 NGA","Getafe","LL"],
+["Álex Sancris","RW",25,"🇪🇸 ESP","Getafe","LL"],
+["Adrián Liso","RW",20,"🇪🇸 ESP","Getafe","LL"],
+["Borja Mayoral","ST",28,"🇪🇸 ESP","Getafe","LL"],
+["Mama Baldé","ST",30,"🇬🇼 GNB","Getafe","LL"],
+["Coba da Costa","LW",21,"🇪🇸 ESP","Getafe","LL"],
+// ---- Espanyol (LL) ----
+["Marko Dmitrović","GK",33,"🇷🇸 SRB","Espanyol","LL"],
+["Omar El Hilali","RB",22,"🇲🇦 MAR","Espanyol","LL"],
+["Leandro Cabrera","CB",34,"🇺🇾 URU","Espanyol","LL"],
+["Fernando Calero","CB",30,"🇪🇸 ESP","Espanyol","LL"],
+["Carlos Romero","LB",23,"🇪🇸 ESP","Espanyol","LL"],
+["Riccardo Kumbulla","CB",26,"🇦🇱 ALB","Espanyol","LL"],
+["Pol Lozano","CDM",26,"🇪🇸 ESP","Espanyol","LL"],
+["Charles Pickel","CDM",28,"🇨🇭 SUI","Espanyol","LL"],
+["Edu Expósito","CM",29,"🇪🇸 ESP","Espanyol","LL"],
+["Pere Milla","CAM",33,"🇪🇸 ESP","Espanyol","LL"],
+["Jofre Carreras","RW",24,"🇪🇸 ESP","Espanyol","LL"],
+["Tyrhys Dolan","LW",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Espanyol","LL"],
+["Roberto Fernández","ST",24,"🇪🇸 ESP","Espanyol","LL"],
+["Kike García","ST",36,"🇪🇸 ESP","Espanyol","LL"],
+// ---- Mallorca (LL) ----
+["Leo Román","GK",25,"🇪🇸 ESP","Mallorca","LL"],
+["Pablo Maffeo","RB",28,"🇪🇸 ESP","Mallorca","LL"],
+["Martin Valjent","CB",30,"🇸🇰 SVK","Mallorca","LL"],
+["Antonio Raíllo","CB",34,"🇪🇸 ESP","Mallorca","LL"],
+["Johan Mojica","LB",33,"🇨🇴 COL","Mallorca","LL"],
+["Toni Lato","LB",28,"🇪🇸 ESP","Mallorca","LL"],
+["Sergi Darder","CM",32,"🇪🇸 ESP","Mallorca","LL"],
+["Antonio Sánchez","CM",28,"🇪🇸 ESP","Mallorca","LL"],
+["Manu Morlanes","CDM",26,"🇪🇸 ESP","Mallorca","LL"],
+["Pablo Torre","CAM",22,"🇪🇸 ESP","Mallorca","LL"],
+["Jan Virgili","LW",20,"🇪🇸 ESP","Mallorca","LL"],
+["Vedat Muriqi","ST",31,"🇽🇰 KVX","Mallorca","LL"],
+["Mateo Joseph","ST",22,"🇪🇸 ESP","Mallorca","LL"],
+["Marc Domènech","RW",21,"🇪🇸 ESP","Mallorca","LL"],
+// ---- Alavés (LL) ----
+["Antonio Sivera","GK",29,"🇪🇸 ESP","Alavés","LL"],
+["Nahuel Tenaglia","RB",29,"🇦🇷 ARG","Alavés","LL"],
+["Facundo Garcés","CB",25,"🇦🇷 ARG","Alavés","LL"],
+["Víctor Laguardia","CB",35,"🇪🇸 ESP","Alavés","LL"],
+["Jon Pacheco","CB",24,"🇪🇸 ESP","Alavés","LL"],
+["Andoni Gorosabel","RB",28,"🇪🇸 ESP","Alavés","LL"],
+["Antonio Blanco","CDM",24,"🇪🇸 ESP","Alavés","LL"],
+["Pablo Ibáñez","CM",27,"🇪🇸 ESP","Alavés","LL"],
+["Denis Suárez","CAM",31,"🇪🇸 ESP","Alavés","LL"],
+["Carlos Vicente","RW",26,"🇪🇸 ESP","Alavés","LL"],
+["Abde Rebbach","LW",25,"🇩🇿 ALG","Alavés","LL"],
+["Toni Martínez","ST",28,"🇪🇸 ESP","Alavés","LL"],
+["Lucas Boyé","ST",29,"🇦🇷 ARG","Alavés","LL"],
+["Carles Aleñá","CAM",27,"🇪🇸 ESP","Alavés","LL"],
+// ---- Levante (LL) ----
+["Mathew Ryan","GK",33,"🇦🇺 AUS","Levante","LL"],
+["Jeremy Toljan","RB",31,"🇩🇪 GER","Levante","LL"],
+["Unai Elgezabal","CB",28,"🇪🇸 ESP","Levante","LL"],
+["Matías Moreno","CB",22,"🇦🇷 ARG","Levante","LL"],
+["Manu Sánchez","LB",25,"🇪🇸 ESP","Levante","LL"],
+["Adrián de la Fuente","CB",24,"🇪🇸 ESP","Levante","LL"],
+["Unai Vencedor","CDM",25,"🇪🇸 ESP","Levante","LL"],
+["Pablo Martínez","CM",26,"🇫🇷 FRA","Levante","LL"],
+["Carlos Álvarez","CAM",23,"🇪🇸 ESP","Levante","LL"],
+["José Luis Morales","RW",38,"🇪🇸 ESP","Levante","LL"],
+["Jon Ander Olasagasti","CM",24,"🇪🇸 ESP","Levante","LL"],
+["Iván Romero","ST",24,"🇪🇸 ESP","Levante","LL"],
+["Goduine Koyalipou","ST",26,"🇨🇫 CTA","Levante","LL"],
+["Etta Eyong","ST",22,"🇨🇲 CMR","Levante","LL"],
+// ---- Elche (LL) ----
+["Matías Dituro","GK",38,"🇦🇷 ARG","Elche","LL"],
+["Héctor Fort","RB",19,"🇪🇸 ESP","Elche","LL"],
+["Pedro Bigas","CB",35,"🇪🇸 ESP","Elche","LL"],
+["Víctor Chust","CB",25,"🇪🇸 ESP","Elche","LL"],
+["Álvaro Núñez","LB",26,"🇪🇸 ESP","Elche","LL"],
+["David Affengruber","CB",24,"🇦🇹 AUT","Elche","LL"],
+["Marc Aguado","CDM",24,"🇪🇸 ESP","Elche","LL"],
+["Aleix Febas","CM",29,"🇪🇸 ESP","Elche","LL"],
+["Martim Neto","CM",22,"🇵🇹 POR","Elche","LL"],
+["Josan","RW",36,"🇪🇸 ESP","Elche","LL"],
+["Germán Valera","LW",24,"🇪🇸 ESP","Elche","LL"],
+["Rafa Mir","ST",28,"🇪🇸 ESP","Elche","LL"],
+["Álvaro Rodríguez","ST",21,"🇺🇾 URU","Elche","LL"],
+["Grady Diangana","LW",27,"🇨🇩 COD","Elche","LL"],
+// ---- Real Oviedo (LL) ----
+["Aarón Escandell","GK",30,"🇪🇸 ESP","Real Oviedo","LL"],
+["Lucas Ahijado","RB",29,"🇪🇸 ESP","Real Oviedo","LL"],
+["David Costas","CB",28,"🇪🇸 ESP","Real Oviedo","LL"],
+["Dani Calvo","CB",31,"🇪🇸 ESP","Real Oviedo","LL"],
+["Rahim Alhassane","LB",24,"🇬🇳 GUI","Real Oviedo","LL"],
+["Eric Bailly","CB",31,"🇨🇮 CIV","Real Oviedo","LL"],
+["Santiago Colombatto","CDM",28,"🇦🇷 ARG","Real Oviedo","LL"],
+["Leander Dendoncker","CM",30,"🇧🇪 BEL","Real Oviedo","LL"],
+["Alberto Reina","CM",24,"🇪🇸 ESP","Real Oviedo","LL"],
+["Ovie Ejaria","CAM",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Real Oviedo","LL"],
+["Haissem Hassan","RW",23,"🇫🇷 FRA","Real Oviedo","LL"],
+["Salomón Rondón","ST",36,"🇻🇪 VEN","Real Oviedo","LL"],
+["Federico Viñas","ST",27,"🇺🇾 URU","Real Oviedo","LL"],
+["Josip Brekalo","LW",27,"🇭🇷 CRO","Real Oviedo","LL"],
+// ---- Inter (SA) ----
+["Yann Sommer","GK",37,"🇨🇭 SUI","Inter","SA"],
+["Alessandro Bastoni","CB",26,"🇮🇹 ITA","Inter","SA"],
+["Benjamin Pavard","CB",30,"🇫🇷 FRA","Inter","SA"],
+["Federico Dimarco","LB",28,"🇮🇹 ITA","Inter","SA"],
+["Denzel Dumfries","RB",30,"🇳🇱 NED","Inter","SA"],
+["Nicolò Barella","CM",29,"🇮🇹 ITA","Inter","SA"],
+["Hakan Çalhanoğlu","CDM",32,"🇹🇷 TUR","Inter","SA"],
+["Henrikh Mkhitaryan","CM",37,"🇦🇲 ARM","Inter","SA"],
+["Lautaro Martínez","ST",28,"🇦🇷 ARG","Inter","SA"],
+["Marcus Thuram","ST",28,"🇫🇷 FRA","Inter","SA"],
+["Piotr Zieliński","CAM",31,"🇵🇱 POL","Inter","SA"],
+["Josep Martínez","GK",27,"🇪🇸 ESP","Inter","SA"],
+["Yann Bisseck","CB",25,"🇩🇪 GER","Inter","SA"],
+["Stefan de Vrij","CB",34,"🇳🇱 NED","Inter","SA"],
+["Carlos Augusto","LB",27,"🇧🇷 BRA","Inter","SA"],
+["Davide Frattesi","CM",26,"🇮🇹 ITA","Inter","SA"],
+// ---- Juventus (SA) ----
+["Michele Di Gregorio","GK",28,"🇮🇹 ITA","Juventus","SA"],
+["Gleison Bremer","CB",28,"🇧🇷 BRA","Juventus","SA"],
+["Federico Gatti","CB",27,"🇮🇹 ITA","Juventus","SA"],
+["Andrea Cambiaso","LB",25,"🇮🇹 ITA","Juventus","SA"],
+["Manuel Locatelli","CDM",28,"🇮🇹 ITA","Juventus","SA"],
+["Khéphren Thuram","CM",24,"🇫🇷 FRA","Juventus","SA"],
+["Teun Koopmeiners","CAM",27,"🇳🇱 NED","Juventus","SA"],
+["Kenan Yıldız","CAM",20,"🇹🇷 TUR","Juventus","SA"],
+["Francisco Conceição","RW",23,"🇵🇹 POR","Juventus","SA"],
+["Dušan Vlahović","ST",25,"🇷🇸 SRB","Juventus","SA"],
+["Weston McKennie","CM",27,"🇺🇸 USA","Juventus","SA"],
+["Mattia Perin","GK",33,"🇮🇹 ITA","Juventus","SA"],
+["Pierre Kalulu","CB",25,"🇫🇷 FRA","Juventus","SA"],
+["Douglas Luiz","CM",27,"🇧🇷 BRA","Juventus","SA"],
+["Nico González","RW",27,"🇦🇷 ARG","Juventus","SA"],
+["Randal Kolo Muani","ST",27,"🇫🇷 FRA","Juventus","SA"],
+// ---- AC Milan (SA) ----
+["Mike Maignan","GK",30,"🇫🇷 FRA","AC Milan","SA"],
+["Fikayo Tomori","CB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","AC Milan","SA"],
+["Strahinja Pavlović","CB",24,"🇷🇸 SRB","AC Milan","SA"],
+["Theo Hernández","LB",28,"🇫🇷 FRA","AC Milan","SA"],
+["Youssouf Fofana","CDM",26,"🇫🇷 FRA","AC Milan","SA"],
+["Tijjani Reijnders","CM",27,"🇳🇱 NED","AC Milan","SA"],
+["Christian Pulisic","RW",27,"🇺🇸 USA","AC Milan","SA"],
+["Rafael Leão","LW",26,"🇵🇹 POR","AC Milan","SA"],
+["Álvaro Morata","ST",33,"🇪🇸 ESP","AC Milan","SA"],
+["Ruben Loftus-Cheek","CM",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","AC Milan","SA"],
+["Marco Sportiello","GK",33,"🇮🇹 ITA","AC Milan","SA"],
+["Malick Thiaw","CB",24,"🇩🇪 GER","AC Milan","SA"],
+["Matteo Gabbia","CB",26,"🇮🇹 ITA","AC Milan","SA"],
+["Yunus Musah","CM",23,"🇺🇸 USA","AC Milan","SA"],
+["Tammy Abraham","ST",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","AC Milan","SA"],
+// ---- Napoli (SA) ----
+["Alex Meret","GK",28,"🇮🇹 ITA","Napoli","SA"],
+["Amir Rrahmani","CB",31,"🇽🇰 KVX","Napoli","SA"],
+["Alessandro Buongiorno","CB",26,"🇮🇹 ITA","Napoli","SA"],
+["Giovanni Di Lorenzo","RB",32,"🇮🇹 ITA","Napoli","SA"],
+["Stanislav Lobotka","CDM",31,"🇸🇰 SVK","Napoli","SA"],
+["Scott McTominay","CM",29,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Napoli","SA"],
+["Frank Anguissa","CM",30,"🇨🇲 CMR","Napoli","SA"],
+["Matteo Politano","RW",32,"🇮🇹 ITA","Napoli","SA"],
+["Khvicha Kvaratskhelia","LW",25,"🇬🇪 GEO","Napoli","SA"],
+["Romelu Lukaku","ST",32,"🇧🇪 BEL","Napoli","SA"],
+["Elia Caprile","GK",24,"🇮🇹 ITA","Napoli","SA"],
+["Juan Jesus","CB",34,"🇧🇷 BRA","Napoli","SA"],
+["Leonardo Spinazzola","LB",33,"🇮🇹 ITA","Napoli","SA"],
+["David Neres","RW",28,"🇧🇷 BRA","Napoli","SA"],
+["Giacomo Raspadori","ST",26,"🇮🇹 ITA","Napoli","SA"],
+// ---- Atalanta (SA) ----
+["Marco Carnesecchi","GK",25,"🇮🇹 ITA","Atalanta","SA"],
+["Isak Hien","CB",26,"🇸🇪 SWE","Atalanta","SA"],
+["Sead Kolašinac","CB",32,"🇧🇦 BIH","Atalanta","SA"],
+["Ederson ","CDM",26,"🇧🇷 BRA","Atalanta","SA"],
+["Marten de Roon","CM",34,"🇳🇱 NED","Atalanta","SA"],
+["Charles De Ketelaere","CAM",24,"🇧🇪 BEL","Atalanta","SA"],
+["Ademola Lookman","LW",28,"🇳🇬 NGA","Atalanta","SA"],
+["Mateo Retegui","ST",26,"🇮🇹 ITA","Atalanta","SA"],
+["Gianluca Scamacca","ST",27,"🇮🇹 ITA","Atalanta","SA"],
+["Rui Patrício","GK",38,"🇵🇹 POR","Atalanta","SA"],
+["Berat Djimsiti","CB",32,"🇦🇱 ALB","Atalanta","SA"],
+["Odilon Kossounou","CB",24,"🇨🇮 CIV","Atalanta","SA"],
+["Davide Zappacosta","RB",33,"🇮🇹 ITA","Atalanta","SA"],
+["Raoul Bellanova","RB",26,"🇮🇹 ITA","Atalanta","SA"],
+["Mario Pašalić","CAM",31,"🇭🇷 CRO","Atalanta","SA"],
+// ---- AS Roma (SA) ----
+["Mile Svilar","GK",26,"🇷🇸 SRB","AS Roma","SA"],
+["Zeki Çelik","RB",28,"🇹🇷 TUR","AS Roma","SA"],
+["Gianluca Mancini","CB",29,"🇮🇹 ITA","AS Roma","SA"],
+["Evan Ndicka","CB",26,"🇨🇮 CIV","AS Roma","SA"],
+["Angeliño","LB",28,"🇪🇸 ESP","AS Roma","SA"],
+["Mats Hummels","CB",37,"🇩🇪 GER","AS Roma","SA"],
+["Manu Koné","CM",24,"🇫🇷 FRA","AS Roma","SA"],
+["Bryan Cristante","CDM",30,"🇮🇹 ITA","AS Roma","SA"],
+["Lorenzo Pellegrini","CAM",29,"🇮🇹 ITA","AS Roma","SA"],
+["Paulo Dybala","CAM",32,"🇦🇷 ARG","AS Roma","SA"],
+["Artem Dovbyk","ST",28,"🇺🇦 UKR","AS Roma","SA"],
+["Stephan El Shaarawy","LW",33,"🇮🇹 ITA","AS Roma","SA"],
+["Matías Soulé","RW",22,"🇦🇷 ARG","AS Roma","SA"],
+["Tommaso Baldanzi","CAM",22,"🇮🇹 ITA","AS Roma","SA"],
+// ---- Lazio (SA) ----
+["Ivan Provedel","GK",31,"🇮🇹 ITA","Lazio","SA"],
+["Manuel Lazzari","RB",32,"🇮🇹 ITA","Lazio","SA"],
+["Alessio Romagnoli","CB",31,"🇮🇹 ITA","Lazio","SA"],
+["Mario Gila","CB",25,"🇪🇸 ESP","Lazio","SA"],
+["Nuno Tavares","LB",26,"🇵🇹 POR","Lazio","SA"],
+["Patric","CB",33,"🇪🇸 ESP","Lazio","SA"],
+["Nicolò Rovella","CDM",24,"🇮🇹 ITA","Lazio","SA"],
+["Matteo Guendouzi","CM",27,"🇫🇷 FRA","Lazio","SA"],
+["Mattia Zaccagni","LW",30,"🇮🇹 ITA","Lazio","SA"],
+["Gustav Isaksen","RW",24,"🇩🇰 DEN","Lazio","SA"],
+["Boulaye Dia","ST",29,"🇸🇳 SEN","Lazio","SA"],
+["Valentín Castellanos","ST",27,"🇦🇷 ARG","Lazio","SA"],
+["Pedro","RW",38,"🇪🇸 ESP","Lazio","SA"],
+["Toma Bašić","CM",29,"🇭🇷 CRO","Lazio","SA"],
+// ---- Fiorentina (SA) ----
+["David de Gea","GK",35,"🇪🇸 ESP","Fiorentina","SA"],
+["Dodô","RB",27,"🇧🇷 BRA","Fiorentina","SA"],
+["Luca Ranieri","CB",26,"🇮🇹 ITA","Fiorentina","SA"],
+["Pietro Comuzzo","CB",20,"🇮🇹 ITA","Fiorentina","SA"],
+["Robin Gosens","LB",31,"🇩🇪 GER","Fiorentina","SA"],
+["Marin Pongračić","CB",28,"🇭🇷 CRO","Fiorentina","SA"],
+["Rolando Mandragora","CM",28,"🇮🇹 ITA","Fiorentina","SA"],
+["Yacine Adli","CM",25,"🇫🇷 FRA","Fiorentina","SA"],
+["Danilo Cataldi","CDM",31,"🇮🇹 ITA","Fiorentina","SA"],
+["Albert Guðmundsson","CAM",28,"🇮🇸 ISL","Fiorentina","SA"],
+["Andrea Colpani","CAM",26,"🇮🇹 ITA","Fiorentina","SA"],
+["Moise Kean","ST",26,"🇮🇹 ITA","Fiorentina","SA"],
+["Riccardo Sottil","LW",26,"🇮🇹 ITA","Fiorentina","SA"],
+["Albert Ranieri","ST",25,"🇮🇹 ITA","Fiorentina","SA"],
+// ---- Bologna (SA) ----
+["Łukasz Skorupski","GK",34,"🇵🇱 POL","Bologna","SA"],
+["Emil Holm","RB",25,"🇸🇪 SWE","Bologna","SA"],
+["Sam Beukema","CB",27,"🇳🇱 NED","Bologna","SA"],
+["Jhon Lucumí","CB",27,"🇨🇴 COL","Bologna","SA"],
+["Charalampos Lykogiannis","LB",32,"🇬🇷 GRE","Bologna","SA"],
+["Stefan Posch","RB",28,"🇦🇹 AUT","Bologna","SA"],
+["Remo Freuler","CM",33,"🇨🇭 SUI","Bologna","SA"],
+["Lewis Ferguson","CM",26,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Bologna","SA"],
+["Tommaso Pobega","CM",26,"🇮🇹 ITA","Bologna","SA"],
+["Riccardo Orsolini","RW",28,"🇮🇹 ITA","Bologna","SA"],
+["Dan Ndoye","RW",24,"🇨🇭 SUI","Bologna","SA"],
+["Santiago Castro","ST",21,"🇦🇷 ARG","Bologna","SA"],
+["Thijs Dallinga","ST",25,"🇳🇱 NED","Bologna","SA"],
+["Jens Odgaard","CAM",26,"🇩🇰 DEN","Bologna","SA"],
+// ---- Torino (SA) ----
+["Vanja Milinković-Savić","GK",28,"🇷🇸 SRB","Torino","SA"],
+["Mergim Vojvoda","RB",30,"🇽🇰 KVX","Torino","SA"],
+["Saúl Coco","CB",26,"🇬🇶 EQG","Torino","SA"],
+["Guillermo Maripán","CB",31,"🇨🇱 CHI","Torino","SA"],
+["Valentino Lazaro","LB",29,"🇦🇹 AUT","Torino","SA"],
+["Adam Masina","CB",31,"🇲🇦 MAR","Torino","SA"],
+["Samuele Ricci","CDM",24,"🇮🇹 ITA","Torino","SA"],
+["Ivan Ilić","CM",25,"🇷🇸 SRB","Torino","SA"],
+["Karol Linetty","CM",31,"🇵🇱 POL","Torino","SA"],
+["Nikola Vlašić","CAM",28,"🇭🇷 CRO","Torino","SA"],
+["Yann Karamoh","LW",27,"🇨🇮 CIV","Torino","SA"],
+["Duván Zapata","ST",34,"🇨🇴 COL","Torino","SA"],
+["Antonio Sanabria","ST",29,"🇵🇾 PAR","Torino","SA"],
+["Che Adams","ST",29,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Torino","SA"],
+// ---- Como (SA) ----
+["Jean Butez","GK",30,"🇫🇷 FRA","Como","SA"],
+["Marc-Oliver Kempf","CB",30,"🇩🇪 GER","Como","SA"],
+["Edoardo Goldaniga","CB",32,"🇮🇹 ITA","Como","SA"],
+["Alberto Dossena","CB",27,"🇮🇹 ITA","Como","SA"],
+["Alex Valle","LB",21,"🇪🇸 ESP","Como","SA"],
+["Jacobo Ramón","CB",20,"🇪🇸 ESP","Como","SA"],
+["Máximo Perrone","CDM",22,"🇦🇷 ARG","Como","SA"],
+["Sergi Roberto","CM",33,"🇪🇸 ESP","Como","SA"],
+["Lucas Da Cunha","CM",24,"🇫🇷 FRA","Como","SA"],
+["Nico Paz","CAM",21,"🇦🇷 ARG","Como","SA"],
+["Assane Diao","RW",20,"🇪🇸 ESP","Como","SA"],
+["Jesús Rodríguez","LW",20,"🇪🇸 ESP","Como","SA"],
+["Patrick Cutrone","ST",27,"🇮🇹 ITA","Como","SA"],
+["Tasos Douvikas","ST",25,"🇬🇷 GRE","Como","SA"],
+// ---- Genoa (SA) ----
+["Nicola Leali","GK",32,"🇮🇹 ITA","Genoa","SA"],
+["Aaron Martín","LB",28,"🇪🇸 ESP","Genoa","SA"],
+["Koni De Winter","CB",23,"🇧🇪 BEL","Genoa","SA"],
+["Johan Vásquez","CB",27,"🇲🇽 MEX","Genoa","SA"],
+["Brooke Norton-Cuffy","RB",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Genoa","SA"],
+["Sebastian Otoa","CB",21,"🇩🇰 DEN","Genoa","SA"],
+["Morten Frendrup","CDM",24,"🇩🇰 DEN","Genoa","SA"],
+["Patrizio Masini","CM",23,"🇮🇹 ITA","Genoa","SA"],
+["Morten Thorsby","CM",29,"🇳🇴 NOR","Genoa","SA"],
+["Ruslan Malinovskyi","CAM",32,"🇺🇦 UKR","Genoa","SA"],
+["Junior Messias","RW",34,"🇧🇷 BRA","Genoa","SA"],
+["Andrea Pinamonti","ST",26,"🇮🇹 ITA","Genoa","SA"],
+["Lorenzo Colombo","ST",23,"🇮🇹 ITA","Genoa","SA"],
+["Vitinha","ST",25,"🇵🇹 POR","Genoa","SA"],
+// ---- Udinese (SA) ----
+["Maduka Okoye","GK",26,"🇳🇬 NGA","Udinese","SA"],
+["Jordan Zemura","LB",26,"🇿🇼 ZIM","Udinese","SA"],
+["Thomas Kristensen","CB",28,"🇩🇰 DEN","Udinese","SA"],
+["Oumar Solet","CB",25,"🇫🇷 FRA","Udinese","SA"],
+["Kingsley Ehizibue","RB",30,"🇳🇬 NGA","Udinese","SA"],
+["Lautaro Giannetti","CB",31,"🇦🇷 ARG","Udinese","SA"],
+["Jurgen Ekkelenkamp","CM",25,"🇳🇱 NED","Udinese","SA"],
+["Sandi Lovric","CM",27,"🇸🇮 SVN","Udinese","SA"],
+["Arthur Atta","CDM",22,"🇫🇷 FRA","Udinese","SA"],
+["Hassane Kamara","LB",31,"🇨🇮 CIV","Udinese","SA"],
+["Iker Bravo","RW",20,"🇪🇸 ESP","Udinese","SA"],
+["Keinan Davis","ST",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Udinese","SA"],
+["Adam Buksa","ST",28,"🇵🇱 POL","Udinese","SA"],
+["Vakoun Bayo","ST",28,"🇨🇮 CIV","Udinese","SA"],
+// ---- Cagliari (SA) ----
+["Alen Sherri","GK",24,"🇦🇱 ALB","Cagliari","SA"],
+["Gabriele Zappa","RB",26,"🇮🇹 ITA","Cagliari","SA"],
+["Yerry Mina","CB",31,"🇨🇴 COL","Cagliari","SA"],
+["Sebastiano Luperto","CB",29,"🇮🇹 ITA","Cagliari","SA"],
+["Adam Obert","LB",23,"🇸🇰 SVK","Cagliari","SA"],
+["Riccardo Palmieri","LB",22,"🇮🇹 ITA","Cagliari","SA"],
+["Michel Adopo","CDM",25,"🇨🇮 CIV","Cagliari","SA"],
+["Nicolas Viola","CM",36,"🇮🇹 ITA","Cagliari","SA"],
+["Razvan Marin","CM",29,"🇷🇴 ROU","Cagliari","SA"],
+["Zito Luvumbo","RW",23,"🇦🇴 ANG","Cagliari","SA"],
+["Gennaro Borrelli","ST",25,"🇮🇹 ITA","Cagliari","SA"],
+["Sebastiano Esposito","ST",23,"🇮🇹 ITA","Cagliari","SA"],
+["Roberto Piccoli","ST",24,"🇮🇹 ITA","Cagliari","SA"],
+["Andrea Belotti","ST",32,"🇮🇹 ITA","Cagliari","SA"],
+// ---- Lecce (SA) ----
+["Wladimiro Falcone","GK",30,"🇮🇹 ITA","Lecce","SA"],
+["Antonino Gallo","LB",25,"🇮🇹 ITA","Lecce","SA"],
+["Federico Baschirotto","CB",29,"🇮🇹 ITA","Lecce","SA"],
+["Kialonda Gaspar","CB",24,"🇦🇴 ANG","Lecce","SA"],
+["Jamil Siebert","CB",23,"🇩🇪 GER","Lecce","SA"],
+["Valentín Gendrey","RB",25,"🇫🇷 FRA","Lecce","SA"],
+["Lassana Coulibaly","CDM",29,"🇲🇱 MLI","Lecce","SA"],
+["Ylber Ramadani","CM",29,"🇦🇱 ALB","Lecce","SA"],
+["Medon Berisha","CM",22,"🇦🇱 ALB","Lecce","SA"],
+["Santiago Pierotti","RW",24,"🇦🇷 ARG","Lecce","SA"],
+["Tete Morente","LW",28,"🇪🇸 ESP","Lecce","SA"],
+["Nikola Krstović","ST",25,"🇲🇪 MNE","Lecce","SA"],
+["Lameck Banda","LW",24,"🇿🇲 ZAM","Lecce","SA"],
+["Konan N'Dri","ST",21,"🇨🇮 CIV","Lecce","SA"],
+// ---- Hellas Verona (SA) ----
+["Lorenzo Montipò","GK",29,"🇮🇹 ITA","Hellas Verona","SA"],
+["Victor Nelsson","CB",27,"🇩🇰 DEN","Hellas Verona","SA"],
+["Martin Frese","LB",27,"🇩🇰 DEN","Hellas Verona","SA"],
+["Unai Núñez","CB",28,"🇪🇸 ESP","Hellas Verona","SA"],
+["Daniele Ghilardi","CB",22,"🇮🇹 ITA","Hellas Verona","SA"],
+["Jackson Tchatchoua","RB",23,"🇨🇲 CMR","Hellas Verona","SA"],
+["Suat Serdar","CM",28,"🇩🇪 GER","Hellas Verona","SA"],
+["Antoine Bernede","CM",26,"🇫🇷 FRA","Hellas Verona","SA"],
+["Grigoris Kastanos","CM",27,"🇨🇾 CYP","Hellas Verona","SA"],
+["Tomáš Suslov","CAM",23,"🇸🇰 SVK","Hellas Verona","SA"],
+["Rafik Belghali","RB",22,"🇩🇿 ALG","Hellas Verona","SA"],
+["Gift Orban","ST",23,"🇳🇬 NGA","Hellas Verona","SA"],
+["Casper Tengstedt","ST",25,"🇩🇰 DEN","Hellas Verona","SA"],
+["Amin Sarr","ST",24,"🇸🇪 SWE","Hellas Verona","SA"],
+// ---- Parma (SA) ----
+["Zion Suzuki","GK",23,"🇯🇵 JPN","Parma","SA"],
+["Lautaro Valenti","CB",24,"🇦🇷 ARG","Parma","SA"],
+["Yordan Osorio","CB",31,"🇻🇪 VEN","Parma","SA"],
+["Alessandro Circati","CB",22,"🇦🇺 AUS","Parma","SA"],
+["Emanuele Valeri","LB",27,"🇮🇹 ITA","Parma","SA"],
+["Enrico Delprato","RB",26,"🇮🇹 ITA","Parma","SA"],
+["Nahuel Estévez","CDM",25,"🇦🇷 ARG","Parma","SA"],
+["Adrián Bernabé","CM",24,"🇪🇸 ESP","Parma","SA"],
+["Mandela Keita","CDM",23,"🇧🇪 BEL","Parma","SA"],
+["Hernani","CM",31,"🇧🇷 BRA","Parma","SA"],
+["Pontus Almqvist","RW",26,"🇸🇪 SWE","Parma","SA"],
+["Dennis Man","RW",27,"🇷🇴 ROU","Parma","SA"],
+["Mateo Pellegrino","ST",24,"🇦🇷 ARG","Parma","SA"],
+["Adrián Benedyczak","ST",25,"🇵🇱 POL","Parma","SA"],
+// ---- Pisa (SA) ----
+["Adrian Šemper","GK",27,"🇭🇷 CRO","Pisa","SA"],
+["Simone Canestrelli","CB",25,"🇮🇹 ITA","Pisa","SA"],
+["Antonio Caracciolo","CB",34,"🇮🇹 ITA","Pisa","SA"],
+["Arturo Calabresi","CB",29,"🇮🇹 ITA","Pisa","SA"],
+["Tomas Esteves","RB",23,"🇵🇹 POR","Pisa","SA"],
+["Samuele Angori","LB",22,"🇮🇹 ITA","Pisa","SA"],
+["Marius Marin","CDM",27,"🇷🇴 ROU","Pisa","SA"],
+["Idrissa Touré","CM",27,"🇩🇪 GER","Pisa","SA"],
+["Michel Aebischer","CM",28,"🇨🇭 SUI","Pisa","SA"],
+["Juan Cuadrado","RW",37,"🇨🇴 COL","Pisa","SA"],
+["Lorran","LW",20,"🇧🇷 BRA","Pisa","SA"],
+["M'Bala Nzola","ST",29,"🇦🇴 ANG","Pisa","SA"],
+["Stefano Moreo","ST",32,"🇮🇹 ITA","Pisa","SA"],
+["Ettore Gliozzi","ST",30,"🇮🇹 ITA","Pisa","SA"],
+// ---- Cremonese (SA) ----
+["Marco Silvestri","GK",34,"🇮🇹 ITA","Cremonese","SA"],
+["Filippo Terracciano","RB",22,"🇮🇹 ITA","Cremonese","SA"],
+["Matteo Bianchetti","CB",32,"🇮🇹 ITA","Cremonese","SA"],
+["Federico Ceccherini","CB",33,"🇮🇹 ITA","Cremonese","SA"],
+["Tommaso Barbieri","RB",23,"🇮🇹 ITA","Cremonese","SA"],
+["Marco Pezzella","LB",27,"🇮🇹 ITA","Cremonese","SA"],
+["Michele Castagnetti","CDM",36,"🇮🇹 ITA","Cremonese","SA"],
+["Warren Bondo","CM",22,"🇫🇷 FRA","Cremonese","SA"],
+["Alberto Grassi","CM",30,"🇮🇹 ITA","Cremonese","SA"],
+["Jari Vandeputte","CAM",29,"🇧🇪 BEL","Cremonese","SA"],
+["Jamie Vardy","ST",39,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Cremonese","SA"],
+["Federico Bonazzoli","ST",28,"🇮🇹 ITA","Cremonese","SA"],
+["Manuel De Luca","ST",27,"🇮🇹 ITA","Cremonese","SA"],
+["Faris Moumbagna","ST",25,"🇨🇲 CMR","Cremonese","SA"],
+// ---- Sassuolo (SA) ----
+["Stefano Turati","GK",24,"🇮🇹 ITA","Sassuolo","SA"],
+["Tarik Muharemović","CB",22,"🇧🇦 BIH","Sassuolo","SA"],
+["Josh Doig","LB",23,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Sassuolo","SA"],
+["Filippo Romagna","CB",28,"🇮🇹 ITA","Sassuolo","SA"],
+["Yeferson Paz","CB",22,"🇨🇴 COL","Sassuolo","SA"],
+["Daniel Boloca","CDM",27,"🇷🇴 ROU","Sassuolo","SA"],
+["Kristian Thorstvedt","CM",26,"🇳🇴 NOR","Sassuolo","SA"],
+["Nemanja Matić","CDM",37,"🇷🇸 SRB","Sassuolo","SA"],
+["Cristian Volpato","CAM",22,"🇮🇹 ITA","Sassuolo","SA"],
+["Domenico Berardi","RW",31,"🇮🇹 ITA","Sassuolo","SA"],
+["Armand Laurienté","LW",27,"🇫🇷 FRA","Sassuolo","SA"],
+["Samuele Mulattieri","ST",25,"🇮🇹 ITA","Sassuolo","SA"],
+["Walid Cheddira","ST",27,"🇲🇦 MAR","Sassuolo","SA"],
+["Luca Lipani","CM",20,"🇮🇹 ITA","Sassuolo","SA"],
+// ---- Bayern München (BL) ----
+["Manuel Neuer","GK",40,"🇩🇪 GER","Bayern München","BL"],
+["Dayot Upamecano","CB",27,"🇫🇷 FRA","Bayern München","BL"],
+["Jonathan Tah","CB",30,"🇩🇪 GER","Bayern München","BL"],
+["Alphonso Davies","LB",25,"🇨🇦 CAN","Bayern München","BL"],
+["Joshua Kimmich","CDM",31,"🇩🇪 GER","Bayern München","BL"],
+["Aleksandar Pavlović","CDM",21,"🇩🇪 GER","Bayern München","BL"],
+["Jamal Musiala","CAM",23,"🇩🇪 GER","Bayern München","BL"],
+["Michael Olise","RW",24,"🇫🇷 FRA","Bayern München","BL"],
+["Serge Gnabry","LW",30,"🇩🇪 GER","Bayern München","BL"],
+["Harry Kane","ST",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Bayern München","BL"],
+["Konrad Laimer","CM",28,"🇦🇹 AUT","Bayern München","BL"],
+["Sven Ulreich","GK",37,"🇩🇪 GER","Bayern München","BL"],
+["Min-jae Kim","CB",29,"🇰🇷 KOR","Bayern München","BL"],
+["Raphaël Guerreiro","LB",32,"🇵🇹 POR","Bayern München","BL"],
+["Leon Goretzka","CM",31,"🇩🇪 GER","Bayern München","BL"],
+["Kingsley Coman","LW",29,"🇫🇷 FRA","Bayern München","BL"],
+// ---- Bayer Leverkusen (BL) ----
+["Mark Flekken","GK",32,"🇳🇱 NED","Bayer Leverkusen","BL"],
+["Edmond Tapsoba","CB",27,"🇧🇫 BFA","Bayer Leverkusen","BL"],
+["Jonathan Tah ","CB",30,"🇩🇪 GER","Bayer Leverkusen","BL"],
+["Alejandro Grimaldo","LB",30,"🇪🇸 ESP","Bayer Leverkusen","BL"],
+["Jeremie Frimpong","RB",25,"🇳🇱 NED","Bayer Leverkusen","BL"],
+["Granit Xhaka","CDM",33,"🇨🇭 SUI","Bayer Leverkusen","BL"],
+["Florian Wirtz","CAM",22,"🇩🇪 GER","Bayer Leverkusen","BL"],
+["Jonas Hofmann","RW",33,"🇩🇪 GER","Bayer Leverkusen","BL"],
+["Patrik Schick","ST",30,"🇨🇿 CZE","Bayer Leverkusen","BL"],
+["Victor Boniface","ST",25,"🇳🇬 NGA","Bayer Leverkusen","BL"],
+["Lukáš Hrádecký","GK",36,"🇫🇮 FIN","Bayer Leverkusen","BL"],
+["Piero Hincapié","CB",24,"🇪🇨 ECU","Bayer Leverkusen","BL"],
+["Nordi Mukiele","RB",28,"🇫🇷 FRA","Bayer Leverkusen","BL"],
+["Robert Andrich","CDM",31,"🇩🇪 GER","Bayer Leverkusen","BL"],
+["Amine Adli","LW",25,"🇲🇦 MAR","Bayer Leverkusen","BL"],
+// ---- Borussia Dortmund (BL) ----
+["Gregor Kobel","GK",28,"🇨🇭 SUI","Borussia Dortmund","BL"],
+["Nico Schlotterbeck","CB",26,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Waldemar Anton","CB",29,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Julian Ryerson","RB",28,"🇳🇴 NOR","Borussia Dortmund","BL"],
+["Nico Schlotterbeck ","CDM",26,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Pascal Groß","CM",34,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Julian Brandt","CAM",29,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Karim Adeyemi","RW",24,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Serhou Guirassy","ST",29,"🇬🇳 GUI","Borussia Dortmund","BL"],
+["Maximilian Beier","ST",23,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Niklas Süle","CB",30,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Ramy Bensebaini","LB",30,"🇩🇿 ALG","Borussia Dortmund","BL"],
+["Emre Can","CDM",31,"🇩🇪 GER","Borussia Dortmund","BL"],
+["Marcel Sabitzer","CM",31,"🇦🇹 AUT","Borussia Dortmund","BL"],
+["Jamie Gittens","LW",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Borussia Dortmund","BL"],
+// ---- RB Leipzig (BL) ----
+["Péter Gulácsi","GK",35,"🇭🇺 HUN","RB Leipzig","BL"],
+["Willi Orbán","CB",33,"🇭🇺 HUN","RB Leipzig","BL"],
+["Castello Lukeba","CB",23,"🇫🇷 FRA","RB Leipzig","BL"],
+["David Raum","LB",28,"🇩🇪 GER","RB Leipzig","BL"],
+["Xaver Schlager","CDM",28,"🇦🇹 AUT","RB Leipzig","BL"],
+["Xavi Simons","CAM",22,"🇳🇱 NED","RB Leipzig","BL"],
+["Loïs Openda","ST",26,"🇧🇪 BEL","RB Leipzig","BL"],
+["Benjamin Šeško","ST",22,"🇸🇮 SVN","RB Leipzig","BL"],
+["Antonio Nusa","LW",20,"🇳🇴 NOR","RB Leipzig","BL"],
+["Maarten Vandevoordt","GK",23,"🇧🇪 BEL","RB Leipzig","BL"],
+["Lutsharel Geertruida","RB",25,"🇳🇱 NED","RB Leipzig","BL"],
+["El Chadaille Bitshiabu","CB",20,"🇫🇷 FRA","RB Leipzig","BL"],
+["Nicolas Seiwald","CDM",24,"🇦🇹 AUT","RB Leipzig","BL"],
+["Christoph Baumgartner","CAM",26,"🇦🇹 AUT","RB Leipzig","BL"],
+["Yussuf Poulsen","ST",31,"🇩🇰 DEN","RB Leipzig","BL"],
+// ---- VfB Stuttgart (BL) ----
+["Alexander Nübel","GK",29,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Josha Vagnoman","RB",25,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Jeff Chabot","CB",27,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Anthony Rouault","CB",24,"🇫🇷 FRA","VfB Stuttgart","BL"],
+["Maximilian Mittelstädt","LB",28,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Pascal Stenzel","RB",29,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Atakan Karazor","CDM",29,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Angelo Stiller","CM",24,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Enzo Millot","CAM",23,"🇫🇷 FRA","VfB Stuttgart","BL"],
+["Chris Führich","LW",28,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Jamie Leweling","RW",24,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Deniz Undav","ST",29,"🇩🇪 GER","VfB Stuttgart","BL"],
+["Ermedin Demirović","ST",27,"🇧🇦 BIH","VfB Stuttgart","BL"],
+["Nick Woltemade","ST",24,"🇩🇪 GER","VfB Stuttgart","BL"],
+// ---- Eintracht Frankfurt (BL) ----
+["Kevin Trapp","GK",35,"🇩🇪 GER","Eintracht Frankfurt","BL"],
+["Rasmus Kristensen","RB",28,"🇩🇰 DEN","Eintracht Frankfurt","BL"],
+["Robin Koch","CB",29,"🇩🇪 GER","Eintracht Frankfurt","BL"],
+["Arthur Theate","CB",25,"🇧🇪 BEL","Eintracht Frankfurt","BL"],
+["Nathaniel Brown","LB",22,"🇩🇪 GER","Eintracht Frankfurt","BL"],
+["Tuta","CB",26,"🇧🇷 BRA","Eintracht Frankfurt","BL"],
+["Ellyes Skhiri","CDM",30,"🇹🇳 TUN","Eintracht Frankfurt","BL"],
+["Hugo Larsson","CM",21,"🇸🇪 SWE","Eintracht Frankfurt","BL"],
+["Mario Götze","CAM",33,"🇩🇪 GER","Eintracht Frankfurt","BL"],
+["Ansgar Knauff","RW",23,"🇩🇪 GER","Eintracht Frankfurt","BL"],
+["Jean-Mattéo Bahoya","LW",20,"🇫🇷 FRA","Eintracht Frankfurt","BL"],
+["Can Uzun","CAM",20,"🇹🇷 TUR","Eintracht Frankfurt","BL"],
+["Igor Matanović","ST",22,"🇭🇷 CRO","Eintracht Frankfurt","BL"],
+["Fares Chaïbi","CM",23,"🇩🇿 ALG","Eintracht Frankfurt","BL"],
+// ---- VfL Wolfsburg (BL) ----
+["Kamil Grabara","GK",27,"🇵🇱 POL","VfL Wolfsburg","BL"],
+["Kilian Fischer","RB",25,"🇩🇪 GER","VfL Wolfsburg","BL"],
+["Sebastiaan Bornauw","CB",26,"🇧🇪 BEL","VfL Wolfsburg","BL"],
+["Cédric Zesiger","CB",27,"🇨🇭 SUI","VfL Wolfsburg","BL"],
+["Rogério","LB",27,"🇧🇷 BRA","VfL Wolfsburg","BL"],
+["Joakim Mæhle","RB",28,"🇩🇰 DEN","VfL Wolfsburg","BL"],
+["Maximilian Arnold","CM",31,"🇩🇪 GER","VfL Wolfsburg","BL"],
+["Yannick Gerhardt","CM",31,"🇩🇪 GER","VfL Wolfsburg","BL"],
+["Mattias Svanberg","CM",26,"🇸🇪 SWE","VfL Wolfsburg","BL"],
+["Patrick Wimmer","LW",24,"🇦🇹 AUT","VfL Wolfsburg","BL"],
+["Lukas Nmecha","ST",26,"🇩🇪 GER","VfL Wolfsburg","BL"],
+["Jonas Wind","ST",26,"🇩🇰 DEN","VfL Wolfsburg","BL"],
+["Václav Černý","RW",28,"🇨🇿 CZE","VfL Wolfsburg","BL"],
+["Tiago Tomás","ST",23,"🇵🇹 POR","VfL Wolfsburg","BL"],
+// ---- Borussia M'gladbach (BL) ----
+["Moritz Nicolas","GK",28,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Joe Scally","RB",23,"🇺🇸 USA","Borussia M'gladbach","BL"],
+["Ko Itakura","CB",29,"🇯🇵 JPN","Borussia M'gladbach","BL"],
+["Nico Elvedi","CB",29,"🇨🇭 SUI","Borussia M'gladbach","BL"],
+["Luca Netz","LB",23,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Marvin Friedrich","CB",30,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Julian Weigl","CDM",30,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Florian Neuhaus","CM",28,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Rocco Reitz","CM",23,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Alassane Pléa","ST",32,"🇫🇷 FRA","Borussia M'gladbach","BL"],
+["Tim Kleindienst","ST",30,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Franck Honorat","RW",29,"🇫🇷 FRA","Borussia M'gladbach","BL"],
+["Robin Hack","LW",27,"🇩🇪 GER","Borussia M'gladbach","BL"],
+["Nathan Ngoumou","RW",25,"🇫🇷 FRA","Borussia M'gladbach","BL"],
+// ---- Werder Bremen (BL) ----
+["Michael Zetterer","GK",30,"🇩🇪 GER","Werder Bremen","BL"],
+["Mitchell Weiser","RB",31,"🇩🇪 GER","Werder Bremen","BL"],
+["Marco Friedl","CB",28,"🇦🇹 AUT","Werder Bremen","BL"],
+["Niklas Stark","CB",30,"🇩🇪 GER","Werder Bremen","BL"],
+["Anthony Jung","LB",34,"🇩🇪 GER","Werder Bremen","BL"],
+["Julián Malatini","CB",24,"🇦🇷 ARG","Werder Bremen","BL"],
+["Senne Lynen","CDM",26,"🇧🇪 BEL","Werder Bremen","BL"],
+["Romano Schmid","CM",26,"🇦🇹 AUT","Werder Bremen","BL"],
+["Jens Stage","CM",29,"🇩🇰 DEN","Werder Bremen","BL"],
+["Leonardo Bittencourt","CAM",32,"🇩🇪 GER","Werder Bremen","BL"],
+["Marvin Ducksch","ST",31,"🇩🇪 GER","Werder Bremen","BL"],
+["Justin Njinmah","ST",25,"🇩🇪 GER","Werder Bremen","BL"],
+["Naby Keïta","CM",31,"🇬🇳 GUI","Werder Bremen","BL"],
+["Derrick Köhn","LB",27,"🇩🇪 GER","Werder Bremen","BL"],
+// ---- Hoffenheim (BL) ----
+["Oliver Baumann","GK",35,"🇩🇪 GER","Hoffenheim","BL"],
+["Pavel Kadeřábek","RB",33,"🇨🇿 CZE","Hoffenheim","BL"],
+["Stanley Nsoki","CB",26,"🇫🇷 FRA","Hoffenheim","BL"],
+["Leo Østigård","CB",26,"🇳🇴 NOR","Hoffenheim","BL"],
+["Koki Machida","CB",28,"🇯🇵 JPN","Hoffenheim","BL"],
+["Bernardo","LB",30,"🇧🇷 BRA","Hoffenheim","BL"],
+["Grischa Prömel","CDM",30,"🇩🇪 GER","Hoffenheim","BL"],
+["Dennis Geiger","CM",27,"🇩🇪 GER","Hoffenheim","BL"],
+["Wouter Burger","CM",24,"🇳🇱 NED","Hoffenheim","BL"],
+["Andrej Kramarić","CAM",34,"🇭🇷 CRO","Hoffenheim","BL"],
+["Bazoumana Touré","RW",21,"🇨🇮 CIV","Hoffenheim","BL"],
+["Marius Bülter","LW",32,"🇩🇪 GER","Hoffenheim","BL"],
+["Fisnik Asllani","ST",23,"🇩🇪 GER","Hoffenheim","BL"],
+["Tim Lemperle","ST",23,"🇩🇪 GER","Hoffenheim","BL"],
+// ---- Freiburg (BL) ----
+["Noah Atubolu","GK",23,"🇩🇪 GER","Freiburg","BL"],
+["Lukas Kübler","RB",33,"🇩🇪 GER","Freiburg","BL"],
+["Philipp Lienhart","CB",29,"🇦🇹 AUT","Freiburg","BL"],
+["Matthias Ginter","CB",31,"🇩🇪 GER","Freiburg","BL"],
+["Jordy Makengo","CB",24,"🇫🇷 FRA","Freiburg","BL"],
+["Christian Günter","LB",32,"🇩🇪 GER","Freiburg","BL"],
+["Maximilian Eggestein","CM",29,"🇩🇪 GER","Freiburg","BL"],
+["Patrick Osterhage","CM",25,"🇩🇪 GER","Freiburg","BL"],
+["Johan Manzambi","CM",20,"🇨🇭 SUI","Freiburg","BL"],
+["Yuito Suzuki","CAM",24,"🇯🇵 JPN","Freiburg","BL"],
+["Vincenzo Grifo","LW",32,"🇮🇹 ITA","Freiburg","BL"],
+["Eren Dinkçi","RW",23,"🇩🇪 GER","Freiburg","BL"],
+["Lucas Höler","ST",31,"🇩🇪 GER","Freiburg","BL"],
+["Junior Adamu","ST",24,"🇦🇹 AUT","Freiburg","BL"],
+// ---- Mainz 05 (BL) ----
+["Robin Zentner","GK",31,"🇩🇪 GER","Mainz 05","BL"],
+["Andreas Hanche-Olsen","CB",28,"🇳🇴 NOR","Mainz 05","BL"],
+["Stefan Bell","CB",34,"🇩🇪 GER","Mainz 05","BL"],
+["Danny da Costa","RB",32,"🇩🇪 GER","Mainz 05","BL"],
+["Silvan Widmer","RB",32,"🇨🇭 SUI","Mainz 05","BL"],
+["Phillipp Mwene","LB",31,"🇦🇹 AUT","Mainz 05","BL"],
+["Dominik Kohr","CDM",31,"🇩🇪 GER","Mainz 05","BL"],
+["Kaishu Sano","CDM",24,"🇯🇵 JPN","Mainz 05","BL"],
+["Nadiem Amiri","CM",29,"🇩🇪 GER","Mainz 05","BL"],
+["Paul Nebel","RW",23,"🇩🇪 GER","Mainz 05","BL"],
+["Lee Jae-sung","CAM",33,"🇰🇷 KOR","Mainz 05","BL"],
+["Benedict Hollerbach","LW",24,"🇩🇪 GER","Mainz 05","BL"],
+["Nelson Weiper","ST",20,"🇩🇪 GER","Mainz 05","BL"],
+["Armindo Sieb","ST",22,"🇩🇪 GER","Mainz 05","BL"],
+// ---- Augsburg (BL) ----
+["Finn Dahmen","GK",27,"🇩🇪 GER","Augsburg","BL"],
+["Mads Pedersen","LB",29,"🇩🇰 DEN","Augsburg","BL"],
+["Keven Schlotterbeck","CB",28,"🇩🇪 GER","Augsburg","BL"],
+["Chrislain Matsima","CB",23,"🇫🇷 FRA","Augsburg","BL"],
+["Marius Wolf","RB",30,"🇩🇪 GER","Augsburg","BL"],
+["Kristijan Jakić","CDM",28,"🇭🇷 CRO","Augsburg","BL"],
+["Elvis Rexhbeçaj","CM",28,"🇽🇰 KVX","Augsburg","BL"],
+["Arne Maier","CM",26,"🇩🇪 GER","Augsburg","BL"],
+["Han-noah Massengo","CM",24,"🇫🇷 FRA","Augsburg","BL"],
+["Alexis Claude-Maurice","CAM",27,"🇫🇷 FRA","Augsburg","BL"],
+["Elias Saad","LW",25,"🇩🇪 GER","Augsburg","BL"],
+["Mert Kömür","CAM",20,"🇩🇪 GER","Augsburg","BL"],
+["Phillip Tietz","ST",28,"🇩🇪 GER","Augsburg","BL"],
+["Samuel Essende","ST",27,"🇨🇩 COD","Augsburg","BL"],
+// ---- Union Berlin (BL) ----
+["Frederik Rønnow","GK",33,"🇩🇰 DEN","Union Berlin","BL"],
+["Christopher Trimmel","RB",38,"🇦🇹 AUT","Union Berlin","BL"],
+["Diogo Leite","CB",26,"🇵🇹 POR","Union Berlin","BL"],
+["Danilho Doekhi","CB",27,"🇳🇱 NED","Union Berlin","BL"],
+["Leopold Querfeld","CB",22,"🇦🇹 AUT","Union Berlin","BL"],
+["Tom Rothe","LB",21,"🇩🇪 GER","Union Berlin","BL"],
+["Rani Khedira","CDM",31,"🇩🇪 GER","Union Berlin","BL"],
+["Janik Haberer","CM",31,"🇩🇪 GER","Union Berlin","BL"],
+["Aljoscha Kemlein","CM",20,"🇩🇪 GER","Union Berlin","BL"],
+["Ilyas Ansah","RW",21,"🇩🇪 GER","Union Berlin","BL"],
+["Tim Skarke","LW",28,"🇩🇪 GER","Union Berlin","BL"],
+["Andrej Ilić","ST",25,"🇷🇸 SRB","Union Berlin","BL"],
+["Oliver Burke","ST",28,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Union Berlin","BL"],
+["Marin Ljubičić","ST",23,"🇭🇷 CRO","Union Berlin","BL"],
+// ---- St. Pauli (BL) ----
+["Nikola Vasilj","GK",29,"🇧🇦 BIH","St. Pauli","BL"],
+["Philipp Treu","LB",24,"🇩🇪 GER","St. Pauli","BL"],
+["Hauke Wahl","CB",31,"🇩🇪 GER","St. Pauli","BL"],
+["Karol Mets","CB",32,"🇪🇪 EST","St. Pauli","BL"],
+["Eric Smith","CB",28,"🇸🇪 SWE","St. Pauli","BL"],
+["Lars Ritzka","LB",27,"🇩🇪 GER","St. Pauli","BL"],
+["Jackson Irvine","CM",32,"🇦🇺 AUS","St. Pauli","BL"],
+["Carlo Boukhalfa","CDM",26,"🇩🇪 GER","St. Pauli","BL"],
+["Connor Metcalfe","CM",26,"🇦🇺 AUS","St. Pauli","BL"],
+["Joel Chima Fujita","CM",23,"🇯🇵 JPN","St. Pauli","BL"],
+["Mathias Pereira Lage","RW",29,"🇵🇹 POR","St. Pauli","BL"],
+["Oladapo Afolayan","LW",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","St. Pauli","BL"],
+["Andréas Hountondji","ST",23,"🇧🇯 BEN","St. Pauli","BL"],
+["Danel Sinani","CAM",28,"🇱🇺 LUX","St. Pauli","BL"],
+// ---- Heidenheim (BL) ----
+["Kevin Müller","GK",34,"🇩🇪 GER","Heidenheim","BL"],
+["Jonas Föhrenbach","LB",29,"🇩🇪 GER","Heidenheim","BL"],
+["Patrick Mainka","CB",30,"🇩🇪 GER","Heidenheim","BL"],
+["Benedikt Gimber","CB",28,"🇩🇪 GER","Heidenheim","BL"],
+["Omar Traoré","RB",28,"🇩🇪 GER","Heidenheim","BL"],
+["Lennard Maloney","CDM",25,"🇩🇪 GER","Heidenheim","BL"],
+["Niklas Dorsch","CM",27,"🇩🇪 GER","Heidenheim","BL"],
+["Jan Schöppner","CM",26,"🇩🇪 GER","Heidenheim","BL"],
+["Adrian Beck","CAM",28,"🇩🇪 GER","Heidenheim","BL"],
+["Sirlord Conteh","RW",29,"🇸🇱 SLE","Heidenheim","BL"],
+["Mathias Honsak","LW",28,"🇦🇹 AUT","Heidenheim","BL"],
+["Leonardo Scienza","RW",27,"🇩🇪 GER","Heidenheim","BL"],
+["Budu Zivzivadze","ST",31,"🇬🇪 GEO","Heidenheim","BL"],
+["Stefan Schimmer","ST",31,"🇩🇪 GER","Heidenheim","BL"],
+// ---- Hamburger SV (BL) ----
+["Daniel Heuer Fernandes","GK",33,"🇩🇪 GER","Hamburger SV","BL"],
+["William Mikelbrencis","RB",21,"🇫🇷 FRA","Hamburger SV","BL"],
+["Sebastian Schonlau","CB",31,"🇩🇪 GER","Hamburger SV","BL"],
+["Daniel Elfadli","CB",28,"🇩🇪 GER","Hamburger SV","BL"],
+["Luka Vušković","CB",18,"🇭🇷 CRO","Hamburger SV","BL"],
+["Miro Muheim","LB",27,"🇨🇭 SUI","Hamburger SV","BL"],
+["Nicolai Remberg","CDM",25,"🇩🇪 GER","Hamburger SV","BL"],
+["Jonas Meffert","CM",31,"🇩🇪 GER","Hamburger SV","BL"],
+["Ludovit Reis","CM",25,"🇳🇱 NED","Hamburger SV","BL"],
+["Albert Sambi Lokonga","CM",26,"🇧🇪 BEL","Hamburger SV","BL"],
+["Jean-Luc Dompé","LW",30,"🇫🇷 FRA","Hamburger SV","BL"],
+["Rayan Philippe","RW",25,"🇫🇷 FRA","Hamburger SV","BL"],
+["Ransford Königsdörffer","ST",24,"🇬🇭 GHA","Hamburger SV","BL"],
+["Robert Glatzel","ST",31,"🇩🇪 GER","Hamburger SV","BL"],
+// ---- 1. FC Köln (BL) ----
+["Marvin Schwäbe","GK",30,"🇩🇪 GER","1. FC Köln","BL"],
+["Joel Schmied","CB",27,"🇨🇭 SUI","1. FC Köln","BL"],
+["Timo Hübers","CB",29,"🇩🇪 GER","1. FC Köln","BL"],
+["Dominique Heintz","CB",32,"🇩🇪 GER","1. FC Köln","BL"],
+["Leart Paqarada","LB",31,"🇽🇰 KVX","1. FC Köln","BL"],
+["Eric Martel","CDM",23,"🇩🇪 GER","1. FC Köln","BL"],
+["Denis Huseinbašić","CM",24,"🇩🇪 GER","1. FC Köln","BL"],
+["Isak Johannesson","CM",22,"🇮🇸 ISL","1. FC Köln","BL"],
+["Linton Maina","RW",26,"🇩🇪 GER","1. FC Köln","BL"],
+["Jan Thielmann","RW",23,"🇩🇪 GER","1. FC Köln","BL"],
+["Luca Waldschmidt","CAM",29,"🇩🇪 GER","1. FC Köln","BL"],
+["Said El Mala","LW",19,"🇩🇪 GER","1. FC Köln","BL"],
+["Ragnar Ache","ST",27,"🇩🇪 GER","1. FC Köln","BL"],
+["Damion Downs","ST",21,"🇺🇸 USA","1. FC Köln","BL"],
+// ---- Paris Saint-Germain (L1) ----
+["Gianluigi Donnarumma","GK",27,"🇮🇹 ITA","Paris Saint-Germain","L1"],
+["Marquinhos","CB",31,"🇧🇷 BRA","Paris Saint-Germain","L1"],
+["Willian Pacho","CB",24,"🇪🇨 ECU","Paris Saint-Germain","L1"],
+["Nuno Mendes","LB",23,"🇵🇹 POR","Paris Saint-Germain","L1"],
+["Achraf Hakimi","RB",27,"🇲🇦 MAR","Paris Saint-Germain","L1"],
+["Vitinha","CM",26,"🇵🇹 POR","Paris Saint-Germain","L1"],
+["João Neves","CDM",21,"🇵🇹 POR","Paris Saint-Germain","L1"],
+["Fabián Ruiz","CM",30,"🇪🇸 ESP","Paris Saint-Germain","L1"],
+["Ousmane Dembélé","RW",28,"🇫🇷 FRA","Paris Saint-Germain","L1"],
+["Khvicha Kvaratskhelia ","LW",25,"🇬🇪 GEO","Paris Saint-Germain","L1"],
+["Bradley Barcola","LW",23,"🇫🇷 FRA","Paris Saint-Germain","L1"],
+["Désiré Doué","CAM",20,"🇫🇷 FRA","Paris Saint-Germain","L1"],
+["Matvey Safonov","GK",26,"🇷🇺 RUS","Paris Saint-Germain","L1"],
+["Lucas Hernández","CB",30,"🇫🇷 FRA","Paris Saint-Germain","L1"],
+["Warren Zaïre-Emery","CM",20,"🇫🇷 FRA","Paris Saint-Germain","L1"],
+["Gonçalo Ramos","ST",24,"🇵🇹 POR","Paris Saint-Germain","L1"],
+["Lee Kang-in","CAM",25,"🇰🇷 KOR","Paris Saint-Germain","L1"],
+// ---- AS Monaco (L1) ----
+["Philipp Köhn","GK",28,"🇨🇭 SUI","AS Monaco","L1"],
+["Thilo Kehrer","CB",29,"🇩🇪 GER","AS Monaco","L1"],
+["Mohammed Salisu","CB",26,"🇬🇭 GHA","AS Monaco","L1"],
+["Vanderson","RB",24,"🇧🇷 BRA","AS Monaco","L1"],
+["Denis Zakaria","CDM",29,"🇨🇭 SUI","AS Monaco","L1"],
+["Lamine Camara","CM",22,"🇸🇳 SEN","AS Monaco","L1"],
+["Maghnes Akliouche","CAM",23,"🇫🇷 FRA","AS Monaco","L1"],
+["Takumi Minamino","CAM",31,"🇯🇵 JPN","AS Monaco","L1"],
+["Folarin Balogun","ST",24,"🇺🇸 USA","AS Monaco","L1"],
+["Radosław Majecki","GK",26,"🇵🇱 POL","AS Monaco","L1"],
+["Wilfried Singo","CB",25,"🇨🇮 CIV","AS Monaco","L1"],
+["Caio Henrique","LB",28,"🇧🇷 BRA","AS Monaco","L1"],
+["Aleksandr Golovin","CAM",29,"🇷🇺 RUS","AS Monaco","L1"],
+["Breel Embolo","ST",29,"🇨🇭 SUI","AS Monaco","L1"],
+["Krépin Diatta","RW",26,"🇸🇳 SEN","AS Monaco","L1"],
+// ---- Marseille (L1) ----
+["Gerónimo Rulli","GK",33,"🇦🇷 ARG","Marseille","L1"],
+["Leonardo Balerdi","CB",26,"🇦🇷 ARG","Marseille","L1"],
+["CJ Egan-Riley","CB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Marseille","L1"],
+["Pierre-Emerick Aubameyang","ST",36,"🇬🇦 GAB","Marseille","L1"],
+["Adrien Rabiot","CM",30,"🇫🇷 FRA","Marseille","L1"],
+["Mason Greenwood","RW",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Marseille","L1"],
+["Amine Gouiri","ST",25,"🇩🇿 ALG","Marseille","L1"],
+["Geoffrey Kondogbia","CDM",32,"🇨🇫 CTA","Marseille","L1"],
+["Rubén Blanco","GK",30,"🇪🇸 ESP","Marseille","L1"],
+["Derek Cornelius","CB",28,"🇨🇦 CAN","Marseille","L1"],
+["Amir Murillo","RB",30,"🇵🇦 PAN","Marseille","L1"],
+["Valentin Rongier","CM",31,"🇫🇷 FRA","Marseille","L1"],
+["Pierre-Emile Højbjerg","CDM",30,"🇩🇰 DEN","Marseille","L1"],
+["Luis Henrique","RW",24,"🇧🇷 BRA","Marseille","L1"],
+["Neal Maupay","ST",29,"🇫🇷 FRA","Marseille","L1"],
+// ---- Lille (L1) ----
+["Berke Özer","GK",25,"🇹🇷 TUR","Lille","L1"],
+["Aïssa Mandi","CB",34,"🇩🇿 ALG","Lille","L1"],
+["Nathan Ngoy","CB",22,"🇧🇪 BEL","Lille","L1"],
+["Thomas Meunier","RB",34,"🇧🇪 BEL","Lille","L1"],
+["Benjamin André","CDM",35,"🇫🇷 FRA","Lille","L1"],
+["Hákon Haraldsson","CAM",22,"🇮🇸 ISL","Lille","L1"],
+["Edon Zhegrova","RW",26,"🇽🇰 KVX","Lille","L1"],
+["Jonathan David","ST",26,"🇨🇦 CAN","Lille","L1"],
+["Bafodé Diakité","CB",25,"🇫🇷 FRA","Lille","L1"],
+["Alexsandro","CB",26,"🇧🇷 BRA","Lille","L1"],
+["Gabriel Gudmundsson","LB",26,"🇸🇪 SWE","Lille","L1"],
+["Ayyoub Bouaddi","CDM",18,"🇫🇷 FRA","Lille","L1"],
+["Angel Gomes","CM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Lille","L1"],
+["Rémy Cabella","CAM",36,"🇫🇷 FRA","Lille","L1"],
+["Mohamed Bayo","ST",27,"🇬🇳 GUI","Lille","L1"],
+// ---- Olympique Lyon (L1) ----
+["Rémy Descamps","GK",29,"🇫🇷 FRA","Olympique Lyon","L1"],
+["Ainsley Maitland-Niles","RB",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Olympique Lyon","L1"],
+["Moussa Niakhaté","CB",29,"🇸🇳 SEN","Olympique Lyon","L1"],
+["Clinton Mata","CB",33,"🇦🇴 ANG","Olympique Lyon","L1"],
+["Nicolás Tagliafico","LB",33,"🇦🇷 ARG","Olympique Lyon","L1"],
+["Saël Kumbedi","RB",20,"🇫🇷 FRA","Olympique Lyon","L1"],
+["Corentin Tolisso","CM",31,"🇫🇷 FRA","Olympique Lyon","L1"],
+["Tanner Tessmann","CM",24,"🇺🇸 USA","Olympique Lyon","L1"],
+["Orel Mangala","CDM",27,"🇧🇪 BEL","Olympique Lyon","L1"],
+["Malick Fofana","LW",20,"🇧🇪 BEL","Olympique Lyon","L1"],
+["Georges Mikautadze","ST",25,"🇬🇪 GEO","Olympique Lyon","L1"],
+["Alexandre Lacazette","ST",34,"🇫🇷 FRA","Olympique Lyon","L1"],
+["Ernest Nuamah","RW",22,"🇬🇭 GHA","Olympique Lyon","L1"],
+["Maxence Caqueret","CM",25,"🇫🇷 FRA","Olympique Lyon","L1"],
+// ---- OGC Nice (L1) ----
+["Marcin Bułka","GK",26,"🇵🇱 POL","OGC Nice","L1"],
+["Jordan Lotomba","RB",27,"🇨🇭 SUI","OGC Nice","L1"],
+["Dante","CB",42,"🇧🇷 BRA","OGC Nice","L1"],
+["Mohamed Abdelmonem","CB",26,"🇪🇬 EGY","OGC Nice","L1"],
+["Melvin Bard","LB",25,"🇫🇷 FRA","OGC Nice","L1"],
+["Antoine Mendy","RB",21,"🇫🇷 FRA","OGC Nice","L1"],
+["Hicham Boudaoui","CDM",26,"🇩🇿 ALG","OGC Nice","L1"],
+["Pablo Rosario","CM",28,"🇫🇷 FRA","OGC Nice","L1"],
+["Sofiane Diop","CAM",25,"🇲🇦 MAR","OGC Nice","L1"],
+["Jérémie Boga","LW",28,"🇨🇮 CIV","OGC Nice","L1"],
+["Gaëtan Laborde","ST",31,"🇫🇷 FRA","OGC Nice","L1"],
+["Evann Guessand","ST",24,"🇨🇮 CIV","OGC Nice","L1"],
+["Terem Moffi","ST",26,"🇳🇬 NGA","OGC Nice","L1"],
+["Tom Louchet","CM",21,"🇫🇷 FRA","OGC Nice","L1"],
+// ---- RC Lens (L1) ----
+["Robin Risser","GK",21,"🇫🇷 FRA","RC Lens","L1"],
+["Ruben Aguilar","RB",32,"🇫🇷 FRA","RC Lens","L1"],
+["Jonathan Gradit","CB",33,"🇫🇷 FRA","RC Lens","L1"],
+["Facundo Medina","CB",26,"🇦🇷 ARG","RC Lens","L1"],
+["Malang Sarr","CB",27,"🇫🇷 FRA","RC Lens","L1"],
+["Deiver Machado","LB",32,"🇨🇴 COL","RC Lens","L1"],
+["Neil El Aynaoui","CM",24,"🇲🇦 MAR","RC Lens","L1"],
+["Andy Diouf","CDM",22,"🇫🇷 FRA","RC Lens","L1"],
+["Adrien Thomasson","CAM",32,"🇫🇷 FRA","RC Lens","L1"],
+["Florian Sotoca","RW",35,"🇫🇷 FRA","RC Lens","L1"],
+["Wesley Saïd","LW",30,"🇫🇷 FRA","RC Lens","L1"],
+["Przemysław Frankowski","RB",30,"🇵🇱 POL","RC Lens","L1"],
+["Rémy Labeau Lascary","ST",21,"🇫🇷 FRA","RC Lens","L1"],
+["Morgan Guilavogui","ST",27,"🇬🇳 GUI","RC Lens","L1"],
+// ---- Stade Rennais (L1) ----
+["Brice Samba","GK",31,"🇨🇬 CGO","Stade Rennais","L1"],
+["Lorenz Assignon","RB",25,"🇫🇷 FRA","Stade Rennais","L1"],
+["Warmed Omari","CB",25,"🇫🇷 FRA","Stade Rennais","L1"],
+["Jérémy Jacquet","CB",20,"🇫🇷 FRA","Stade Rennais","L1"],
+["Adrien Truffert","LB",24,"🇫🇷 FRA","Stade Rennais","L1"],
+["Christopher Wooh","CB",24,"🇨🇲 CMR","Stade Rennais","L1"],
+["Baptiste Santamaria","CDM",30,"🇫🇷 FRA","Stade Rennais","L1"],
+["Glen Kamara","CM",30,"🇫🇮 FIN","Stade Rennais","L1"],
+["Ludovic Blas","CAM",28,"🇫🇷 FRA","Stade Rennais","L1"],
+["Kader Meïté","RW",20,"🇨🇮 CIV","Stade Rennais","L1"],
+["Henrik Meister","ST",22,"🇩🇰 DEN","Stade Rennais","L1"],
+["Arnaud Kalimuendo","ST",24,"🇫🇷 FRA","Stade Rennais","L1"],
+["Albert Grønbaek","CAM",24,"🇩🇰 DEN","Stade Rennais","L1"],
+["Mahdi Camara","CM",27,"🇫🇷 FRA","Stade Rennais","L1"],
+// ---- Strasbourg (L1) ----
+["Mike Penders","GK",20,"🇧🇪 BEL","Strasbourg","L1"],
+["Guela Doué","RB",23,"🇫🇷 FRA","Strasbourg","L1"],
+["Mamadou Sarr","CB",20,"🇫🇷 FRA","Strasbourg","L1"],
+["Saïdou Sow","CB",23,"🇬🇳 GUI","Strasbourg","L1"],
+["Marvin Senaya","RB",23,"🇫🇷 FRA","Strasbourg","L1"],
+["Ismaël Doukouré","CB",22,"🇫🇷 FRA","Strasbourg","L1"],
+["Andrey Santos","CM",21,"🇧🇷 BRA","Strasbourg","L1"],
+["Félix Lemaréchal","CM",20,"🇫🇷 FRA","Strasbourg","L1"],
+["Sebastian Nanasi","CAM",23,"🇸🇪 SWE","Strasbourg","L1"],
+["Dilane Bakwa","RW",23,"🇫🇷 FRA","Strasbourg","L1"],
+["Diego Moreira","LW",21,"🇵🇹 POR","Strasbourg","L1"],
+["Emanuel Emegha","ST",22,"🇳🇱 NED","Strasbourg","L1"],
+["Joaquín Panichelli","ST",23,"🇦🇷 ARG","Strasbourg","L1"],
+["Abdoul Ouattara","RW",20,"🇧🇫 BFA","Strasbourg","L1"],
+// ---- Nantes (L1) ----
+["Anthony Lopes","GK",35,"🇵🇹 POR","Nantes","L1"],
+["Jean-Kévin Duverne","CB",28,"🇫🇷 FRA","Nantes","L1"],
+["Nicolas Pallois","CB",37,"🇫🇷 FRA","Nantes","L1"],
+["Chidozie Awaziem","CB",28,"🇳🇬 NGA","Nantes","L1"],
+["Jean-Charles Castelletto","CB",30,"🇨🇲 CMR","Nantes","L1"],
+["Johann Lepenant","CDM",23,"🇫🇷 FRA","Nantes","L1"],
+["Douglas Augusto","CM",28,"🇧🇷 BRA","Nantes","L1"],
+["Junior Mwanga","CM",22,"🇫🇷 FRA","Nantes","L1"],
+["Louis Leroux","CM",20,"🇫🇷 FRA","Nantes","L1"],
+["Sorba Thomas","RW",27,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Nantes","L1"],
+["Herba Guirassy","RW",22,"🇫🇷 FRA","Nantes","L1"],
+["Mostafa Mohamed","ST",28,"🇪🇬 EGY","Nantes","L1"],
+["Matthis Abline","ST",22,"🇫🇷 FRA","Nantes","L1"],
+["Bahereba Guirassy","CAM",19,"🇫🇷 FRA","Nantes","L1"],
+// ---- Toulouse (L1) ----
+["Guillaume Restes","GK",20,"🇫🇷 FRA","Toulouse","L1"],
+["Mikkel Desler","RB",30,"🇩🇰 DEN","Toulouse","L1"],
+["Rasmus Nicolaisen","CB",28,"🇩🇰 DEN","Toulouse","L1"],
+["Charlie Cresswell","CB",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Toulouse","L1"],
+["Warren Kamanzi","RB",24,"🇳🇴 NOR","Toulouse","L1"],
+["Kevin Keben","CB",22,"🇨🇲 CMR","Toulouse","L1"],
+["Vincent Sierro","CM",30,"🇨🇭 SUI","Toulouse","L1"],
+["Cristian Cásseres","CDM",25,"🇻🇪 VEN","Toulouse","L1"],
+["Djibril Sidibé","RB",33,"🇫🇷 FRA","Toulouse","L1"],
+["Aron Dønnum","RW",27,"🇳🇴 NOR","Toulouse","L1"],
+["Yann Gboho","LW",24,"🇫🇷 FRA","Toulouse","L1"],
+["Frank Magri","ST",26,"🇨🇲 CMR","Toulouse","L1"],
+["Santiago Hidalgo","ST",20,"🇦🇷 ARG","Toulouse","L1"],
+["Shavy Babicka","RW",21,"🇬🇦 GAB","Toulouse","L1"],
+// ---- Brest (L1) ----
+["Marco Bizot","GK",34,"🇳🇱 NED","Brest","L1"],
+["Kenny Lala","RB",34,"🇫🇷 FRA","Brest","L1"],
+["Brendan Chardonnet","CB",31,"🇫🇷 FRA","Brest","L1"],
+["Lilian Brassier","CB",26,"🇫🇷 FRA","Brest","L1"],
+["Bradley Locko","LB",23,"🇫🇷 FRA","Brest","L1"],
+["Soumaïla Coulibaly","CB",22,"🇫🇷 FRA","Brest","L1"],
+["Julien Le Cardinal","RB",27,"🇫🇷 FRA","Brest","L1"],
+["Pierre Lees-Melou","CM",32,"🇫🇷 FRA","Brest","L1"],
+["Hugo Magnetti","CDM",27,"🇫🇷 FRA","Brest","L1"],
+["Kamory Doumbia","CAM",22,"🇲🇱 MLI","Brest","L1"],
+["Romain Del Castillo","CAM",29,"🇫🇷 FRA","Brest","L1"],
+["Abdallah Sima","RW",24,"🇸🇳 SEN","Brest","L1"],
+["Ludovic Ajorque","ST",31,"🇫🇷 FRA","Brest","L1"],
+["Jeremy Le Douaron","ST",27,"🇫🇷 FRA","Brest","L1"],
+// ---- Auxerre (L1) ----
+["Donovan Léon","GK",32,"🇫🇷 FRA","Auxerre","L1"],
+["Paul Joly","RB",27,"🇫🇷 FRA","Auxerre","L1"],
+["Clément Akpa","CB",24,"🇨🇮 CIV","Auxerre","L1"],
+["Jubal","CB",31,"🇧🇷 BRA","Auxerre","L1"],
+["Sébastien Mailly","CB",23,"🇫🇷 FRA","Auxerre","L1"],
+["Sinaly Diomandé","CB",24,"🇨🇮 CIV","Auxerre","L1"],
+["Élisha Owusu","CDM",28,"🇬🇭 GHA","Auxerre","L1"],
+["Rayan Raveloson","CM",28,"🇲🇬 MAD","Auxerre","L1"],
+["Gaëtan Perrin","CAM",29,"🇫🇷 FRA","Auxerre","L1"],
+["Hamed Traorè","CAM",25,"🇨🇮 CIV","Auxerre","L1"],
+["Josué Casimir","RW",23,"🇫🇷 FRA","Auxerre","L1"],
+["Lassine Sinayoko","ST",25,"🇲🇱 MLI","Auxerre","L1"],
+["Danny Namaso","ST",25,"🇨🇩 COD","Auxerre","L1"],
+["Théo Bair","ST",26,"🇨🇦 CAN","Auxerre","L1"],
+// ---- Le Havre (L1) ----
+["Mory Diaw","GK",32,"🇸🇳 SEN","Le Havre","L1"],
+["Arouna Sangante","CB",23,"🇫🇷 FRA","Le Havre","L1"],
+["Yoann Salmier","CB",33,"🇫🇷 FRA","Le Havre","L1"],
+["Gautier Lloris","CB",27,"🇫🇷 FRA","Le Havre","L1"],
+["Etienne Youte","CB",22,"🇫🇷 FRA","Le Havre","L1"],
+["Félix Gouré","RB",24,"🇨🇮 CIV","Le Havre","L1"],
+["Abdoulaye Touré","CDM",31,"🇫🇷 FRA","Le Havre","L1"],
+["Rassoul Ndiaye","CM",24,"🇸🇳 SEN","Le Havre","L1"],
+["Yassine Kechta","CAM",22,"🇫🇷 FRA","Le Havre","L1"],
+["Antoine Joujou","RW",24,"🇫🇷 FRA","Le Havre","L1"],
+["Issa Soumaré","LW",27,"🇫🇷 FRA","Le Havre","L1"],
+["Samuel Grandsir","LW",28,"🇫🇷 FRA","Le Havre","L1"],
+["Simon Ebonog","ST",22,"🇨🇲 CMR","Le Havre","L1"],
+["Ahmed Hassan","ST",25,"🇪🇬 EGY","Le Havre","L1"],
+// ---- Angers (L1) ----
+["Hervé Koffi","GK",28,"🇧🇫 BFA","Angers","L1"],
+["Yann Lonfat","RB",22,"🇨🇭 SUI","Angers","L1"],
+["Jacques Ekomié","LB",26,"🇬🇦 GAB","Angers","L1"],
+["Lilian Raolisoa","LB",22,"🇫🇷 FRA","Angers","L1"],
+["Emmanuel Biumla","CB",24,"🇨🇲 CMR","Angers","L1"],
+["Jean-Eudes Aholou","CDM",31,"🇨🇮 CIV","Angers","L1"],
+["Zinedine Ould Khaled","CM",24,"🇩🇿 ALG","Angers","L1"],
+["Marwan Naïli","CM",22,"🇫🇷 FRA","Angers","L1"],
+["Himad Abdelli","CAM",26,"🇩🇿 ALG","Angers","L1"],
+["Yassin Belkhdim","CAM",22,"🇫🇷 FRA","Angers","L1"],
+["Jim Allevinah","RW",30,"🇨🇬 CGO","Angers","L1"],
+["Prosper Peter","RW",20,"🇳🇬 NGA","Angers","L1"],
+["Estéban Lepaul","ST",25,"🇫🇷 FRA","Angers","L1"],
+["Sidiki Chérif","ST",22,"🇫🇷 FRA","Angers","L1"],
+// ---- Lorient (L1) ----
+["Yvon Mvogo","GK",31,"🇨🇭 SUI","Lorient","L1"],
+["Igor Silva","CB",23,"🇧🇷 BRA","Lorient","L1"],
+["Montassar Talbi","CB",27,"🇹🇳 TUN","Lorient","L1"],
+["Théo Le Bris","LB",23,"🇫🇷 FRA","Lorient","L1"],
+["Arthur Avom","RB",23,"🇨🇲 CMR","Lorient","L1"],
+["Panos Katseris","RB",21,"🇨🇾 CYP","Lorient","L1"],
+["Laurent Abergel","CDM",32,"🇫🇷 FRA","Lorient","L1"],
+["Tom Lacoux","CM",23,"🇫🇷 FRA","Lorient","L1"],
+["Bonke Innocent","CDM",29,"🇳🇬 NGA","Lorient","L1"],
+["Romain Faivre","CAM",27,"🇫🇷 FRA","Lorient","L1"],
+["Aiyegun Tosin","RW",27,"🇳🇬 NGA","Lorient","L1"],
+["Sékou Mara","ST",23,"🇫🇷 FRA","Lorient","L1"],
+["Pablo Pagis","ST",25,"🇫🇷 FRA","Lorient","L1"],
+["Mohamed Bamba","ST",24,"🇨🇮 CIV","Lorient","L1"],
+// ---- Metz (L1) ----
+["Jonathan Fischer","GK",24,"🇫🇷 FRA","Metz","L1"],
+["Fali Candé","CB",27,"🇬🇼 GNB","Metz","L1"],
+["Sadibou Sané","CB",24,"🇸🇳 SEN","Metz","L1"],
+["Morgan Bokele","CB",22,"🇫🇷 FRA","Metz","L1"],
+["Koffi Kouao","LB",24,"🇨🇮 CIV","Metz","L1"],
+["Matthieu Udol","LB",29,"🇫🇷 FRA","Metz","L1"],
+["Maxime Colin","RB",34,"🇫🇷 FRA","Metz","L1"],
+["Kévin N'Doram","CDM",29,"🇫🇷 FRA","Metz","L1"],
+["Gauthier Hein","CAM",29,"🇫🇷 FRA","Metz","L1"],
+["Joël Asoro","RW",26,"🇸🇪 SWE","Metz","L1"],
+["Stéphane Diarra","RW",27,"🇫🇷 FRA","Metz","L1"],
+["Cheikh Sabaly","RW",23,"🇸🇳 SEN","Metz","L1"],
+["Habib Diallo","ST",30,"🇸🇳 SEN","Metz","L1"],
+["Brian Madjo","ST",20,"🇫🇷 FRA","Metz","L1"],
+// ---- Paris FC (L1) ----
+["Obed Nkambadio","GK",22,"🇫🇷 FRA","Paris FC","L1"],
+["Otávio","CB",30,"🇧🇷 BRA","Paris FC","L1"],
+["Samir Chergui","CB",24,"🇫🇷 FRA","Paris FC","L1"],
+["Adji Camara","CB",24,"🇲🇱 MLI","Paris FC","L1"],
+["Thibault De Smet","LB",27,"🇧🇪 BEL","Paris FC","L1"],
+["Maxime Lopez","CDM",28,"🇫🇷 FRA","Paris FC","L1"],
+["Vincent Marchetti","CAM",24,"🇫🇷 FRA","Paris FC","L1"],
+["Lohann Doucet","CM",20,"🇫🇷 FRA","Paris FC","L1"],
+["Florent Da Silva","CM",22,"🇫🇷 FRA","Paris FC","L1"],
+["Ilan Kebbal","CAM",27,"🇩🇿 ALG","Paris FC","L1"],
+["Moses Simon","RW",30,"🇳🇬 NGA","Paris FC","L1"],
+["Nhoa Lamine","RW",20,"🇫🇷 FRA","Paris FC","L1"],
+["Jean-Philippe Krasso","ST",28,"🇨🇮 CIV","Paris FC","L1"],
+["Willem Geubbels","ST",24,"🇫🇷 FRA","Paris FC","L1"]
+];
+
+/* ---------- Formations: 11 slots {role,x,y} (x:0-100 left→right, y:0 自陣→100 敵陣) ---------- */
+const FORM={
+"4-3-3":[["GK",50,13],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CM",68,52],["CM",50,46],["CM",32,52],["RW",80,78],["ST",50,85],["LW",20,78]],
+"4-4-2":[["GK",50,13],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["RM",82,54],["CM",60,50],["CM",40,50],["LM",18,54],["ST",62,83],["ST",38,83]],
+"4-2-3-1":[["GK",50,13],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CDM",62,44],["CDM",38,44],["RW",82,67],["CAM",50,63],["LW",18,67],["ST",50,87]],
+"3-5-2":[["GK",50,13],["CB",72,22],["CB",50,20],["CB",28,22],["RWB",89,48],["CM",64,52],["CM",50,46],["CM",36,52],["LWB",11,48],["ST",62,83],["ST",38,83]],
+"3-4-3":[["GK",50,13],["CB",72,22],["CB",50,20],["CB",28,22],["RM",85,50],["CM",60,48],["CM",40,48],["LM",15,50],["RW",78,81],["ST",50,85],["LW",22,81]],
+"5-3-2":[["GK",50,13],["RWB",89,32],["CB",68,22],["CB",50,19],["CB",32,22],["LWB",11,32],["CM",68,55],["CM",50,50],["CM",32,55],["ST",62,83],["ST",38,83]],
+"4-1-2-1-2":[["GK",50,13],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CDM",50,42],["CM",75,56],["CM",25,56],["CAM",50,68],["ST",62,85],["ST",38,85]],
+"5-4-1":[["GK",50,13],["RWB",89,32],["CB",68,22],["CB",50,19],["CB",32,22],["LWB",11,32],["RM",82,57],["CM",60,53],["CM",40,53],["LM",18,57],["ST",50,85]]
+};
+const FORMS=Object.keys(FORM);
+
+/* position grouping for color/filter */
+const GRP={GK:"gk",RB:"df",LB:"df",CB:"df",RWB:"df",LWB:"df",CDM:"mf",CM:"mf",CAM:"mf",RM:"mf",LM:"mf",DM:"mf",AM:"mf",RW:"fw",LW:"fw",ST:"fw",CF:"fw"};
+function grp(pos){return GRP[pos]||"mf"}
+
+/* ピッチ座標(x:0-100左→右, y:0自陣→100敵陣)からポジション名を推定 */
+function roleFromXY(x,y){
+  if(y<15) return 'GK';
+  if(y<37){ // ディフェンスライン
+    if(x>=72) return 'RB';
+    if(x<=28) return 'LB';
+    return 'CB';
+  }
+  if(y<46){ // アンカー〜守備的MF
+    if(x>=80) return 'RWB';
+    if(x<=20) return 'LWB';
+    return 'CDM';
+  }
+  if(y<62){ // 中盤
+    if(x>=80) return 'RM';
+    if(x<=20) return 'LM';
+    return 'CM';
+  }
+  if(y<72){ // トップ下
+    if(x>=78) return 'RM';
+    if(x<=22) return 'LM';
+    return 'CAM';
+  }
+  // 前線
+  if(x>=68) return 'RW';
+  if(x<=32) return 'LW';
+  return 'ST';
+}
+
+/* =========================================================
+   State
+   ========================================================= */
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},loadedClub:null,captain:null,teamName:null,teamInfo:null}; // slots: [{role,x,y,pid|null,sub|null}]
+let tokenEls={};
+const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M3.5 21c0-4.2 4-6.5 8.5-6.5s8.5 2.3 8.5 6.5"/></svg>';
+let memFallback=null; // 保存フォールバック
+let memPhotos=null;
+const PAGE=30; // 無限スクロール 1ページ分
+let pickCurIdx=[]; // 現在フィルター済み選手インデックス（picker用）
+let mktCurIdx=[]; // 現在フィルター済み選手インデックス（市場用）
+let currentSlot=-1;
+
+function buildSlots(formKey,keepPlayers){
+  const f=FORM[formKey];
+  const old=state.slots;
+  state.slots=f.map((s,i)=>({role:s[0],x:s[1],y:s[2],
+    pid:(keepPlayers&&old[i])?old[i].pid:null,
+    sub:(keepPlayers&&old[i])?(old[i].sub??null):null}));
+  state.formation=formKey;
+}
+
+/* =========================================================
+   Persistence (window.storage / fallback, localStorage不使用)
+   ========================================================= */
+// 保存用の安定ID：選手名＋国籍コード。配列番号(index)が変わっても選手を特定できる。
+function pidToKey(pid){ if(pid==null) return null; const p=P[pid]; if(!p) return null; return p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); }
+let _keyMap=null;
+function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; } }
+function keyToPid(key){
+  if(key==null) return null;
+  if(typeof key==='number') return (key>=0&&key<P.length)?key:null; // 旧形式(index)の後方互換
+  if(!_keyMap) buildKeyMap();
+  return (key in _keyMap)?_keyMap[key]:null;
+}
+async function save(){
+  const data={ v:3, formation:state.formation,
+    slots:state.slots.map(s=>({role:s.role,x:s.x,y:s.y,pid:pidToKey(s.pid),sub:pidToKey(s.sub)})),
+    bench:state.bench.map(pidToKey).filter(k=>k!=null),
+    captain:pidToKey(state.captain),
+    loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo };
+  try{ if(window.storage){ await window.storage.set('xi_state_v2',JSON.stringify(data),false); } }catch(e){}
+  memFallback=data;
+}
+async function savePhotos(){
+  const keyed={}; for(const pid in state.photos){ const k=pidToKey(+pid); if(k!=null) keyed[k]=state.photos[pid]; }
+  try{ if(window.storage){ await window.storage.set('xi_photos_v2',JSON.stringify({v:3,photos:keyed}),false); } }catch(e){}
+  memPhotos=state.photos;
+}
+async function load(){
+  let raw=null;
+  try{ if(window.storage){ const r=await window.storage.get('xi_state_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
+  if(!raw) raw=memFallback;
+  if(!raw) return null;
+  if(raw.v>=3){ // キー形式 → 現在のindexへ解決（データ更新で番号がズレても正しい選手に復元）
+    _keyMap=null; buildKeyMap();
+    raw=Object.assign({},raw,{
+      slots:(raw.slots||[]).map(s=>({role:s.role,x:s.x,y:s.y,pid:keyToPid(s.pid),sub:keyToPid(s.sub)})),
+      bench:(raw.bench||[]).map(keyToPid).filter(v=>v!=null),
+      captain:keyToPid(raw.captain) });
+  }
+  return raw;
+}
+async function loadPhotos(){
+  let raw=null;
+  try{ if(window.storage){ const r=await window.storage.get('xi_photos_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
+  if(!raw) return memPhotos;
+  if(raw.v>=3&&raw.photos){ if(!_keyMap) buildKeyMap(); const out={}; for(const k in raw.photos){ const i=keyToPid(k); if(i!=null) out[i]=raw.photos[k]; } return out; }
+  return raw; // 旧形式(index-keyed)
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+const pitch=document.getElementById('pitch');
+
+/* チーム読込時に各スタメン枠の第二候補(slot.sub)を控えから自動で1回だけ割り当てる。
+   以後はユーザーが手動で選び、選手交代や移動では自動で変わらない。 */
+function autoAssignSubs(){
+  if(!state.bench||!state.bench.length)return;
+  const used=new Set();
+  const savedRole=pickRole;
+  state.slots.forEach(s=>{
+    if(s.pid==null){s.sub=null;return;}
+    pickRole=s.role;
+    // 控えのうち未使用の選手を、その枠のサジェスト順（適性ポジション優先）で1人
+    const avail=state.bench.filter(pid=>!inXI(pid)&&!used.has(pid)).sort(suggestSort);
+    const pid=avail[0];
+    // 同じ大枠の控えがいる場合のみ第二候補に（大枠外まで無理に割り当てない）
+    if(pid!=null&&grp(P[pid][1])===grp(s.role)){ used.add(pid); s.sub=pid; } else s.sub=null;
+  });
+  pickRole=savedRole;
+}
+// スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
+function benchReturn(pid){
+  if(pid==null||!state.loadedClub) return;
+  if(inXI(pid)) return;
+  if(!state.bench.includes(pid)) state.bench.push(pid);
+}
+
+function render(){
+  // remove existing tokens
+  pitch.querySelectorAll('.tok').forEach(t=>t.remove());
+  tokenEls={};
+  let filled=0,ages=[];
+  state.slots.forEach((s,i)=>{
+    const tok=document.createElement('div');
+    tok.className='tok';tok.style.left=s.x+'%';tok.style.top=(100-s.y)+'%';
+    tok.dataset.i=i;
+    const disc=document.createElement('div');
+    if(s.pid==null){
+      disc.className='disc empty';disc.textContent='+';
+      tok.appendChild(disc);
+      const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role);
+    }else{
+      const p=P[s.pid];filled++;ages.push(p[2]);
+      const ph=state.photos[s.pid];
+      disc.className='disc'+(ph?' photo':'');
+      if(ph)disc.style.backgroundImage="url('"+ph+"')";
+      let extra='';
+      if(state.captain===s.pid) extra+='<span class="capt">C</span>';
+      disc.innerHTML=SIL+extra;
+      tok.appendChild(disc);
+      const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role);
+      const nm=document.createElement('div');nm.className='pname';nm.textContent=shortName(p[0]);tok.appendChild(nm);
+      // 第二候補（手動・永続）。"2nd"表記はせず別色で小さく下に表示
+      if(s.sub!=null&&P[s.sub]){
+        const sub=document.createElement('div');sub.className='psub';
+        sub.textContent=shortName(P[s.sub][0]);
+        tok.appendChild(sub);
+      }
+    }
+    pitch.appendChild(tok);
+    tokenEls[i]=tok;
+    attachDrag(tok,i);
+  });
+  document.getElementById('hint').style.display=filled?'none':'block';
+  document.getElementById('sAge').textContent=ages.length?(ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1):'–';
+  document.getElementById('sCnt').innerHTML=filled+'<small>/11</small>';
+  renderBench();
+  updateTeamTag();
+}
+function teamDisplayName(){ return state.teamName||state.loadedClub||null; }
+function updateTeamTag(){
+  const el=document.getElementById('teamTag');if(!el)return;
+  const name=teamDisplayName();
+  if(name){ el.textContent=name; el.classList.add('team'); el.title=name; }
+  else { el.textContent='tactics board'; el.classList.remove('team'); el.title=''; }
+}
+
+/* ---- ベンチ（控え） ---- */
+function renderBench(){
+  const wrap=document.getElementById('bench');
+  const cue=document.getElementById('scrollcue');
+  const list=state.bench.filter(pid=>!inXI(pid));
+  state.bench=list; // XIに上がった選手はベンチから除外
+  if(cue)cue.style.display='block';
+  const cards=list.map(pid=>{
+    const p=P[pid],ph=state.photos[pid];
+    return `<div class="bcard" data-pid="${pid}" draggable="false">
+      <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
+      <div class="bn">${shortName(p[0])}</div>
+      <div class="bp">${p[1]}</div>
+      <div class="bv">${p[2]}歳</div>
+    </div>`;
+  }).join('');
+  const addCard=`<div class="bcard add" id="benchAdd"><div class="addplus">＋</div><div class="addlbl">追加</div></div>`;
+  // スタメン＋ベンチの合計人数と平均年齢
+  const ages=state.slots.filter(s=>s.pid!=null).map(s=>P[s.pid][2]).concat(list.map(pid=>P[pid][2]));
+  const avg=ages.length?(ages.reduce((a,b)=>a+b,0)/ages.length).toFixed(1):'–';
+  const xiCnt=state.slots.filter(s=>s.pid!=null).length;
+  const foot=`<div class="benchfoot">合計 <b>${ages.length}</b>人 <span>(スタメン${xiCnt} ＋ 控え${list.length})</span>　平均年齢 <b>${avg}</b><small>歳</small></div>`;
+  const empty=list.length?'':'<div class="benchEmpty">控え選手がいません。<b>＋</b> から追加、または上の <b>⬇</b> でクラブを読み込めます。</div>';
+  wrap.innerHTML=`<div class="bh"><b>ベンチ</b><span>控え ${list.length}人</span><i>ドラッグで交代・タップで詳細</i></div>`+
+    empty+`<div class="bgrid">${cards}${addCard}</div>`+foot;
+  wrap.querySelectorAll('.bcard[data-pid]').forEach(card=>attachBenchDrag(card,+card.dataset.pid));
+  const add=document.getElementById('benchAdd'); if(add) add.onclick=openBenchAdd;
+}
+/* ---- ベンチ → ピッチ ドラッグ交代 ---- */
+let dropTarget=-1;
+function highlightSlot(si){
+  if(si===dropTarget)return;
+  if(dropTarget>=0&&tokenEls[dropTarget])tokenEls[dropTarget].classList.remove('droptarget');
+  dropTarget=si;
+  if(si>=0&&tokenEls[si])tokenEls[si].classList.add('droptarget');
+}
+function slotAtPoint(x,y){
+  const r=pitch.getBoundingClientRect();
+  if(x<r.left-40||x>r.right+40||y<r.top-40||y>r.bottom+40)return -1;
+  let best=64,bi=-1;
+  state.slots.forEach((s,i)=>{
+    const cx=r.left+s.x/100*r.width, cy=r.top+(100-s.y)/100*r.height;
+    const d=Math.hypot(x-cx,y-cy); if(d<best){best=d;bi=i;}
+  });
+  return bi;
+}
+function makeBenchGhost(pid){
+  const ph=state.photos[pid];
+  const g=document.createElement('div'); g.className='benchghost';
+  g.innerHTML=`<div class="disc${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>`;
+  return g;
+}
+function attachBenchDrag(el,pid){
+  el.style.touchAction='none';
+  let sx,sy,dragging=false,ghost=null,lastX=0,lastY=0,scrollRAF=0;
+  const scroller=document.getElementById('scroll');
+  function paint(){
+    if(!ghost)return;
+    ghost.style.left=lastX+'px'; ghost.style.top=lastY+'px';
+    highlightSlot(slotAtPoint(lastX,lastY));
+  }
+  // 画面端に近づいたら自動スクロール（縦長でも前線スロットまでドラッグできる）
+  function autoScrollTick(){
+    if(!dragging){scrollRAF=0;return;}
+    const vh=window.innerHeight, edge=120, max=18;
+    let dy=0;
+    if(lastY<edge) dy=-max*(1-lastY/edge);
+    else if(lastY>vh-edge) dy=max*(1-(vh-lastY)/edge);
+    if(dy){ const before=scroller.scrollTop; scroller.scrollTop+=dy; if(scroller.scrollTop!==before) paint(); }
+    scrollRAF=requestAnimationFrame(autoScrollTick);
+  }
+  el.addEventListener('pointerdown',e=>{
+    e.preventDefault(); sx=e.clientX; sy=e.clientY; dragging=false; ghost=null;
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+  });
+  el.addEventListener('pointermove',e=>{
+    if(sx===undefined)return;
+    if(!dragging){
+      if(Math.abs(e.clientX-sx)<6&&Math.abs(e.clientY-sy)<6)return;
+      dragging=true; el.classList.add('dragging');
+      ghost=makeBenchGhost(pid); document.body.appendChild(ghost);
+      if(!scrollRAF) scrollRAF=requestAnimationFrame(autoScrollTick);
+    }
+    lastX=e.clientX; lastY=e.clientY; paint();
+  });
+  const end=e=>{
+    if(sx===undefined)return;
+    const was=dragging;
+    sx=undefined; dragging=false; el.classList.remove('dragging');
+    if(scrollRAF){cancelAnimationFrame(scrollRAF);scrollRAF=0;}
+    if(ghost){ghost.remove();ghost=null;} highlightSlot(-1);
+    try{el.releasePointerCapture(e.pointerId);}catch(_){}
+    if(e.type==='pointercancel') return;          // キャンセルは無視
+    if(!was){ openDetail(pid,null); return; }      // 動かなければタップ＝詳細
+    const si=slotAtPoint(e.clientX,e.clientY);
+    if(si>=0) benchToSlot(pid,si);
+  };
+  el.addEventListener('pointerup',end);
+  el.addEventListener('pointercancel',end);
+}
+function benchToSlot(pid,slotIdx){
+  const outgoing=state.slots[slotIdx].pid;
+  state.slots.forEach(s=>{if(s.pid===pid)s.pid=null});
+  state.slots[slotIdx].pid=pid;
+  if(state.slots[slotIdx].sub===pid) state.slots[slotIdx].sub=null; // 同枠のスタメン＝第2候補の重複を解消
+  state.bench=state.bench.filter(b=>b!==pid);
+  if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)) state.bench.push(outgoing);
+  render();save();
+  toast(outgoing!=null?shortName(P[pid][0])+' ⇄ '+shortName(P[outgoing][0]):shortName(P[pid][0])+' を起用');
+}
+function initials(name){const c=name.trim().replace(/\s+$/,'').split(' ');return (c[0][0]+(c.length>1?c[c.length-1][0]:'')).toUpperCase()}
+function shortName(name){const t=name.trim();const c=t.split(' ');return c.length>1?c[c.length-1]:t}
+
+/* render formation chips */
+const fbar=document.getElementById('fbar');
+FORMS.forEach(f=>{
+  const c=document.createElement('div');c.className='chip'+(f===state.formation?' on':'');c.textContent=f;
+  c.onclick=()=>{ if(f===state.formation)return; buildSlots(f,true); [...fbar.children].forEach(x=>x.classList.remove('on')); c.classList.add('on'); render(); save(); };
+  fbar.appendChild(c);
+});
+
+/* =========================================================
+   Drag & tap on tokens
+   ========================================================= */
+function attachDrag(el,actor){
+  let sx,sy,ox,oy,moved,rect;
+  const base=()=>state.slots[actor];
+  el.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    rect=pitch.getBoundingClientRect();moved=false;
+    sx=e.clientX;sy=e.clientY;const b=base();ox=b.x;oy=b.y;
+    el.setPointerCapture(e.pointerId);el.classList.add('drag');
+  });
+  el.addEventListener('pointermove',e=>{
+    if(sx===undefined)return;
+    if(Math.abs(e.clientX-sx)>5||Math.abs(e.clientY-sy)>5)moved=true;
+    const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
+    const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
+    base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';
+  });
+  el.addEventListener('pointerup',e=>{
+    el.classList.remove('drag');
+    if(sx===undefined)return;sx=undefined;
+    if(!moved){ onSlotTap(actor); return; }
+    let tj=-1,best=46;
+    for(let j=0;j<state.slots.length;j++){
+      if(j===actor)continue;
+      const cx=rect.left+state.slots[j].x/100*rect.width;
+      const cy=rect.top+(100-state.slots[j].y)/100*rect.height;
+      const d=Math.hypot(e.clientX-cx,e.clientY-cy);
+      if(d<best){best=d;tj=j;}
+    }
+    if(tj>=0){
+      const t=state.slots[actor].pid;state.slots[actor].pid=state.slots[tj].pid;state.slots[tj].pid=t;
+      state.slots[actor].x=ox;state.slots[actor].y=oy;
+      render();save();toast('ポジションを入れ替えました');
+    }else{
+      // 空きスペースへ移動 → 新しい位置からポジション名を自動判定
+      const s=state.slots[actor];
+      const nr=roleFromXY(s.x,s.y);
+      if(nr!==s.role){ s.role=nr; render(); toast('ポジションを '+nr+' に変更'); }
+      save();
+    }
+  });
+  el.addEventListener('pointercancel',()=>{el.classList.remove('drag');sx=undefined;});
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+/* ---- 選手写真の追加（端末内で完結・自分でアップロード） ---- */
+let photoTarget=null;
+const photoInput=document.getElementById('photoInput');
+function pickPhoto(pid){ photoTarget=pid; photoInput.value=''; photoInput.click(); }
+photoInput.addEventListener('change',()=>{
+  const f=photoInput.files&&photoInput.files[0]; if(!f||photoTarget==null)return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      // 正方形にトリミングしつつ240pxへ縮小（容量節約）
+      const S=240,c=document.createElement('canvas');c.width=S;c.height=S;
+      const ctx=c.getContext('2d');
+      const side=Math.min(img.width,img.height);
+      const sx=(img.width-side)/2, sy=(img.height-side)/2;
+      ctx.drawImage(img,sx,sy,side,side,0,0,S,S);
+      const url=c.toDataURL('image/jpeg',0.82);
+      state.photos[photoTarget]=url;
+      const pid=photoTarget;photoTarget=null;
+      savePhotos();closeSheet();render();toast('写真を設定しました');
+    };
+    img.onerror=()=>{photoTarget=null;toast('画像を読み込めませんでした');};
+    img.src=fr.result;
+  };
+  fr.readAsDataURL(f);
+});
+
+function onSlotTap(i){
+  currentSlot=i;
+  if(state.slots[i].pid==null){ openPicker(i); }
+  else { openSlotMenu(i); }
+}
+
+/* =========================================================
+   Sheet helpers
+   ========================================================= */
+const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
+function openSheet(html){benchAddMode=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');}
+function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
+scrim.onclick=closeSheet;
+
+/* シートのスワイプ操作：上で拡大／下で閉じる（グラブハンドル） */
+(function setupSheetDrag(){
+  const zone=document.getElementById('grabzone'); if(!zone)return;
+  let startY=null,dy=0,dragging=false;
+  zone.addEventListener('pointerdown',e=>{
+    dragging=true;startY=e.clientY;dy=0;
+    sheet.style.transition='none';
+    try{ zone.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  zone.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    dy=e.clientY-startY;
+    if(dy>0){ // 下方向：指に追従
+      sheet.style.transform='translateY('+dy+'px)';
+    }else{ // 上方向：拡大
+      sheet.classList.add('expanded');
+      sheet.style.transform='translateY(0)';
+    }
+  });
+  const end=()=>{
+    if(!dragging)return; dragging=false;
+    sheet.style.transition='';
+    sheet.style.transform='';
+    if(dy>110){ closeSheet(); }                                  // 大きく下げたら閉じる
+    else if(dy>30){ sheet.classList.remove('expanded'); }        // 少し下げたら通常サイズへ
+    startY=null;dy=0;
+  };
+  zone.addEventListener('pointerup',end);
+  zone.addEventListener('pointercancel',end);
+  // ハンドルのダブルタップで拡大⇔通常をトグル
+  let lastTap=0;
+  zone.addEventListener('click',()=>{
+    const now=Date.now();
+    if(now-lastTap<300){ sheet.classList.toggle('expanded'); }
+    lastTap=now;
+  });
+})();
+
+/* ---- Player picker (assign to slot) ---- */
+// 人気カウント（選手名 -> スカッド配置回数）。将来バックエンドから供給。未集計時は空。
+let POP={};
+function popScore(p){ return POP[p[0].trim()]||0; }
+// スロット役割ごとのサジェスト優先（先頭ほど優先）。盤面ロール→推薦する選手ポジション。
+const SUGGEST={
+  GK:['GK'], CB:['CB'], LB:['LB'], RB:['RB'],
+  LWB:['LB','LW'], RWB:['RB','RW'],
+  CDM:['CDM','CM'], CM:['CM','CDM','CAM'], CAM:['CAM','CM'],
+  LM:['LW','LB'], RM:['RW','RB'],
+  LW:['LW','LM'], RW:['RW','RM'], ST:['ST']
+};
+let pickRole=null; // 現在ピッカー対象スロットの役割
+// 大枠内でのポジション並び順（同じ大枠の選手をポジションごとに固める）
+const POSORDER={GK:0,CB:1,RB:2,LB:3,RWB:4,LWB:5,CDM:1,CM:2,CAM:3,RM:4,LM:5,RW:1,LW:2,ST:3};
+// スロット指定なし（ベンチ追加など）でのポジション全体並び順：GK→DF→MF→FW
+const POSORDERFULL={GK:0,CB:1,RB:2,LB:3,LWB:4,RWB:5,CDM:6,CM:7,CAM:8,RM:9,LM:10,LW:11,RW:12,ST:13};
+// 大枠を押した時に出る細かいポジション（ベンチ追加画面のサブフィルタ）
+const SUBPOS={DF:['CB','RB','LB'],MF:['CDM','CM','CAM'],FW:['ST','LW','RW']};
+function suggestRank(pos){
+  if(!pickRole) return 0;
+  const tiers=SUGGEST[pickRole]||[pickRole];
+  const i=tiers.indexOf(pos);
+  if(i>=0) return i;                                   // 明示サジェスト（先頭ほど優先：0,1,2…）
+  const sg=grp(pickRole), pg=grp(pos);
+  // 以降は大枠ごとにまとめる：自大枠→他フィールド大枠→GK(常に最後)。大枠内はポジション順で固める。
+  const gr = pg==='gk' ? 9 : (pg===sg ? 0 : ({df:1,mf:2,fw:3})[pg]);
+  return 10 + gr*10 + (POSORDER[pos]||0);
+}
+// サジェスト順：①役割推薦 ②クラブ読込中はそのクラブ優先 ③人気順 ④年齢の高い順
+function suggestSort(a,b){
+  if(pickRole){ const ra=suggestRank(P[a][1]), rb=suggestRank(P[b][1]); if(ra!==rb) return ra-rb; }
+  else { const oa=POSORDERFULL[P[a][1]]??99, ob=POSORDERFULL[P[b][1]]??99; if(oa!==ob) return oa-ob; } // スロット指定なし：ポジション順
+  const club=state.loadedClub;
+  if(club){ const ca=P[a][4].trim()===club?1:0, cb=P[b][4].trim()===club?1:0; if(ca!==cb) return cb-ca; }
+  const pa=popScore(P[a]), pb=popScore(P[b]);
+  if(pa!==pb) return pb-pa;
+  return P[b][2]-P[a][2];
+}
+let pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+let benchAddMode=false; // 「ベンチに追加」ピッカーかどうか
+function openPicker(slotIdx){
+  pickFilter={pos:'ALL',lg:'ALL',club:state.loadedClub||'ALL',q:''};
+  const role=state.slots[slotIdx].role;
+  pickRole=role;
+  openSheet(pickerHTML(slotIdx,role));
+  wirePicker(slotIdx);
+}
+function pickerHTML(slotIdx,role){
+  return `
+  <h2>選手を配置 <span>${role}</span></h2>
+  <div class="controls">
+    <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+    <div class="filters" id="posF">${posChips()}</div>
+    <div class="filters" id="lgF">${lgChips()}</div>
+    <div class="filters" id="clubF">${clubChips()}</div>
+  </div>
+  <div class="list" id="plist"></div>`;
+}
+function posChips(f=pickFilter){
+  const opts=[["ALL","全部"],["GK","GK"],["DF","DF"],["MF","MF"],["FW","FW"]];
+  let html=opts.map(o=>`<div class="fchip ${f.pos===o[0]?'on':''}" data-pos="${o[0]}">${o[1]}</div>`).join('');
+  if(benchAddMode){ // ベンチ追加時：大枠を選ぶと右側に細かいポジションのサブフィルタを出す
+    const subs=SUBPOS[f.pos];
+    if(subs){ html+=`<div class="fchipdiv"></div>`+subs.map(sp=>`<div class="fchip subchip ${f.subpos===sp?'on':''}" data-subpos="${sp}">${sp}</div>`).join(''); }
+  }
+  return html;
+}
+function lgChips(f=pickFilter){
+  const opts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"]];
+  return opts.map(o=>`<div class="fchip ${f.lg===o[0]?'on':''}" data-lg="${o[0]}">${o[1]}</div>`).join('');
+}
+function clubChips(f=pickFilter){
+  const clubs=f.lg==='ALL'
+    ?[...new Set(P.map(p=>p[4].trim()))].sort()
+    :[...new Set(P.filter(p=>p[5]===f.lg).map(p=>p[4].trim()))].sort();
+  return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">全クラブ</div>`+
+    clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${c}">${c}</div>`).join('');
+}
+function wirePicker(slotIdx){
+  const q=document.getElementById('pq');
+  if(q) q.oninput=()=>{pickFilter.q=q.value.toLowerCase();drawPickList(slotIdx)};
+  const posF=document.getElementById('posF');
+  if(posF) posF.onclick=e=>{
+    const c=e.target.closest('[data-pos],[data-subpos]');if(!c)return;
+    if(c.dataset.subpos!==undefined){ pickFilter.subpos=(pickFilter.subpos===c.dataset.subpos?null:c.dataset.subpos); }
+    else { pickFilter.pos=c.dataset.pos; pickFilter.subpos=null; }
+    posF.innerHTML=posChips(); drawPickList(slotIdx);
+  };
+  const lgF=document.getElementById('lgF');
+  if(lgF) lgF.onclick=e=>{const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.club='ALL';[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx)};
+  wirePickClub(slotIdx);
+  drawPickList(slotIdx);
+}
+function wirePickClub(slotIdx){
+  const clubF=document.getElementById('clubF');
+  if(!clubF)return;
+  clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
+}
+function playerMatches(p){
+  if(pickFilter.lg!=='ALL'&&p[5]!==pickFilter.lg)return false;
+  if(pickFilter.subpos){ if(p[1]!==pickFilter.subpos)return false; }
+  else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
+  if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
+  if(pickFilter.q&&!(p[0].toLowerCase().includes(pickFilter.q)||p[4].toLowerCase().includes(pickFilter.q)))return false;
+  return true;
+}
+function inXI(pid){return state.slots.some(s=>s.pid===pid)}
+function drawPickList(slotIdx){
+  const list=document.getElementById('plist');if(!list)return;
+  pickCurIdx=P.map((p,i)=>i).filter(i=>playerMatches(P[i])&&(!benchAddMode||(!inXI(i)&&!state.bench.includes(i))));
+  pickCurIdx.sort(suggestSort);
+  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">▾ さらに ${pickCurIdx.length-PAGE}人</div>`);
+  list._loaded=Math.min(PAGE,pickCurIdx.length);
+  list.onscroll=()=>{
+    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+      const start=list._loaded;if(start>=pickCurIdx.length)return;
+      const more=pickCurIdx.slice(start,start+PAGE);
+      const s=document.getElementById('pickMore');
+      if(s)s.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
+      list._loaded=start+more.length;
+      const ns=document.getElementById('pickMore');
+      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+    }
+  };
+  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;if(benchAddMode)addPlayerToBench(pid);else assign(slotIdx,pid);};
+}
+// ベンチに追加（読込クラブをポジション順で優先表示）
+function openBenchAdd(){
+  pickFilter={pos:'ALL',lg:'ALL',club:state.loadedClub||'ALL',q:''};
+  pickRole=null;
+  openSheet(`
+  <h2>ベンチに追加</h2>
+  <div class="controls">
+    <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+    <div class="filters" id="posF">${posChips()}</div>
+    <div class="filters" id="lgF">${lgChips()}</div>
+    <div class="filters" id="clubF">${clubChips()}</div>
+  </div>
+  <div class="list" id="plist"></div>`);
+  benchAddMode=true;
+  wirePicker(-1);
+}
+function addPlayerToBench(pid){
+  if(!state.bench.includes(pid)&&!inXI(pid)) state.bench.push(pid);
+  closeSheet();render();save();toast(shortName(P[pid][0])+' をベンチに追加しました');
+}
+function prowHTML(i){
+  const p=P[i],g=grp(p[1]),already=inXI(i);
+  return `<div class="prow ${already?'inxi':''}" data-pid="${i}">
+    <div class="pos ${g}">${p[1]}</div>
+    <div class="meta">
+      <div class="nm">${p[0].trim()} ${already?'<span class="badge">●起用中</span>':''}</div>
+      <div class="sub">${p[3]} · ${p[4]} · ${p[2]}歳</div>
+    </div>
+  </div>`;
+}
+function assign(slotIdx,pid){
+  // 同じ選手が他スロットにいたら外す（重複起用防止）
+  const outgoing=state.slots[slotIdx].pid;
+  state.slots.forEach(s=>{if(s.pid===pid)s.pid=null});
+  state.slots[slotIdx].pid=pid;
+  if(state.slots[slotIdx].sub===pid) state.slots[slotIdx].sub=null; // 同枠のスタメン＝第2候補の重複を解消
+  if(outgoing!=null&&outgoing!==pid) benchReturn(outgoing); // 元の選手を控えへ戻す
+  closeSheet();render();save();
+  toast(P[pid][0].trim()+' を '+state.slots[slotIdx].role+' に配置');
+}
+
+/* ---- Slot menu (occupied) ---- */
+function openSlotMenu(i){
+  const s=state.slots[i];
+  const p=P[s.pid];
+  const hasBench=state.loadedClub&&state.bench.length>0;
+  const isCapt=state.captain===s.pid;
+  const subLabel=s.sub!=null&&P[s.sub] ? '第二候補：'+shortName(P[s.sub][0]) : '第二候補を選ぶ';
+  openSheet(`
+    <h2>${shortName(p[0])} <span>${s.role}</span></h2>
+    <div class="menu">
+      <div class="mitem" data-act="photo"><div class="mi">📷</div>写真を追加 / 変更</div>
+      <div class="mitem" data-act="detail"><div class="mi">ℹ️</div>選手の詳細を見る</div>
+      <div class="mitem" data-act="change"><div class="mi">⇄</div>${hasBench?'選手を変更（ベンチ優先）':'選手を変更 / 移籍'}</div>
+      <div class="mitem" data-act="sub"><div class="mi">②</div>${subLabel}</div>
+      <div class="mitem" data-act="captain"><div class="mi">${isCapt?'★':'👑'}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
+      <div class="mitem danger" data-act="remove"><div class="mi">✕</div>スタメンから外す</div>
+    </div>`);
+  body.querySelector('.menu').onclick=e=>{
+    const it=e.target.closest('[data-act]');if(!it)return;
+    const a=it.dataset.act;
+    if(a==='photo')pickPhoto(s.pid);
+    if(a==='detail')openDetail(s.pid,i);
+    if(a==='change') hasBench ? openBenchPicker(i) : openPicker(i);
+    if(a==='sub') openSubPicker(i);
+    if(a==='captain'){ state.captain=isCapt?null:s.pid; closeSheet();render();save();toast(isCapt?'キャプテンを解除':shortName(p[0])+' をキャプテンに指定'); }
+    if(a==='remove'){ if(state.captain===s.pid)state.captain=null; const out=s.pid; s.pid=null; s.sub=null; benchReturn(out); closeSheet();render();save();toast('外しました'); }
+  };
+}
+
+/* ---- 第二候補ピッカー（slot.sub に割り当て） ---- */
+function openSubPicker(slotIdx){
+  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+  const role=state.slots[slotIdx].role;
+  pickRole=role;
+  const hasBench=state.loadedClub&&state.bench.length>0;
+  const cur=state.slots[slotIdx].sub;
+  openSheet(`
+    <h2>第二候補を選ぶ <span>${role}</span></h2>
+    <div class="controls">
+      ${hasBench?`<div class="filters" id="benchModeF">
+        <div class="fchip on" data-bm="bench">ベンチ（${state.bench.length}人）</div>
+        <div class="fchip" data-bm="transfer">✈ 全選手から</div>
+      </div>`:''}
+      <div id="transferExtra" style="${hasBench?'display:none;':''}padding-top:6px">
+        <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+        <div class="filters" id="posF">${posChips()}</div>
+        <div class="filters" id="lgF">${lgChips()}</div>
+        <div class="filters" id="clubF">${clubChips()}</div>
+      </div>
+      ${cur!=null?`<div class="bench-badge">現在の第二候補：<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">解除</span></div>`:''}
+    </div>
+    <div class="list" id="plist"></div>`);
+  const drawSub=()=>{
+    const list=document.getElementById('plist');if(!list)return;
+    const usebench=!document.getElementById('transferExtra')||document.getElementById('transferExtra').style.display==='none';
+    if(hasBench&&usebench){
+      const pids=state.bench;
+      list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid)).join(''):'<div class="empty-msg">ベンチに選手がいません</div>';
+      list.onscroll=null;
+      list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
+    }else{
+      wireSubPickerFull(slotIdx);
+    }
+  };
+  if(hasBench){
+    document.getElementById('benchModeF').onclick=e=>{
+      const c=e.target.closest('[data-bm]');if(!c)return;
+      [...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+      const te=document.getElementById('transferExtra');
+      if(c.dataset.bm==='bench'){ te.style.display='none'; drawSub(); }
+      else{ te.style.display='block'; pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+        document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();document.getElementById('clubF').innerHTML=clubChips();
+        wireSubPickerFull(slotIdx); }
+    };
+  }
+  const cb=body.querySelector('[data-clearsub]');
+  if(cb)cb.onclick=()=>{state.slots[slotIdx].sub=null;closeSheet();render();save();toast('第二候補を解除しました');};
+  drawSub();
+}
+function wireSubPickerFull(slotIdx){
+  const q=document.getElementById('pq');
+  if(q) q.oninput=()=>{pickFilter.q=q.value.toLowerCase();drawSubFull(slotIdx)};
+  const posF=document.getElementById('posF');
+  if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
+  const lgF=document.getElementById('lgF');
+  if(lgF) lgF.onclick=e=>{const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.club='ALL';[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx)};
+  const clubF=document.getElementById('clubF');
+  if(clubF) clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx);};
+  drawSubFull(slotIdx);
+}
+function drawSubFull(slotIdx){
+  const list=document.getElementById('plist');if(!list)return;
+  pickCurIdx=P.map((p,i)=>i).filter(i=>playerMatches(P[i]));
+  pickCurIdx.sort(suggestSort);
+  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">▾ さらに ${pickCurIdx.length-PAGE}人</div>`);
+  list._loaded=Math.min(PAGE,pickCurIdx.length);
+  list.onscroll=()=>{
+    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+      const start=list._loaded;if(start>=pickCurIdx.length)return;
+      const more=pickCurIdx.slice(start,start+PAGE);
+      const sm=document.getElementById('pickMore');
+      if(sm)sm.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
+      list._loaded=start+more.length;
+      const ns=document.getElementById('pickMore');
+      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+    }
+  };
+  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
+}
+function assignSub(slotIdx,pid){
+  if(state.slots[slotIdx].pid===pid){ toast('その選手はこの枠のスタメンです'); return; } // 同枠のスタメンは第2候補にしない
+  state.slots[slotIdx].sub=pid;
+  closeSheet();render();save();
+  toast(shortName(P[pid][0])+' を第二候補に設定');
+}
+
+/* ---- Bench-first picker (チーム読込後) ---- */
+function openBenchPicker(slotIdx){
+  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+  const role=state.slots[slotIdx].role;
+  pickRole=role;
+  const blen=state.bench.length;
+  openSheet(`
+    <h2>選手を変更 <span>${role}</span></h2>
+    <div class="controls">
+      <div class="filters" id="benchModeF">
+        <div class="fchip on" data-bm="bench">ベンチ（${blen}人）</div>
+        <div class="fchip" data-bm="transfer">✈ 移籍市場から</div>
+      </div>
+      <div id="transferExtra" style="display:none;padding-top:6px">
+        <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+        <div class="filters" id="posF">${posChips()}</div>
+        <div class="filters" id="lgF">${lgChips()}</div>
+        <div class="filters" id="clubF">${clubChips()}</div>
+      </div>
+    </div>
+    <div class="list" id="plist"></div>`);
+  drawBenchList(slotIdx);
+  document.getElementById('benchModeF').onclick=e=>{
+    const c=e.target.closest('[data-bm]');if(!c)return;
+    [...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    const te=document.getElementById('transferExtra');
+    if(c.dataset.bm==='bench'){
+      te.style.display='none';
+      drawBenchList(slotIdx);
+    }else{
+      te.style.display='block';
+      pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+      document.getElementById('posF').innerHTML=posChips();
+      document.getElementById('lgF').innerHTML=lgChips();
+      document.getElementById('clubF').innerHTML=clubChips();
+      wirePicker(slotIdx);
+    }
+  };
+}
+function drawBenchList(slotIdx){
+  const list=document.getElementById('plist');if(!list)return;
+  const pids=state.bench;
+  if(!pids.length){list.innerHTML='<div class="empty-msg">ベンチに選手がいません</div>';return;}
+  list.innerHTML=pids.slice().sort(suggestSort).map(pid=>prowHTML(pid)).join('');
+  list.onscroll=null;
+  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assign(slotIdx,+row.dataset.pid);};
+}
+
+/* ---- Player detail ---- */
+function openDetail(pid,slotIdx){
+  const p=P[pid];const ph=state.photos[pid];
+  const inSquad=inXI(pid);
+  const inBench=state.bench.includes(pid);
+  let actions;
+  if(slotIdx!=null){
+    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+      <button class="bigbtn ghost" id="dChange">この選手を変更 / 移籍</button>
+      <button class="bigbtn ghost" id="dRemove">スタメンから外す</button>`;
+  }else if(inSquad){
+    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+      <button class="bigbtn ghost" disabled style="opacity:.5">すでにスタメン起用中</button>`;
+  }else{
+    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+      <button class="bigbtn" id="dAdd">スタメンに入れる</button>`+
+      (inBench
+        ? `<button class="bigbtn ghost" id="dUnbench">ベンチから外す</button>`
+        : `<button class="bigbtn ghost" id="dBench">ベンチ（控え）に加える</button>`);
+  }
+  openSheet(`
+    <h2>選手プロフィール</h2>
+    <div class="detail">
+      <div class="dhead">
+        <div class="davatar${ph?' photo':''}"${ph?` style="background-image:url('${ph}')"`:''}>${SIL}</div>
+        <div>
+          <div class="dname">${p[0].trim()}</div>
+          <div class="dclub">${p[3]} · ${p[4]}</div>
+        </div>
+      </div>
+      <div class="dgrid">
+        <div class="dcell"><div class="dk">ポジション</div><div class="dv">${p[1]}</div></div>
+        <div class="dcell"><div class="dk">年齢</div><div class="dv">${p[2]}<small style="font-size:13px"> 歳</small></div></div>
+        <div class="dcell"><div class="dk">リーグ</div><div class="dv" style="font-size:17px">${L[p[5]]}</div></div>
+        <div class="dcell"><div class="dk">国籍</div><div class="dv" style="font-size:17px">${p[3]}</div></div>
+      </div>
+      ${actions}
+    </div>`);
+  const $=id=>document.getElementById(id);
+  if($('dPhoto'))$('dPhoto').onclick=()=>pickPhoto(pid);
+  if($('dChange'))$('dChange').onclick=()=>{const useBench=slotIdx!=null&&state.loadedClub&&state.bench.length>0;useBench?openBenchPicker(slotIdx):openPicker(slotIdx);};
+  if($('dRemove'))$('dRemove').onclick=()=>{const out=state.slots[slotIdx].pid;state.slots[slotIdx].pid=null;benchReturn(out);closeSheet();render();save();toast('外しました');};
+  if($('dAdd'))$('dAdd').onclick=()=>{ state.bench=state.bench.filter(x=>x!==pid); addToXI(pid); };
+  if($('dBench'))$('dBench').onclick=()=>{ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet();render();save();toast('ベンチに加えました'); };
+  if($('dUnbench'))$('dUnbench').onclick=()=>{ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast('ベンチから外しました'); };
+}
+function addToXI(pid){
+  // 同グループの空きを優先、なければ最初の空き
+  const g=grp(P[pid][1]);
+  let target=state.slots.findIndex(s=>s.pid==null&&grp(s.role)===g);
+  if(target<0)target=state.slots.findIndex(s=>s.pid==null);
+  if(target<0){toast('スタメンが11人埋まっています。誰かを外してください');return;}
+  assign(target,pid);
+}
+
+/* =========================================================
+   Header actions
+   ========================================================= */
+// 移籍市場（全選手ブラウズ）
+let mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+document.getElementById('btnMarket').onclick=()=>{
+  mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+  openSheet(`
+    <h2>移籍市場 <span>全${P.length}選手</span></h2>
+    <div class="controls">
+      <input class="search" id="mq" placeholder="選手名・クラブで検索…" autocomplete="off">
+      <div class="filters" id="mposF">${posChips(mktFilter)}</div>
+      <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
+      <div class="filters" id="mclubF">${clubChips(mktFilter)}</div>
+    </div>
+    <div class="list" id="mlist"></div>`);
+  document.getElementById('mq').oninput=e=>{mktFilter.q=e.target.value.toLowerCase();drawMkt()};
+  document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
+  document.getElementById('mlgF').onclick=e=>{const c=e.target.closest('[data-lg]');if(!c)return;mktFilter.lg=c.dataset.lg;mktFilter.club='ALL';[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt()};
+  wireMktClub();
+  drawMkt();
+};
+function wireMktClub(){
+  const mclubF=document.getElementById('mclubF');if(!mclubF)return;
+  mclubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;mktFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt();};
+}
+function drawMkt(){
+  const list=document.getElementById('mlist');if(!list)return;
+  const f=mktFilter;
+  mktCurIdx=P.map((p,i)=>i).filter(i=>{
+    const p=P[i];
+    if(f.lg!=='ALL'&&p[5]!==f.lg)return false;
+    if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
+    if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
+    if(f.q&&!(p[0].toLowerCase().includes(f.q)||p[4].toLowerCase().includes(f.q)))return false;
+    return true;
+  });
+  mktCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
+  if(!mktCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">▾ さらに ${mktCurIdx.length-PAGE}人</div>`);
+  list._loaded=Math.min(PAGE,mktCurIdx.length);
+  list.onscroll=()=>{
+    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+      const start=list._loaded;if(start>=mktCurIdx.length)return;
+      const more=mktCurIdx.slice(start,start+PAGE);
+      const s=document.getElementById('mktMore');
+      if(s)s.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
+      list._loaded=start+more.length;
+      const ns=document.getElementById('mktMore');
+      if(ns){const rem=mktCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+    }
+  };
+  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;openDetail(+row.dataset.pid,null);};
+}
+
+// クラブのスタメンを一括読込
+document.getElementById('btnLoad').onclick=()=>{
+  const allClubs=[...new Set(P.map(p=>p[4].trim()))].sort();
+  const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"]];
+  let cLg='ALL', cQ='';
+  openSheet(`
+    <h2>クラブを読み込む <span>11人を自動配置</span></h2>
+    <div class="controls">
+      <div class="origbtn" id="cOrig">✎ オリジナルチームを作成（ゼロから組む）</div>
+      <div class="filters" id="cLgF">
+        ${lgOpts.map(o=>`<div class="fchip ${o[0]==='ALL'?'on':''}" data-clg="${o[0]}">${o[1]}</div>`).join('')}
+      </div>
+      <input class="search" id="cq" placeholder="クラブ名を検索…" autocomplete="off" style="margin-top:6px">
+    </div>
+    <div class="list" id="clist"></div>`);
+  document.getElementById('cOrig').onclick=startOriginal;
+  function renderClist(){
+    const clubs=allClubs.filter(c=>{
+      if(cLg!=='ALL'){const p=P.find(p=>p[4].trim()===c);if(!p||p[5]!==cLg)return false;}
+      if(cQ&&!c.toLowerCase().includes(cQ))return false;
+      return true;
+    });
+    document.getElementById('clist').innerHTML=clubs.length
+      ?clubs.map(c=>clubRow(c)).join('')
+      :'<div class="empty-msg">該当するクラブがありません</div>';
+  }
+  document.getElementById('cLgF').onclick=e=>{
+    const c=e.target.closest('[data-clg]');if(!c)return;
+    cLg=c.dataset.clg;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    renderClist();
+  };
+  document.getElementById('cq').oninput=e=>{cQ=e.target.value.toLowerCase();renderClist();};
+  document.getElementById('clist').onclick=e=>{const row=e.target.closest('[data-club]');if(!row)return;loadClub(row.dataset.club);};
+  renderClist();
+};
+/* クラブ名から決定的に色を生成してエンブレム風バッジを作る */
+function clubColors(c){
+  let h=0;for(let k=0;k<c.length;k++)h=(h*31+c.charCodeAt(k))>>>0;
+  const hue=h%360, hue2=(hue+40)%360;
+  return [`hsl(${hue},58%,42%)`,`hsl(${hue2},60%,30%)`];
+}
+function clubRow(c){
+  const players=P.filter(p=>p[4].trim()===c);
+  const lg=L[players[0][5]];
+  const [a,b]=clubColors(c);
+  const init=c.split(' ').map(w=>w[0]).join('').slice(0,3).toUpperCase();
+  return `<div class="prow" data-club="${c}">
+    <div class="emblem" style="width:40px;height:40px;font-size:14px;flex:0 0 auto;background:linear-gradient(150deg,${a},${b})">${init}</div>
+    <div class="meta"><div class="nm">${c}</div><div class="sub">${lg} · ${players.length}名収録</div></div>
+  </div>`;
+}
+// オリジナルチーム作成：まずプロフィール（チーム名など）を入力
+function startOriginal(){
+  const info=state.teamInfo||{};
+  openSheet(`
+    <h2>オリジナルチーム作成 <span>プロフィール</span></h2>
+    <div class="detail">
+      <div class="formfield">
+        <label>チーム名 <i>必須</i></label>
+        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="${(state.teamName&&!state.loadedClub)?escAttr(state.teamName):''}" autocomplete="off">
+      </div>
+      <div class="formfield">
+        <label>スローガン / 愛称 <i>任意</i></label>
+        <input class="search" id="otTag" maxlength="30" placeholder="例：王者への挑戦" value="${info.slogan?escAttr(info.slogan):''}" autocomplete="off">
+      </div>
+      <div class="formfield">
+        <label>監督名 <i>任意</i></label>
+        <input class="search" id="otMgr" maxlength="24" placeholder="例：山田 太郎" value="${info.manager?escAttr(info.manager):''}" autocomplete="off">
+      </div>
+      <div class="formfield">
+        <label>本拠地 <i>任意</i></label>
+        <input class="search" id="otHome" maxlength="24" placeholder="例：東京" value="${info.home?escAttr(info.home):''}" autocomplete="off">
+      </div>
+      <div class="formfield">
+        <label>チームカラー</label>
+        <div class="colorrow" id="otColors">
+          ${['#caff3a','#ff5b6e','#4fc3f7','#ffd166','#a78bfa','#ff8a65','#4ade80','#f472b6'].map((c,i)=>`<span class="cdot2${(info.color||'#caff3a')===c?' on':''}" data-color="${c}" style="background:${c}"></span>`).join('')}
+        </div>
+      </div>
+      <button class="bigbtn" id="otStart">この内容でチームを作成 →</button>
+      <button class="bigbtn ghost" id="otBlank">名前だけで今すぐ作成</button>
+    </div>`);
+  let chosen=info.color||'#caff3a';
+  document.getElementById('otColors').onclick=e=>{
+    const c=e.target.closest('[data-color]');if(!c)return;
+    chosen=c.dataset.color;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+  };
+  const build=()=>{
+    const name=(document.getElementById('otName').value||'').trim();
+    if(!name){ toast('チーム名を入力してください'); document.getElementById('otName').focus(); return; }
+    state.slots.forEach(s=>{s.pid=null;s.sub=null;});
+    state.bench=[];
+    state.loadedClub=null;
+    state.captain=null;
+    state.teamName=name;
+    state.teamInfo={
+      slogan:(document.getElementById('otTag').value||'').trim(),
+      manager:(document.getElementById('otMgr').value||'').trim(),
+      home:(document.getElementById('otHome').value||'').trim(),
+      color:chosen
+    };
+    closeSheet();render();save();
+    toast(name+' を作成！空きの◯をタップして選手を配置');
+  };
+  document.getElementById('otStart').onclick=build;
+  document.getElementById('otBlank').onclick=build;
+}
+function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function loadClub(club){
+  const ids=P.map((p,i)=>i).filter(i=>P[i][4].trim()===club);
+  // 各スロットを、その役割のサジェスト順で最適な選手から埋める（適性ポジション優先）
+  const used=new Set();
+  const savedRole=pickRole;
+  state.slots.forEach(s=>{
+    pickRole=s.role;
+    const pid=ids.filter(id=>!used.has(id)).sort(suggestSort)[0];
+    if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null;
+  });
+  pickRole=savedRole;
+  // 起用しなかった残りの選手はベンチへ
+  state.bench=ids.filter(id=>!used.has(id));
+  state.loadedClub=club;
+  state.teamName=club;
+  state.teamInfo=null;
+  state.captain=null;
+  autoAssignSubs(); // 第二候補を初期割当（以後は手動・自動では変わらない）
+  closeSheet();render();save();toast(club+' のスタメン・控え・第二候補を配置しました');
+}
+
+/* ---- スカッド分析（スタッツバーをタップ） ---- */
+document.getElementById('statbar').onclick=openSquadAnalysis;
+function openSquadAnalysis(){
+  const xi=state.slots.filter(s=>s.pid!=null).map(s=>P[s.pid]);
+  if(!xi.length){ toast('まず選手を配置してください'); return; }
+  const bench=state.bench.map(pid=>P[pid]);
+  const all=xi.concat(bench);
+  const sum=a=>a.reduce((x,y)=>x+y,0);
+  const ages=xi.map(p=>p[2]);
+  const avg=(sum(ages)/ages.length).toFixed(1);
+  const cnt={GK:0,DF:0,MF:0,FW:0};
+  xi.forEach(p=>{const g=grp(p[1]).toUpperCase();cnt[g]=(cnt[g]||0)+1;});
+  const youngest=[...xi].sort((a,b)=>a[2]-b[2])[0];
+  const oldest=[...xi].sort((a,b)=>b[2]-a[2])[0];
+  // 国籍集計（フラグ＋略号。全カ国を表示）
+  const nat={};
+  xi.forEach(p=>{const key=p[3].trim();nat[key]=(nat[key]||0)+1;});
+  const natTop=Object.entries(nat).sort((a,b)=>b[1]-a[1]).map(e=>e[0]+(e[1]>1?' ×'+e[1]:'')).join('　');
+  const natCount=Object.keys(nat).length;
+  const captP=state.captain!=null&&P[state.captain]?shortName(P[state.captain][0]):'未設定';
+  openSheet(`
+    <h2>スカッド分析 <span>${teamDisplayName()||'オリジナル'}</span></h2>
+    <div class="detail">
+      <div class="dgrid">
+        <div class="dcell"><div class="dk">平均年齢</div><div class="dv lime">${avg}<small style="font-size:13px"> 歳</small></div></div>
+        <div class="dcell"><div class="dk">起用人数</div><div class="dv">${xi.length}<small style="font-size:13px">/11</small></div></div>
+        <div class="dcell"><div class="dk">控え選手</div><div class="dv">${bench.length}<small style="font-size:13px"> 人</small></div></div>
+        <div class="dcell full"><div class="dk">ポジション構成 (GK・DF・MF・FW)</div>
+          <div class="dv">${cnt.GK} ・ ${cnt.DF} ・ ${cnt.MF} ・ ${cnt.FW}</div>
+          ${posBar(cnt,xi.length)}
+        </div>
+        <div class="dcell"><div class="dk">キャプテン</div><div class="dv" style="font-size:18px">${captP}</div></div>
+        <div class="dcell"><div class="dk">最年少</div><div class="dv" style="font-size:18px">${shortName(youngest[0])}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${youngest[2]}歳</div></div>
+        <div class="dcell"><div class="dk">最年長</div><div class="dv" style="font-size:18px">${shortName(oldest[0])}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${oldest[2]}歳</div></div>
+        <div class="dcell full"><div class="dk">国籍 (${natCount}カ国)</div><div class="dv" style="font-size:16px">${natTop}</div></div>
+      </div>
+      <button class="bigbtn ghost" id="saClose">閉じる</button>
+    </div>`);
+  const c=document.getElementById('saClose');if(c)c.onclick=closeSheet;
+}
+function posBar(cnt,total){
+  const cols={GK:'#ffd166',DF:'#4fc3f7',MF:'#caff3a',FW:'#ff8a65'};
+  const seg=['GK','DF','MF','FW'].filter(k=>cnt[k]>0).map(k=>
+    `<div style="flex:${cnt[k]};background:${cols[k]}"></div>`).join('');
+  return `<div style="display:flex;height:8px;border-radius:5px;overflow:hidden;margin-top:8px;gap:2px">${seg}</div>`;
+}
+
+/* =========================================================
+   SNS共有：スタメン画像を生成して共有（画像＋アプリリンク）
+   ========================================================= */
+const APP_URL='https://starting-xi.app';
+function roleCol(role){const g=grp(role);return {gk:'#ffd166',df:'#4fc3f7',mf:'#caff3a',fw:'#ff8a65'}[g]||'#caff3a';}
+function roundRect(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath();}
+
+// 端末内の選手写真を事前ロード（共有画像に反映するため）
+function preloadPhotos(){
+  const targets=state.slots.filter(s=>s.pid!=null&&state.photos[s.pid]);
+  return Promise.all(targets.map(s=>new Promise(res=>{
+    const im=new Image();
+    im.onload=()=>res([s.pid,im]); im.onerror=()=>res(null);
+    im.src=state.photos[s.pid];
+  }))).then(arr=>{ const m={}; arr.forEach(e=>{ if(e)m[e[0]]=e[1]; }); return m; });
+}
+// 頭〜肩のシルエット（イニシャルは入れない）
+function drawSilhouette(x,fx,fy,R){
+  x.save();
+  x.beginPath();x.arc(fx,fy,R-4,0,7);x.clip();
+  x.fillStyle='rgba(234,255,240,.82)';
+  // 頭
+  x.beginPath();x.arc(fx,fy-9,12,0,7);x.fill();
+  // 肩
+  x.beginPath();x.arc(fx,fy+30,23,Math.PI,2*Math.PI);x.fill();
+  x.restore();
+}
+async function buildShareCanvas(){
+  const photoImgs=await preloadPhotos();
+  const W=1080,H=1440,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const x=cv.getContext('2d');
+  const accent=(state.teamInfo&&state.teamInfo.color)||'#caff3a';
+  // 背景
+  const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#16221c');bg.addColorStop(.45,'#0a0e0c');bg.addColorStop(1,'#0a0e0c');
+  x.fillStyle=bg;x.fillRect(0,0,W,H);
+  // ヘッダー：アプリ名（常に表示）
+  x.textBaseline='alphabetic';x.textAlign='left';
+  x.font='800 58px Manrope,sans-serif';x.fillStyle='#eafff0';x.fillText('STARTING',56,104);
+  const w1=x.measureText('STARTING ').width;
+  x.fillStyle=accent;x.fillText(' XI',56+w1,104);
+  // フォーメーション右上
+  x.textAlign='right';x.font='800 46px "Bebas Neue",Manrope,sans-serif';x.fillStyle='#7d9389';
+  x.fillText(state.formation,W-56,100);x.textAlign='left';
+  // チーム名（ピル）
+  const tn=teamDisplayName();let headBottom=150;
+  if(tn){
+    x.font='800 34px Manrope,sans-serif';const pw=Math.min(x.measureText(tn).width,W-180);
+    x.fillStyle=accent;roundRect(x,56,128,pw+52,60,30);x.fill();
+    x.fillStyle='#0a0e0c';x.fillText(tn,84,170);headBottom=210;
+    if(state.teamInfo&&state.teamInfo.slogan){x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,58,244);headBottom=260;}
+  }
+  // ピッチ
+  const px=46,py=Math.max(270,headBottom+30),pw=W-92,ph=920;
+  // 芝のストライプ
+  const stripes=11;for(let i=0;i<stripes;i++){x.fillStyle=(i%2===0)?'#15493a':'#12402f';x.fillRect(px,py+ph/stripes*i,pw,ph/stripes+1);}
+  roundRect(x,px,py,pw,ph,24);x.save();x.clip();
+  // マーキング
+  x.strokeStyle='rgba(255,255,255,.16)';x.lineWidth=3;
+  x.strokeRect(px+pw*0.24,py,pw*0.52,ph*0.14);
+  x.strokeRect(px+pw*0.24,py+ph*0.86,pw*0.52,ph*0.14);
+  x.beginPath();x.moveTo(px+pw*0.05,py+ph/2);x.lineTo(px+pw*0.95,py+ph/2);x.stroke();
+  x.beginPath();x.arc(px+pw/2,py+ph/2,pw*0.13,0,7);x.stroke();
+  x.restore();
+  roundRect(x,px,py,pw,ph,24);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.12)';x.stroke();
+  // トークン
+  state.slots.forEach(s=>{
+    if(s.pid==null)return;const p=P[s.pid];
+    const fx=px+(s.x/100)*pw, fy=py+((100-s.y)/100)*ph, R=42;
+    x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
+    x.textAlign='center';
+    const im=photoImgs[s.pid];
+    if(im){
+      // ユーザーが追加した写真を円形に反映
+      x.save();x.beginPath();x.arc(fx,fy,R-4,0,7);x.clip();
+      const side=Math.min(im.width,im.height);
+      const sx=(im.width-side)/2, sy=(im.height-side)/2;
+      x.drawImage(im,sx,sy,side,side, fx-(R-4),fy-(R-4),(R-4)*2,(R-4)*2);
+      x.restore();
+    }else{
+      // 写真なしは頭の形のシルエット（イニシャルは入れない）
+      drawSilhouette(x,fx,fy,R);
+    }
+    x.lineWidth=6;x.strokeStyle=roleCol(s.role);x.beginPath();x.arc(fx,fy,R,0,7);x.stroke();
+    // キャプテン
+    if(state.captain===s.pid){x.beginPath();x.arc(fx-R+8,fy-R+8,16,0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 20px Manrope,sans-serif';x.fillText('C',fx-R+8,fy-R+15);}
+    // 名前
+    x.fillStyle='#eafff0';x.font='800 26px Manrope,sans-serif';
+    x.fillText(shortName(p[0]),fx,fy+R+46);
+    // 役職
+    x.fillStyle=roleCol(s.role);x.font='700 19px Manrope,sans-serif';
+    x.fillText(s.role,fx,fy+R+70);
+    // 第二候補
+    if(s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText('▸ '+shortName(P[s.sub][0]),fx,fy+R+92);}
+    x.textAlign='left';
+  });
+  // フッター
+  const fy=py+ph+58;
+  const xi=state.slots.filter(s=>s.pid!=null).map(s=>P[s.pid]);
+  const avgAge=xi.length?(xi.reduce((a,p)=>a+p[2],0)/xi.length).toFixed(1):'–';
+  x.fillStyle='#7d9389';x.font='700 26px Manrope,sans-serif';x.textAlign='left';
+  x.fillText('AVG AGE',56,fy);
+  x.fillStyle=accent;x.font='800 40px "Bebas Neue",Manrope,sans-serif';
+  x.fillText(avgAge,56,fy+44);
+  x.textAlign='right';x.fillStyle='#5a6b62';x.font='700 24px Manrope,sans-serif';
+  x.fillText('⚽ made with STARTING XI',W-56,fy);
+  x.fillStyle=accent;x.font='700 24px Manrope,sans-serif';
+  x.fillText(APP_URL.replace('https://',''),W-56,fy+38);
+  x.textAlign='left';
+  return cv;
+}
+
+async function shareLineup(){
+  const filled=state.slots.filter(s=>s.pid!=null).length;
+  if(!filled){ toast('まず選手を配置してください'); return; }
+  toast('画像を生成中…');
+  const tn=teamDisplayName();
+  const shareText=(tn?tn+' ':'')+'の最強スタメン⚽ #StartingXI で作成！';
+  let canvas;
+  try{ canvas=await buildShareCanvas(); }catch(e){ toast('画像の生成に失敗しました'); return; }
+  canvas.toBlob(blob=>{
+    if(!blob){ toast('画像の生成に失敗しました'); return; }
+    const file=new File([blob],'starting-xi.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],text:shareText,url:APP_URL}).catch(()=>{});
+    }else{
+      openShareFallback(URL.createObjectURL(blob),shareText);
+    }
+  },'image/png');
+}
+// 共有非対応時：画像プレビュー＋アプリリンク（青・見切れ表示）＋保存/コピー
+function openShareFallback(imgUrl,shareText){
+  openSheet(`
+    <h2>SNSに共有 <span>プレビュー</span></h2>
+    <div class="detail">
+      <div class="shareprev"><img src="${imgUrl}" alt="lineup"></div>
+      <div class="sharecap">${escAttr(shareText)}</div>
+      <div class="sharelink"><span class="sl">${APP_URL}/s/${Math.random().toString(36).slice(2,9)}</span></div>
+      <button class="bigbtn" id="shDl">画像を保存</button>
+      <button class="bigbtn ghost" id="shCopy">リンクをコピー</button>
+    </div>`);
+  document.getElementById('shDl').onclick=()=>{const a=document.createElement('a');a.href=imgUrl;a.download='starting-xi.png';a.click();toast('画像を保存しました');};
+  document.getElementById('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(shareText+' '+APP_URL);toast('リンクをコピーしました');}catch(e){toast('コピーできませんでした');}};
+}
+document.getElementById('btnShare').onclick=shareLineup;
+
+// 整列リセット（フォーメーション既定位置へ）
+document.getElementById('btnReset').onclick=()=>{
+  const f=FORM[state.formation];
+  state.slots.forEach((s,i)=>{s.x=f[i][1];s.y=f[i][2];});
+  render();save();toast('既定の配置に戻しました');
+};
+
+/* =========================================================
+   Toast
+   ========================================================= */
+let tT;const toastEl=document.getElementById('toast');
+function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>toastEl.classList.remove('on'),1900);}
+
+/* =========================================================
+   Init
+   ========================================================= */
+(async function init(){
+  const saved=await load();
+  const ph=await loadPhotos();
+  if(ph&&typeof ph==='object')state.photos=ph;
+  if(saved&&saved.slots&&saved.slots.length===11){
+    state.formation=saved.formation||"4-3-3";
+    state.slots=saved.slots;
+    state.bench=Array.isArray(saved.bench)?saved.bench:[];
+    state.loadedClub=saved.loadedClub||null;
+    state.captain=(saved.captain!=null)?saved.captain:null;
+    state.teamName=saved.teamName||null;
+    state.teamInfo=saved.teamInfo||null;
+    [...fbar.children].forEach(c=>c.classList.toggle('on',c.textContent===state.formation));
+  }else{
+    buildSlots("4-3-3",false);
+  }
+  render();
+})();
+</script>
