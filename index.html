@@ -72,7 +72,7 @@ header{
 /* ---------- Pitch ---------- */
 .pitchwrap{padding:8px 12px 8px;position:relative}
 .pitch{
-  position:relative;width:100%;height:clamp(540px,72vh,600px);border-radius:18px;overflow:hidden;
+  position:relative;width:100%;height:clamp(560px,72vh,610px);border-radius:18px;overflow:hidden;
   background:
     repeating-linear-gradient(0deg, var(--grass-a) 0 9.09%, var(--grass-b) 9.09% 18.18%);
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.10), var(--shadow);
@@ -89,25 +89,25 @@ header{
 
 /* ---------- Player token ---------- */
 .tok{
-  position:absolute;width:64px;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:none;z-index:2;
+  position:absolute;width:80px;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:pan-y;z-index:2;
 }
 .tok.drag{z-index:30;cursor:grabbing}
 .disc{
-  width:44px;height:44px;border-radius:50%;display:grid;place-items:center;position:relative;
+  width:50px;height:50px;border-radius:50%;display:grid;place-items:center;position:relative;
   background:linear-gradient(160deg,#1d2722,#10160f);
   border:2px solid var(--lime);box-shadow:0 5px 14px rgba(0,0,0,.5);
-  font-weight:800;font-size:13px;color:var(--ink);
+  font-weight:800;font-size:15px;color:var(--ink);
 }
 .tok.drag .disc{transform:scale(1.12);border-color:#fff}
 .disc.empty{border-style:dashed;border-color:var(--mut);background:rgba(255,255,255,.03);color:var(--mut);font-weight:600;font-size:20px}
-.disc svg{width:23px;height:23px;opacity:.9}
+.disc svg{width:26px;height:26px;opacity:.9}
 .disc.photo{background-size:cover;background-position:center 20%}
 .disc.photo svg{display:none}
 .disc .val{position:absolute;bottom:-6px;right:-6px;background:var(--lime);color:#0a0e0c;font-size:8px;font-weight:800;padding:1px 4px;border-radius:6px;border:1px solid #0a0e0c}
-.role{margin-top:13px;font-family:'Bebas Neue';font-size:11px;letter-spacing:1px;color:var(--lime-dim);line-height:1}
-.pname{margin-top:2px;font-size:10px;font-weight:700;max-width:74px;text-align:center;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
-.psub{margin-top:1px;font-size:8.5px;font-weight:700;max-width:78px;text-align:center;color:#ffc46b;opacity:.92;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
+.role{margin-top:12px;font-family:'Bebas Neue';font-size:12px;letter-spacing:1px;color:var(--lime-dim);line-height:1}
+.pname{margin-top:2px;font-size:13px;font-weight:700;max-width:96px;text-align:center;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
+.psub{margin-top:1px;font-size:10px;font-weight:700;max-width:96px;text-align:center;color:#ffc46b;opacity:.92;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;text-shadow:0 1px 3px #000}
 .psub::before{content:'▸';font-size:7px;margin-right:2px;opacity:.7}
 .flag{font-size:9px}
 .disc .capt{position:absolute;top:-6px;left:-6px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:#0a0e0c;font-size:9px;font-weight:800;display:grid;place-items:center;border:1.5px solid #0a0e0c}
@@ -2571,11 +2571,11 @@ const FORM={
 "4-3-3":[["GK",50,12],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CM",68,52],["CM",50,46],["CM",32,52],["RW",80,78],["ST",50,85],["LW",20,78]],
 "4-4-2":[["GK",50,12],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["RM",82,54],["CM",60,50],["CM",40,50],["LM",18,54],["ST",62,83],["ST",38,83]],
 "4-2-3-1":[["GK",50,12],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CDM",62,44],["CDM",38,44],["RW",82,67],["CAM",50,63],["LW",18,67],["ST",50,87]],
-"3-5-2":[["GK",50,12],["CB",72,31],["CB",50,31],["CB",28,31],["RWB",89,48],["CM",64,52],["CM",50,46],["CM",36,52],["LWB",11,48],["ST",62,83],["ST",38,83]],
-"3-4-3":[["GK",50,12],["CB",72,31],["CB",50,31],["CB",28,31],["RM",85,50],["CM",60,48],["CM",40,48],["LM",15,50],["RW",78,81],["ST",50,85],["LW",22,81]],
-"5-3-2":[["GK",50,12],["RWB",89,32],["CB",68,31],["CB",50,31],["CB",32,31],["LWB",11,32],["CM",68,55],["CM",50,50],["CM",32,55],["ST",62,83],["ST",38,83]],
+"3-5-2":[["GK",50,12],["CB",72,33],["CB",50,33],["CB",28,33],["RWB",89,48],["CM",64,52],["CM",50,46],["CM",36,52],["LWB",11,48],["ST",62,83],["ST",38,83]],
+"3-4-3":[["GK",50,12],["CB",72,33],["CB",50,33],["CB",28,33],["RM",85,50],["CM",60,48],["CM",40,48],["LM",15,50],["RW",78,81],["ST",50,85],["LW",22,81]],
+"5-3-2":[["GK",50,12],["RWB",89,32],["CB",68,33],["CB",50,33],["CB",32,33],["LWB",11,32],["CM",68,55],["CM",50,50],["CM",32,55],["ST",62,83],["ST",38,83]],
 "4-1-2-1-2":[["GK",50,12],["RB",82,26],["CB",63,22],["CB",37,22],["LB",18,26],["CDM",50,42],["CM",75,56],["CM",25,56],["CAM",50,68],["ST",62,85],["ST",38,85]],
-"5-4-1":[["GK",50,12],["RWB",89,32],["CB",68,31],["CB",50,31],["CB",32,31],["LWB",11,32],["RM",82,57],["CM",60,53],["CM",40,53],["LM",18,57],["ST",50,85]]
+"5-4-1":[["GK",50,12],["RWB",89,32],["CB",68,33],["CB",50,33],["CB",32,33],["LWB",11,32],["RM",82,57],["CM",60,53],["CM",40,53],["LM",18,57],["ST",50,85]]
 };
 const FORMS=Object.keys(FORM);
 
@@ -2887,25 +2887,40 @@ FORMS.forEach(f=>{
    Drag & tap on tokens
    ========================================================= */
 function attachDrag(el,actor){
-  let sx,sy,ox,oy,moved,rect;
+  let sx,sy,ox,oy,moved,armed,timer,pid,rect;
   const base=()=>state.slots[actor];
+  function arm(){
+    armed=true; const b=base(); ox=b.x; oy=b.y;
+    try{el.setPointerCapture(pid);}catch(_){}
+    el.classList.add('drag');
+    if(navigator.vibrate){try{navigator.vibrate(15);}catch(_){}}
+  }
+  function disarm(){ if(timer){clearTimeout(timer);timer=null;} }
   el.addEventListener('pointerdown',e=>{
-    e.preventDefault();
-    rect=pitch.getBoundingClientRect();moved=false;
-    sx=e.clientX;sy=e.clientY;const b=base();ox=b.x;oy=b.y;
-    el.setPointerCapture(e.pointerId);el.classList.add('drag');
+    sx=e.clientX;sy=e.clientY;moved=false;armed=false;pid=e.pointerId;
+    rect=pitch.getBoundingClientRect();
+    if(e.pointerType==='mouse'){ e.preventDefault(); arm(); }   // マウスは即ドラッグ
+    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },500); } // タッチは0.5秒長押し
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
-    if(Math.abs(e.clientX-sx)>5||Math.abs(e.clientY-sy)>5)moved=true;
+    if(!armed){
+      if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6){ moved=true; disarm(); } // 長押し前に動いた＝スクロール
+      return;
+    }
+    e.preventDefault(); moved=true;
     const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
     const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
     base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';
   });
   el.addEventListener('pointerup',e=>{
+    disarm();
+    if(sx===undefined)return;
+    const wasArmed=armed, wasMoved=moved; sx=undefined; armed=false;
     el.classList.remove('drag');
-    if(sx===undefined)return;sx=undefined;
-    if(!moved){ onSlotTap(actor); return; }
+    try{el.releasePointerCapture(pid);}catch(_){}
+    if(!wasMoved){ onSlotTap(actor); return; }   // タップ（長押しのみ含む）→ メニュー
+    if(!wasArmed) return;                         // 長押し前に動いた＝スクロール、何もしない
     let tj=-1,best=46;
     for(let j=0;j<state.slots.length;j++){
       if(j===actor)continue;
@@ -2919,14 +2934,12 @@ function attachDrag(el,actor){
       state.slots[actor].x=ox;state.slots[actor].y=oy;
       render();save();toast('ポジションを入れ替えました');
     }else{
-      // 空きスペースへ移動 → 新しい位置からポジション名を自動判定
-      const s=state.slots[actor];
-      const nr=roleFromXY(s.x,s.y);
+      const s=state.slots[actor];const nr=roleFromXY(s.x,s.y);
       if(nr!==s.role){ s.role=nr; render(); toast('ポジションを '+nr+' に変更'); }
       save();
     }
   });
-  el.addEventListener('pointercancel',()=>{el.classList.remove('drag');sx=undefined;});
+  el.addEventListener('pointercancel',()=>{ disarm(); el.classList.remove('drag'); sx=undefined; armed=false; });
 }
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 
@@ -3186,7 +3199,7 @@ function addPlayerToBench(pid){
 // 3文字コード → flag-icons のコード（全端末で旗を画像表示。コソボxk・英4地域も対応）
 const FI={ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa'};
 // 国籍フィールド("🏴 ENG"等) → 画像旗+略号
-function flagHTML(nat){ const code=(nat||'').trim().split(' ').pop(); const fi=FI[code]; return (fi?`<span class="fi fi-${fi}"></span>`:'')+code; }
+function flagHTML(nat){ const code=(nat||'').trim().split(' ').pop(); const fi=FI[code]; return fi?`<span class="fi fi-${fi}"></span>`:code; }
 function prowHTML(i){
   const p=P[i],g=grp(p[1]),already=inXI(i);
   return `<div class="prow ${already?'inxi':''}" data-pid="${i}">
