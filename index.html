@@ -4755,7 +4755,7 @@ function makeBenchGhost(pid){
 }
 function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   el.style.touchAction='none'; // ドラッグ中にブラウザのスクロールと競合させない（長押しで起動、スクロールは余白から）
-  let sx,sy,armed=false,didDrag=false,timer=null,ghost=null,lastX=0,lastY=0,scrollRAF=0,ptrId=null;
+  let sx,sy,armed=false,didDrag=false,timer=null,ghost=null,lastX=0,lastY=0,scrollRAF=0,ptrId=null,psy=0;
   const scroller=document.getElementById('scroll');
   function clearAreas(){ const bg=document.querySelector('#bench .bgrid'),rg=document.querySelector('.rgrid'); if(bg)bg.classList.remove('dropon'); if(rg)rg.classList.remove('dropon'); }
   function paint(){
@@ -4786,17 +4786,17 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   }
   function disarmTimer(){ if(timer){clearTimeout(timer);timer=null;} }
   el.addEventListener('pointerdown',e=>{
-    sx=e.clientX; sy=e.clientY; lastX=e.clientX; lastY=e.clientY;
+    sx=e.clientX; sy=e.clientY; lastX=e.clientX; lastY=e.clientY; psy=e.clientY;
     armed=false; didDrag=false; ptrId=e.pointerId;
     if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },500); } // タッチは0.5秒長押しでドラッグ
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
     if(!armed){
-      // マウスは少し動いたらドラッグ開始。タッチは長押し前の移動＝スクロールなのでドラッグしない
+      // マウスは少し動いたらドラッグ開始。タッチは長押し前の移動＝スクロール（カードの上でも手動で縦スクロール）
       if(e.pointerType==='mouse'&&(Math.abs(e.clientX-sx)>3||Math.abs(e.clientY-sy)>3)){ arm(); }
-      else if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6){ disarmTimer(); } // タッチ：長押し前に動いた＝スクロール
-      if(!armed) return;
+      else if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6){ disarmTimer(); didDrag=true; } // 移動＝スクロール意図（タップ誤発火も抑制）
+      if(!armed){ if(didDrag){ scroller.scrollTop-=(e.clientY-psy); } psy=e.clientY; return; }
     }
     e.preventDefault();
     lastX=e.clientX; lastY=e.clientY; paint();
@@ -4918,7 +4918,7 @@ setFormLabel();
    Drag & tap on tokens
    ========================================================= */
 function attachDrag(el,actor){
-  let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null;
+  let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0;
   const base=()=>state.slots[actor];
   const scroller=document.getElementById('scroll');
   const benchEl=document.getElementById('bench');
@@ -4927,11 +4927,13 @@ function attachDrag(el,actor){
   // 画面端で自動スクロール（駒をベンチまで持っていけるように）
   function autoScrollTick(){
     if(!armed){scrollRAF=0;return;}
-    const vh=window.innerHeight, edge=110, max=16;
-    let dy=0;
-    if(lastY>vh-edge) dy=max*(1-(vh-lastY)/edge);
-    else if(lastY<edge) dy=-max*(1-lastY/edge);
-    if(dy) scroller.scrollTop+=dy;
+    if(moved){ // 実際にドラッグを始めてからのみ（アーム直後の誤スクロール暴走を防止）
+      const vh=window.innerHeight, edge=90, max=16;
+      let dy=0;
+      if(lastY>vh-edge) dy=max*(1-(vh-lastY)/edge);
+      else if(lastY<edge) dy=-max*(1-lastY/edge);
+      if(dy) scroller.scrollTop+=dy;
+    }
     scrollRAF=requestAnimationFrame(autoScrollTick);
   }
   function arm(){
@@ -4945,6 +4947,7 @@ function attachDrag(el,actor){
   function stopScroll(){ if(scrollRAF){cancelAnimationFrame(scrollRAF);scrollRAF=0;} }
   el.addEventListener('pointerdown',e=>{
     sx=e.clientX;sy=e.clientY;moved=false;armed=false;pid=e.pointerId;
+    lastX=sx;lastY=sy;psy=sy; // 自動スクロールの誤作動防止＋長押し前スクロール用に初期化
     rect=pitch.getBoundingClientRect();
     if(e.pointerType==='mouse'){ e.preventDefault(); arm(); }   // マウスは即ドラッグ
     else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },500); } // タッチは0.5秒長押し
@@ -4952,8 +4955,10 @@ function attachDrag(el,actor){
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
     if(!armed){
-      // 長押し(0.5秒)前に動いた＝スクロール意図。ドラッグせずブラウザのスクロールに任せる（駒は動かさない）
+      // 長押し(0.5秒)前に動いた＝スクロール意図。駒は動かさず、駒の上でも画面を手動で縦スクロール
       if(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10){ moved=true; disarm(); }
+      if(moved){ scroller.scrollTop-=(e.clientY-psy); }
+      psy=e.clientY;
       return;
     }
     e.preventDefault(); moved=true; lastX=e.clientX; lastY=e.clientY;
