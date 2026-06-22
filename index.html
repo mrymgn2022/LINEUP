@@ -105,7 +105,7 @@ header{
 /* ---------- Player token ---------- */
 .tok{
   position:absolute;width:80px;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:pan-y;z-index:2;
+  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:none;z-index:2;
 }
 .tok.drag{z-index:30;cursor:grabbing}
 .disc{
@@ -183,7 +183,7 @@ header{
 .bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
 .bcard .bv{font-size:10px;color:var(--mut);font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;min-height:15px}
 .bcard .bv .fi{font-size:15px;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35)}
-.bcard[data-pid]{touch-action:pan-y}
+.bcard[data-pid]{touch-action:none}
 .bcard.dragging{opacity:.35}
 .bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:96px}
 .bcard.add:active{background:rgba(255,255,255,.03)}
@@ -4754,7 +4754,7 @@ function makeBenchGhost(pid){
   return g;
 }
 function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
-  el.style.touchAction='pan-y'; // 長押し前は縦スクロールを許可
+  el.style.touchAction='none'; // ドラッグ中にブラウザのスクロールと競合させない（長押しで起動、スクロールは余白から）
   let sx,sy,armed=false,didDrag=false,timer=null,ghost=null,lastX=0,lastY=0,scrollRAF=0,ptrId=null;
   const scroller=document.getElementById('scroll');
   function clearAreas(){ const bg=document.querySelector('#bench .bgrid'),rg=document.querySelector('.rgrid'); if(bg)bg.classList.remove('dropon'); if(rg)rg.classList.remove('dropon'); }
