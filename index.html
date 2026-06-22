@@ -4571,11 +4571,11 @@ function autoAssignSubs(){
   state.slots.forEach(s=>{
     if(s.pid==null){s.sub=null;return;}
     pickRole=s.role;
-    // 控えのうち未使用の選手を、その枠のサジェスト順（適性ポジション優先）で1人
-    const avail=state.bench.filter(pid=>!inXI(pid)&&!used.has(pid)).sort(suggestSort);
+    // 控えのうち「同じ大枠(GK/DF/MF/FW)」の未使用選手だけを、その枠のサジェスト順で1人
+    // （先に大枠で絞らないと、LM/RM枠でサジェスト上位のウイング等が選ばれて大枠不一致→nullになる）
+    const avail=state.bench.filter(pid=>!inXI(pid)&&!used.has(pid)&&grp(P[pid][1])===grp(s.role)).sort(suggestSort);
     const pid=avail[0];
-    // 同じ大枠の控えがいる場合のみ第二候補に（大枠外まで無理に割り当てない）
-    if(pid!=null&&grp(P[pid][1])===grp(s.role)){ used.add(pid); s.sub=pid; } else s.sub=null;
+    if(pid!=null){ used.add(pid); s.sub=pid; } else s.sub=null;
   });
   pickRole=savedRole;
 }
@@ -5857,8 +5857,14 @@ function clubRow(c){
 function autoFillFrom(ids){
   const used=new Set(); const savedRole=pickRole;
   state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
+  // 控え構成：まず各スタメン枠に同じ大枠(GK/DF/MF/FW)のバックアップを1人ずつ確保し、
+  // 残り枠を市場価値順で埋める（こうしないと高額なFW/MFに偏ってDFの第二候補が付かない）
+  const benchSet=new Set();
+  state.slots.forEach(s=>{ if(s.pid==null)return; pickRole=s.role; const back=ids.filter(id=>!used.has(id)&&!benchSet.has(id)&&grp(P[id][1])===grp(s.role)).sort(suggestSort)[0]; if(back!=null) benchSet.add(back); });
   pickRole=savedRole;
-  state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15);
+  for(const id of ids.filter(id=>!used.has(id)&&!benchSet.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]))){ if(benchSet.size>=15)break; benchSet.add(id); }
+  state.bench=[...benchSet].sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
+  autoAssignSubs(); // 第二候補も初期割当（条件指定の自動配置でも全ポジションに付くように）
 }
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
 function autoFillNationality(code,form,name){
