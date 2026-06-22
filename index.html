@@ -105,7 +105,7 @@ header{
 /* ---------- Player token ---------- */
 .tok{
   position:absolute;width:80px;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:none;z-index:2;
+  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:pan-y;z-index:2;
 }
 .tok.drag{z-index:30;cursor:grabbing}
 .disc{
@@ -4425,7 +4425,7 @@ function roleFromXY(x,y){
 /* =========================================================
    State
    ========================================================= */
-let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,tokInfo:'sub',loadedClub:null,captain:null,teamName:null,teamInfo:null}; // names/memos: {安定ID -> 文字列}; tokInfo: 駒下の表示 'sub'(第2候補)|'memo'(メモ)|'none'
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,loadedClub:null,captain:null,teamName:null,teamInfo:null}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
 let tokenEls={};
 const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M3.5 21c0-4.2 4-6.5 8.5-6.5s8.5 2.3 8.5 6.5"/></svg>';
 let memFallback=null; // 保存フォールバック
@@ -4520,7 +4520,7 @@ async function save(){
     slots:state.slots.map(s=>({role:s.role,x:s.x,y:s.y,pid:pidToKey(s.pid),sub:pidToKey(s.sub)})),
     bench:state.bench.map(pidToKey).filter(k=>k!=null),
     captain:pidToKey(state.captain),
-    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,tokInfo:state.tokInfo,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo };
+    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo };
   const json=JSON.stringify(data);
   try{ if(window.storage){ await window.storage.set('xi_state_v2',json,false); } }catch(e){}
   lsSet('xi_state_v2',json);
@@ -4617,13 +4617,14 @@ function render(){
       const nm=document.createElement('div');nm.className='pname';
       if(state.showFlags){ nm.innerHTML=flagHTML(p[3])+' '+escAttr(squadShortName(s.pid)); } else { nm.textContent=squadShortName(s.pid); }
       tok.appendChild(nm);
-      // 駒下の表示：第2候補 か メモ のどちらか（排他）。無い駒も同じ高さを確保して段差を防ぐ
-      if(state.tokInfo==='sub'){
+      // 駒下の表示：第2候補・メモを独立して表示（両方ON可）。無い駒も同じ高さを確保して段差を防ぐ
+      if(state.showSub){
         const sub=document.createElement('div');sub.className='psub';
         if(s.sub!=null&&P[s.sub]){ sub.textContent=squadShortName(s.sub); }
         else { sub.textContent='—'; sub.style.visibility='hidden'; }
         tok.appendChild(sub);
-      }else if(state.tokInfo==='memo'){
+      }
+      if(state.showMemo){
         const m=document.createElement('div');m.className='pmemo';
         const mt=memoOf(s.pid);
         if(mt){ m.textContent=mt; } else { m.textContent='—'; m.style.visibility='hidden'; }
@@ -4951,9 +4952,9 @@ function attachDrag(el,actor){
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
     if(!armed){
-      // 少し動かしたら即ドラッグ開始（長押し待ち不要）。トークンは touch-action:none なのでスクロールに奪われない
-      if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){ disarm(); arm(); }
-      else return;
+      // 長押し(0.5秒)前に動いた＝スクロール意図。ドラッグせずブラウザのスクロールに任せる（駒は動かさない）
+      if(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10){ moved=true; disarm(); }
+      return;
     }
     e.preventDefault(); moved=true; lastX=e.clientX; lastY=e.clientY;
     const pr=pitch.getBoundingClientRect();
@@ -5208,6 +5209,8 @@ let pickRole=null; // 現在ピッカー対象スロットの役割
 const POSORDER={GK:0,CB:1,RB:2,LB:3,RWB:4,LWB:5,CDM:1,CM:2,CAM:3,RM:4,LM:5,RW:1,LW:2,ST:3};
 // スロット指定なし（ベンチ追加など）でのポジション全体並び順：GK→DF→MF→FW
 const POSORDERFULL={GK:0,CB:1,RB:2,LB:3,LWB:4,RWB:5,CDM:6,CM:7,CAM:8,RM:9,LM:10,LW:11,RW:12,ST:13};
+// ベンチ表示用の並び：ポジション順(GK→DF→MF→FW)、同ポジは市場価値の高い順
+function benchPosSort(a,b){ const oa=POSORDERFULL[P[a][1]]??99, ob=POSORDERFULL[P[b][1]]??99; if(oa!==ob) return oa-ob; return mvScore(P[b])-mvScore(P[a]); }
 // 大枠を押した時に出る細かいポジション（ベンチ追加画面のサブフィルタ）
 const SUBPOS={DF:['CB','RB','LB'],MF:['CDM','CM','CAM'],FW:['ST','LW','RW']};
 function suggestRank(pos){
@@ -5473,7 +5476,7 @@ function openSlotMenu(i){
       <div class="mitem" data-act="search"><div class="mi">🔍</div>この選手の画像をネット検索</div>
       <div class="mitem" data-act="detail"><div class="mi">ℹ️</div>選手の詳細を見る</div>
       <div class="mitem" data-act="swap"><div class="mi">🔁</div>選手を入れ替える</div>
-      <div class="mitem" data-act="change"><div class="mi">⇄</div>${hasBench?'選手を変更（ベンチ優先）':'選手を変更 / 移籍'}</div>
+      <div class="mitem" data-act="change"><div class="mi">⇄</div>${hasBench?'選手を変更（ベンチ優先）':'選手をチーム外から追加'}</div>
       <div class="mitem" data-act="sub"><div class="mi">②</div>${subLabel}</div>
       <div class="mitem" data-act="memo"><div class="mi">📝</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
       <div class="mitem" data-act="captain"><div class="mi">${isCapt?'★':'👑'}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
@@ -5702,7 +5705,7 @@ function openMemo(pid){
 function applyMemo(pid,val){
   if(!state.memos)state.memos={};
   const key=pidToKey(pid); val=(val||'').trim();
-  if(!val){ delete state.memos[key]; } else { state.memos[key]=val; state.tokInfo='memo'; } // 保存したら見えるようにメモ表示へ
+  if(!val){ delete state.memos[key]; } else { state.memos[key]=val; state.showMemo=true; } // 保存したら見えるようにメモ表示をON（第2候補表示はそのまま）
   if(typeof syncSubBtn==='function')syncSubBtn(); if(typeof syncMemoBtn==='function')syncMemoBtn();
   closeSheet();render();save();toast(val?'メモを保存しました':'メモを削除しました');
 }
@@ -5864,7 +5867,7 @@ function autoFillFrom(ids){
   state.slots.forEach(s=>{ if(s.pid==null)return; pickRole=s.role; const back=ids.filter(id=>!used.has(id)&&!benchSet.has(id)&&grp(P[id][1])===grp(s.role)).sort(suggestSort)[0]; if(back!=null) benchSet.add(back); });
   pickRole=savedRole;
   for(const id of ids.filter(id=>!used.has(id)&&!benchSet.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]))){ if(benchSet.size>=15)break; benchSet.add(id); }
-  state.bench=[...benchSet].sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
+  state.bench=[...benchSet].sort(benchPosSort); // 表示はポジション順（選出は市場価値）
   autoAssignSubs(); // 第二候補も初期割当（条件指定の自動配置でも全ポジションに付くように）
 }
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
@@ -5992,7 +5995,7 @@ function placeClubSquad(club,name){
   });
   pickRole=savedRole;
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
-  state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15);
+  state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15).sort(benchPosSort); // 選出は市場価値の上位15人、表示はポジション順
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
@@ -6197,9 +6200,10 @@ async function buildShareCanvas(){
       x.fillText(s.role,fx,fy+R+70);
       subY=fy+R+92;
     }
-    // 駒下：第2候補 か メモ（表示モードに応じて）
-    if(state.tokInfo==='sub'&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(squadShortName(s.sub),fx,subY);}
-    else if(state.tokInfo==='memo'){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 18px Manrope,sans-serif';x.fillText(mt,fx,subY);}}
+    // 駒下：第2候補・メモを独立して表示（両方ONなら2行）
+    let infoY=subY;
+    if(state.showSub&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(squadShortName(s.sub),fx,infoY);infoY+=22;}
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 18px Manrope,sans-serif';x.fillText(mt,fx,infoY);}}
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
@@ -6301,17 +6305,17 @@ document.getElementById('btnFlags').onclick=()=>{
 };
 
 // 駒下の表示：第2候補 ⇄ メモ ⇄ 非表示（2ndとメモは排他。両方OFFも可）
-function syncSubBtn(){ const b=document.getElementById('btnSubs'); if(b)b.classList.toggle('on',state.tokInfo==='sub'); }
-function syncMemoBtn(){ const b=document.getElementById('btnMemo'); if(b)b.classList.toggle('on',state.tokInfo==='memo'); }
+function syncSubBtn(){ const b=document.getElementById('btnSubs'); if(b)b.classList.toggle('on',!!state.showSub); }
+function syncMemoBtn(){ const b=document.getElementById('btnMemo'); if(b)b.classList.toggle('on',!!state.showMemo); }
 document.getElementById('btnSubs').onclick=()=>{
-  state.tokInfo = (state.tokInfo==='sub') ? 'none' : 'sub'; // メモが点灯中なら消えて第2候補が点灯
-  syncSubBtn();syncMemoBtn();render();save();
-  toast(state.tokInfo==='sub'?'第2候補を表示':'第2候補を非表示');
+  state.showSub = !state.showSub; // 第2候補の表示を独立トグル（メモには影響しない）
+  syncSubBtn();render();save();
+  toast(state.showSub?'第2候補を表示':'第2候補を非表示');
 };
 document.getElementById('btnMemo').onclick=()=>{
-  state.tokInfo = (state.tokInfo==='memo') ? 'none' : 'memo'; // 2ndが点灯中なら消えてメモが点灯
-  syncSubBtn();syncMemoBtn();render();save();
-  toast(state.tokInfo==='memo'?'メモを表示':'メモを非表示');
+  state.showMemo = !state.showMemo; // メモの表示を独立トグル（第2候補には影響しない）
+  syncMemoBtn();render();save();
+  toast(state.showMemo?'メモを表示':'メモを非表示');
 };
 
 // 整列リセット（フォーメーション既定位置へ）
@@ -6339,8 +6343,10 @@ function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout
   state.memos=(saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{};
   state.hideRoles=!!(saved&&saved.hideRoles);
   state.showFlags=(saved&&typeof saved.showFlags==='boolean')?saved.showFlags:true;
-  state.tokInfo=(saved&&(saved.tokInfo==='sub'||saved.tokInfo==='memo'||saved.tokInfo==='none'))?saved.tokInfo
-              :(saved&&saved.showSubs===false)?'none':'sub'; // 旧showSubsからの移行
+  // 第2候補・メモの表示フラグ（独立）。旧tokInfo/showSubs からの移行も対応
+  if(saved&&typeof saved.showSub==='boolean'){ state.showSub=saved.showSub; state.showMemo=!!saved.showMemo; }
+  else if(saved){ state.showSub=(saved.tokInfo==='sub')||(saved.tokInfo==null&&saved.showSubs!==false); state.showMemo=(saved.tokInfo==='memo'); }
+  else { state.showSub=true; state.showMemo=false; }
   syncLabelBtn();syncFlagBtn();syncSubBtn();syncMemoBtn();
   if(saved&&saved.slots&&saved.slots.length===11){
     state.formation=saved.formation||"4-3-3";
