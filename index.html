@@ -422,7 +422,7 @@ header{
    形式: [名前, ポジション, 年齢, "🏳 国籍", クラブ, リーグ]
    プレミアリーグは公開ロスター情報を参照（2025/26）。
    ========================================================= */
-const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン",ED:"エールディヴィジ",PT:"プリメイラ・リーガ",BE:"ベルギー・プロ・リーグ"};
+const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン",ED:"エールディヴィジ",PT:"プリメイラ・リーガ",BE:"ベルギー・プロ・リーグ",J1:"J1リーグ"};
 const P=[
 // ---- Manchester City (PL) ----
 ["Gianluigi Donnarumma","GK",27,"🇮🇹 ITA","Manchester City","PL"],
@@ -3766,6 +3766,600 @@ const P=[
 ["Mouhamed Belkheir","ST",27,"🇩🇿 ALG","RAAL La Louvière","BE"],
 ["Nachon Nsingi","ST",25,"🇧🇪 BEL","RAAL La Louvière","BE"],
 
+// ---- J1リーグ (J1) ----
+["Tomoki Hayakawa","GK",27,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Taiki Yamada","GK",24,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Yuji Kajikawa","GK",34,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Haruto Fujii","GK",23,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Tae-hyeon Kim","CB",25,"🇰🇷 KOR","Kashima Antlers","J1"],
+["Naomichi Ueda","CB",31,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Ikuma Sekigawa","CB",25,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Kaito Chida","CB",31,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Keisuke Tsukui","CB",22,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Yugo Okawa","CB",18,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Anthony Motosuna","CB",17,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Ryoya Ogawa","LB",29,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Koki Anzai","LB",31,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Kimito Nono","RB",24,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Ryuta Koike","RB",30,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Kento Misao","CDM",30,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Yuta Higuchi","CM",29,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Yuta Matsumura","RW",25,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Haruki Hayashi","LW",22,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Ryotaro Araki","CAM",24,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Élber","LW",34,"🇧🇷 BRA","Kashima Antlers","J1"],
+["Aleksandar Cavric","RW",32,"🇸🇰 SVK","Kashima Antlers","J1"],
+["Léo Ceará","ST",31,"🇧🇷 BRA","Kashima Antlers","J1"],
+["Yuma Suzuki","ST",30,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Kyosuke Tagawa","ST",27,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Homare Tokuda","ST",19,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Minato Yoshida","ST",17,"🇯🇵 JPN","Kashima Antlers","J1"],
+["Konosuke Nishikawa","GK",23,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Shuhei Matsubara","GK",33,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Ryusei Haruna","GK",22,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Sho Omori","CB",26,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Kenta Itakura","CB",24,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Danilo","CB",29,"🇧🇷 BRA","Mito HollyHock","J1"],
+["Takeshi Ushizawa","CB",25,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Seiya Inoue","CB",26,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Takumi Mase","RB",28,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Yuto Yamashita","CDM",30,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Yuto Nagao","CDM",24,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Shota Yamashita","CM",18,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Kotatsu Kawakami","CDM",23,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Koki Ando","CM",18,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Yoshiki Torikai","CAM",27,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Chihiro Kato","CAM",27,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Taishi Semba","CAM",26,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Koya Okuda","CAM",31,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Kiichi Yamazaki","CAM",24,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Hayata Yamamoto","LW",23,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Mizuki Arai","LW",29,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Matheus Leiria","RW",31,"🇧🇷 BRA","Mito HollyHock","J1"],
+["Arata Watanabe","ST",30,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Keisuke Tada","ST",23,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Ryo Nemoto","ST",26,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Kishin Gokita","ST",21,"🇯🇵 JPN","Mito HollyHock","J1"],
+["Patryck","ST",27,"🇧🇷 BRA","Mito HollyHock","J1"],
+["Shusaku Nishikawa","GK",40,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Ayumi Niekawa","GK",32,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Ryusei Sato","GK",22,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Danilo Boza","CB",28,"🇧🇷 BRA","Urawa Red Diamonds","J1"],
+["Yuta Miyamoto","CB",26,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Kenta Nemoto","CB",23,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Luka Didulica","CB",18,"🇦🇺 AUS","Urawa Red Diamonds","J1"],
+["Yoshitaka Tanaka","CB",18,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Takuya Ogiwara","LB",26,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Hirokazu Ishihara","RB",27,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Eiichi Katayama","RB",34,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Samuel Gustafson","CDM",31,"🇸🇪 SWE","Urawa Red Diamonds","J1"],
+["Kaito Yasui","CDM",26,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Kai Shibato","CDM",30,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Hayate Ueki","CDM",22,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Takeshi Wada","CDM",17,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Yoichi Naganuma","RW",29,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Takahiro Sekine","LW",31,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Matheus Savio","CAM",29,"🇧🇷 BRA","Urawa Red Diamonds","J1"],
+["Jumpei Hayakawa","CAM",20,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Sota Matsunaga","CAM",22,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Yusuke Matsuo","LW",28,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Hiroki Abe","LW",27,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Takuro Kaneko","RW",28,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Hiiro Komori","ST",25,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Ado Onaiwu","ST",30,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Renji Hidano","ST",22,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["Rio Nitta","ST",23,"🇯🇵 JPN","Urawa Red Diamonds","J1"],
+["José Aurelio Suárez","GK",30,"🇪🇸 ESP","JEF United Chiba","J1"],
+["Tomoya Wakahara","GK",26,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Ryota Suzuki","GK",32,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Haruto Usui","GK",26,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Shunji Saito","CB",18,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Koji Toriumi","CB",31,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takashi Kawano","CB",30,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takayuki Mae","CB",32,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Ryota Kuboniwa","CB",24,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Rikuto Ishio","LB",24,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Masaru Hidaka","LB",31,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Issei Takahashi","RB",28,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Koki Yonekura","RB",38,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Eduardo","CDM",29,"🇧🇷 BRA","JEF United Chiba","J1"],
+["Manato Shinada","CDM",26,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Taiki Amagasa","CDM",26,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Yusuke Kobayashi","CDM",31,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Haru Ito","CM",17,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takuya Yasui","CM",27,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Yuma Igari","CM",23,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Kazuki Tanaka","RW",26,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takuro Iwai","RW",23,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Makoto Himeno","LW",17,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Carlinhos Junior","LW",31,"🇧🇷 BRA","JEF United Chiba","J1"],
+["Naoki Tsubaki","LW",25,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Zain Issaka","RW",29,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Naohiro Sugiyama","RW",27,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takumi Tsukui","ST",24,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Daichi Ishikawa","ST",30,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Hiroto Goya","ST",32,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Takumi Matsumura","ST",22,"🇯🇵 JPN","JEF United Chiba","J1"],
+["Ryosuke Kojima","GK",29,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Kenta Matsumoto","GK",29,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Kengo Nagai","GK",31,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Haruki Saruta","GK",27,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Kanade Tsuneto","CB",21,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Taiyo Koga","CB",27,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Seiya Baba","CB",24,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Hiroki Noda","CB",28,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Daiki Sugioka","LB",27,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Hiromu Mitsumaru","LB",32,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yusei Yamanouchi","LB",22,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Wataru Harada","RB",29,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Koki Kumasaka","CDM",25,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Takumi Tsuchiya","CDM",22,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Rei Shimano","CDM",22,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Nobuteru Nakagawa","CM",24,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yudai Konishi","CM",28,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Sachiro Toshima","CM",30,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Riki Harakawa","CM",32,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Tojiro Kubo","RW",27,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Kaiji Chonan","RW",17,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yota Komi","LW",23,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Hinata Yamauchi","LW",25,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Hayato Nakama","LW",34,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yoshio Koizumi","CAM",29,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Koya Yuruki","LW",30,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yusuke Segawa","LW",32,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Shusuke Furuya","RW",21,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Mao Hosoya","ST",24,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Yuki Kakita","ST",28,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Nabel Yoshitaka Furusawa","ST",23,"🇯🇵 JPN","Kashiwa Reysol","J1"],
+["Hayate Tanaka","GK",27,"🇯🇵 JPN","FC Tokyo","J1"],
+["Seung-gyu Kim","GK",35,"🇰🇷 KOR","FC Tokyo","J1"],
+["Wataru Goto","GK",20,"🇯🇵 JPN","FC Tokyo","J1"],
+["Alexander Scholz","CB",33,"🇩🇰 DEN","FC Tokyo","J1"],
+["Kanta Doi","CB",21,"🇯🇵 JPN","FC Tokyo","J1"],
+["Hayato Inamura","CB",24,"🇯🇵 JPN","FC Tokyo","J1"],
+["Rio Omori","CB",23,"🇯🇵 JPN","FC Tokyo","J1"],
+["Masato Morishige","CB",39,"🇯🇵 JPN","FC Tokyo","J1"],
+["Renta Higashi","CB",22,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kento Hashimoto","LB",26,"🇯🇵 JPN","FC Tokyo","J1"],
+["Yuto Nagatomo","LB",39,"🇯🇵 JPN","FC Tokyo","J1"],
+["Takahiro Ko","CDM",28,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kento Hashimoto","CDM",32,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kyota Tokiwa","CDM",24,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kaede Suzuki","CDM",19,"🇯🇵 JPN","FC Tokyo","J1"],
+["Yuta Sugawara","RW",18,"🇯🇵 JPN","FC Tokyo","J1"],
+["Ryunosuke Sato","LW",19,"🇯🇵 JPN","FC Tokyo","J1"],
+["Maki Kitahara","CAM",16,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kio Tanaka","CAM",18,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kota Tawaratsumida","LW",22,"🇯🇵 JPN","FC Tokyo","J1"],
+["Keita Endo","LW",28,"🇯🇵 JPN","FC Tokyo","J1"],
+["Kein Sato","RW",24,"🇯🇵 JPN","FC Tokyo","J1"],
+["Fuki Yamada","RW",24,"🇯🇵 JPN","FC Tokyo","J1"],
+["Teruhito Nakagawa","RW",33,"🇯🇵 JPN","FC Tokyo","J1"],
+["Marcelo Ryan","ST",24,"🇧🇷 BRA","FC Tokyo","J1"],
+["Motoki Nagakura","ST",26,"🇯🇵 JPN","FC Tokyo","J1"],
+["Tsuyoshi Ogashiwa","ST",27,"🇯🇵 JPN","FC Tokyo","J1"],
+["Leon Nozawa","ST",22,"🇯🇵 JPN","FC Tokyo","J1"],
+["Divine Chinedu Otani","ST",19,"🇯🇵 JPN","FC Tokyo","J1"],
+["Matheus","GK",33,"🇧🇷 BRA","Tokyo Verdy","J1"],
+["Yuya Nagasawa","GK",29,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Hiroki Mawatari","GK",31,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Keisuke Nakamura","GK",21,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Ryota Inoue","CB",25,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Kaito Suzuki","CB",23,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Naoki Hayashi","CB",28,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Maaya Sako","CB",23,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Daiki Fukazawa","LB",27,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Kazuya Miyahara","RB",30,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Yosuke Uchida","RB",23,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Shuto Tanabe","RB",24,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Riku Matsuda","RB",27,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Tetsuyuki Inami","CDM",27,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Joi Yamamoto","CDM",20,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Kento Imai","CM",18,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Yuan Matsuhashi","LW",24,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Yuya Fukuda","LW",27,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Yuta Arai","LW",23,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Kosuke Saito","CAM",29,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Rei Hirakawa","CAM",26,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Issei Kumatoriya","LW",23,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Shion Nakayama","LW",18,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Gakuto Kawamura","LW",20,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Itsuki Someno","ST",24,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Shimon Teranuma","ST",25,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Goki Yamada","ST",25,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Ryosuke Shirai","ST",21,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Hayato Hirao","ST",21,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Sota Ofuji","ST",18,"🇯🇵 JPN","Tokyo Verdy","J1"],
+["Kosei Tani","GK",25,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Tatsuya Morita","GK",35,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Yoshiaki Arai","GK",30,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Kaung Zan Mara","GK",24,"🇲🇲 MYA","Machida Zelvia","J1"],
+["Yuta Nakayama","CB",29,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Ibrahim Dresevic","CB",29,"🇽🇰 KVX","Machida Zelvia","J1"],
+["Daihachi Okamura","CB",29,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Min-tae Kim","CB",32,"🇰🇷 KOR","Machida Zelvia","J1"],
+["Tomoki Imai","CB",35,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Kotaro Hayashi","LB",25,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Henry Heroki Mochizuki","RB",24,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Hotaka Nakamura","RB",28,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Hiroyuki Mae","CDM",30,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Neta Lavi","CDM",29,"🇮🇱 ISR","Machida Zelvia","J1"],
+["Hokuto Shimoda","CDM",34,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Je-hoon Cha","CDM",20,"🇰🇷 KOR","Machida Zelvia","J1"],
+["Keiya Sento","CM",31,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Asahi Masuyama","RW",29,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Futa Tokumura","CAM",18,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Ryohei Shirasaki","CAM",33,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Sang-ho Na","LW",29,"🇰🇷 KOR","Machida Zelvia","J1"],
+["Yuki Soma","RW",29,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Erik","RW",31,"🇧🇷 BRA","Machida Zelvia","J1"],
+["Takuma Nishimura","ST",29,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Shota Fujio","ST",25,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Tete Yengi","ST",25,"🇦🇺 AUS","Machida Zelvia","J1"],
+["Kanji Kuwayama","ST",23,"🇯🇵 JPN","Machida Zelvia","J1"],
+["Svend Brodersen","GK",29,"🇩🇪 GER","Kawasaki Frontale","J1"],
+["Louis Thébault-Yamaguchi","GK",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Yuki Hayasaka","GK",27,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Keun-hyeong Lee","GK",20,"🇰🇷 KOR","Kawasaki Frontale","J1"],
+["Filip Uremovic","CB",29,"🇭🇷 CRO","Kawasaki Frontale","J1"],
+["Yuichi Maruyama","CB",37,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Shunsuke Hayashi","CB",19,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Ryota Kamihashi","CB",24,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Sota Miura","LB",25,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Asahi Sasaki","LB",26,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Reon Yamahara","LB",27,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Noriharu Kan","LB",19,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Yuto Matsunagane","RB",21,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Hiroto Noda","RB",20,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Kento Tachibanada","CDM",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["So Kawahara","CDM",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Kota Yui","CDM",21,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Yuki Yamamoto","CM",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Ryota Oshima","CM",33,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Ryuki Osa","LW",18,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Toya Myogan","LW",21,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Yuto Ozeki","CAM",21,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Tatsuya Ito","LW",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Marcinho","LW",31,"🇧🇷 BRA","Kawasaki Frontale","J1"],
+["Ten Miyagi","LW",25,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Kazuya Konno","RW",28,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Kyosuke Mochiyama","ST",22,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Erison","ST",27,"🇧🇷 BRA","Kawasaki Frontale","J1"],
+["Lazar Romanic","ST",28,"🇷🇸 SRB","Kawasaki Frontale","J1"],
+["Soma Kanda","ST",20,"🇯🇵 JPN","Kawasaki Frontale","J1"],
+["Il-gyu Park","GK",36,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Ryoya Kimura","GK",23,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Yuya Tsuboi","GK",26,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Hiroki Iikura","GK",40,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Jeison Quiñónes","CB",28,"🇨🇴 COL","Yokohama F. Marinos","J1"],
+["Taisei Inoue","CB",23,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Ryotaro Tsunoda","CB",26,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Thomas Deng","CB",29,"🇦🇺 AUS","Yokohama F. Marinos","J1"],
+["Kosei Suwama","CB",23,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Ren Kato","LB",26,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Taiki Watanabe","LB",27,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Kanta Sekitomi","LB",20,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Ken Matsubara","RB",33,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Kei Murakami","RB",19,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Takuto Kimura","CDM",26,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Yuta Tanaka","CDM",23,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Riku Yamane","CM",22,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Kota Watanabe","CM",27,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Aruto Higuchi","CM",21,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Tomoki Kondo","RW",25,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["George Onaiwu","RW",25,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Jun Amano","CAM",34,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Kosuke Matsumura","CAM",22,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Shin Miidera","CAM",16,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Tevis","RW",20,"🇧🇷 BRA","Yokohama F. Marinos","J1"],
+["Jordy Croux","RW",32,"🇧🇪 BEL","Yokohama F. Marinos","J1"],
+["Yuri Araújo","RW",30,"🇧🇷 BRA","Yokohama F. Marinos","J1"],
+["Hiroto Asada","RW",18,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Ryo Miyaichi","RW",33,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Kaina Tanimura","ST",28,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Dean David","ST",30,"🇮🇱 ISR","Yokohama F. Marinos","J1"],
+["Hikaru Takahashi","ST",21,"🇯🇵 JPN","Yokohama F. Marinos","J1"],
+["Yuya Oki","GK",26,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Togo Umeda","GK",25,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kei Ishikawa","GK",33,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Tomotaro Sasaki","GK",19,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Seung-wook Park","CB",29,"🇰🇷 KOR","Shimizu S-Pulse","J1"],
+["Jelani Reshaun Sumiyoshi","CB",28,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Mateus Brunetti","CB",26,"🇧🇷 BRA","Shimizu S-Pulse","J1"],
+["Sen Takagi","CB",24,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Sodai Hasukawa","CB",27,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Yuji Takahashi","CB",33,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Joo-young Eom","CB",18,"🇰🇷 KOR","Shimizu S-Pulse","J1"],
+["Yuki Honda","LB",35,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Yutaka Yoshida","LB",36,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Haruto Hidaka","RB",22,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kengo Kitazume","RB",34,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Masaki Yumiba","CDM",24,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Rinsei Ohata","CM",22,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Yuji Doi","CM",19,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Keigo Suzuki","CDM",22,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Yudai Shimamoto","CM",19,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kai Matsuzaki","RW",28,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Hikaru Nakahara","RW",29,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kenta Inoue","RW",27,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Motoki Nishihara","LW",19,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Ryota Hariu","LW",18,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kazuki Kozuka","CAM",31,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Capixaba","LW",29,"🇧🇷 BRA","Shimizu S-Pulse","J1"],
+["Se-hun Oh","ST",27,"🇰🇷 KOR","Shimizu S-Pulse","J1"],
+["Koya Kitagawa","ST",29,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Kanta Chiba","ST",23,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Ahmed Ahmedov","ST",31,"🇧🇬 BUL","Shimizu S-Pulse","J1"],
+["Riku Gunji","ST",20,"🇯🇵 JPN","Shimizu S-Pulse","J1"],
+["Daniel Schmidt","GK",34,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Alexandre Pisano","GK",20,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yohei Takeda","GK",38,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Hiroaki Hagi","GK",19,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Ryuki Oiso","CB",21,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Haruya Fujii","CB",25,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yota Sato","CB",27,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yuki Nogami","CB",35,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Harumu Kubo","CB",19,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Shuhei Tokumoto","LB",30,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Akinari Kawazura","LB",32,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Ryosuke Yamanaka","LB",33,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Teruki Hara","RB",27,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Soichiro Mori","RB",18,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Tomoki Takamine","CDM",28,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Haruki Yoshida","CDM",23,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Katsuhiro Nakayama","RW",29,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Masahito Ono","LW",29,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Haruto Suzuki","LW",21,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Tsukasa Morishima","CAM",29,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yuya Asano","CAM",29,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Hidemasa Koda","CAM",22,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Takuya Uchida","CAM",28,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Taichi Kikuchi","CAM",27,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Shungo Sugiura","CAM",20,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Kyota Sakakibara","CAM",24,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Mateus Castro","RW",31,"🇧🇷 BRA","Nagoya Grampus","J1"],
+["Yudai Kimura","ST",25,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yuya Yamagishi","ST",32,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Kensuke Nagai","ST",37,"🇯🇵 JPN","Nagoya Grampus","J1"],
+["Yves Avelete","ST",23,"🇹🇬 TOG","Nagoya Grampus","J1"],
+["Masaaki Murakami","GK",33,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Gakuji Ota","GK",35,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Kentaro Kakoi","GK",35,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Akira Fantini","GK",28,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Henrique Trevisan","CB",29,"🇧🇷 BRA","Kyoto Sanga","J1"],
+["Shogo Asada","CB",27,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Yoshinori Suzuki","CB",33,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Hisashi Appiah Tawiah","CB",27,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Kodai Nagata","CB",23,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Hidehiro Sugai","LB",27,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Kyo Sato","LB",26,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Shinnosuke Fukuda","RB",25,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Yusuke Ishida","RB",23,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["João Pedro","CDM",26,"🇧🇷 BRA","Kyoto Sanga","J1"],
+["Sung-jun Yoon","CDM",19,"🇰🇷 KOR","Kyoto Sanga","J1"],
+["Mitsuki Saito","CDM",27,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Ryuma Nakano","RW",23,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Taiki Hirato","LW",29,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Haruki Arai","LW",28,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Taiyo Hiraoka","CAM",23,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Temma Matsuda","CAM",31,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Fuchi Honda","CAM",25,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Masaya Okugawa","LW",30,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Rafael Elias","ST",27,"🇧🇷 BRA","Kyoto Sanga","J1"],
+["Alex Souza","ST",25,"🇧🇷 BRA","Kyoto Sanga","J1"],
+["David Silva","ST",18,"🇧🇷 BRA","Kyoto Sanga","J1"],
+["Shun Nagasawa","ST",37,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Ko Sakai","ST",18,"🇯🇵 JPN","Kyoto Sanga","J1"],
+["Rui Araki","GK",18,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Masaaki Higashiguchi","GK",40,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Aolin Zhang","GK",21,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Genta Miura","CB",31,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Ryo Hatsuse","LB",28,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Shinya Nakano","LB",22,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Takeru Kishimoto","RB",28,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Ginjiro Ikegaya","RB",22,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Tokuma Suzuki","CDM",29,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Rin Mito","CDM",24,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Yuki Yoshihara","CDM",21,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Shuto Abe","CM",28,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Takato Yamamoto","CM",18,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Shu Kurata","LW",37,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Welton","LW",28,"🇧🇷 BRA","Gamba Osaka","J1"],
+["Kanji Okunuki","LW",26,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Ryotaro Meshino","LW",28,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Taiki Tono","LW",19,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Ryoya Yamashita","RW",28,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Jiro Nakamura","RW",22,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Takashi Usami","ST",34,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Gaku Nawata","ST",19,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Deniz Hümmet","ST",29,"🇹🇷 TUR","Gamba Osaka","J1"],
+["Harumi Minamino","ST",22,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Daichi Hayashi","ST",29,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Issam Jebali","ST",34,"🇹🇳 TUN","Gamba Osaka","J1"],
+["Shoji Toyama","ST",23,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Naru Nakatsumi","ST",18,"🇯🇵 JPN","Gamba Osaka","J1"],
+["Kosuke Nakamura","GK",31,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Jin-hyeon Kim","GK",38,"🇰🇷 KOR","Cerezo Osaka","J1"],
+["Ken Isibor","GK",18,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Shinnosuke Hatanaka","CB",30,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Hayato Tanaka","CB",22,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Rikito Inoue","CB",29,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Ayumu Ohata","LB",25,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Kyohei Noborizato","LB",35,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Dion Cools","RB",30,"🇲🇾 MAS","Cerezo Osaka","J1"],
+["Takumi Nakamura","RB",25,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Nelson Ishiwatari","CDM",21,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Hinata Kida","CDM",25,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Kyohei Yoshino","CM",31,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Rui Osako","CM",21,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Eiji Kubo","CM",18,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Masaya Shibayama","RW",23,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Shion Homma","LW",25,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Satoki Uejo","LW",29,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Yumeki Yokoyama","CAM",20,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Shinji Kagawa","CAM",37,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Thiago Andrade","LW",25,"🇧🇷 BRA","Cerezo Osaka","J1"],
+["Motohiko Nakajima","ST",27,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Solomon Sakuragawa","ST",24,"🇯🇵 JPN","Cerezo Osaka","J1"],
+["Wigi Kanemoto","ST",21,"🇰🇷 KOR","Cerezo Osaka","J1"],
+["Daiya Maekawa","GK",31,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Shuichi Gonda","GK",37,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Shioki Takayama","GK",25,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Richard Monday Ubong","GK",20,"🇳🇬 NGA","Vissel Kobe","J1"],
+["Matheus Thuler","CB",27,"🇧🇷 BRA","Vissel Kobe","J1"],
+["Caetano","CB",26,"🇧🇷 BRA","Vissel Kobe","J1"],
+["Boniface Nduka","CB",30,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Kaito Yamada","CB",19,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Katsuya Nagato","LB",31,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Diego","LB",30,"🇧🇷 BRA","Vissel Kobe","J1"],
+["Ryosuke Irie","LB",21,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Rikuto Hirose","RB",30,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Nanasei Iino","RB",29,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Gotoku Sakai","RB",35,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Justin Homma","RB",20,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yuya Kuwasaki","CDM",28,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yosuke Ideguchi","CM",29,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Kento Hamasaki","CM",19,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Kakeru Yamauchi","CM",24,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Mitsuki Hidaka","CM",23,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Tafuku Satomi","CM",17,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Juzo Ura","RW",22,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Sota Onishi","RW",19,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Rikuto Hashimoto","LW",21,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Taiga Seguchi","LW",18,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yuta Goke","CAM",27,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Makoto Mitsuta","CAM",26,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Haruya Ide","CAM",32,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Jean Patric","LW",29,"🇧🇷 BRA","Vissel Kobe","J1"],
+["Takashi Inui","LW",38,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Sota Ito","LW",18,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yuta Miyahara","LW",21,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yoshinori Muto","ST",33,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Ren Komatsu","ST",27,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Yuya Osako","ST",36,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Kotaro Uchino","ST",22,"🇯🇵 JPN","Vissel Kobe","J1"],
+["David Aizawa","ST",22,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Hayato Watanabe","ST",19,"🇯🇵 JPN","Vissel Kobe","J1"],
+["Lennart Moser","GK",26,"🇩🇪 GER","Fagiano Okayama","J1"],
+["Taro Hamada","GK",26,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Goro Kawanami","GK",35,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Shun Matsuda","GK",19,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Ryo Senda","CB",18,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Yugo Tatsuta","CB",28,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kota Kudo","CB",22,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kaito Abe","CB",26,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Yoshitake Suzuki","CB",27,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Hiroshi Omori","CB",23,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Daichi Tagami","CB",33,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Yota Fujii","LB",20,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kosuke Shirai","RB",32,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Eiji Miyamoto","CDM",27,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Ryo Tabei","CDM",26,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kosei Ogura","CDM",21,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Haruka Motoyama","CDM",27,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Ibuki Fujita","CM",35,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Masaya Matsumoto","RW",31,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Towa Yamane","LW",27,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Rui Sueyoshi","LW",29,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Ataru Esaka","CAM",34,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Yuta Kamiya","CAM",29,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Yuto Baigorria","CAM",19,"? BOL","Fagiano Okayama","J1"],
+["Jun Nishikawa","RW",24,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kota Kawano","ST",22,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kazunari Ichimi","ST",28,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Léo Gaúcho","ST",24,"🇧🇷 BRA","Fagiano Okayama","J1"],
+["Werik Popó","ST",24,"🇧🇷 BRA","Fagiano Okayama","J1"],
+["Lucão","ST",30,"🇧🇷 BRA","Fagiano Okayama","J1"],
+["Noah Kenshin Browne","ST",25,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Kanshiro Suemune","ST",19,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Aura Takahashi","ST",20,"🇯🇵 JPN","Fagiano Okayama","J1"],
+["Keisuke Osako","GK",26,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Issei Ouchi","GK",25,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Yudai Tanaka","GK",30,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Cailen Hill","GK",23,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Hikaru Ogawa","GK",18,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Hayato Araki","CB",29,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Ju-sung Kim","CB",25,"🇰🇷 KOR","Sanfrecce Hiroshima","J1"],
+["Taichi Yamasaki","CB",25,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Tsukasa Shiotani","CB",37,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Takaaki Shichi","LB",32,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Shuto Nakano","RB",25,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Naoto Arai","RB",29,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Taishi Matsumoto","CDM",27,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Hayao Kawabe","CM",30,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Yotaro Nakajima","CM",20,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Sota Koshimichi","RW",22,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Shunki Higashi","LW",25,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Daiki Suga","LW",27,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Motoki Ohara","CAM",26,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Shimon Kobayashi","CAM",18,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Naoki Maeda","RW",31,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Shun Ayukawa","ST",24,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Akito Suzuki","ST",22,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Sota Nakamura","ST",23,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Mutsuki Kato","ST",28,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Kosuke Kinoshita","ST",31,"🇯🇵 JPN","Sanfrecce Hiroshima","J1"],
+["Yuma Obata","GK",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kazuki Fujita","GK",25,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Powell Obinna Obi","GK",28,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kenta Matsuyama","GK",27,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Yuhi Sakai","CB",21,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Takumi Kamijima","CB",29,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Teppei Oka","CB",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Yuma Tsujioka","CB",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Masaya Tashiro","CB",33,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Daiki Miya","CB",30,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Moon-hyeon Kim","CB",24,"🇰🇷 KOR","Avispa Fukuoka","J1"],
+["Yota Maejima","LB",28,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Yu Hashimoto","RB",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Masato Yuzawa","RB",32,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kaoru Yamawaki","RB",25,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Keiya Shiihashi","CDM",29,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kohei Okuno","CDM",26,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Hiroki Akino","CDM",31,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kokoro Maeda","CDM",21,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Masato Shigemi","CM",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Yuji Kitajima","LW",25,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Shohei Takemoto","LW",18,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Tomoya Miki","CAM",28,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Shintaro Nago","CAM",30,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Kazuki Fujimoto","LW",27,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Hikaru Maeda","RW",17,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Shosei Usui","ST",24,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Reiju Tsuruno","ST",25,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Sonosuke Sato","ST",22,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Abdul Hanan Sani Brown","ST",19,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Ichika Maeda","ST",20,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Hisashi Jogo","ST",40,"🇯🇵 JPN","Avispa Fukuoka","J1"],
+["Masaaki Goto","GK",32,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Go Hatano","GK",28,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Luka Radotic","GK",25,"🇷🇸 SRB","V-Varen Nagasaki","J1"],
+["Kaito Ioka","GK",28,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Ryosuke Shindo","CB",30,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Eduardo","CB",33,"🇧🇷 BRA","V-Varen Nagasaki","J1"],
+["Yusei Egawa","CB",25,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Ikki Arai","CB",32,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Hijiri Onaga","LB",31,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Shunya Yoneda","LB",30,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Keita Takahata","LB",25,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Hyeung-jun Noh","LB",18,"🇰🇷 KOR","V-Varen Nagasaki","J1"],
+["Masahiro Sekiguchi","RB",28,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Naru Sasaki","RB",22,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Riku Yamada","CDM",28,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Harumu Nabeshima","CDM",22,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Diego Pituca","CM",33,"🇧🇷 BRA","V-Varen Nagasaki","J1"],
+["Temmu Matsumoto","CM",23,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Tsubasa Kasayanagi","LW",22,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Takashi Sawada","LW",35,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Matheus Jesus","CAM",29,"🇧🇷 BRA","V-Varen Nagasaki","J1"],
+["Motoki Hasegawa","CAM",27,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Keita Nakamura","CAM",32,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Yuto Iwasaki","LW",28,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Norman Campbell","RW",26,"🇯🇲 JAM","V-Varen Nagasaki","J1"],
+["Thiago Santana","ST",33,"🇧🇷 BRA","V-Varen Nagasaki","J1"],
+["Ryogo Yamasaki","ST",33,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+["Reijin Ko","ST",22,"🇯🇵 JPN","V-Varen Nagasaki","J1"],
+
 
 ];
 
@@ -3868,6 +4462,46 @@ function buildSlots(formKey,keepPlayers){
 function pidToKey(pid){ if(pid==null) return null; const p=P[pid]; if(!p) return null; return p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); }
 // 表示名：ユーザーが設定した愛称があればそれ、なければ元の名前（short=苗字のみ）
 function nameOf(pid,short){ if(pid==null||!P[pid])return ''; const c=state.names&&state.names[pidToKey(pid)]; if(c)return c; return short?shortName(P[pid][0]):P[pid][0].trim(); }
+// 同名（同じ苗字）が26人(スタメン+ベンチ)の中に複数いる場合の表示名（pid→"Kai. Sano"等）
+let squadDispName={};
+function firstNameOf(pid){ const parts=P[pid][0].trim().split(/\s+/); return parts.length>1?parts[0]:''; }
+function computeSquadDups(){
+  squadDispName={};
+  const bySur={};
+  const add=pid=>{ if(pid==null||!P[pid])return; if(state.names&&state.names[pidToKey(pid)])return; const sur=shortName(P[pid][0]); (bySur[sur]=bySur[sur]||[]).push(pid); };
+  state.slots.forEach(s=>add(s.pid));
+  state.bench.forEach(pid=>{ if(!inXI(pid)) add(pid); });
+  clubOtherIds().forEach(pid=>add(pid)); // ベンチ外（読込クラブの控え外）も対象
+  // 苗字が被るグループごとに、ファーストネームの最短プレフィックスで区別する
+  Object.keys(bySur).forEach(sur=>{
+    const ids=[...new Set(bySur[sur])];
+    if(ids.length<2) return;
+    const firsts=ids.map(firstNameOf);
+    // 全員を区別できる最短のプレフィックス長Lを求める
+    const maxLen=Math.max(...firsts.map(f=>f.length),1);
+    let L=1;
+    for(;L<=maxLen;L++){
+      const pre=firsts.map(f=>f.slice(0,L).toLowerCase());
+      if(new Set(pre).size===pre.length) break; // 全員ユニーク
+    }
+    L=Math.min(L,maxLen);
+    ids.forEach((pid,i)=>{
+      const f=firsts[i];
+      if(!f){ squadDispName[pid]=sur; return; } // ファーストネーム不明はそのまま
+      const pre=f.slice(0,L);
+      // プレフィックスが姓名フルでなければ末尾にピリオド（K. / Kai. ）
+      const dot=pre.length<f.length?'.':'';
+      squadDispName[pid]=pre.charAt(0).toUpperCase()+pre.slice(1)+dot+' '+sur;
+    });
+  });
+}
+// 表示用の苗字。同名が被るときだけファーストネームのプレフィックスを付ける（例: K. Sano / Kai. Sano）
+function squadShortName(pid){
+  if(pid==null||!P[pid]) return '';
+  const c=state.names&&state.names[pidToKey(pid)]; if(c) return c; // ユーザー設定名はそのまま
+  if(squadDispName[pid]) return squadDispName[pid];
+  return shortName(P[pid][0]);
+}
 // 選手メモ（安定IDキー。駒下に表示する自由テキスト）
 function memoOf(pid){ if(pid==null||!P[pid])return ''; return (state.memos&&state.memos[pidToKey(pid)])||''; }
 let _keyMap=null;
@@ -3958,6 +4592,7 @@ function render(){
   // remove existing tokens
   pitch.querySelectorAll('.tok').forEach(t=>t.remove());
   pitch.classList.toggle('bigname',!!state.hideRoles);
+  computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   tokenEls={};
   let filled=0,ages=[];
   state.slots.forEach((s,i)=>{
@@ -3980,12 +4615,12 @@ function render(){
       tok.appendChild(disc);
       if(!state.hideRoles){ const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role); }
       const nm=document.createElement('div');nm.className='pname';
-      if(state.showFlags){ nm.innerHTML=flagHTML(p[3])+' '+escAttr(nameOf(s.pid,true)); } else { nm.textContent=nameOf(s.pid,true); }
+      if(state.showFlags){ nm.innerHTML=flagHTML(p[3])+' '+escAttr(squadShortName(s.pid)); } else { nm.textContent=squadShortName(s.pid); }
       tok.appendChild(nm);
       // 駒下の表示：第2候補 か メモ のどちらか（排他）。無い駒も同じ高さを確保して段差を防ぐ
       if(state.tokInfo==='sub'){
         const sub=document.createElement('div');sub.className='psub';
-        if(s.sub!=null&&P[s.sub]){ sub.textContent=nameOf(s.sub,true); }
+        if(s.sub!=null&&P[s.sub]){ sub.textContent=squadShortName(s.sub); }
         else { sub.textContent='—'; sub.style.visibility='hidden'; }
         tok.appendChild(sub);
       }else if(state.tokInfo==='memo'){
@@ -4062,7 +4697,7 @@ function renderBench(){
     const p=P[pid],ph=state.photos[pid];
     return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${nameOf(pid,true)}</div>
+      <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
       <div class="bv">${flagHTML(p[3])}</div>
     </div>`;
@@ -4079,7 +4714,7 @@ function renderBench(){
     const p=P[pid],ph=state.photos[pid];
     return `<div class="bcard ocard${(swapSel&&swapSel.t==='reserve'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${nameOf(pid,true)}</div>
+      <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
       <div class="bv">${flagHTML(p[3])}</div>
     </div>`;
@@ -4554,6 +5189,11 @@ Object.assign(HEIGHT,{"Nordin Jackers|BEL":187,"Joel Ordóñez|ECU":188,"Jorne S
 Object.assign(FOOT,{"Nordin Jackers|BEL":"右","Axl De Corte|BEL":"左","Joel Ordóñez|ECU":"右","Jorne Spileers|BEL":"右","Brandon Mechele|BEL":"右","Vince Osuji|NGA":"右","Joaquin Seys|BEL":"左","Bjorn Meijer|NED":"左","Kyriani Sabbe|BEL":"右","Hugo Siquet|BEL":"右","Raphael Onyedika|NGA":"右","Lynnt Audoor|BEL":"右","Hugo Vetlesen|NOR":"右","Ludovit Reis|NED":"右","Alejandro Granados|ESP":"左","Félix Lemaréchal|FRA":"右","Hans Vanaken|BEL":"右","Cisse Sandra|BEL":"左","Christos Tzolis|GRE":"右","Mamadou Diakhon|SEN":"右","Shandre Campbell|RSA":"左","Carlos Forbs|POR":"左","Nicolò Tresoldi|GER":"右","Romeo Vermant|BEL":"右","Gustaf Nilsson|SWE":"右","Lucca Brughmans|BEL":"右","Tobias Lawal|AUT":"右","Hendrik Van Crombrugge|BEL":"左","Matte Smets|BEL":"右","Mujaid Sadick|ESP":"右","Josué Kongolo|BEL":"右","Adrián Palacios|VEN":"左","Yaimar Medina|ECU":"左","Joris Kayembe|COD":"左","Zakaria El Ouahdi|MAR":"右","Ken Nkuba|BEL":"右","Ibrahima Sory Bangoura|GUI":"右","Nikolas Sattlberger|AUT":"右","Bryan Heynen|BEL":"右","August De Wannemacker|BEL":"右","Konstantinos Karetsas|GRE":"左","Daan Heymans|BEL":"右","Noah Adedeji-Sternberg|BEL":"右","Yira Sor|NGA":"右","Ayumu Yokoyama|JPN":"右","Jarne Steuckers|BEL":"左","Junya Ito|JPN":"右","Robin Mirisola|BEL":"右","Jusef Erabi|SWE":"右","Kjell Scherpen|NED":"右","Vic Chambaere|BEL":"右","Giorgi Kavlashvili|GEO":"左","Jens Teunckens|BEL":"左","Kevin Mac Allister|ARG":"右","Ross Sykes|ENG":"右","Fedde Leysen|BEL":"左","Mamadou Thierno Barry|SEN":"右","Massiré Sylla|SEN":"右","Louis Patris|BEL":"右","Adem Zorgane|ALG":"右","Kamiel Van De Perre|BEL":"右","Besfort Zeneli|SWE":"右","Rob Schoofs|BEL":"左","Ivan Pavlic|BEL":"右","Anan Khalaili|ISR":"右","Ousseynou Niang|SEN":"右","Anouar Ait El Hadj|BEL":"右","Guilherme Smith|BRA":"右","Promise David|CAN":"右","Kevin Rodríguez|ECU":"右","Raul Florucz|AUT":"左","Mohammed Fuseini|GHA":"右","Mateo Biondic|GER":"右","Marc Giger|SUI":"右","Colin Coosemans|BEL":"右","Justin Heekeren|GER":"右","Marco Kana|BEL":"右","Lucas Hey|DEN":"右","Ludwig Augustinsson|SWE":"左","Ilay Camara|SEN":"右","Killian Sardella|BEL":"右","Ali Maamar|MAR":"右","Thomas Foket|BEL":"右","Enric Llansana|NED":"右","Nathan De Cat|BEL":"右","Nathan-Dylan Saliba|CAN":"右","Anas Tajaouart|MAR":"右","Mario Stroeykens|COD":"右","Alexis Flips|FRA":"右","César Huerta|MEX":"右","Ibrahim Kanaté|MLI":"右","Tristan Degreef|BEL":"右","Mihajlo Cvetkovic|SRB":"右","Danylo Sikan|UKR":"右","Adriano Bertaccini|BEL":"右","Elyèss Dao|MAR":"右","Davy Roef|BEL":"右","Kjell Peersman|BEL":"右","Tom Vandenberghe|BEL":"右","Maksim Paskotsi|EST":"右","Siebe Van der Heyden|BEL":"左","Matties Volckaert|BEL":"右","Hatim Es-Saoubi|MAR":"右","Tiago Araújo|POR":"左","Abdoul Ayinde|BFA":"左","Gilles De Meyer|BEL":"右","Mohammed El Âdfaoui|BEL":"左","Wout Asselman|BEL":"左","Mathias Delorge|BEL":"左","Tibe De Vlieger|BEL":"右","Atsuki Ito|JPN":"右","Leonardo Lopes|POR":"右","Matisse Samoise|BEL":"右","Abdelkahar Kadri|ALG":"右","Aimé Omgba|NED":"右","Michal Skoras|POL":"右","Momodou Sonko|SWE":"右","Hyllarion Goore|CIV":"右","Wilfried Kanga|CIV":"右","Max Dean|ENG":"右","Moctar Diop|SEN":"左","Leo Kokubo|JPN":"右","Matt Lendfers|BEL":"右","Loïc Mbe Soh|FRA":"右","Visar Musliu|MKD":"両","Shogo Taniguchi|JPN":"右","Wolke Janssens|BEL":"右","Hugo Lambotte|BEL":"右","Taiga Hata|JPN":"右","Simen Juklerød|NOR":"左","Robert-Jan Vanwesemael|BEL":"右","Abdoulaye Sissako|FRA":"右","Alouis Diriken|BEL":"右","Ryan Merlen|FRA":"右","Ryotaro Ito|JPN":"右","Illyès Benachour|MAR":"左","Ilias Sebaoui|MAR":"右","Adam Nhaili|BEL":"右","Isaías Delpupo|ARG":"左","Oumar Diouf|SEN":"左","Taishi Brandon Nozawa|JPN":"右","Yannick Thoelen|BEL":"右","Niels Devalckeneer|BEL":"右","Rein Van Helden|BEL":"右","Yuto Tsunashima|JPN":"右","Andreas Verstraeten|BEL":"左","Daam Foulon|BEL":"左","Eran Tuypens|BEL":"左","Semm Renders|BEL":"右","Glenn Bijl|NED":"右","Xander Dierckx|BEL":"左","Youssef Hamdaoui|MAR":"右","Thibo Somers|BEL":"右","Christopher Scott|GER":"右","Farouck Adekami|CIV":"右","Anthony Valencia|ECU":"左","Mukhammadali Urinboev|UZB":"左","Geoffry Hairemans|BEL":"左","Gerard Vandeplas|BEL":"右","Andreas Jungdal|DEN":"右","Oskar Annell|BEL":"右","Emin Bayram|TUR":"右","Seiji Kimura|JPN":"右","Amando Lapage|BEL":"右","Michée Ndembi|BEL":"右","Bakary Haidara|CIV":"右","Roman Neustädter|RUS":"右","Dylan Ourega|FRA":"左","Bryan Reynolds|USA":"右","Lucas Mbamba|BEL":"右","Doğucan Haspolat|TUR":"右","Arthur Piedfort|BEL":"右","Sergiy Sydorchuk|UKR":"右","Thomas Van den Keybus|BEL":"右","Reda Laalaoui|MAR":"右","Raf Smekens|BEL":"左","Isa Sakamoto|JPN":"右","Josimar Alcócer|CRC":"右","Naoufal Bohamdi-Kamoni|MAR":"右","Shunsuke Saito|JPN":"右","Nacho Ferri|ESP":"右","Afonso Patrão|POR":"右","Fernand Goure|CIV":"右","Warleson|BRA":"右","Maxime Delanghe|BEL":"右","Bas Langenbick|BEL":"右","Geoffrey Kondo|FRA":"左","Christiaan Ravych|BEL":"右","Emmanuel Kakou|CIV":"右","Royer Caicedo|COL":"左","Nazinho|POR":"左","Gary Magnée|BEL":"右","Ibrahim Diakité|GUI":"右","Ibrahima Diaby|FRA":"左","Hannes Van Der Bruggen|BEL":"右","Lawrence Agyekum|GHA":"右","Erick Nunes|BRA":"右","Heriberto Jurado|MEX":"左","Charles Herrmann|GER":"左","Krys Kouassi|FRA":"左","Steve Ngoura|FRA":"右","Dante Vanzeir|BEL":"右","Abdoul Kader Ouattara|BFA":"右","Mohamed Koné|CIV":"右","Martin Delavallée|BEL":"右","Théo Defourny|BEL":"右","Check Keita|MLI":"右","Aiham Ousou|SYR":"右","Mehdi Boukamir|MAR":"右","Massamba Sow|FRA":"右","Mardochée Nzita|BEL":"左","Amine Boukamir|MAR":"右","Yassine Khalifi|MAR":"右","Patrick Pflücke|GER":"左","Jakob Napoleon Romsaas|NOR":"右","Parfait Guiagon|CIV":"右","Antoine Bernier|BEL":"右","Isaac Mbenza|BEL":"右","Aurélien Scheidler|FRA":"右","Antoine Colassin|BEL":"右","Tobe Leysen|BEL":"左","Owen Jochmans|BEL":"右","Théo Radelet|BEL":"左","Roggerio Nyakossi|SUI":"右","Ewoud Pletinckx|BEL":"右","Noë Dussenne|BEL":"右","Viktor Damjanic|CRO":"左","Christ Souanga|BEL":"右","Takahiro Akimoto|JPN":"左","Óscar Gil|ESP":"右","Davis Opoku|BEL":"右","Thibault Vlietinck|BEL":"右","Birger Verstraete|BEL":"右","Siebe Schrijvers|BEL":"右","Wouter George|BEL":"右","Bryang Kayo|USA":"右","William Balikwisha|COD":"右","Thibaud Verlinden|BEL":"右","Henok Teklab|GER":"右","Chukwubuikem Ikwuemesi|NGA":"右","Abdoul Karim Traoré|GUI":"右","Sory Kaba|GUI":"右","Kyan Vaesen|BEL":"右","Luc Marijnissen|NED":"右","Bo De Kerf|BEL":"右","Kobe Cools|BEL":"右","Fabio Ferraro|BEL":"左","Nail Moutha-Sebtaoui|MAR":"左","Marsoni Sambu|ANG":"右","Malcolm Viltard|FRA":"右","Nathan Rôdes|BEL":"右","Roman Kvet|CZE":"右","Amine Daali|BEL":"左","David Hrncar|SVK":"右","Mohamed Berte|BEL":"右","David Toshevski|MKD":"右","Matthieu Epolo|COD":"右","Lucas Pirard|BEL":"右","Belmin Dizdarevic|BIH":"右","Ibe Hautekiet|BEL":"右","Ibrahim Karamoko|FRA":"右","Josué Homawoo|TOG":"左","David Bates|SCO":"右","Daan Dierckx|BEL":"右","Gustav Mortensen|DEN":"左","Souleyman Doumbia|CIV":"左","Boli Bolingoli|BEL":"左","Henry Lawrence|ENG":"右","Marlon Fossey|USA":"右","Steeven Assengue|BEL":"右","Marco Ilaimaharitra|MAD":"右","Nayel Mehssatou|CHI":"右","Casper Nielsen|DEN":"右","Léandre Kuavita|BEL":"左","Tobias Mohr|GER":"左","Mohammed El Hankouri|MAR":"右","Rafiki Saïd|COM":"右","Adnane Abid|BEL":"右","Dennis Eckert Ayensa|IRN":"右","Timothé Nkada|FRA":"右","Bernard Nguene|CMR":"右","Thomas Henry|FRA":"右","Grejohn Kyei|FRA":"右","Nacho Miras|ESP":"右","Ortwin De Wolf|BEL":"左","Tijn Van Ingelgom|BEL":"右","Axel Willockx|BEL":"右","Redouane Halhal|MAR":"右","José Marsà|ESP":"左","Tommy St. Jago|CUW":"右","Gora Diouf|SEN":"左","Ian Struyf|BEL":"左","Lovro Golic|SVN":"右","Moncef Zekri|MAR":"左","Thérence Koudou|FRA":"右","Fredrik Hammar|SWE":"右","Massimo Decoene|BEL":"右","Dikeni Salifou|GER":"右","Amine Ouahabi|MAR":"右","Mathis Servais|BEL":"左","Bilal Bafdili|BEL":"右","Maksim Kireev|BLR":"右","Myron van Brederode|NED":"右","Bill Antonio|ZIM":"右","Halil Özdemir|TUR":"右","Bouke Boersma|NED":"右","Keano Vanrafelghem|BEL":"右","Benito Raman|BEL":"右","Mauro Lenaerts|BEL":"右","Brent Gabriël|BEL":"右","Louis Bostyn|BEL":"右","Arnaud Dobbels|BEL":"右","Jakob Kiilerich|DEN":"左","Laurent Lemoine|BEL":"右","Anton Tanghe|BEL":"右","Benoit De Jaegere|BEL":"右","Kadir Seven|TUR":"左","Mouhamadou Sall|SEN":"右","Yannick Cappelle|BEL":"左","Wilguens Paugain|HAI":"右","Enrique Lofolomo|GER":"右","Thomas Claes|BEL":"右","Dirk Asare|BEL":"右","Thibaud Sergeant|BEL":"左","Serxho Ujka|ALB":"右","Joseph Opoku|GHA":"右","Nikola Mituljikic|SRB":"左","Malick Mbaye|SEN":"右","Anosike Ementa|DEN":"右","Tobias Hedl|AUT":"右","Siebe Van Keymolen|BEL":"右","Marcos Peano|ARG":"右","Célestin De Schrevel|BEL":"右","Lucas Monteiro|POR":"右","Yllan Okou|FRA":"左","Djibril Lamego|FRA":"左","Wagane Faye|SEN":"右","Matthis Riou|FRA":"右","Thierry Lutonda|BEL":"左","Nolan Gillot|FRA":"左","Darío Benavides|ESP":"右","Alexis Beka Beka|FRA":"右","Sami Lahssaini|BEL":"右","Samuel Gueulette|RWA":"右","Jordi Liongola|BDI":"右","Joël Ito|BEL":"右","Bryan Soumaré|FRA":"左","Mouhamed Belkheir|ALG":"左","Nachon Nsingi|BEL":"右"});
 Object.assign(BIRTH,{"Nordin Jackers|BEL":"1997-09-05","Axl De Corte|BEL":"2006-03-24","Joel Ordóñez|ECU":"2004-04-21","Jorne Spileers|BEL":"2005-01-21","Brandon Mechele|BEL":"1993-01-28","Vince Osuji|NGA":"2006-04-06","Joaquin Seys|BEL":"2005-03-28","Bjorn Meijer|NED":"2003-03-18","Kyriani Sabbe|BEL":"2005-01-26","Hugo Siquet|BEL":"2002-07-09","Raphael Onyedika|NGA":"2001-04-19","Lynnt Audoor|BEL":"2003-10-13","Hugo Vetlesen|NOR":"2000-02-29","Ludovit Reis|NED":"2000-06-01","Alejandro Granados|ESP":"2006-05-30","Félix Lemaréchal|FRA":"2003-08-07","Hans Vanaken|BEL":"1992-08-24","Cisse Sandra|BEL":"2003-12-16","Christos Tzolis|GRE":"2002-01-30","Mamadou Diakhon|SEN":"2005-09-22","Shandre Campbell|RSA":"2005-07-15","Carlos Forbs|POR":"2004-03-19","Nicolò Tresoldi|GER":"2004-08-20","Romeo Vermant|BEL":"2004-01-24","Gustaf Nilsson|SWE":"1997-05-23","Lucca Brughmans|BEL":"2008-06-27","Tobias Lawal|AUT":"2000-06-07","Hendrik Van Crombrugge|BEL":"1993-04-30","Emile Doucouré|BEL":"2007-09-28","Matte Smets|BEL":"2004-01-04","Mujaid Sadick|ESP":"2000-03-14","Josué Kongolo|BEL":"2006-04-13","Adrián Palacios|VEN":"2004-06-07","Yaimar Medina|ECU":"2004-11-05","Joris Kayembe|COD":"1994-08-08","Zakaria El Ouahdi|MAR":"2001-12-31","Ken Nkuba|BEL":"2002-01-21","Ibrahima Sory Bangoura|GUI":"2004-01-05","Nikolas Sattlberger|AUT":"2004-01-18","Bryan Heynen|BEL":"1997-02-06","August De Wannemacker|BEL":"2008-12-25","Konstantinos Karetsas|GRE":"2007-11-19","Daan Heymans|BEL":"1999-06-15","Noah Adedeji-Sternberg|BEL":"2005-06-19","Yira Sor|NGA":"2000-07-24","Ayumu Yokoyama|JPN":"2003-03-04","Jarne Steuckers|BEL":"2002-02-04","Junya Ito|JPN":"1993-03-09","Robin Mirisola|BEL":"2006-12-08","Aaron Bibout|CMR":"2004-09-09","Jusef Erabi|SWE":"2003-06-08","Kjell Scherpen|NED":"2000-01-23","Vic Chambaere|BEL":"2003-01-10","Giorgi Kavlashvili|GEO":"2007-01-24","Jens Teunckens|BEL":"1998-01-30","Kevin Mac Allister|ARG":"1997-11-07","Ross Sykes|ENG":"1999-03-26","Fedde Leysen|BEL":"2003-07-09","Mamadou Thierno Barry|SEN":"2005-03-20","Massiré Sylla|SEN":"2005-01-07","Louis Patris|BEL":"2001-06-07","Adem Zorgane|ALG":"2000-01-06","Kamiel Van De Perre|BEL":"2004-02-12","Besfort Zeneli|SWE":"2002-11-21","Rob Schoofs|BEL":"1994-03-23","Ivan Pavlic|BEL":"2001-11-10","Anan Khalaili|ISR":"2004-09-03","Ousseynou Niang|SEN":"2001-10-12","Anouar Ait El Hadj|BEL":"2002-04-20","Guilherme Smith|BRA":"2003-06-11","Promise David|CAN":"2001-07-03","Kevin Rodríguez|ECU":"2000-03-04","Raul Florucz|AUT":"2001-06-10","Mohammed Fuseini|GHA":"2002-05-16","Mateo Biondic|GER":"2003-07-24","Marc Giger|SUI":"2004-03-27","Colin Coosemans|BEL":"1992-08-03","Justin Heekeren|GER":"2000-11-27","Marco Kana|BEL":"2002-08-08","Lucas Hey|DEN":"2003-04-13","Ludwig Augustinsson|SWE":"1994-04-21","Ilay Camara|SEN":"2003-01-18","Killian Sardella|BEL":"2002-05-02","Ali Maamar|MAR":"2005-03-23","Thomas Foket|BEL":"1994-09-25","Enric Llansana|NED":"2001-04-12","Nathan De Cat|BEL":"2008-07-19","Nathan-Dylan Saliba|CAN":"2004-02-07","Anas Tajaouart|MAR":"2005-09-07","Mario Stroeykens|COD":"2004-09-29","Alexis Flips|FRA":"2000-01-18","César Huerta|MEX":"2000-12-03","Ibrahim Kanaté|MLI":"2006-10-23","Tristan Degreef|BEL":"2005-01-19","Mihajlo Cvetkovic|SRB":"2007-01-10","Danylo Sikan|UKR":"2001-04-16","Adriano Bertaccini|BEL":"2000-08-13","Elyèss Dao|MAR":"2006-11-20","Davy Roef|BEL":"1994-02-06","Kjell Peersman|BEL":"2004-05-21","Tom Vandenberghe|BEL":"1992-08-17","Bas Evers|BEL":"2008-12-02","Maksim Paskotsi|EST":"2003-01-19","Siebe Van der Heyden|BEL":"1998-05-30","Matties Volckaert|BEL":"2002-10-12","Hatim Es-Saoubi|MAR":"2000-12-13","Tiago Araújo|POR":"2001-03-27","Abdoul Ayinde|BFA":"2005-07-17","Gilles De Meyer|BEL":"2006-09-17","Mohammed El Âdfaoui|BEL":"2008-02-28","Wout Asselman|BEL":"2005-01-20","Mathias Delorge|BEL":"2004-07-31","Tibe De Vlieger|BEL":"2005-11-05","Atsuki Ito|JPN":"1998-08-11","Leonardo Lopes|POR":"1998-11-30","Matisse Samoise|BEL":"2001-11-21","Abdelkahar Kadri|ALG":"2000-06-24","Aimé Omgba|NED":"2002-10-22","Michal Skoras|POL":"2000-02-15","Momodou Sonko|SWE":"2005-01-31","Hyllarion Goore|CIV":"2005-08-24","Wilfried Kanga|CIV":"1998-02-21","Max Dean|ENG":"2004-02-21","Ibrahima Cissé|SEN":"2007-09-24","Moctar Diop|SEN":"2005-01-06","Leo Kokubo|JPN":"2001-01-23","Matt Lendfers|BEL":"2006-03-10","Loïc Mbe Soh|FRA":"2001-06-13","Visar Musliu|MKD":"1994-11-13","Shogo Taniguchi|JPN":"1991-07-15","Wolke Janssens|BEL":"1995-01-11","Hugo Lambotte|BEL":"2006-06-20","Taiga Hata|JPN":"2002-01-20","Simen Juklerød|NOR":"1994-05-18","Robert-Jan Vanwesemael|BEL":"2002-03-26","Abdoulaye Sissako|FRA":"1998-05-26","Alouis Diriken|BEL":"2004-04-01","Ryan Merlen|FRA":"2002-05-11","Ryotaro Ito|JPN":"1998-02-06","Illyès Benachour|MAR":"2007-01-09","Ilias Sebaoui|MAR":"2001-10-04","Kaito Matsuzawa|JPN":"2001-02-05","Adam Nhaili|BEL":"2005-08-09","Isaías Delpupo|ARG":"2003-03-31","Oumar Diouf|SEN":"2003-05-15","Shion Shinkawa|JPN":"2007-08-06","Taishi Brandon Nozawa|JPN":"2002-12-25","Yannick Thoelen|BEL":"1990-07-18","Niels Devalckeneer|BEL":"2004-05-17","Rein Van Helden|BEL":"2002-07-24","Yuto Tsunashima|JPN":"2000-08-15","Andreas Verstraeten|BEL":"2006-01-10","Daam Foulon|BEL":"1999-03-23","Eran Tuypens|BEL":"2005-12-07","Semm Renders|BEL":"2007-12-17","Glenn Bijl|NED":"1995-07-13","Jules Ahoka|COD":"2006-05-08","Xander Dierckx|BEL":"2009-02-27","Youssef Hamdaoui|MAR":"2008-03-20","Thibo Somers|BEL":"1999-03-16","Christopher Scott|GER":"2002-06-07","Farouck Adekami|CIV":"2006-08-07","Anthony Valencia|ECU":"2003-07-21","Mukhammadali Urinboev|UZB":"2005-04-24","Geoffry Hairemans|BEL":"1991-10-21","Gerard Vandeplas|BEL":"2006-02-25","Gabriel Jesus David|NGA":"2007-01-02","Andreas Jungdal|DEN":"2002-02-22","Oskar Annell|BEL":"2005-02-15","Emin Bayram|TUR":"2003-04-02","Seiji Kimura|JPN":"2001-08-24","Amando Lapage|BEL":"2004-11-08","Michée Ndembi|BEL":"2007-07-04","Bakary Haidara|CIV":"2005-06-01","Roman Neustädter|RUS":"1988-02-18","Dylan Ourega|FRA":"2004-10-06","Bryan Reynolds|USA":"2001-06-28","Lucas Mbamba|BEL":"2006-08-12","Doğucan Haspolat|TUR":"2000-02-11","Arthur Piedfort|BEL":"2005-02-01","Sergiy Sydorchuk|UKR":"1991-05-02","Thomas Van den Keybus|BEL":"2001-04-25","Reda Laalaoui|MAR":"2005-05-11","Raf Smekens|BEL":"2004-01-29","Isa Sakamoto|JPN":"2003-08-26","Josimar Alcócer|CRC":"2004-07-07","Naoufal Bohamdi-Kamoni|MAR":"2007-08-20","Shunsuke Saito|JPN":"2005-04-26","Nacho Ferri|ESP":"2004-10-05","Afonso Patrão|POR":"2007-02-03","Fernand Goure|CIV":"2002-04-12","Warleson|BRA":"1996-08-31","Maxime Delanghe|BEL":"2001-05-23","Bas Langenbick|BEL":"2003-06-16","Geoffrey Kondo|FRA":"2002-05-02","Christiaan Ravych|BEL":"2002-07-30","Emmanuel Kakou|CIV":"2005-06-30","Royer Caicedo|COL":"2006-05-05","Nazinho|POR":"2003-07-20","Gary Magnée|BEL":"1999-10-12","Ibrahim Diakité|GUI":"2003-10-31","Ibrahima Diaby|FRA":"2007-03-17","Hannes Van Der Bruggen|BEL":"1993-04-01","Lawrence Agyekum|GHA":"2003-11-23","Erick Nunes|BRA":"2004-02-29","Heriberto Jurado|MEX":"2005-01-03","Charles Herrmann|GER":"2006-01-21","Krys Kouassi|FRA":"2007-03-08","Steve Ngoura|FRA":"2005-02-22","Dante Vanzeir|BEL":"1998-04-16","Abdoul Kader Ouattara|BFA":"2005-05-26","Mohamed Koné|CIV":"2002-03-07","Martin Delavallée|BEL":"2004-03-18","Théo Defourny|BEL":"1992-04-25","Check Keita|MLI":"2003-04-02","Aiham Ousou|SYR":"2000-01-09","Mehdi Boukamir|MAR":"2004-01-26","Massamba Sow|FRA":"2004-06-13","Mardochée Nzita|BEL":"2000-02-24","Amine Boukamir|MAR":"2006-10-23","Mory Kera|BEL":"2008-06-26","Yassine Titraoui|ALG":"2003-07-26","Yassine Khalifi|MAR":"2005-08-09","Patrick Pflücke|GER":"1996-11-30","Jakob Napoleon Romsaas|NOR":"2004-05-16","Parfait Guiagon|CIV":"2001-02-22","Antoine Bernier|BEL":"1997-09-10","Isaac Mbenza|BEL":"1996-03-08","Aurélien Scheidler|FRA":"1998-06-04","Antoine Colassin|BEL":"2001-02-26","Tobe Leysen|BEL":"2002-03-09","Owen Jochmans|BEL":"2003-01-28","Théo Radelet|BEL":"2007-11-15","Roggerio Nyakossi|SUI":"2004-01-13","Ewoud Pletinckx|BEL":"2000-10-10","Noë Dussenne|BEL":"1992-04-07","Viktor Damjanic|CRO":"2005-11-03","Christ Souanga|BEL":"2006-10-23","Takahiro Akimoto|JPN":"1998-01-31","Óscar Gil|ESP":"1998-04-26","Davis Opoku|BEL":"2007-10-29","Thibault Vlietinck|BEL":"1997-08-19","Birger Verstraete|BEL":"1994-04-16","Siebe Schrijvers|BEL":"1996-07-18","Wouter George|BEL":"2002-03-03","Bryang Kayo|USA":"2002-07-27","William Balikwisha|COD":"1999-05-12","Thibaud Verlinden|BEL":"1999-07-09","Henok Teklab|GER":"1998-11-16","Chukwubuikem Ikwuemesi|NGA":"2001-08-05","Abdoul Karim Traoré|GUI":"2007-01-12","Sory Kaba|GUI":"1995-07-28","Kyan Vaesen|BEL":"2001-04-13","Louis Fortin|BEL":"2002-01-12","Luc Marijnissen|NED":"2003-01-09","Bo De Kerf|BEL":"2003-11-21","Kobe Cools|BEL":"1997-07-25","Fabio Ferraro|BEL":"2002-09-03","Nail Moutha-Sebtaoui|MAR":"2005-11-17","Marsoni Sambu|ANG":"1996-06-03","Malcolm Viltard|FRA":"2002-10-24","Nathan Rôdes|BEL":"1997-12-11","Krzysztof Koton|POL":"2003-05-17","Roman Kvet|CZE":"1997-12-17","Amine Daali|BEL":"2004-04-25","David Hrncar|SVK":"1997-12-10","Mohamed Berte|BEL":"2002-03-25","David Toshevski|MKD":"2001-07-16","Matthieu Epolo|COD":"2005-01-15","Lucas Pirard|BEL":"1995-03-10","Belmin Dizdarevic|BIH":"2001-08-09","Matteo Godfroid|BEL":"2004-02-25","Ibe Hautekiet|BEL":"2002-04-13","Ibrahim Karamoko|FRA":"2001-07-23","Josué Homawoo|TOG":"1997-11-12","David Bates|SCO":"1996-10-05","Daan Dierckx|BEL":"2003-02-24","Gustav Mortensen|DEN":"2004-03-19","Souleyman Doumbia|CIV":"1996-09-24","Boli Bolingoli|BEL":"1995-07-01","Henry Lawrence|ENG":"2001-09-21","Marlon Fossey|USA":"1998-09-09","Steeven Assengue|BEL":"2005-06-14","Marco Ilaimaharitra|MAD":"1995-07-26","Nayel Mehssatou|CHI":"2002-04-11","Casper Nielsen|DEN":"1994-04-29","Léandre Kuavita|BEL":"2004-05-31","Tobias Mohr|GER":"1995-08-24","Mohammed El Hankouri|MAR":"1997-07-01","Rafiki Saïd|COM":"2000-03-15","Adnane Abid|BEL":"2003-08-23","Dennis Eckert Ayensa|IRN":"1997-01-09","Timothé Nkada|FRA":"1999-07-20","René Mitongo|BEL":"2008-01-18","Bernard Nguene|CMR":"2006-08-04","Thomas Henry|FRA":"1994-09-20","Grejohn Kyei|FRA":"1995-08-12","Nacho Miras|ESP":"1997-07-19","Ortwin De Wolf|BEL":"1997-04-23","Tijn Van Ingelgom|BEL":"2007-03-05","Axel Willockx|BEL":"2007-02-07","Redouane Halhal|MAR":"2003-03-05","José Marsà|ESP":"2002-03-04","Tommy St. Jago|CUW":"2000-01-03","Gora Diouf|SEN":"2003-09-20","Ian Struyf|BEL":"2007-08-22","Lovro Golic|SVN":"2006-03-05","Moncef Zekri|MAR":"2008-09-20","Thérence Koudou|FRA":"2004-12-13","Fredrik Hammar|SWE":"2001-02-26","Massimo Decoene|BEL":"2004-02-11","Dikeni Salifou|GER":"2003-06-08","Amine Ouahabi|MAR":"2008-07-04","Mathis Servais|BEL":"2004-11-23","Bilal Bafdili|BEL":"2004-08-03","Maksim Kireev|BLR":"2004-07-09","Myron van Brederode|NED":"2003-07-06","Bill Antonio|ZIM":"2002-09-03","Halil Özdemir|TUR":"2005-08-18","Bouke Boersma|NED":"2005-06-23","Keano Vanrafelghem|BEL":"2003-08-02","Benito Raman|BEL":"1994-11-07","Mauro Lenaerts|BEL":"2007-09-06","Brent Gabriël|BEL":"1999-01-27","Louis Bostyn|BEL":"1993-10-04","Arnaud Dobbels|BEL":"2005-02-02","Jakob Kiilerich|DEN":"2000-05-10","Laurent Lemoine|BEL":"1998-04-24","Anton Tanghe|BEL":"1999-01-28","Benoit De Jaegere|BEL":"2004-04-12","Kadir Seven|TUR":"2003-05-05","Mouhamadou Sall|SEN":"2007-10-21","Yannick Cappelle|BEL":"2003-07-07","Wilguens Paugain|HAI":"2001-08-24","Enrique Lofolomo|GER":"2000-04-14","Thomas Claes|BEL":"2004-03-26","Dirk Asare|BEL":"2004-07-04","Tristan Panduro|DEN":"2008-01-10","Thibaud Sergeant|BEL":"2005-09-19","Serxho Ujka|ALB":"1998-08-27","Joseph Opoku|GHA":"2005-08-08","Nikola Mituljikic|SRB":"2003-01-20","Malick Mbaye|SEN":"2004-04-06","Anosike Ementa|DEN":"2002-05-03","Tobias Hedl|AUT":"2003-01-15","Siebe Van Keymolen|BEL":"2005-02-10","Marcos Peano|ARG":"1998-10-15","Célestin De Schrevel|BEL":"2002-04-02","Lucas Monteiro|POR":"2005-08-04","Yllan Okou|FRA":"2002-12-23","Djibril Lamego|FRA":"2003-02-25","Wagane Faye|SEN":"1993-11-20","Matthis Riou|FRA":"2001-01-19","Thierry Lutonda|BEL":"2000-10-27","Nolan Gillot|FRA":"2002-10-31","Darío Benavides|ESP":"2003-01-12","Alexis Beka Beka|FRA":"2001-03-29","Sami Lahssaini|BEL":"1998-09-18","Samuel Gueulette|RWA":"2000-05-19","Jordi Liongola|BDI":"2000-05-17","Joël Ito|BEL":"1998-03-27","Bryan Soumaré|FRA":"1999-02-11","Noah Makembo-Ntemo|BEL":"2007-03-14","Mouhamed Belkheir|ALG":"1999-01-02","Nachon Nsingi|BEL":"2001-04-24"});
 Object.assign(MV,{"Nordin Jackers|BEL":1200,"Axl De Corte|BEL":400,"Joel Ordóñez|ECU":33000,"Jorne Spileers|BEL":3000,"Brandon Mechele|BEL":2800,"Vince Osuji|NGA":800,"Joaquin Seys|BEL":20000,"Bjorn Meijer|NED":3000,"Kyriani Sabbe|BEL":8000,"Hugo Siquet|BEL":4000,"Raphael Onyedika|NGA":23000,"Lynnt Audoor|BEL":1500,"Hugo Vetlesen|NOR":5000,"Ludovit Reis|NED":3000,"Alejandro Granados|ESP":500,"Félix Lemaréchal|FRA":6000,"Hans Vanaken|BEL":5000,"Cisse Sandra|BEL":2000,"Christos Tzolis|GRE":40000,"Mamadou Diakhon|SEN":7000,"Shandre Campbell|RSA":1000,"Carlos Forbs|POR":20000,"Nicolò Tresoldi|GER":25000,"Romeo Vermant|BEL":9000,"Gustaf Nilsson|SWE":1800,"Lucca Brughmans|BEL":4000,"Tobias Lawal|AUT":2000,"Hendrik Van Crombrugge|BEL":900,"Emile Doucouré|BEL":500,"Matte Smets|BEL":10000,"Mujaid Sadick|ESP":5000,"Josué Kongolo|BEL":3500,"Adrián Palacios|VEN":800,"Yaimar Medina|ECU":4000,"Joris Kayembe|COD":2000,"Zakaria El Ouahdi|MAR":17000,"Ken Nkuba|BEL":1500,"Ibrahima Sory Bangoura|GUI":6000,"Nikolas Sattlberger|AUT":2200,"Bryan Heynen|BEL":8000,"August De Wannemacker|BEL":2000,"Konstantinos Karetsas|GRE":35000,"Daan Heymans|BEL":6000,"Noah Adedeji-Sternberg|BEL":4000,"Yira Sor|NGA":2500,"Ayumu Yokoyama|JPN":1500,"Jarne Steuckers|BEL":5000,"Junya Ito|JPN":3000,"Robin Mirisola|BEL":4000,"Aaron Bibout|CMR":3500,"Jusef Erabi|SWE":2000,"Kjell Scherpen|NED":8000,"Vic Chambaere|BEL":700,"Giorgi Kavlashvili|GEO":100,"Jens Teunckens|BEL":100,"Kevin Mac Allister|ARG":12000,"Ross Sykes|ENG":4500,"Fedde Leysen|BEL":3500,"Mamadou Thierno Barry|SEN":1200,"Massiré Sylla|SEN":800,"Louis Patris|BEL":2500,"Adem Zorgane|ALG":12000,"Kamiel Van De Perre|BEL":8000,"Besfort Zeneli|SWE":6000,"Rob Schoofs|BEL":2000,"Ivan Pavlic|BEL":400,"Anan Khalaili|ISR":23000,"Ousseynou Niang|SEN":6000,"Anouar Ait El Hadj|BEL":5000,"Guilherme Smith|BRA":4000,"Promise David|CAN":17000,"Kevin Rodríguez|ECU":6000,"Raul Florucz|AUT":4000,"Mohammed Fuseini|GHA":2500,"Mateo Biondic|GER":2000,"Marc Giger|SUI":800,"Colin Coosemans|BEL":1200,"Justin Heekeren|GER":500,"Marco Kana|BEL":3000,"Lucas Hey|DEN":2500,"Ludwig Augustinsson|SWE":1500,"Ilay Camara|SEN":3500,"Killian Sardella|BEL":2500,"Ali Maamar|MAR":2500,"Thomas Foket|BEL":300,"Enric Llansana|NED":2000,"Nathan De Cat|BEL":27000,"Nathan-Dylan Saliba|CAN":7500,"Anas Tajaouart|MAR":400,"Mario Stroeykens|COD":4500,"Alexis Flips|FRA":300,"César Huerta|MEX":3500,"Ibrahim Kanaté|MLI":1000,"Tristan Degreef|BEL":3000,"Mihajlo Cvetkovic|SRB":10000,"Danylo Sikan|UKR":4000,"Adriano Bertaccini|BEL":4000,"Elyèss Dao|MAR":250,"Davy Roef|BEL":2500,"Kjell Peersman|BEL":400,"Tom Vandenberghe|BEL":250,"Bas Evers|BEL":100,"Maksim Paskotsi|EST":3500,"Siebe Van der Heyden|BEL":3000,"Matties Volckaert|BEL":2000,"Hatim Es-Saoubi|MAR":800,"Tiago Araújo|POR":2500,"Abdoul Ayinde|BFA":600,"Gilles De Meyer|BEL":500,"Mohammed El Âdfaoui|BEL":2000,"Wout Asselman|BEL":400,"Mathias Delorge|BEL":7000,"Tibe De Vlieger|BEL":3000,"Atsuki Ito|JPN":2500,"Leonardo Lopes|POR":2500,"Matisse Samoise|BEL":2500,"Abdelkahar Kadri|ALG":2500,"Aimé Omgba|NED":1000,"Michal Skoras|POL":4000,"Momodou Sonko|SWE":1700,"Hyllarion Goore|CIV":4000,"Wilfried Kanga|CIV":3000,"Max Dean|ENG":2500,"Ibrahima Cissé|SEN":900,"Moctar Diop|SEN":600,"Leo Kokubo|JPN":5000,"Matt Lendfers|BEL":200,"Loïc Mbe Soh|FRA":2000,"Visar Musliu|MKD":1000,"Shogo Taniguchi|JPN":750,"Wolke Janssens|BEL":300,"Hugo Lambotte|BEL":150,"Taiga Hata|JPN":2500,"Simen Juklerød|NOR":300,"Robert-Jan Vanwesemael|BEL":3000,"Abdoulaye Sissako|FRA":2000,"Alouis Diriken|BEL":300,"Ryan Merlen|FRA":1000,"Ryotaro Ito|JPN":6000,"Illyès Benachour|MAR":100,"Ilias Sebaoui|MAR":3500,"Kaito Matsuzawa|JPN":800,"Adam Nhaili|BEL":150,"Isaías Delpupo|ARG":250,"Oumar Diouf|SEN":1000,"Shion Shinkawa|JPN":800,"Taishi Brandon Nozawa|JPN":3500,"Yannick Thoelen|BEL":200,"Niels Devalckeneer|BEL":150,"Rein Van Helden|BEL":3000,"Yuto Tsunashima|JPN":1500,"Andreas Verstraeten|BEL":1000,"Daam Foulon|BEL":2000,"Eran Tuypens|BEL":300,"Semm Renders|BEL":1200,"Glenn Bijl|NED":600,"Jules Ahoka|COD":300,"Xander Dierckx|BEL":3000,"Youssef Hamdaoui|MAR":1500,"Thibo Somers|BEL":3000,"Christopher Scott|GER":2200,"Farouck Adekami|CIV":1800,"Anthony Valencia|ECU":1800,"Mukhammadali Urinboev|UZB":400,"Geoffry Hairemans|BEL":250,"Gerard Vandeplas|BEL":1000,"Gabriel Jesus David|NGA":200,"Andreas Jungdal|DEN":3500,"Oskar Annell|BEL":50,"Emin Bayram|TUR":4000,"Seiji Kimura|JPN":1500,"Amando Lapage|BEL":800,"Michée Ndembi|BEL":250,"Bakary Haidara|CIV":150,"Roman Neustädter|RUS":100,"Dylan Ourega|FRA":1000,"Bryan Reynolds|USA":3500,"Lucas Mbamba|BEL":1000,"Doğucan Haspolat|TUR":5000,"Arthur Piedfort|BEL":4000,"Sergiy Sydorchuk|UKR":250,"Thomas Van den Keybus|BEL":700,"Reda Laalaoui|MAR":500,"Raf Smekens|BEL":150,"Isa Sakamoto|JPN":4000,"Josimar Alcócer|CRC":3000,"Naoufal Bohamdi-Kamoni|MAR":500,"Shunsuke Saito|JPN":1300,"Nacho Ferri|ESP":6000,"Afonso Patrão|POR":1500,"Fernand Goure|CIV":300,"Warleson|BRA":2000,"Maxime Delanghe|BEL":1500,"Bas Langenbick|BEL":50,"Geoffrey Kondo|FRA":3000,"Christiaan Ravych|BEL":2500,"Emmanuel Kakou|CIV":2000,"Royer Caicedo|COL":1500,"Nazinho|POR":6000,"Gary Magnée|BEL":2200,"Ibrahim Diakité|GUI":1000,"Ibrahima Diaby|FRA":1500,"Hannes Van Der Bruggen|BEL":400,"Lawrence Agyekum|GHA":1500,"Erick Nunes|BRA":600,"Heriberto Jurado|MEX":700,"Charles Herrmann|GER":800,"Krys Kouassi|FRA":200,"Steve Ngoura|FRA":5000,"Dante Vanzeir|BEL":1800,"Abdoul Kader Ouattara|BFA":400,"Mohamed Koné|CIV":2000,"Martin Delavallée|BEL":1500,"Théo Defourny|BEL":150,"Check Keita|MLI":3500,"Aiham Ousou|SYR":3000,"Mehdi Boukamir|MAR":500,"Massamba Sow|FRA":400,"Mardochée Nzita|BEL":1500,"Amine Boukamir|MAR":500,"Mory Kera|BEL":150,"Yassine Titraoui|ALG":7000,"Yassine Khalifi|MAR":1300,"Patrick Pflücke|GER":1800,"Jakob Napoleon Romsaas|NOR":1200,"Parfait Guiagon|CIV":5000,"Antoine Bernier|BEL":1500,"Isaac Mbenza|BEL":350,"Aurélien Scheidler|FRA":2000,"Antoine Colassin|BEL":600,"Tobe Leysen|BEL":5000,"Owen Jochmans|BEL":150,"Théo Radelet|BEL":50,"Roggerio Nyakossi|SUI":5000,"Ewoud Pletinckx|BEL":1800,"Noë Dussenne|BEL":300,"Viktor Damjanic|CRO":300,"Christ Souanga|BEL":300,"Takahiro Akimoto|JPN":1500,"Óscar Gil|ESP":800,"Davis Opoku|BEL":800,"Thibault Vlietinck|BEL":450,"Birger Verstraete|BEL":900,"Siebe Schrijvers|BEL":1500,"Wouter George|BEL":700,"Bryang Kayo|USA":300,"William Balikwisha|COD":300,"Thibaud Verlinden|BEL":1200,"Henok Teklab|GER":800,"Chukwubuikem Ikwuemesi|NGA":1200,"Abdoul Karim Traoré|GUI":1000,"Sory Kaba|GUI":1000,"Kyan Vaesen|BEL":700,"Louis Fortin|BEL":100,"Luc Marijnissen|NED":1500,"Bo De Kerf|BEL":600,"Kobe Cools|BEL":600,"Fabio Ferraro|BEL":1200,"Nail Moutha-Sebtaoui|MAR":300,"Marsoni Sambu|ANG":700,"Malcolm Viltard|FRA":1500,"Nathan Rôdes|BEL":600,"Krzysztof Koton|POL":250,"Roman Kvet|CZE":1200,"Amine Daali|BEL":200,"David Hrncar|SVK":500,"Mohamed Berte|BEL":650,"David Toshevski|MKD":600,"Matthieu Epolo|COD":8000,"Lucas Pirard|BEL":350,"Belmin Dizdarevic|BIH":100,"Matteo Godfroid|BEL":50,"Ibe Hautekiet|BEL":4000,"Ibrahim Karamoko|FRA":3000,"Josué Homawoo|TOG":2000,"David Bates|SCO":1800,"Daan Dierckx|BEL":1500,"Gustav Mortensen|DEN":3000,"Souleyman Doumbia|CIV":250,"Boli Bolingoli|BEL":200,"Henry Lawrence|ENG":4000,"Marlon Fossey|USA":3500,"Steeven Assengue|BEL":300,"Marco Ilaimaharitra|MAD":800,"Nayel Mehssatou|CHI":1500,"Casper Nielsen|DEN":1500,"Léandre Kuavita|BEL":700,"Tobias Mohr|GER":800,"Mohammed El Hankouri|MAR":1200,"Rafiki Saïd|COM":5000,"Adnane Abid|BEL":2500,"Dennis Eckert Ayensa|IRN":2000,"Timothé Nkada|FRA":2000,"René Mitongo|BEL":1000,"Bernard Nguene|CMR":1000,"Thomas Henry|FRA":500,"Grejohn Kyei|FRA":300,"Nacho Miras|ESP":3500,"Ortwin De Wolf|BEL":500,"Tijn Van Ingelgom|BEL":100,"Axel Willockx|BEL":50,"Redouane Halhal|MAR":5000,"José Marsà|ESP":3500,"Tommy St. Jago|CUW":2000,"Gora Diouf|SEN":1500,"Ian Struyf|BEL":400,"Lovro Golic|SVN":300,"Moncef Zekri|MAR":4000,"Thérence Koudou|FRA":4000,"Fredrik Hammar|SWE":3000,"Massimo Decoene|BEL":400,"Dikeni Salifou|GER":1000,"Amine Ouahabi|MAR":100,"Mathis Servais|BEL":4000,"Bilal Bafdili|BEL":1000,"Maksim Kireev|BLR":700,"Myron van Brederode|NED":4500,"Bill Antonio|ZIM":1200,"Halil Özdemir|TUR":400,"Bouke Boersma|NED":2500,"Keano Vanrafelghem|BEL":1500,"Benito Raman|BEL":800,"Mauro Lenaerts|BEL":400,"Brent Gabriël|BEL":1000,"Louis Bostyn|BEL":150,"Arnaud Dobbels|BEL":50,"Jakob Kiilerich|DEN":1000,"Laurent Lemoine|BEL":800,"Anton Tanghe|BEL":700,"Benoit De Jaegere|BEL":500,"Kadir Seven|TUR":350,"Mouhamadou Sall|SEN":100,"Yannick Cappelle|BEL":650,"Wilguens Paugain|HAI":800,"Enrique Lofolomo|GER":1000,"Thomas Claes|BEL":1500,"Dirk Asare|BEL":1000,"Tristan Panduro|DEN":100,"Thibaud Sergeant|BEL":50,"Serxho Ujka|ALB":400,"Joseph Opoku|GHA":4500,"Nikola Mituljikic|SRB":400,"Malick Mbaye|SEN":400,"Anosike Ementa|DEN":2500,"Tobias Hedl|AUT":400,"Siebe Van Keymolen|BEL":100,"Marcos Peano|ARG":2000,"Célestin De Schrevel|BEL":200,"Lucas Monteiro|POR":100,"Yllan Okou|FRA":2000,"Djibril Lamego|FRA":1500,"Wagane Faye|SEN":400,"Matthis Riou|FRA":300,"Thierry Lutonda|BEL":600,"Nolan Gillot|FRA":500,"Darío Benavides|ESP":400,"Alexis Beka Beka|FRA":300,"Sami Lahssaini|BEL":700,"Samuel Gueulette|RWA":500,"Jordi Liongola|BDI":1500,"Joël Ito|BEL":900,"Bryan Soumaré|FRA":200,"Noah Makembo-Ntemo|BEL":100,"Mouhamed Belkheir|ALG":500,"Nachon Nsingi|BEL":300});
+// ---- J1リーグ 追加データ ----
+Object.assign(MV,{"Tomoki Hayakawa|JPN":2000,"Taiki Yamada|JPN":75,"Yuji Kajikawa|JPN":75,"Tae-hyeon Kim|KOR":1200,"Naomichi Ueda|JPN":1000,"Ikuma Sekigawa|JPN":900,"Kaito Chida|JPN":325,"Keisuke Tsukui|JPN":325,"Ryoya Ogawa|JPN":900,"Koki Anzai|JPN":700,"Kimito Nono|JPN":1200,"Ryuta Koike|JPN":450,"Kento Misao|JPN":800,"Yuta Higuchi|JPN":800,"Yuta Matsumura|JPN":750,"Haruki Hayashi|JPN":250,"Ryotaro Araki|JPN":850,"Élber|BRA":550,"Aleksandar Cavric|SVK":1200,"Léo Ceará|BRA":2500,"Yuma Suzuki|JPN":2500,"Kyosuke Tagawa|JPN":600,"Homare Tokuda|JPN":175,"Konosuke Nishikawa|JPN":1000,"Shuhei Matsubara|JPN":100,"Ryusei Haruna|JPN":50,"Sho Omori|JPN":600,"Kenta Itakura|JPN":600,"Danilo|BRA":350,"Takeshi Ushizawa|JPN":200,"Seiya Inoue|JPN":175,"Takumi Mase|JPN":500,"Yuto Yamashita|JPN":500,"Yuto Nagao|JPN":400,"Shota Yamashita|JPN":100,"Kotatsu Kawakami|JPN":75,"Koki Ando|JPN":300,"Yoshiki Torikai|JPN":650,"Chihiro Kato|JPN":450,"Taishi Semba|JPN":275,"Koya Okuda|JPN":250,"Kiichi Yamazaki|JPN":225,"Hayata Yamamoto|JPN":500,"Mizuki Arai|JPN":150,"Matheus Leiria|BRA":150,"Arata Watanabe|JPN":700,"Keisuke Tada|JPN":250,"Ryo Nemoto|JPN":150,"Kishin Gokita|JPN":100,"Patryck|BRA":75,"Shusaku Nishikawa|JPN":100,"Ayumi Niekawa|JPN":75,"Danilo Boza|BRA":1200,"Yuta Miyamoto|JPN":800,"Kenta Nemoto|JPN":400,"Takuya Ogiwara|JPN":600,"Hirokazu Ishihara|JPN":850,"Eiichi Katayama|JPN":75,"Samuel Gustafson|SWE":1400,"Kaito Yasui|JPN":900,"Kai Shibato|JPN":275,"Hayate Ueki|JPN":150,"Yoichi Naganuma|JPN":500,"Takahiro Sekine|JPN":450,"Matheus Savio|BRA":1300,"Jumpei Hayakawa|JPN":300,"Yusuke Matsuo|JPN":750,"Hiroki Abe|JPN":100,"Takuro Kaneko|JPN":1200,"Hiiro Komori|JPN":800,"Ado Onaiwu|JPN":600,"Renji Hidano|JPN":350,"Rio Nitta|JPN":200,"José Aurelio Suárez|ESP":450,"Tomoya Wakahara|JPN":300,"Ryota Suzuki|JPN":100,"Haruto Usui|JPN":25,"Koji Toriumi|JPN":600,"Takashi Kawano|JPN":500,"Takayuki Mae|JPN":225,"Ryota Kuboniwa|JPN":200,"Rikuto Ishio|JPN":500,"Masaru Hidaka|JPN":400,"Issei Takahashi|JPN":600,"Koki Yonekura|JPN":50,"Eduardo|BRA":500,"Manato Shinada|JPN":400,"Taiki Amagasa|JPN":350,"Yusuke Kobayashi|JPN":150,"Takuya Yasui|JPN":350,"Yuma Igari|JPN":150,"Kazuki Tanaka|JPN":750,"Takuro Iwai|JPN":100,"Makoto Himeno|JPN":300,"Carlinhos Junior|BRA":800,"Naoki Tsubaki|JPN":450,"Zain Issaka|JPN":600,"Naohiro Sugiyama|JPN":350,"Takumi Tsukui|JPN":800,"Daichi Ishikawa|JPN":600,"Hiroto Goya|JPN":275,"Takumi Matsumura|JPN":75,"Ryosuke Kojima|JPN":1200,"Kenta Matsumoto|JPN":450,"Kengo Nagai|JPN":100,"Haruki Saruta|JPN":50,"Taiyo Koga|JPN":1300,"Seiya Baba|JPN":500,"Hiroki Noda|JPN":225,"Daiki Sugioka|JPN":500,"Hiromu Mitsumaru|JPN":225,"Yusei Yamanouchi|JPN":225,"Wataru Harada|JPN":600,"Koki Kumasaka|JPN":400,"Takumi Tsuchiya|JPN":400,"Rei Shimano|JPN":100,"Nobuteru Nakagawa|JPN":650,"Yudai Konishi|JPN":450,"Sachiro Toshima|JPN":350,"Riki Harakawa|JPN":300,"Tojiro Kubo|JPN":900,"Yota Komi|JPN":600,"Hinata Yamauchi|JPN":250,"Hayato Nakama|JPN":225,"Yoshio Koizumi|JPN":1000,"Koya Yuruki|JPN":600,"Yusuke Segawa|JPN":450,"Mao Hosoya|JPN":1500,"Yuki Kakita|JPN":600,"Hayate Tanaka|JPN":500,"Seung-gyu Kim|KOR":500,"Alexander Scholz|DEN":1000,"Kanta Doi|JPN":600,"Hayato Inamura|JPN":450,"Rio Omori|JPN":400,"Masato Morishige|JPN":75,"Renta Higashi|JPN":50,"Kento Hashimoto|JPN":500,"Yuto Nagatomo|JPN":100,"Takahiro Ko|JPN":1000,"Kento Hashimoto|JPN":600,"Kyota Tokiwa|JPN":400,"Ryunosuke Sato|JPN":2000,"Maki Kitahara|JPN":200,"Kota Tawaratsumida|JPN":800,"Keita Endo|JPN":600,"Kein Sato|JPN":1000,"Fuki Yamada|JPN":500,"Teruhito Nakagawa|JPN":400,"Marcelo Ryan|BRA":1000,"Motoki Nagakura|JPN":700,"Tsuyoshi Ogashiwa|JPN":300,"Leon Nozawa|JPN":250,"Divine Chinedu Otani|JPN":100,"Matheus|BRA":350,"Yuya Nagasawa|JPN":150,"Hiroki Mawatari|JPN":50,"Keisuke Nakamura|JPN":50,"Ryota Inoue|JPN":400,"Kaito Suzuki|JPN":400,"Naoki Hayashi|JPN":350,"Maaya Sako|JPN":50,"Daiki Fukazawa|JPN":400,"Kazuya Miyahara|JPN":550,"Yosuke Uchida|JPN":225,"Shuto Tanabe|JPN":150,"Riku Matsuda|JPN":125,"Tetsuyuki Inami|JPN":225,"Joi Yamamoto|JPN":100,"Yuan Matsuhashi|JPN":400,"Yuya Fukuda|JPN":350,"Yuta Arai|JPN":350,"Kosuke Saito|JPN":700,"Rei Hirakawa|JPN":650,"Issei Kumatoriya|JPN":200,"Shion Nakayama|JPN":150,"Itsuki Someno|JPN":700,"Shimon Teranuma|JPN":200,"Goki Yamada|JPN":150,"Ryosuke Shirai|JPN":125,"Hayato Hirao|JPN":75,"Kosei Tani|JPN":1700,"Tatsuya Morita|JPN":75,"Yoshiaki Arai|JPN":50,"Yuta Nakayama|JPN":1500,"Ibrahim Dresevic|KVX":1400,"Daihachi Okamura|JPN":900,"Min-tae Kim|KOR":325,"Tomoki Imai|JPN":150,"Kotaro Hayashi|JPN":800,"Henry Heroki Mochizuki|JPN":750,"Hotaka Nakamura|JPN":250,"Hiroyuki Mae|JPN":800,"Neta Lavi|ISR":800,"Hokuto Shimoda|JPN":175,"Keiya Sento|JPN":500,"Asahi Masuyama|JPN":500,"Futa Tokumura|JPN":300,"Ryohei Shirasaki|JPN":275,"Sang-ho Na|KOR":900,"Yuki Soma|JPN":2000,"Erik|BRA":1000,"Takuma Nishimura|JPN":800,"Shota Fujio|JPN":800,"Tete Yengi|AUS":450,"Kanji Kuwayama|JPN":175,"Svend Brodersen|GER":850,"Louis Thébault-Yamaguchi|JPN":400,"Yuki Hayasaka|JPN":150,"Filip Uremovic|CRO":2000,"Yuichi Maruyama|JPN":100,"Shunsuke Hayashi|JPN":100,"Ryota Kamihashi|JPN":50,"Sota Miura|JPN":1300,"Asahi Sasaki|JPN":900,"Reon Yamahara|JPN":900,"Yuto Matsunagane|JPN":300,"Hiroto Noda|JPN":75,"Kento Tachibanada|JPN":1200,"So Kawahara|JPN":900,"Kota Yui|JPN":50,"Yuki Yamamoto|JPN":1000,"Ryota Oshima|JPN":100,"Ryuki Osa|JPN":200,"Toya Myogan|JPN":125,"Yuto Ozeki|JPN":700,"Tatsuya Ito|JPN":900,"Marcinho|BRA":900,"Ten Miyagi|JPN":350,"Kazuya Konno|JPN":800,"Kyosuke Mochiyama|JPN":150,"Erison|BRA":2000,"Lazar Romanic|SRB":900,"Soma Kanda|JPN":150,"Il-gyu Park|JPN":250,"Ryoya Kimura|JPN":150,"Yuya Tsuboi|JPN":50,"Hiroki Iikura|JPN":50,"Jeison Quiñónes|COL":1000,"Taisei Inoue|JPN":600,"Ryotaro Tsunoda|JPN":500,"Thomas Deng|AUS":450,"Kosei Suwama|JPN":300,"Ren Kato|JPN":500,"Taiki Watanabe|JPN":225,"Kanta Sekitomi|JPN":125,"Ken Matsubara|JPN":275,"Takuto Kimura|JPN":200,"Riku Yamane|JPN":1000,"Kota Watanabe|JPN":900,"Aruto Higuchi|JPN":125,"Tomoki Kondo|JPN":700,"George Onaiwu|JPN":275,"Jun Amano|JPN":400,"Tevis|BRA":800,"Jordy Croux|BEL":350,"Yuri Araújo|BRA":300,"Hiroto Asada|JPN":200,"Ryo Miyaichi|JPN":175,"Kaina Tanimura|JPN":1400,"Dean David|ISR":1200,"Yuya Oki|JPN":400,"Togo Umeda|JPN":350,"Kei Ishikawa|JPN":50,"Seung-wook Park|KOR":750,"Jelani Reshaun Sumiyoshi|JPN":600,"Mateus Brunetti|BRA":500,"Sen Takagi|JPN":375,"Sodai Hasukawa|JPN":350,"Yuji Takahashi|JPN":225,"Yuki Honda|JPN":100,"Yutaka Yoshida|JPN":100,"Haruto Hidaka|JPN":150,"Kengo Kitazume|JPN":125,"Masaki Yumiba|JPN":350,"Rinsei Ohata|JPN":125,"Yudai Shimamoto|JPN":350,"Kai Matsuzaki|JPN":650,"Hikaru Nakahara|JPN":500,"Kenta Inoue|JPN":350,"Motoki Nishihara|JPN":225,"Ryota Hariu|JPN":50,"Kazuki Kozuka|JPN":225,"Capixaba|BRA":600,"Se-hun Oh|KOR":1000,"Koya Kitagawa|JPN":850,"Kanta Chiba|JPN":300,"Ahmed Ahmedov|BUL":300,"Riku Gunji|JPN":75,"Daniel Schmidt|JPN":450,"Alexandre Pisano|JPN":275,"Yohei Takeda|JPN":50,"Haruya Fujii|JPN":1700,"Yota Sato|JPN":500,"Yuki Nogami|JPN":150,"Shuhei Tokumoto|JPN":400,"Akinari Kawazura|JPN":250,"Ryosuke Yamanaka|JPN":125,"Teruki Hara|JPN":600,"Soichiro Mori|JPN":300,"Tomoki Takamine|JPN":1000,"Haruki Yoshida|JPN":300,"Katsuhiro Nakayama|JPN":700,"Masahito Ono|JPN":200,"Haruto Suzuki|JPN":50,"Tsukasa Morishima|JPN":700,"Yuya Asano|JPN":500,"Hidemasa Koda|JPN":450,"Takuya Uchida|JPN":325,"Taichi Kikuchi|JPN":300,"Shungo Sugiura|JPN":200,"Kyota Sakakibara|JPN":100,"Mateus Castro|BRA":1000,"Yudai Kimura|JPN":850,"Yuya Yamagishi|JPN":550,"Kensuke Nagai|JPN":100,"Masaaki Murakami|JPN":250,"Gakuji Ota|JPN":50,"Kentaro Kakoi|JPN":50,"Akira Fantini|JPN":50,"Henrique Trevisan|BRA":400,"Shogo Asada|JPN":325,"Yoshinori Suzuki|JPN":250,"Hisashi Appiah Tawiah|JPN":200,"Kodai Nagata|JPN":50,"Hidehiro Sugai|JPN":650,"Kyo Sato|JPN":650,"Shinnosuke Fukuda|JPN":750,"Yusuke Ishida|JPN":450,"João Pedro|BRA":400,"Sung-jun Yoon|KOR":400,"Mitsuki Saito|JPN":225,"Ryuma Nakano|JPN":200,"Taiki Hirato|JPN":800,"Haruki Arai|JPN":600,"Taiyo Hiraoka|JPN":600,"Temma Matsuda|JPN":500,"Fuchi Honda|JPN":300,"Masaya Okugawa|JPN":800,"Rafael Elias|BRA":3200,"Alex Souza|BRA":700,"David Silva|BRA":100,"Shun Nagasawa|JPN":50,"Rui Araki|JPN":400,"Masaaki Higashiguchi|JPN":50,"Aolin Zhang|JPN":50,"Genta Miura|JPN":250,"Ryo Hatsuse|JPN":700,"Shinya Nakano|JPN":300,"Takeru Kishimoto|JPN":450,"Ginjiro Ikegaya|JPN":125,"Tokuma Suzuki|JPN":700,"Rin Mito|JPN":400,"Shuto Abe|JPN":800,"Takato Yamamoto|JPN":175,"Shu Kurata|JPN":75,"Welton|BRA":1200,"Kanji Okunuki|JPN":400,"Ryotaro Meshino|JPN":350,"Ryoya Yamashita|JPN":900,"Jiro Nakamura|JPN":100,"Takashi Usami|JPN":400,"Gaku Nawata|JPN":150,"Deniz Hümmet|TUR":2500,"Harumi Minamino|JPN":450,"Daichi Hayashi|JPN":300,"Issam Jebali|TUN":200,"Shoji Toyama|JPN":200,"Kosuke Nakamura|JPN":250,"Jin-hyeon Kim|KOR":50,"Shinnosuke Hatanaka|JPN":800,"Hayato Tanaka|JPN":700,"Rikito Inoue|JPN":400,"Ayumu Ohata|JPN":450,"Kyohei Noborizato|JPN":100,"Dion Cools|MAS":700,"Takumi Nakamura|JPN":200,"Nelson Ishiwatari|JPN":750,"Hinata Kida|JPN":300,"Kyohei Yoshino|JPN":300,"Rui Osako|JPN":150,"Masaya Shibayama|JPN":800,"Shion Homma|JPN":400,"Satoki Uejo|JPN":325,"Yumeki Yokoyama|JPN":1000,"Shinji Kagawa|JPN":150,"Thiago Andrade|BRA":1200,"Motohiko Nakajima|JPN":800,"Solomon Sakuragawa|JPN":750,"Daiya Maekawa|JPN":800,"Shuichi Gonda|JPN":100,"Shioki Takayama|JPN":25,"Matheus Thuler|BRA":1800,"Caetano|BRA":1000,"Boniface Nduka|JPN":400,"Kaito Yamada|JPN":200,"Katsuya Nagato|JPN":800,"Diego|BRA":450,"Rikuto Hirose|JPN":450,"Nanasei Iino|JPN":300,"Gotoku Sakai|JPN":250,"Justin Homma|JPN":75,"Yuya Kuwasaki|JPN":650,"Yosuke Ideguchi|JPN":900,"Kento Hamasaki|JPN":400,"Kakeru Yamauchi|JPN":150,"Mitsuki Hidaka|JPN":150,"Juzo Ura|JPN":100,"Rikuto Hashimoto|JPN":75,"Yuta Goke|JPN":900,"Makoto Mitsuta|JPN":800,"Haruya Ide|JPN":250,"Jean Patric|BRA":350,"Takashi Inui|JPN":125,"Yoshinori Muto|JPN":700,"Ren Komatsu|JPN":450,"Yuya Osako|JPN":400,"Kotaro Uchino|JPN":125,"Lennart Moser|GER":600,"Taro Hamada|JPN":250,"Goro Kawanami|JPN":50,"Yugo Tatsuta|JPN":750,"Kota Kudo|JPN":500,"Kaito Abe|JPN":325,"Yoshitake Suzuki|JPN":300,"Hiroshi Omori|JPN":200,"Daichi Tagami|JPN":200,"Yota Fujii|JPN":100,"Kosuke Shirai|JPN":350,"Eiji Miyamoto|JPN":450,"Ryo Tabei|JPN":400,"Kosei Ogura|JPN":325,"Haruka Motoyama|JPN":250,"Ibuki Fujita|JPN":125,"Masaya Matsumoto|JPN":500,"Towa Yamane|JPN":500,"Rui Sueyoshi|JPN":150,"Ataru Esaka|JPN":500,"Yuta Kamiya|JPN":350,"Yuto Baigorria|BOL":200,"Jun Nishikawa|JPN":650,"Kota Kawano|JPN":300,"Kazunari Ichimi|JPN":400,"Léo Gaúcho|BRA":350,"Werik Popó|BRA":350,"Lucão|BRA":350,"Noah Kenshin Browne|JPN":250,"Keisuke Osako|JPN":2000,"Issei Ouchi|JPN":175,"Yudai Tanaka|JPN":100,"Hayato Araki|JPN":1500,"Ju-sung Kim|KOR":800,"Taichi Yamasaki|JPN":250,"Tsukasa Shiotani|JPN":175,"Takaaki Shichi|JPN":300,"Shuto Nakano|JPN":1400,"Naoto Arai|JPN":700,"Taishi Matsumoto|JPN":800,"Hayao Kawabe|JPN":2000,"Yotaro Nakajima|JPN":800,"Sota Koshimichi|JPN":350,"Shunki Higashi|JPN":1600,"Daiki Suga|JPN":500,"Motoki Ohara|JPN":300,"Shimon Kobayashi|JPN":200,"Naoki Maeda|JPN":500,"Shun Ayukawa|JPN":175,"Akito Suzuki|JPN":1200,"Sota Nakamura|JPN":900,"Mutsuki Kato|JPN":800,"Kosuke Kinoshita|JPN":550,"Yuma Obata|JPN":275,"Kazuki Fujita|JPN":225,"Powell Obinna Obi|JPN":75,"Kenta Matsuyama|JPN":50,"Takumi Kamijima|JPN":500,"Teppei Oka|JPN":500,"Yuma Tsujioka|JPN":300,"Masaya Tashiro|JPN":300,"Daiki Miya|JPN":300,"Moon-hyeon Kim|KOR":50,"Yota Maejima|JPN":550,"Yu Hashimoto|JPN":400,"Masato Yuzawa|JPN":250,"Kaoru Yamawaki|JPN":100,"Keiya Shiihashi|JPN":600,"Kohei Okuno|JPN":450,"Hiroki Akino|JPN":250,"Kokoro Maeda|JPN":100,"Masato Shigemi|JPN":450,"Yuji Kitajima|JPN":300,"Tomoya Miki|JPN":1000,"Shintaro Nago|JPN":800,"Kazuki Fujimoto|JPN":500,"Hikaru Maeda|JPN":50,"Shosei Usui|JPN":450,"Reiju Tsuruno|JPN":200,"Sonosuke Sato|JPN":125,"Abdul Hanan Sani Brown|JPN":100,"Ichika Maeda|JPN":50,"Hisashi Jogo|JPN":25,"Masaaki Goto|JPN":550,"Go Hatano|JPN":250,"Luka Radotic|SRB":50,"Kaito Ioka|JPN":25,"Ryosuke Shindo|JPN":500,"Eduardo|BRA":350,"Yusei Egawa|JPN":350,"Ikki Arai|JPN":275,"Hijiri Onaga|JPN":550,"Shunya Yoneda|JPN":500,"Keita Takahata|JPN":375,"Masahiro Sekiguchi|JPN":450,"Riku Yamada|JPN":300,"Diego Pituca|BRA":600,"Temmu Matsumoto|JPN":450,"Tsubasa Kasayanagi|JPN":500,"Takashi Sawada|JPN":50,"Matheus Jesus|BRA":1800,"Motoki Hasegawa|JPN":900,"Keita Nakamura|JPN":150,"Yuto Iwasaki|JPN":650,"Norman Campbell|JAM":800,"Thiago Santana|BRA":700,"Ryogo Yamasaki|JPN":100});
+Object.assign(HEIGHT,{"Tomoki Hayakawa|JPN":187,"Taiki Yamada|JPN":190,"Yuji Kajikawa|JPN":185,"Haruto Fujii|JPN":183,"Tae-hyeon Kim|KOR":186,"Naomichi Ueda|JPN":186,"Ikuma Sekigawa|JPN":182,"Kaito Chida|JPN":186,"Keisuke Tsukui|JPN":180,"Yugo Okawa|JPN":185,"Anthony Motosuna|JPN":192,"Ryoya Ogawa|JPN":183,"Koki Anzai|JPN":172,"Kimito Nono|JPN":179,"Ryuta Koike|JPN":170,"Kento Misao|JPN":181,"Yuta Higuchi|JPN":168,"Yuta Matsumura|JPN":173,"Haruki Hayashi|JPN":177,"Ryotaro Araki|JPN":170,"Élber|BRA":170,"Aleksandar Cavric|SVK":186,"Léo Ceará|BRA":178,"Yuma Suzuki|JPN":182,"Kyosuke Tagawa|JPN":181,"Homare Tokuda|JPN":186,"Minato Yoshida|JPN":172,"Konosuke Nishikawa|JPN":181,"Shuhei Matsubara|JPN":185,"Ryusei Haruna|JPN":183,"Sho Omori|JPN":177,"Kenta Itakura|JPN":182,"Danilo|BRA":183,"Takeshi Ushizawa|JPN":178,"Seiya Inoue|JPN":187,"Takumi Mase|JPN":175,"Yuto Yamashita|JPN":174,"Yuto Nagao|JPN":178,"Shota Yamashita|JPN":173,"Kotatsu Kawakami|JPN":173,"Koki Ando|JPN":170,"Yoshiki Torikai|JPN":165,"Chihiro Kato|JPN":175,"Taishi Semba|JPN":164,"Koya Okuda|JPN":181,"Kiichi Yamazaki|JPN":167,"Hayata Yamamoto|JPN":180,"Mizuki Arai|JPN":170,"Matheus Leiria|BRA":179,"Arata Watanabe|JPN":171,"Keisuke Tada|JPN":175,"Ryo Nemoto|JPN":184,"Kishin Gokita|JPN":184,"Patryck|BRA":180,"Shusaku Nishikawa|JPN":183,"Ayumi Niekawa|JPN":195,"Ryusei Sato|JPN":191,"Danilo Boza|BRA":185,"Yuta Miyamoto|JPN":171,"Kenta Nemoto|JPN":184,"Luka Didulica|AUS":200,"Yoshitaka Tanaka|JPN":186,"Takuya Ogiwara|JPN":175,"Hirokazu Ishihara|JPN":169,"Eiichi Katayama|JPN":181,"Samuel Gustafson|SWE":187,"Kaito Yasui|JPN":174,"Kai Shibato|JPN":180,"Hayate Ueki|JPN":173,"Takeshi Wada|JPN":170,"Yoichi Naganuma|JPN":177,"Takahiro Sekine|JPN":167,"Matheus Savio|BRA":175,"Jumpei Hayakawa|JPN":163,"Sota Matsunaga|JPN":180,"Yusuke Matsuo|JPN":170,"Hiroki Abe|JPN":171,"Takuro Kaneko|JPN":178,"Hiiro Komori|JPN":178,"Ado Onaiwu|JPN":180,"Renji Hidano|JPN":181,"Rio Nitta|JPN":174,"José Aurelio Suárez|ESP":187,"Tomoya Wakahara|JPN":185,"Ryota Suzuki|JPN":192,"Haruto Usui|JPN":186,"Shunji Saito|JPN":182,"Koji Toriumi|JPN":183,"Takashi Kawano|JPN":186,"Takayuki Mae|JPN":172,"Ryota Kuboniwa|JPN":182,"Rikuto Ishio|JPN":181,"Masaru Hidaka|JPN":168,"Issei Takahashi|JPN":180,"Koki Yonekura|JPN":177,"Eduardo|BRA":170,"Manato Shinada|JPN":180,"Taiki Amagasa|JPN":176,"Yusuke Kobayashi|JPN":171,"Haru Ito|JPN":171,"Takuya Yasui|JPN":174,"Yuma Igari|JPN":167,"Kazuki Tanaka|JPN":173,"Takuro Iwai|JPN":175,"Makoto Himeno|JPN":171,"Carlinhos Junior|BRA":174,"Naoki Tsubaki|JPN":172,"Zain Issaka|JPN":174,"Naohiro Sugiyama|JPN":176,"Takumi Tsukui|JPN":180,"Daichi Ishikawa|JPN":178,"Hiroto Goya|JPN":178,"Takumi Matsumura|JPN":178,"Ryosuke Kojima|JPN":183,"Kenta Matsumoto|JPN":185,"Kengo Nagai|JPN":184,"Haruki Saruta|JPN":191,"Kanade Tsuneto|JPN":183,"Taiyo Koga|JPN":183,"Seiya Baba|JPN":181,"Hiroki Noda|JPN":181,"Daiki Sugioka|JPN":182,"Hiromu Mitsumaru|JPN":172,"Yusei Yamanouchi|JPN":180,"Wataru Harada|JPN":178,"Koki Kumasaka|JPN":185,"Takumi Tsuchiya|JPN":180,"Rei Shimano|JPN":183,"Nobuteru Nakagawa|JPN":173,"Yudai Konishi|JPN":170,"Sachiro Toshima|JPN":170,"Riki Harakawa|JPN":175,"Tojiro Kubo|JPN":167,"Kaiji Chonan|JPN":176,"Yota Komi|JPN":169,"Hinata Yamauchi|JPN":170,"Hayato Nakama|JPN":170,"Yoshio Koizumi|JPN":172,"Koya Yuruki|JPN":183,"Yusuke Segawa|JPN":170,"Shusuke Furuya|JPN":174,"Mao Hosoya|JPN":178,"Yuki Kakita|JPN":187,"Nabel Yoshitaka Furusawa|JPN":182,"Hayate Tanaka|JPN":184,"Seung-gyu Kim|KOR":189,"Wataru Goto|JPN":193,"Alexander Scholz|DEN":189,"Kanta Doi|JPN":186,"Hayato Inamura|JPN":182,"Rio Omori|JPN":186,"Masato Morishige|JPN":183,"Renta Higashi|JPN":190,"Kento Hashimoto|JPN":173,"Yuto Nagatomo|JPN":170,"Takahiro Ko|JPN":173,"Kento Hashimoto|JPN":183,"Kyota Tokiwa|JPN":173,"Kaede Suzuki|JPN":180,"Yuta Sugawara|JPN":171,"Ryunosuke Sato|JPN":171,"Maki Kitahara|JPN":175,"Kio Tanaka|JPN":172,"Kota Tawaratsumida|JPN":175,"Keita Endo|JPN":176,"Kein Sato|JPN":179,"Fuki Yamada|JPN":181,"Teruhito Nakagawa|JPN":161,"Marcelo Ryan|BRA":188,"Motoki Nagakura|JPN":177,"Tsuyoshi Ogashiwa|JPN":167,"Leon Nozawa|JPN":174,"Divine Chinedu Otani|JPN":191,"Matheus|BRA":190,"Yuya Nagasawa|JPN":185,"Hiroki Mawatari|JPN":187,"Keisuke Nakamura|JPN":187,"Ryota Inoue|JPN":186,"Kaito Suzuki|JPN":182,"Naoki Hayashi|JPN":182,"Maaya Sako|JPN":193,"Daiki Fukazawa|JPN":174,"Kazuya Miyahara|JPN":172,"Yosuke Uchida|JPN":167,"Shuto Tanabe|JPN":181,"Riku Matsuda|JPN":176,"Tetsuyuki Inami|JPN":178,"Joi Yamamoto|JPN":187,"Kento Imai|JPN":173,"Yuan Matsuhashi|JPN":172,"Yuya Fukuda|JPN":176,"Yuta Arai|JPN":166,"Kosuke Saito|JPN":167,"Rei Hirakawa|JPN":176,"Issei Kumatoriya|JPN":166,"Shion Nakayama|JPN":170,"Gakuto Kawamura|JPN":178,"Itsuki Someno|JPN":181,"Shimon Teranuma|JPN":188,"Goki Yamada|JPN":170,"Ryosuke Shirai|JPN":185,"Hayato Hirao|JPN":176,"Sota Ofuji|JPN":190,"Kosei Tani|JPN":187,"Tatsuya Morita|JPN":191,"Yoshiaki Arai|JPN":189,"Kaung Zan Mara|MYA":190,"Yuta Nakayama|JPN":181,"Ibrahim Dresevic|KVX":186,"Daihachi Okamura|JPN":183,"Min-tae Kim|KOR":187,"Tomoki Imai|JPN":178,"Kotaro Hayashi|JPN":170,"Henry Heroki Mochizuki|JPN":192,"Hotaka Nakamura|JPN":177,"Hiroyuki Mae|JPN":173,"Neta Lavi|ISR":177,"Hokuto Shimoda|JPN":171,"Je-hoon Cha|KOR":185,"Keiya Sento|JPN":171,"Asahi Masuyama|JPN":173,"Futa Tokumura|JPN":169,"Ryohei Shirasaki|JPN":181,"Sang-ho Na|KOR":173,"Yuki Soma|JPN":166,"Erik|BRA":170,"Takuma Nishimura|JPN":178,"Shota Fujio|JPN":184,"Tete Yengi|AUS":197,"Kanji Kuwayama|JPN":184,"Svend Brodersen|GER":188,"Louis Thébault-Yamaguchi|JPN":187,"Yuki Hayasaka|JPN":184,"Keun-hyeong Lee|KOR":194,"Filip Uremovic|CRO":184,"Yuichi Maruyama|JPN":184,"Shunsuke Hayashi|JPN":181,"Ryota Kamihashi|JPN":193,"Sota Miura|JPN":178,"Asahi Sasaki|JPN":180,"Reon Yamahara|JPN":165,"Noriharu Kan|JPN":185,"Yuto Matsunagane|JPN":179,"Hiroto Noda|JPN":172,"Kento Tachibanada|JPN":168,"So Kawahara|JPN":169,"Kota Yui|JPN":180,"Yuki Yamamoto|JPN":173,"Ryota Oshima|JPN":168,"Ryuki Osa|JPN":168,"Toya Myogan|JPN":179,"Yuto Ozeki|JPN":178,"Tatsuya Ito|JPN":167,"Marcinho|BRA":173,"Ten Miyagi|JPN":177,"Kazuya Konno|JPN":161,"Kyosuke Mochiyama|JPN":180,"Erison|BRA":180,"Lazar Romanic|SRB":183,"Soma Kanda|JPN":178,"Il-gyu Park|JPN":180,"Ryoya Kimura|JPN":188,"Yuya Tsuboi|JPN":183,"Hiroki Iikura|JPN":181,"Jeison Quiñónes|COL":185,"Taisei Inoue|JPN":184,"Ryotaro Tsunoda|JPN":185,"Thomas Deng|AUS":182,"Kosei Suwama|JPN":186,"Ren Kato|JPN":176,"Taiki Watanabe|JPN":181,"Kanta Sekitomi|JPN":177,"Ken Matsubara|JPN":180,"Kei Murakami|JPN":181,"Takuto Kimura|JPN":170,"Yuta Tanaka|JPN":175,"Riku Yamane|JPN":174,"Kota Watanabe|JPN":166,"Aruto Higuchi|JPN":174,"Tomoki Kondo|JPN":174,"George Onaiwu|JPN":168,"Jun Amano|JPN":175,"Kosuke Matsumura|JPN":170,"Shin Miidera|JPN":174,"Tevis|BRA":179,"Jordy Croux|BEL":173,"Yuri Araújo|BRA":170,"Hiroto Asada|JPN":180,"Ryo Miyaichi|JPN":183,"Kaina Tanimura|JPN":183,"Dean David|ISR":184,"Hikaru Takahashi|JPN":176,"Yuya Oki|JPN":186,"Togo Umeda|JPN":184,"Kei Ishikawa|JPN":185,"Tomotaro Sasaki|JPN":188,"Seung-wook Park|KOR":184,"Jelani Reshaun Sumiyoshi|JPN":183,"Mateus Brunetti|BRA":183,"Sen Takagi|JPN":173,"Sodai Hasukawa|JPN":182,"Yuji Takahashi|JPN":187,"Joo-young Eom|KOR":188,"Yuki Honda|JPN":173,"Yutaka Yoshida|JPN":167,"Haruto Hidaka|JPN":176,"Kengo Kitazume|JPN":177,"Masaki Yumiba|JPN":175,"Rinsei Ohata|JPN":177,"Yuji Doi|JPN":168,"Keigo Suzuki|JPN":175,"Yudai Shimamoto|JPN":180,"Kai Matsuzaki|JPN":172,"Hikaru Nakahara|JPN":169,"Kenta Inoue|JPN":172,"Motoki Nishihara|JPN":180,"Ryota Hariu|JPN":175,"Kazuki Kozuka|JPN":173,"Capixaba|BRA":170,"Se-hun Oh|KOR":193,"Koya Kitagawa|JPN":180,"Kanta Chiba|JPN":178,"Ahmed Ahmedov|BUL":184,"Riku Gunji|JPN":176,"Daniel Schmidt|JPN":197,"Alexandre Pisano|JPN":197,"Yohei Takeda|JPN":189,"Hiroaki Hagi|JPN":188,"Ryuki Oiso|JPN":187,"Haruya Fujii|JPN":188,"Yota Sato|JPN":184,"Yuki Nogami|JPN":180,"Harumu Kubo|JPN":183,"Shuhei Tokumoto|JPN":170,"Akinari Kawazura|JPN":184,"Ryosuke Yamanaka|JPN":174,"Teruki Hara|JPN":180,"Soichiro Mori|JPN":181,"Tomoki Takamine|JPN":178,"Haruki Yoshida|JPN":181,"Katsuhiro Nakayama|JPN":180,"Masahito Ono|JPN":172,"Haruto Suzuki|JPN":165,"Tsukasa Morishima|JPN":175,"Yuya Asano|JPN":173,"Hidemasa Koda|JPN":168,"Takuya Uchida|JPN":177,"Taichi Kikuchi|JPN":160,"Shungo Sugiura|JPN":174,"Kyota Sakakibara|JPN":168,"Mateus Castro|BRA":167,"Yudai Kimura|JPN":185,"Yuya Yamagishi|JPN":183,"Kensuke Nagai|JPN":177,"Yves Avelete|TOG":180,"Masaaki Murakami|JPN":185,"Gakuji Ota|JPN":190,"Kentaro Kakoi|JPN":190,"Akira Fantini|JPN":180,"Henrique Trevisan|BRA":185,"Shogo Asada|JPN":186,"Yoshinori Suzuki|JPN":184,"Hisashi Appiah Tawiah|JPN":192,"Kodai Nagata|JPN":180,"Hidehiro Sugai|JPN":172,"Kyo Sato|JPN":168,"Shinnosuke Fukuda|JPN":174,"Yusuke Ishida|JPN":175,"João Pedro|BRA":185,"Sung-jun Yoon|KOR":170,"Mitsuki Saito|JPN":166,"Ryuma Nakano|JPN":167,"Taiki Hirato|JPN":177,"Haruki Arai|JPN":170,"Taiyo Hiraoka|JPN":173,"Temma Matsuda|JPN":163,"Fuchi Honda|JPN":170,"Masaya Okugawa|JPN":177,"Rafael Elias|BRA":179,"Alex Souza|BRA":180,"David Silva|BRA":186,"Shun Nagasawa|JPN":192,"Ko Sakai|JPN":171,"Rui Araki|JPN":195,"Masaaki Higashiguchi|JPN":184,"Aolin Zhang|JPN":194,"Genta Miura|JPN":183,"Ryo Hatsuse|JPN":180,"Shinya Nakano|JPN":176,"Takeru Kishimoto|JPN":174,"Ginjiro Ikegaya|JPN":183,"Tokuma Suzuki|JPN":168,"Rin Mito|JPN":180,"Yuki Yoshihara|JPN":180,"Shuto Abe|JPN":171,"Takato Yamamoto|JPN":177,"Shu Kurata|JPN":172,"Welton|BRA":175,"Kanji Okunuki|JPN":171,"Ryotaro Meshino|JPN":171,"Taiki Tono|JPN":173,"Ryoya Yamashita|JPN":164,"Jiro Nakamura|JPN":166,"Takashi Usami|JPN":178,"Gaku Nawata|JPN":169,"Deniz Hümmet|TUR":189,"Harumi Minamino|JPN":176,"Daichi Hayashi|JPN":178,"Issam Jebali|TUN":186,"Shoji Toyama|JPN":180,"Naru Nakatsumi|JPN":171,"Kosuke Nakamura|JPN":185,"Jin-hyeon Kim|KOR":193,"Ken Isibor|JPN":195,"Shinnosuke Hatanaka|JPN":185,"Hayato Tanaka|JPN":188,"Rikito Inoue|JPN":180,"Ayumu Ohata|JPN":168,"Kyohei Noborizato|JPN":168,"Dion Cools|MAS":185,"Takumi Nakamura|JPN":179,"Nelson Ishiwatari|JPN":185,"Hinata Kida|JPN":171,"Kyohei Yoshino|JPN":182,"Rui Osako|JPN":177,"Eiji Kubo|JPN":180,"Masaya Shibayama|JPN":161,"Shion Homma|JPN":164,"Satoki Uejo|JPN":166,"Yumeki Yokoyama|JPN":172,"Shinji Kagawa|JPN":175,"Thiago Andrade|BRA":179,"Motohiko Nakajima|JPN":171,"Solomon Sakuragawa|JPN":191,"Wigi Kanemoto|KOR":184,"Daiya Maekawa|JPN":191,"Shuichi Gonda|JPN":187,"Shioki Takayama|JPN":190,"Richard Monday Ubong|NGA":194,"Matheus Thuler|BRA":185,"Caetano|BRA":182,"Boniface Nduka|JPN":183,"Kaito Yamada|JPN":192,"Katsuya Nagato|JPN":173,"Diego|BRA":183,"Ryosuke Irie|JPN":183,"Rikuto Hirose|JPN":176,"Nanasei Iino|JPN":173,"Gotoku Sakai|JPN":176,"Justin Homma|JPN":181,"Yuya Kuwasaki|JPN":175,"Yosuke Ideguchi|JPN":171,"Kento Hamasaki|JPN":164,"Kakeru Yamauchi|JPN":177,"Mitsuki Hidaka|JPN":176,"Tafuku Satomi|JPN":172,"Juzo Ura|JPN":169,"Sota Onishi|JPN":172,"Rikuto Hashimoto|JPN":170,"Taiga Seguchi|JPN":176,"Yuta Goke|JPN":183,"Makoto Mitsuta|JPN":170,"Haruya Ide|JPN":171,"Jean Patric|BRA":175,"Takashi Inui|JPN":169,"Sota Ito|JPN":186,"Yuta Miyahara|JPN":174,"Yoshinori Muto|JPN":179,"Ren Komatsu|JPN":183,"Yuya Osako|JPN":184,"Kotaro Uchino|JPN":187,"David Aizawa|JPN":195,"Hayato Watanabe|JPN":179,"Lennart Moser|GER":196,"Taro Hamada|JPN":189,"Goro Kawanami|JPN":192,"Shun Matsuda|JPN":185,"Ryo Senda|JPN":174,"Yugo Tatsuta|JPN":191,"Kota Kudo|JPN":180,"Kaito Abe|JPN":183,"Yoshitake Suzuki|JPN":183,"Hiroshi Omori|JPN":188,"Daichi Tagami|JPN":180,"Yota Fujii|JPN":180,"Kosuke Shirai|JPN":166,"Eiji Miyamoto|JPN":173,"Ryo Tabei|JPN":172,"Kosei Ogura|JPN":167,"Haruka Motoyama|JPN":172,"Ibuki Fujita|JPN":170,"Masaya Matsumoto|JPN":175,"Towa Yamane|JPN":167,"Rui Sueyoshi|JPN":166,"Ataru Esaka|JPN":175,"Yuta Kamiya|JPN":174,"Yuto Baigorria|BOL":172,"Jun Nishikawa|JPN":180,"Kota Kawano|JPN":176,"Kazunari Ichimi|JPN":182,"Léo Gaúcho|BRA":187,"Werik Popó|BRA":190,"Lucão|BRA":191,"Noah Kenshin Browne|JPN":189,"Kanshiro Suemune|JPN":174,"Aura Takahashi|JPN":183,"Keisuke Osako|JPN":188,"Issei Ouchi|JPN":186,"Yudai Tanaka|JPN":187,"Cailen Hill|JPN":194,"Hikaru Ogawa|JPN":192,"Hayato Araki|JPN":186,"Ju-sung Kim|KOR":189,"Taichi Yamasaki|JPN":184,"Tsukasa Shiotani|JPN":182,"Takaaki Shichi|JPN":177,"Shuto Nakano|JPN":183,"Naoto Arai|JPN":173,"Taishi Matsumoto|JPN":180,"Hayao Kawabe|JPN":180,"Yotaro Nakajima|JPN":175,"Sota Koshimichi|JPN":181,"Shunki Higashi|JPN":180,"Daiki Suga|JPN":171,"Motoki Ohara|JPN":170,"Shimon Kobayashi|JPN":167,"Naoki Maeda|JPN":176,"Shun Ayukawa|JPN":164,"Akito Suzuki|JPN":180,"Sota Nakamura|JPN":168,"Mutsuki Kato|JPN":180,"Kosuke Kinoshita|JPN":190,"Yuma Obata|JPN":185,"Kazuki Fujita|JPN":186,"Powell Obinna Obi|JPN":193,"Kenta Matsuyama|JPN":189,"Yuhi Sakai|JPN":180,"Takumi Kamijima|JPN":186,"Teppei Oka|JPN":186,"Yuma Tsujioka|JPN":183,"Masaya Tashiro|JPN":185,"Daiki Miya|JPN":186,"Moon-hyeon Kim|KOR":185,"Yota Maejima|JPN":178,"Yu Hashimoto|JPN":171,"Masato Yuzawa|JPN":179,"Kaoru Yamawaki|JPN":179,"Keiya Shiihashi|JPN":178,"Kohei Okuno|JPN":176,"Hiroki Akino|JPN":176,"Kokoro Maeda|JPN":178,"Masato Shigemi|JPN":171,"Yuji Kitajima|JPN":169,"Shohei Takemoto|JPN":176,"Tomoya Miki|JPN":172,"Shintaro Nago|JPN":168,"Kazuki Fujimoto|JPN":180,"Hikaru Maeda|JPN":176,"Shosei Usui|JPN":183,"Reiju Tsuruno|JPN":168,"Sonosuke Sato|JPN":175,"Abdul Hanan Sani Brown|JPN":185,"Ichika Maeda|JPN":175,"Hisashi Jogo|JPN":183,"Masaaki Goto|JPN":191,"Go Hatano|JPN":198,"Luka Radotic|SRB":199,"Kaito Ioka|JPN":186,"Ryosuke Shindo|JPN":183,"Eduardo|BRA":184,"Yusei Egawa|JPN":175,"Ikki Arai|JPN":186,"Hijiri Onaga|JPN":171,"Shunya Yoneda|JPN":173,"Keita Takahata|JPN":176,"Hyeung-jun Noh|KOR":178,"Masahiro Sekiguchi|JPN":172,"Naru Sasaki|JPN":170,"Riku Yamada|JPN":175,"Harumu Nabeshima|JPN":168,"Diego Pituca|BRA":178,"Temmu Matsumoto|JPN":169,"Tsubasa Kasayanagi|JPN":175,"Takashi Sawada|JPN":170,"Matheus Jesus|BRA":187,"Motoki Hasegawa|JPN":177,"Keita Nakamura|JPN":178,"Yuto Iwasaki|JPN":173,"Norman Campbell|JAM":175,"Thiago Santana|BRA":184,"Ryogo Yamasaki|JPN":187,"Reijin Ko|JPN":177});
+Object.assign(FOOT,{"Tomoki Hayakawa|JPN":"右","Taiki Yamada|JPN":"左","Yuji Kajikawa|JPN":"右","Haruto Fujii|JPN":"右","Tae-hyeon Kim|KOR":"左","Naomichi Ueda|JPN":"右","Ikuma Sekigawa|JPN":"右","Kaito Chida|JPN":"右","Keisuke Tsukui|JPN":"右","Yugo Okawa|JPN":"左","Ryoya Ogawa|JPN":"左","Koki Anzai|JPN":"右","Kimito Nono|JPN":"右","Ryuta Koike|JPN":"右","Kento Misao|JPN":"右","Yuta Higuchi|JPN":"右","Yuta Matsumura|JPN":"右","Haruki Hayashi|JPN":"右","Ryotaro Araki|JPN":"右","Élber|BRA":"右","Aleksandar Cavric|SVK":"右","Léo Ceará|BRA":"右","Yuma Suzuki|JPN":"右","Kyosuke Tagawa|JPN":"左","Homare Tokuda|JPN":"右","Minato Yoshida|JPN":"右","Konosuke Nishikawa|JPN":"右","Shuhei Matsubara|JPN":"右","Ryusei Haruna|JPN":"右","Sho Omori|JPN":"左","Kenta Itakura|JPN":"右","Danilo|BRA":"右","Takeshi Ushizawa|JPN":"右","Seiya Inoue|JPN":"右","Takumi Mase|JPN":"右","Yuto Yamashita|JPN":"左","Yuto Nagao|JPN":"右","Yoshiki Torikai|JPN":"右","Chihiro Kato|JPN":"右","Taishi Semba|JPN":"右","Koya Okuda|JPN":"右","Kiichi Yamazaki|JPN":"右","Hayata Yamamoto|JPN":"右","Mizuki Arai|JPN":"右","Matheus Leiria|BRA":"右","Arata Watanabe|JPN":"右","Keisuke Tada|JPN":"右","Ryo Nemoto|JPN":"右","Patryck|BRA":"右","Shusaku Nishikawa|JPN":"左","Ayumi Niekawa|JPN":"右","Danilo Boza|BRA":"右","Yuta Miyamoto|JPN":"右","Kenta Nemoto|JPN":"左","Takuya Ogiwara|JPN":"左","Hirokazu Ishihara|JPN":"右","Eiichi Katayama|JPN":"右","Samuel Gustafson|SWE":"右","Kaito Yasui|JPN":"右","Kai Shibato|JPN":"右","Hayate Ueki|JPN":"左","Yoichi Naganuma|JPN":"右","Takahiro Sekine|JPN":"右","Matheus Savio|BRA":"右","Jumpei Hayakawa|JPN":"左","Yusuke Matsuo|JPN":"右","Hiroki Abe|JPN":"右","Takuro Kaneko|JPN":"左","Hiiro Komori|JPN":"右","Ado Onaiwu|JPN":"右","Renji Hidano|JPN":"左","Rio Nitta|JPN":"右","José Aurelio Suárez|ESP":"右","Tomoya Wakahara|JPN":"右","Ryota Suzuki|JPN":"右","Haruto Usui|JPN":"右","Koji Toriumi|JPN":"右","Takashi Kawano|JPN":"右","Takayuki Mae|JPN":"右","Ryota Kuboniwa|JPN":"右","Rikuto Ishio|JPN":"右","Masaru Hidaka|JPN":"左","Issei Takahashi|JPN":"右","Koki Yonekura|JPN":"右","Eduardo|BRA":"右","Manato Shinada|JPN":"右","Taiki Amagasa|JPN":"左","Yusuke Kobayashi|JPN":"右","Takuya Yasui|JPN":"右","Yuma Igari|JPN":"右","Kazuki Tanaka|JPN":"右","Takuro Iwai|JPN":"右","Carlinhos Junior|BRA":"右","Naoki Tsubaki|JPN":"右","Zain Issaka|JPN":"右","Naohiro Sugiyama|JPN":"左","Takumi Tsukui|JPN":"右","Daichi Ishikawa|JPN":"右","Hiroto Goya|JPN":"右","Ryosuke Kojima|JPN":"左","Kenta Matsumoto|JPN":"右","Kengo Nagai|JPN":"右","Haruki Saruta|JPN":"右","Taiyo Koga|JPN":"右","Seiya Baba|JPN":"右","Hiroki Noda|JPN":"右","Daiki Sugioka|JPN":"左","Hiromu Mitsumaru|JPN":"左","Yusei Yamanouchi|JPN":"右","Wataru Harada|JPN":"右","Koki Kumasaka|JPN":"右","Takumi Tsuchiya|JPN":"右","Nobuteru Nakagawa|JPN":"右","Yudai Konishi|JPN":"左","Sachiro Toshima|JPN":"右","Riki Harakawa|JPN":"右","Tojiro Kubo|JPN":"右","Kaiji Chonan|JPN":"右","Yota Komi|JPN":"右","Hinata Yamauchi|JPN":"右","Hayato Nakama|JPN":"右","Yoshio Koizumi|JPN":"両","Koya Yuruki|JPN":"右","Yusuke Segawa|JPN":"右","Mao Hosoya|JPN":"右","Yuki Kakita|JPN":"右","Nabel Yoshitaka Furusawa|JPN":"右","Hayate Tanaka|JPN":"右","Seung-gyu Kim|KOR":"右","Wataru Goto|JPN":"右","Alexander Scholz|DEN":"右","Kanta Doi|JPN":"右","Hayato Inamura|JPN":"左","Rio Omori|JPN":"右","Masato Morishige|JPN":"右","Renta Higashi|JPN":"右","Kento Hashimoto|JPN":"左","Yuto Nagatomo|JPN":"両","Takahiro Ko|JPN":"右","Kento Hashimoto|JPN":"右","Kyota Tokiwa|JPN":"右","Kaede Suzuki|JPN":"右","Yuta Sugawara|JPN":"左","Ryunosuke Sato|JPN":"右","Kota Tawaratsumida|JPN":"右","Keita Endo|JPN":"右","Kein Sato|JPN":"右","Fuki Yamada|JPN":"左","Teruhito Nakagawa|JPN":"右","Marcelo Ryan|BRA":"右","Motoki Nagakura|JPN":"右","Tsuyoshi Ogashiwa|JPN":"右","Leon Nozawa|JPN":"右","Matheus|BRA":"右","Yuya Nagasawa|JPN":"右","Hiroki Mawatari|JPN":"右","Keisuke Nakamura|JPN":"右","Ryota Inoue|JPN":"右","Kaito Suzuki|JPN":"右","Naoki Hayashi|JPN":"右","Maaya Sako|JPN":"左","Daiki Fukazawa|JPN":"右","Kazuya Miyahara|JPN":"右","Yosuke Uchida|JPN":"右","Shuto Tanabe|JPN":"右","Riku Matsuda|JPN":"右","Tetsuyuki Inami|JPN":"右","Joi Yamamoto|JPN":"右","Yuan Matsuhashi|JPN":"右","Yuya Fukuda|JPN":"右","Yuta Arai|JPN":"右","Kosuke Saito|JPN":"右","Rei Hirakawa|JPN":"右","Issei Kumatoriya|JPN":"右","Shion Nakayama|JPN":"右","Gakuto Kawamura|JPN":"左","Itsuki Someno|JPN":"右","Shimon Teranuma|JPN":"右","Goki Yamada|JPN":"右","Ryosuke Shirai|JPN":"右","Kosei Tani|JPN":"右","Tatsuya Morita|JPN":"右","Yoshiaki Arai|JPN":"右","Kaung Zan Mara|MYA":"左","Yuta Nakayama|JPN":"左","Ibrahim Dresevic|KVX":"右","Daihachi Okamura|JPN":"右","Min-tae Kim|KOR":"右","Tomoki Imai|JPN":"右","Kotaro Hayashi|JPN":"右","Henry Heroki Mochizuki|JPN":"右","Hotaka Nakamura|JPN":"右","Hiroyuki Mae|JPN":"右","Neta Lavi|ISR":"右","Hokuto Shimoda|JPN":"左","Je-hoon Cha|KOR":"右","Keiya Sento|JPN":"右","Asahi Masuyama|JPN":"右","Futa Tokumura|JPN":"右","Ryohei Shirasaki|JPN":"右","Sang-ho Na|KOR":"右","Yuki Soma|JPN":"右","Erik|BRA":"右","Takuma Nishimura|JPN":"右","Shota Fujio|JPN":"右","Tete Yengi|AUS":"右","Kanji Kuwayama|JPN":"右","Svend Brodersen|GER":"両","Louis Thébault-Yamaguchi|JPN":"右","Yuki Hayasaka|JPN":"右","Filip Uremovic|CRO":"右","Yuichi Maruyama|JPN":"左","Ryota Kamihashi|JPN":"左","Sota Miura|JPN":"左","Asahi Sasaki|JPN":"左","Reon Yamahara|JPN":"右","Yuto Matsunagane|JPN":"右","Hiroto Noda|JPN":"右","Kento Tachibanada|JPN":"右","So Kawahara|JPN":"右","Kota Yui|JPN":"右","Yuki Yamamoto|JPN":"右","Ryota Oshima|JPN":"右","Toya Myogan|JPN":"右","Yuto Ozeki|JPN":"右","Tatsuya Ito|JPN":"左","Marcinho|BRA":"右","Ten Miyagi|JPN":"右","Kazuya Konno|JPN":"左","Erison|BRA":"左","Lazar Romanic|SRB":"右","Soma Kanda|JPN":"右","Il-gyu Park|JPN":"右","Ryoya Kimura|JPN":"右","Yuya Tsuboi|JPN":"右","Hiroki Iikura|JPN":"右","Jeison Quiñónes|COL":"右","Taisei Inoue|JPN":"右","Ryotaro Tsunoda|JPN":"左","Thomas Deng|AUS":"右","Kosei Suwama|JPN":"右","Ren Kato|JPN":"右","Taiki Watanabe|JPN":"左","Kanta Sekitomi|JPN":"左","Ken Matsubara|JPN":"右","Kei Murakami|JPN":"右","Takuto Kimura|JPN":"右","Yuta Tanaka|JPN":"右","Riku Yamane|JPN":"右","Kota Watanabe|JPN":"右","Aruto Higuchi|JPN":"右","Tomoki Kondo|JPN":"右","George Onaiwu|JPN":"右","Jun Amano|JPN":"左","Kosuke Matsumura|JPN":"右","Shin Miidera|JPN":"左","Tevis|BRA":"両","Jordy Croux|BEL":"左","Yuri Araújo|BRA":"左","Hiroto Asada|JPN":"右","Ryo Miyaichi|JPN":"右","Kaina Tanimura|JPN":"右","Dean David|ISR":"右","Hikaru Takahashi|JPN":"右","Yuya Oki|JPN":"右","Togo Umeda|JPN":"右","Kei Ishikawa|JPN":"右","Tomotaro Sasaki|JPN":"右","Seung-wook Park|KOR":"右","Jelani Reshaun Sumiyoshi|JPN":"右","Mateus Brunetti|BRA":"左","Sen Takagi|JPN":"右","Sodai Hasukawa|JPN":"右","Yuji Takahashi|JPN":"右","Yuki Honda|JPN":"左","Yutaka Yoshida|JPN":"右","Haruto Hidaka|JPN":"右","Kengo Kitazume|JPN":"右","Masaki Yumiba|JPN":"左","Rinsei Ohata|JPN":"右","Yuji Doi|JPN":"左","Keigo Suzuki|JPN":"左","Yudai Shimamoto|JPN":"右","Kai Matsuzaki|JPN":"左","Hikaru Nakahara|JPN":"左","Kenta Inoue|JPN":"右","Motoki Nishihara|JPN":"右","Ryota Hariu|JPN":"左","Kazuki Kozuka|JPN":"右","Capixaba|BRA":"左","Se-hun Oh|KOR":"左","Koya Kitagawa|JPN":"右","Kanta Chiba|JPN":"右","Ahmed Ahmedov|BUL":"左","Riku Gunji|JPN":"右","Daniel Schmidt|JPN":"右","Alexandre Pisano|JPN":"右","Yohei Takeda|JPN":"右","Haruya Fujii|JPN":"右","Yota Sato|JPN":"右","Yuki Nogami|JPN":"右","Shuhei Tokumoto|JPN":"左","Akinari Kawazura|JPN":"左","Ryosuke Yamanaka|JPN":"左","Teruki Hara|JPN":"右","Soichiro Mori|JPN":"右","Tomoki Takamine|JPN":"左","Haruki Yoshida|JPN":"右","Katsuhiro Nakayama|JPN":"右","Masahito Ono|JPN":"左","Haruto Suzuki|JPN":"右","Tsukasa Morishima|JPN":"右","Yuya Asano|JPN":"左","Hidemasa Koda|JPN":"右","Takuya Uchida|JPN":"右","Taichi Kikuchi|JPN":"左","Shungo Sugiura|JPN":"右","Kyota Sakakibara|JPN":"左","Mateus Castro|BRA":"左","Yudai Kimura|JPN":"右","Yuya Yamagishi|JPN":"右","Kensuke Nagai|JPN":"右","Masaaki Murakami|JPN":"右","Gakuji Ota|JPN":"右","Kentaro Kakoi|JPN":"右","Akira Fantini|JPN":"右","Henrique Trevisan|BRA":"左","Shogo Asada|JPN":"左","Yoshinori Suzuki|JPN":"右","Hisashi Appiah Tawiah|JPN":"右","Kodai Nagata|JPN":"左","Hidehiro Sugai|JPN":"右","Kyo Sato|JPN":"右","Shinnosuke Fukuda|JPN":"右","Yusuke Ishida|JPN":"右","João Pedro|BRA":"右","Mitsuki Saito|JPN":"右","Ryuma Nakano|JPN":"右","Taiki Hirato|JPN":"右","Haruki Arai|JPN":"右","Taiyo Hiraoka|JPN":"右","Temma Matsuda|JPN":"右","Fuchi Honda|JPN":"右","Masaya Okugawa|JPN":"両","Rafael Elias|BRA":"左","Alex Souza|BRA":"右","David Silva|BRA":"左","Shun Nagasawa|JPN":"右","Ko Sakai|JPN":"右","Rui Araki|JPN":"右","Masaaki Higashiguchi|JPN":"右","Aolin Zhang|JPN":"左","Genta Miura|JPN":"右","Ryo Hatsuse|JPN":"両","Shinya Nakano|JPN":"左","Takeru Kishimoto|JPN":"右","Ginjiro Ikegaya|JPN":"右","Tokuma Suzuki|JPN":"右","Rin Mito|JPN":"左","Yuki Yoshihara|JPN":"右","Shuto Abe|JPN":"右","Takato Yamamoto|JPN":"左","Shu Kurata|JPN":"右","Welton|BRA":"両","Kanji Okunuki|JPN":"右","Ryotaro Meshino|JPN":"右","Taiki Tono|JPN":"右","Ryoya Yamashita|JPN":"右","Jiro Nakamura|JPN":"左","Takashi Usami|JPN":"右","Gaku Nawata|JPN":"右","Deniz Hümmet|TUR":"右","Harumi Minamino|JPN":"左","Daichi Hayashi|JPN":"右","Issam Jebali|TUN":"両","Shoji Toyama|JPN":"右","Naru Nakatsumi|JPN":"左","Kosuke Nakamura|JPN":"右","Jin-hyeon Kim|KOR":"右","Shinnosuke Hatanaka|JPN":"両","Hayato Tanaka|JPN":"左","Rikito Inoue|JPN":"右","Ayumu Ohata|JPN":"左","Kyohei Noborizato|JPN":"左","Dion Cools|MAS":"右","Takumi Nakamura|JPN":"右","Nelson Ishiwatari|JPN":"右","Hinata Kida|JPN":"右","Kyohei Yoshino|JPN":"右","Rui Osako|JPN":"左","Eiji Kubo|JPN":"右","Masaya Shibayama|JPN":"左","Shion Homma|JPN":"右","Satoki Uejo|JPN":"右","Yumeki Yokoyama|JPN":"右","Shinji Kagawa|JPN":"右","Thiago Andrade|BRA":"右","Motohiko Nakajima|JPN":"右","Solomon Sakuragawa|JPN":"右","Daiya Maekawa|JPN":"右","Shuichi Gonda|JPN":"右","Shioki Takayama|JPN":"左","Matheus Thuler|BRA":"右","Caetano|BRA":"左","Boniface Nduka|JPN":"右","Katsuya Nagato|JPN":"左","Diego|BRA":"左","Ryosuke Irie|JPN":"左","Rikuto Hirose|JPN":"右","Nanasei Iino|JPN":"右","Gotoku Sakai|JPN":"右","Justin Homma|JPN":"右","Yuya Kuwasaki|JPN":"右","Yosuke Ideguchi|JPN":"右","Kakeru Yamauchi|JPN":"右","Juzo Ura|JPN":"右","Rikuto Hashimoto|JPN":"左","Yuta Goke|JPN":"右","Makoto Mitsuta|JPN":"右","Haruya Ide|JPN":"右","Takashi Inui|JPN":"右","Yuta Miyahara|JPN":"右","Yoshinori Muto|JPN":"右","Ren Komatsu|JPN":"左","Yuya Osako|JPN":"右","Kotaro Uchino|JPN":"右","Lennart Moser|GER":"左","Goro Kawanami|JPN":"右","Yugo Tatsuta|JPN":"右","Kota Kudo|JPN":"左","Kaito Abe|JPN":"右","Yoshitake Suzuki|JPN":"左","Hiroshi Omori|JPN":"右","Daichi Tagami|JPN":"右","Yota Fujii|JPN":"左","Kosuke Shirai|JPN":"右","Eiji Miyamoto|JPN":"右","Ryo Tabei|JPN":"左","Kosei Ogura|JPN":"右","Haruka Motoyama|JPN":"右","Ibuki Fujita|JPN":"右","Masaya Matsumoto|JPN":"右","Towa Yamane|JPN":"右","Rui Sueyoshi|JPN":"右","Ataru Esaka|JPN":"右","Yuta Kamiya|JPN":"右","Yuto Baigorria|BOL":"左","Jun Nishikawa|JPN":"左","Kota Kawano|JPN":"右","Kazunari Ichimi|JPN":"右","Léo Gaúcho|BRA":"右","Werik Popó|BRA":"右","Lucão|BRA":"両","Noah Kenshin Browne|JPN":"左","Aura Takahashi|JPN":"右","Keisuke Osako|JPN":"右","Issei Ouchi|JPN":"右","Yudai Tanaka|JPN":"右","Cailen Hill|JPN":"右","Hikaru Ogawa|JPN":"右","Hayato Araki|JPN":"右","Ju-sung Kim|KOR":"左","Taichi Yamasaki|JPN":"右","Tsukasa Shiotani|JPN":"右","Takaaki Shichi|JPN":"左","Shuto Nakano|JPN":"右","Taishi Matsumoto|JPN":"右","Hayao Kawabe|JPN":"右","Yotaro Nakajima|JPN":"右","Sota Koshimichi|JPN":"右","Shunki Higashi|JPN":"左","Daiki Suga|JPN":"左","Motoki Ohara|JPN":"右","Shimon Kobayashi|JPN":"右","Naoki Maeda|JPN":"左","Shun Ayukawa|JPN":"右","Akito Suzuki|JPN":"右","Sota Nakamura|JPN":"右","Mutsuki Kato|JPN":"右","Kosuke Kinoshita|JPN":"右","Yuma Obata|JPN":"右","Kazuki Fujita|JPN":"右","Powell Obinna Obi|JPN":"右","Kenta Matsuyama|JPN":"右","Takumi Kamijima|JPN":"右","Teppei Oka|JPN":"両","Yuma Tsujioka|JPN":"左","Masaya Tashiro|JPN":"右","Daiki Miya|JPN":"左","Yota Maejima|JPN":"右","Yu Hashimoto|JPN":"両","Masato Yuzawa|JPN":"右","Keiya Shiihashi|JPN":"右","Kohei Okuno|JPN":"右","Hiroki Akino|JPN":"左","Masato Shigemi|JPN":"右","Yuji Kitajima|JPN":"右","Shohei Takemoto|JPN":"右","Tomoya Miki|JPN":"右","Shintaro Nago|JPN":"右","Kazuki Fujimoto|JPN":"右","Hikaru Maeda|JPN":"左","Shosei Usui|JPN":"右","Reiju Tsuruno|JPN":"右","Abdul Hanan Sani Brown|JPN":"右","Ichika Maeda|JPN":"右","Hisashi Jogo|JPN":"右","Masaaki Goto|JPN":"右","Go Hatano|JPN":"右","Luka Radotic|SRB":"右","Kaito Ioka|JPN":"右","Ryosuke Shindo|JPN":"右","Eduardo|BRA":"左","Yusei Egawa|JPN":"左","Ikki Arai|JPN":"右","Hijiri Onaga|JPN":"左","Shunya Yoneda|JPN":"右","Keita Takahata|JPN":"左","Masahiro Sekiguchi|JPN":"右","Riku Yamada|JPN":"右","Diego Pituca|BRA":"左","Temmu Matsumoto|JPN":"左","Tsubasa Kasayanagi|JPN":"右","Takashi Sawada|JPN":"右","Matheus Jesus|BRA":"左","Motoki Hasegawa|JPN":"右","Keita Nakamura|JPN":"右","Yuto Iwasaki|JPN":"右","Norman Campbell|JAM":"右","Thiago Santana|BRA":"左","Ryogo Yamasaki|JPN":"左"});
+Object.assign(BIRTH,{"Tomoki Hayakawa|JPN":"1999-03-03","Taiki Yamada|JPN":"2002-01-08","Yuji Kajikawa|JPN":"1991-07-26","Haruto Fujii|JPN":"2003-06-05","Tae-hyeon Kim|KOR":"2000-09-17","Naomichi Ueda|JPN":"1994-10-24","Ikuma Sekigawa|JPN":"2000-09-13","Kaito Chida|JPN":"1994-10-17","Keisuke Tsukui|JPN":"2004-05-21","Yugo Okawa|JPN":"2007-07-14","Anthony Motosuna|JPN":"2009-03-10","Ryoya Ogawa|JPN":"1996-11-24","Koki Anzai|JPN":"1995-05-31","Kimito Nono|JPN":"2002-03-26","Ryuta Koike|JPN":"1995-08-29","Kento Misao|JPN":"1996-04-16","Yuta Higuchi|JPN":"1996-10-30","Yuta Matsumura|JPN":"2001-04-13","Haruki Hayashi|JPN":"2003-12-05","Ryotaro Araki|JPN":"2002-01-29","Élber|BRA":"1992-05-27","Aleksandar Cavric|SVK":"1994-05-18","Léo Ceará|BRA":"1995-02-03","Yuma Suzuki|JPN":"1996-04-26","Kyosuke Tagawa|JPN":"1999-02-11","Homare Tokuda|JPN":"2007-02-18","Minato Yoshida|JPN":"2008-07-15","Konosuke Nishikawa|JPN":"2002-09-11","Shuhei Matsubara|JPN":"1992-08-11","Ryusei Haruna|JPN":"2004-05-01","Sho Omori|JPN":"1999-08-19","Kenta Itakura|JPN":"2002-06-15","Danilo|BRA":"1997-03-27","Takeshi Ushizawa|JPN":"2001-04-11","Seiya Inoue|JPN":"1999-11-09","Takumi Mase|JPN":"1998-05-03","Yuto Yamashita|JPN":"1996-05-24","Yuto Nagao|JPN":"2001-08-31","Shota Yamashita|JPN":"2008-02-29","Kotatsu Kawakami|JPN":"2002-09-07","Koki Ando|JPN":"2007-09-22","Yoshiki Torikai|JPN":"1998-08-01","Chihiro Kato|JPN":"1998-12-12","Taishi Semba|JPN":"1999-08-19","Koya Okuda|JPN":"1994-10-01","Kiichi Yamazaki|JPN":"2001-10-12","Hayata Yamamoto|JPN":"2003-02-12","Mizuki Arai|JPN":"1997-04-14","Matheus Leiria|BRA":"1995-01-22","Arata Watanabe|JPN":"1995-08-05","Keisuke Tada|JPN":"2002-09-27","Ryo Nemoto|JPN":"2000-02-03","Kishin Gokita|JPN":"2004-07-12","Patryck|BRA":"1998-09-05","Shusaku Nishikawa|JPN":"1986-06-18","Ayumi Niekawa|JPN":"1994-05-12","Ryusei Sato|JPN":"2003-10-24","Danilo Boza|BRA":"1998-05-06","Yuta Miyamoto|JPN":"1999-12-15","Kenta Nemoto|JPN":"2002-12-13","Luka Didulica|AUS":"2007-09-18","Yoshitaka Tanaka|JPN":"2008-04-05","Takuya Ogiwara|JPN":"1999-11-23","Hirokazu Ishihara|JPN":"1999-02-26","Eiichi Katayama|JPN":"1991-11-30","Samuel Gustafson|SWE":"1995-01-11","Kaito Yasui|JPN":"2000-02-09","Kai Shibato|JPN":"1995-11-24","Hayate Ueki|JPN":"2003-10-11","Takeshi Wada|JPN":"2009-06-05","Yoichi Naganuma|JPN":"1997-04-14","Takahiro Sekine|JPN":"1995-04-19","Matheus Savio|BRA":"1997-04-15","Jumpei Hayakawa|JPN":"2005-12-05","Sota Matsunaga|JPN":"2003-10-05","Yusuke Matsuo|JPN":"1997-07-23","Hiroki Abe|JPN":"1999-01-28","Takuro Kaneko|JPN":"1997-07-30","Hiiro Komori|JPN":"2000-08-06","Ado Onaiwu|JPN":"1995-11-08","Renji Hidano|JPN":"2003-12-01","Rio Nitta|JPN":"2003-04-10","José Aurelio Suárez|ESP":"1995-12-18","Tomoya Wakahara|JPN":"1999-12-28","Ryota Suzuki|JPN":"1994-02-10","Haruto Usui|JPN":"1999-07-11","Shunji Saito|JPN":"2008-04-12","Koji Toriumi|JPN":"1995-05-09","Takashi Kawano|JPN":"1996-06-17","Takayuki Mae|JPN":"1993-09-16","Ryota Kuboniwa|JPN":"2001-10-14","Rikuto Ishio|JPN":"2001-08-07","Masaru Hidaka|JPN":"1995-03-14","Issei Takahashi|JPN":"1998-04-20","Koki Yonekura|JPN":"1988-05-17","Eduardo|BRA":"1997-02-01","Manato Shinada|JPN":"1999-09-19","Taiki Amagasa|JPN":"2000-05-11","Yusuke Kobayashi|JPN":"1994-10-23","Haru Ito|JPN":"2009-03-03","Takuya Yasui|JPN":"1998-11-21","Yuma Igari|JPN":"2003-03-03","Kazuki Tanaka|JPN":"2000-01-13","Takuro Iwai|JPN":"2002-11-27","Makoto Himeno|JPN":"2008-08-12","Carlinhos Junior|BRA":"1994-08-08","Naoki Tsubaki|JPN":"2000-06-23","Zain Issaka|JPN":"1997-05-29","Naohiro Sugiyama|JPN":"1998-09-07","Takumi Tsukui|JPN":"2002-04-30","Daichi Ishikawa|JPN":"1996-02-22","Hiroto Goya|JPN":"1994-01-02","Takumi Matsumura|JPN":"2004-01-03","Ryosuke Kojima|JPN":"1997-01-30","Kenta Matsumoto|JPN":"1997-05-04","Kengo Nagai|JPN":"1994-11-06","Haruki Saruta|JPN":"1999-04-23","Kanade Tsuneto|JPN":"2004-07-13","Taiyo Koga|JPN":"1998-10-28","Seiya Baba|JPN":"2001-10-24","Hiroki Noda|JPN":"1997-07-27","Daiki Sugioka|JPN":"1998-09-08","Hiromu Mitsumaru|JPN":"1993-07-06","Yusei Yamanouchi|JPN":"2003-09-01","Wataru Harada|JPN":"1996-07-22","Koki Kumasaka|JPN":"2001-04-15","Takumi Tsuchiya|JPN":"2003-10-25","Rei Shimano|JPN":"2004-01-07","Nobuteru Nakagawa|JPN":"2002-05-15","Yudai Konishi|JPN":"1998-04-18","Sachiro Toshima|JPN":"1995-09-26","Riki Harakawa|JPN":"1993-08-18","Tojiro Kubo|JPN":"1999-04-05","Kaiji Chonan|JPN":"2009-04-07","Yota Komi|JPN":"2002-08-11","Hinata Yamauchi|JPN":"2001-05-30","Hayato Nakama|JPN":"1992-05-16","Yoshio Koizumi|JPN":"1996-10-05","Koya Yuruki|JPN":"1995-07-03","Yusuke Segawa|JPN":"1994-02-07","Shusuke Furuya|JPN":"2005-01-26","Mao Hosoya|JPN":"2001-09-07","Yuki Kakita|JPN":"1997-07-14","Nabel Yoshitaka Furusawa|JPN":"2003-03-28","Hayate Tanaka|JPN":"1999-06-10","Seung-gyu Kim|KOR":"1990-09-30","Wataru Goto|JPN":"2006-05-08","Alexander Scholz|DEN":"1992-10-24","Kanta Doi|JPN":"2004-11-10","Hayato Inamura|JPN":"2002-05-06","Rio Omori|JPN":"2002-07-21","Masato Morishige|JPN":"1987-05-21","Renta Higashi|JPN":"2004-06-17","Kento Hashimoto|JPN":"1999-12-08","Yuto Nagatomo|JPN":"1986-09-12","Takahiro Ko|JPN":"1998-04-20","Kento Hashimoto|JPN":"1993-08-16","Kyota Tokiwa|JPN":"2002-04-09","Kaede Suzuki|JPN":"2007-06-05","Yuta Sugawara|JPN":"2007-09-07","Ryunosuke Sato|JPN":"2006-10-16","Maki Kitahara|JPN":"2009-07-07","Kio Tanaka|JPN":"2007-08-07","Kota Tawaratsumida|JPN":"2004-05-14","Keita Endo|JPN":"1997-11-22","Kein Sato|JPN":"2001-07-11","Fuki Yamada|JPN":"2001-07-10","Teruhito Nakagawa|JPN":"1992-07-27","Marcelo Ryan|BRA":"2002-06-08","Motoki Nagakura|JPN":"1999-10-07","Tsuyoshi Ogashiwa|JPN":"1998-07-09","Leon Nozawa|JPN":"2003-07-21","Divine Chinedu Otani|JPN":"2007-05-04","Matheus|BRA":"1993-04-10","Yuya Nagasawa|JPN":"1996-07-01","Hiroki Mawatari|JPN":"1994-08-16","Keisuke Nakamura|JPN":"2005-04-27","Ryota Inoue|JPN":"2000-07-25","Kaito Suzuki|JPN":"2002-08-25","Naoki Hayashi|JPN":"1998-06-09","Maaya Sako|JPN":"2002-12-02","Daiki Fukazawa|JPN":"1998-08-21","Kazuya Miyahara|JPN":"1996-03-22","Yosuke Uchida|JPN":"2002-08-20","Shuto Tanabe|JPN":"2002-05-05","Riku Matsuda|JPN":"1999-05-03","Tetsuyuki Inami|JPN":"1999-04-05","Joi Yamamoto|JPN":"2006-05-18","Kento Imai|JPN":"2007-10-31","Yuan Matsuhashi|JPN":"2001-10-27","Yuya Fukuda|JPN":"1999-04-04","Yuta Arai|JPN":"2003-03-24","Kosuke Saito|JPN":"1997-06-16","Rei Hirakawa|JPN":"2000-04-20","Issei Kumatoriya|JPN":"2003-02-14","Shion Nakayama|JPN":"2007-10-16","Gakuto Kawamura|JPN":"2006-04-06","Itsuki Someno|JPN":"2001-09-12","Shimon Teranuma|JPN":"2001-03-08","Goki Yamada|JPN":"2000-09-19","Ryosuke Shirai|JPN":"2005-05-17","Hayato Hirao|JPN":"2005-01-06","Sota Ofuji|JPN":"2007-08-07","Kosei Tani|JPN":"2000-11-22","Tatsuya Morita|JPN":"1990-08-03","Yoshiaki Arai|JPN":"1995-09-27","Kaung Zan Mara|MYA":"2002-06-11","Yuta Nakayama|JPN":"1997-02-16","Ibrahim Dresevic|KVX":"1997-01-24","Daihachi Okamura|JPN":"1997-02-15","Min-tae Kim|KOR":"1993-11-26","Tomoki Imai|JPN":"1990-11-29","Kotaro Hayashi|JPN":"2000-11-16","Henry Heroki Mochizuki|JPN":"2001-09-20","Hotaka Nakamura|JPN":"1997-08-12","Hiroyuki Mae|JPN":"1995-08-01","Neta Lavi|ISR":"1996-08-25","Hokuto Shimoda|JPN":"1991-11-07","Je-hoon Cha|KOR":"2006-05-03","Keiya Sento|JPN":"1994-12-29","Asahi Masuyama|JPN":"1997-01-29","Futa Tokumura|JPN":"2007-11-26","Ryohei Shirasaki|JPN":"1993-05-18","Sang-ho Na|KOR":"1996-08-12","Yuki Soma|JPN":"1997-02-25","Erik|BRA":"1994-07-18","Takuma Nishimura|JPN":"1996-10-22","Shota Fujio|JPN":"2001-05-02","Tete Yengi|AUS":"2000-11-28","Kanji Kuwayama|JPN":"2002-11-28","Svend Brodersen|GER":"1997-03-22","Louis Thébault-Yamaguchi|JPN":"1998-05-28","Yuki Hayasaka|JPN":"1999-05-22","Keun-hyeong Lee|KOR":"2006-05-22","Filip Uremovic|CRO":"1997-02-11","Yuichi Maruyama|JPN":"1989-06-16","Shunsuke Hayashi|JPN":"2007-05-29","Ryota Kamihashi|JPN":"2002-06-16","Sota Miura|JPN":"2000-09-07","Asahi Sasaki|JPN":"2000-01-26","Reon Yamahara|JPN":"1999-06-08","Noriharu Kan|JPN":"2007-04-11","Yuto Matsunagane|JPN":"2004-09-14","Hiroto Noda|JPN":"2006-04-05","Kento Tachibanada|JPN":"1998-05-29","So Kawahara|JPN":"1998-03-13","Kota Yui|JPN":"2005-06-10","Yuki Yamamoto|JPN":"1997-11-06","Ryota Oshima|JPN":"1993-01-23","Ryuki Osa|JPN":"2007-10-13","Toya Myogan|JPN":"2004-06-29","Yuto Ozeki|JPN":"2005-02-06","Tatsuya Ito|JPN":"1997-06-26","Marcinho|BRA":"1995-05-16","Ten Miyagi|JPN":"2001-06-02","Kazuya Konno|JPN":"1997-07-11","Kyosuke Mochiyama|JPN":"2003-08-18","Erison|BRA":"1999-04-13","Lazar Romanic|SRB":"1998-03-25","Soma Kanda|JPN":"2005-12-29","Il-gyu Park|JPN":"1989-12-22","Ryoya Kimura|JPN":"2003-06-10","Yuya Tsuboi|JPN":"1999-08-23","Hiroki Iikura|JPN":"1986-06-01","Jeison Quiñónes|COL":"1997-08-17","Taisei Inoue|JPN":"2002-10-01","Ryotaro Tsunoda|JPN":"1999-06-27","Thomas Deng|AUS":"1997-03-20","Kosei Suwama|JPN":"2003-06-06","Ren Kato|JPN":"1999-12-28","Taiki Watanabe|JPN":"1999-04-22","Kanta Sekitomi|JPN":"2005-10-23","Ken Matsubara|JPN":"1993-02-16","Kei Murakami|JPN":"2007-04-11","Takuto Kimura|JPN":"2000-05-16","Yuta Tanaka|JPN":"2002-10-11","Riku Yamane|JPN":"2003-08-17","Kota Watanabe|JPN":"1998-10-18","Aruto Higuchi|JPN":"2005-03-10","Tomoki Kondo|JPN":"2001-03-21","George Onaiwu|JPN":"2000-11-11","Jun Amano|JPN":"1991-07-19","Kosuke Matsumura|JPN":"2004-05-02","Shin Miidera|JPN":"2010-04-02","Tevis|BRA":"2006-01-28","Jordy Croux|BEL":"1994-01-15","Yuri Araújo|BRA":"1996-04-13","Hiroto Asada|JPN":"2008-01-16","Ryo Miyaichi|JPN":"1992-12-14","Kaina Tanimura|JPN":"1998-03-05","Dean David|ISR":"1996-03-14","Hikaru Takahashi|JPN":"2004-06-26","Yuya Oki|JPN":"1999-08-22","Togo Umeda|JPN":"2000-07-23","Kei Ishikawa|JPN":"1992-09-30","Tomotaro Sasaki|JPN":"2007-03-23","Seung-wook Park|KOR":"1997-05-07","Jelani Reshaun Sumiyoshi|JPN":"1997-10-05","Mateus Brunetti|BRA":"1999-11-18","Sen Takagi|JPN":"2002-03-14","Sodai Hasukawa|JPN":"1998-06-27","Yuji Takahashi|JPN":"1993-04-11","Joo-young Eom|KOR":"2007-07-17","Yuki Honda|JPN":"1991-01-02","Yutaka Yoshida|JPN":"1990-02-17","Haruto Hidaka|JPN":"2003-12-11","Kengo Kitazume|JPN":"1992-04-30","Masaki Yumiba|JPN":"2002-05-13","Rinsei Ohata|JPN":"2003-11-23","Yuji Doi|JPN":"2007-05-12","Keigo Suzuki|JPN":"2003-07-13","Yudai Shimamoto|JPN":"2006-10-26","Kai Matsuzaki|JPN":"1997-11-22","Hikaru Nakahara|JPN":"1996-07-08","Kenta Inoue|JPN":"1998-07-23","Motoki Nishihara|JPN":"2006-12-16","Ryota Hariu|JPN":"2008-03-07","Kazuki Kozuka|JPN":"1994-08-02","Capixaba|BRA":"1997-01-09","Se-hun Oh|KOR":"1999-01-15","Koya Kitagawa|JPN":"1996-07-26","Kanta Chiba|JPN":"2003-06-17","Ahmed Ahmedov|BUL":"1995-03-04","Riku Gunji|JPN":"2005-08-03","Daniel Schmidt|JPN":"1992-02-03","Alexandre Pisano|JPN":"2006-01-10","Yohei Takeda|JPN":"1987-06-30","Hiroaki Hagi|JPN":"2007-06-12","Ryuki Oiso|JPN":"2004-12-05","Haruya Fujii|JPN":"2000-12-26","Yota Sato|JPN":"1998-09-10","Yuki Nogami|JPN":"1991-04-20","Harumu Kubo|JPN":"2007-06-18","Shuhei Tokumoto|JPN":"1995-09-12","Akinari Kawazura|JPN":"1994-05-03","Ryosuke Yamanaka|JPN":"1993-04-20","Teruki Hara|JPN":"1998-07-30","Soichiro Mori|JPN":"2007-06-29","Tomoki Takamine|JPN":"1997-12-29","Haruki Yoshida|JPN":"2003-04-29","Katsuhiro Nakayama|JPN":"1996-07-17","Masahito Ono|JPN":"1996-08-09","Haruto Suzuki|JPN":"2005-05-17","Tsukasa Morishima|JPN":"1997-04-25","Yuya Asano|JPN":"1997-02-17","Hidemasa Koda|JPN":"2003-10-02","Takuya Uchida|JPN":"1998-06-02","Taichi Kikuchi|JPN":"1999-05-07","Shungo Sugiura|JPN":"2006-05-14","Kyota Sakakibara|JPN":"2001-10-20","Mateus Castro|BRA":"1994-09-11","Yudai Kimura|JPN":"2001-02-28","Yuya Yamagishi|JPN":"1993-08-29","Kensuke Nagai|JPN":"1989-03-05","Yves Avelete|TOG":"2003-03-06","Masaaki Murakami|JPN":"1992-08-07","Gakuji Ota|JPN":"1990-12-26","Kentaro Kakoi|JPN":"1991-04-23","Akira Fantini|JPN":"1998-05-24","Henrique Trevisan|BRA":"1997-01-20","Shogo Asada|JPN":"1998-07-06","Yoshinori Suzuki|JPN":"1992-09-11","Hisashi Appiah Tawiah|JPN":"1998-10-18","Kodai Nagata|JPN":"2002-09-08","Hidehiro Sugai|JPN":"1998-10-27","Kyo Sato|JPN":"2000-03-21","Shinnosuke Fukuda|JPN":"2000-09-04","Yusuke Ishida|JPN":"2002-11-11","João Pedro|BRA":"1999-09-03","Sung-jun Yoon|KOR":"2007-05-04","Mitsuki Saito|JPN":"1999-01-10","Ryuma Nakano|JPN":"2002-10-06","Taiki Hirato|JPN":"1997-04-18","Haruki Arai|JPN":"1998-04-12","Taiyo Hiraoka|JPN":"2002-09-14","Temma Matsuda|JPN":"1995-06-11","Fuchi Honda|JPN":"2001-05-10","Masaya Okugawa|JPN":"1996-04-14","Rafael Elias|BRA":"1999-04-12","Alex Souza|BRA":"2001-03-24","David Silva|BRA":"2008-02-26","Shun Nagasawa|JPN":"1988-08-25","Ko Sakai|JPN":"2007-10-07","Rui Araki|JPN":"2007-10-14","Masaaki Higashiguchi|JPN":"1986-05-12","Aolin Zhang|JPN":"2005-04-25","Genta Miura|JPN":"1995-03-01","Ryo Hatsuse|JPN":"1997-07-10","Shinya Nakano|JPN":"2003-08-17","Takeru Kishimoto|JPN":"1997-07-16","Ginjiro Ikegaya|JPN":"2004-06-19","Tokuma Suzuki|JPN":"1997-03-12","Rin Mito|JPN":"2002-02-12","Yuki Yoshihara|JPN":"2004-07-19","Shuto Abe|JPN":"1997-12-05","Takato Yamamoto|JPN":"2007-08-24","Shu Kurata|JPN":"1988-11-26","Welton|BRA":"1997-08-06","Kanji Okunuki|JPN":"1999-08-11","Ryotaro Meshino|JPN":"1998-06-18","Taiki Tono|JPN":"2007-06-02","Ryoya Yamashita|JPN":"1997-10-19","Jiro Nakamura|JPN":"2003-08-22","Takashi Usami|JPN":"1992-05-06","Gaku Nawata|JPN":"2006-07-29","Deniz Hümmet|TUR":"1996-09-13","Harumi Minamino|JPN":"2004-05-13","Daichi Hayashi|JPN":"1997-05-23","Issam Jebali|TUN":"1991-12-25","Shoji Toyama|JPN":"2002-09-21","Naru Nakatsumi|JPN":"2007-12-19","Kosuke Nakamura|JPN":"1995-02-27","Jin-hyeon Kim|KOR":"1987-07-06","Ken Isibor|JPN":"2007-08-29","Shinnosuke Hatanaka|JPN":"1995-08-25","Hayato Tanaka|JPN":"2003-11-01","Rikito Inoue|JPN":"1997-03-09","Ayumu Ohata|JPN":"2001-04-27","Kyohei Noborizato|JPN":"1990-11-13","Dion Cools|MAS":"1996-06-04","Takumi Nakamura|JPN":"2001-03-16","Nelson Ishiwatari|JPN":"2005-05-10","Hinata Kida|JPN":"2000-07-04","Kyohei Yoshino|JPN":"1994-11-08","Rui Osako|JPN":"2004-10-13","Eiji Kubo|JPN":"2007-09-02","Masaya Shibayama|JPN":"2002-07-02","Shion Homma|JPN":"2000-08-09","Satoki Uejo|JPN":"1997-04-27","Yumeki Yokoyama|JPN":"2005-09-23","Shinji Kagawa|JPN":"1989-03-17","Thiago Andrade|BRA":"2000-10-31","Motohiko Nakajima|JPN":"1999-04-18","Solomon Sakuragawa|JPN":"2001-08-04","Wigi Kanemoto|KOR":"2004-07-30","Daiya Maekawa|JPN":"1994-09-08","Shuichi Gonda|JPN":"1989-03-03","Shioki Takayama|JPN":"2001-06-13","Richard Monday Ubong|NGA":"2005-10-01","Matheus Thuler|BRA":"1999-03-10","Caetano|BRA":"1999-06-24","Boniface Nduka|JPN":"1996-02-15","Kaito Yamada|JPN":"2006-08-31","Katsuya Nagato|JPN":"1995-01-15","Diego|BRA":"1995-09-21","Ryosuke Irie|JPN":"2004-11-05","Rikuto Hirose|JPN":"1995-09-23","Nanasei Iino|JPN":"1996-10-02","Gotoku Sakai|JPN":"1991-03-14","Justin Homma|JPN":"2005-08-26","Yuya Kuwasaki|JPN":"1998-05-15","Yosuke Ideguchi|JPN":"1996-08-23","Kento Hamasaki|JPN":"2007-06-16","Kakeru Yamauchi|JPN":"2002-01-06","Mitsuki Hidaka|JPN":"2003-05-11","Tafuku Satomi|JPN":"2009-04-20","Juzo Ura|JPN":"2004-05-21","Sota Onishi|JPN":"2007-04-12","Rikuto Hashimoto|JPN":"2005-04-02","Taiga Seguchi|JPN":"2008-01-10","Yuta Goke|JPN":"1999-06-10","Makoto Mitsuta|JPN":"1999-07-20","Haruya Ide|JPN":"1994-03-25","Jean Patric|BRA":"1997-05-14","Takashi Inui|JPN":"1988-06-02","Sota Ito|JPN":"2007-09-24","Yuta Miyahara|JPN":"2005-04-07","Yoshinori Muto|JPN":"1992-07-15","Ren Komatsu|JPN":"1998-09-10","Yuya Osako|JPN":"1990-05-18","Kotaro Uchino|JPN":"2004-06-19","David Aizawa|JPN":"2003-08-02","Hayato Watanabe|JPN":"2007-04-06","Lennart Moser|GER":"1999-12-06","Taro Hamada|JPN":"2000-02-21","Goro Kawanami|JPN":"1991-04-30","Shun Matsuda|JPN":"2007-05-22","Ryo Senda|JPN":"2007-09-20","Yugo Tatsuta|JPN":"1998-06-21","Kota Kudo|JPN":"2003-08-13","Kaito Abe|JPN":"1999-09-18","Yoshitake Suzuki|JPN":"1998-07-06","Hiroshi Omori|JPN":"2002-09-10","Daichi Tagami|JPN":"1993-06-16","Yota Fujii|JPN":"2006-01-16","Kosuke Shirai|JPN":"1994-05-01","Eiji Miyamoto|JPN":"1998-08-03","Ryo Tabei|JPN":"1999-06-25","Kosei Ogura|JPN":"2005-04-09","Haruka Motoyama|JPN":"1999-06-05","Ibuki Fujita|JPN":"1991-01-30","Masaya Matsumoto|JPN":"1995-01-25","Towa Yamane|JPN":"1999-02-05","Rui Sueyoshi|JPN":"1996-07-26","Ataru Esaka|JPN":"1992-05-31","Yuta Kamiya|JPN":"1997-04-24","Yuto Baigorria|BOL":"2006-08-18","Jun Nishikawa|JPN":"2002-02-21","Kota Kawano|JPN":"2003-08-12","Kazunari Ichimi|JPN":"1997-11-10","Léo Gaúcho|BRA":"2001-08-03","Werik Popó|BRA":"2001-10-17","Lucão|BRA":"1995-09-22","Noah Kenshin Browne|JPN":"2001-05-27","Kanshiro Suemune|JPN":"2007-06-10","Aura Takahashi|JPN":"2006-03-01","Keisuke Osako|JPN":"1999-07-28","Issei Ouchi|JPN":"2000-09-08","Yudai Tanaka|JPN":"1995-11-17","Cailen Hill|JPN":"2002-07-09","Hikaru Ogawa|JPN":"2007-06-24","Hayato Araki|JPN":"1996-08-07","Ju-sung Kim|KOR":"2000-12-12","Taichi Yamasaki|JPN":"2001-01-08","Tsukasa Shiotani|JPN":"1988-12-05","Takaaki Shichi|JPN":"1993-12-27","Shuto Nakano|JPN":"2000-06-27","Naoto Arai|JPN":"1996-10-07","Taishi Matsumoto|JPN":"1998-08-22","Hayao Kawabe|JPN":"1995-09-08","Yotaro Nakajima|JPN":"2006-04-22","Sota Koshimichi|JPN":"2004-04-03","Shunki Higashi|JPN":"2000-07-28","Daiki Suga|JPN":"1998-09-10","Motoki Ohara|JPN":"2000-03-09","Shimon Kobayashi|JPN":"2008-01-23","Naoki Maeda|JPN":"1994-11-17","Shun Ayukawa|JPN":"2001-09-15","Akito Suzuki|JPN":"2003-07-30","Sota Nakamura|JPN":"2002-10-15","Mutsuki Kato|JPN":"1997-08-06","Kosuke Kinoshita|JPN":"1994-10-03","Yuma Obata|JPN":"2001-11-07","Kazuki Fujita|JPN":"2001-02-19","Powell Obinna Obi|JPN":"1997-12-18","Kenta Matsuyama|JPN":"1998-11-17","Yuhi Sakai|JPN":"2004-10-05","Takumi Kamijima|JPN":"1997-02-05","Teppei Oka|JPN":"2001-09-06","Yuma Tsujioka|JPN":"2001-12-09","Masaya Tashiro|JPN":"1993-05-01","Daiki Miya|JPN":"1996-04-01","Moon-hyeon Kim|KOR":"2002-05-17","Yota Maejima|JPN":"1997-08-12","Yu Hashimoto|JPN":"2002-06-07","Masato Yuzawa|JPN":"1993-10-10","Kaoru Yamawaki|JPN":"2000-12-17","Keiya Shiihashi|JPN":"1997-06-20","Kohei Okuno|JPN":"2000-04-03","Hiroki Akino|JPN":"1994-10-08","Kokoro Maeda|JPN":"2004-07-01","Masato Shigemi|JPN":"2001-09-20","Yuji Kitajima|JPN":"2000-08-04","Shohei Takemoto|JPN":"2008-05-26","Tomoya Miki|JPN":"1998-03-28","Shintaro Nago|JPN":"1996-04-17","Kazuki Fujimoto|JPN":"1998-07-29","Hikaru Maeda|JPN":"2008-10-25","Shosei Usui|JPN":"2001-07-20","Reiju Tsuruno|JPN":"2001-01-26","Sonosuke Sato|JPN":"2003-07-06","Abdul Hanan Sani Brown|JPN":"2006-07-03","Ichika Maeda|JPN":"2006-06-16","Hisashi Jogo|JPN":"1986-04-16","Masaaki Goto|JPN":"1994-05-24","Go Hatano|JPN":"1998-05-25","Luka Radotic|SRB":"2000-07-17","Kaito Ioka|JPN":"1998-04-27","Ryosuke Shindo|JPN":"1996-06-07","Eduardo|BRA":"1993-04-27","Yusei Egawa|JPN":"2000-10-24","Ikki Arai|JPN":"1993-11-08","Hijiri Onaga|JPN":"1995-02-23","Shunya Yoneda|JPN":"1995-11-05","Keita Takahata|JPN":"2000-09-16","Hyeung-jun Noh|KOR":"2007-07-19","Masahiro Sekiguchi|JPN":"1998-04-21","Naru Sasaki|JPN":"2003-07-13","Riku Yamada|JPN":"1998-04-15","Harumu Nabeshima|JPN":"2004-02-21","Diego Pituca|BRA":"1992-08-15","Temmu Matsumoto|JPN":"2002-09-28","Tsubasa Kasayanagi|JPN":"2003-06-24","Takashi Sawada|JPN":"1991-05-26","Matheus Jesus|BRA":"1997-04-10","Motoki Hasegawa|JPN":"1998-12-10","Keita Nakamura|JPN":"1993-06-30","Yuto Iwasaki|JPN":"1998-06-11","Norman Campbell|JAM":"1999-11-24","Thiago Santana|BRA":"1993-02-04","Ryogo Yamasaki|JPN":"1992-09-20","Reijin Ko|JPN":"2003-08-26"});
 // スロット役割ごとのサジェスト優先（先頭ほど優先）。盤面ロール→推薦する選手ポジション。
 const SUGGEST={
   GK:['GK'], CB:['CB'], LB:['LB'], RB:['RB'],
@@ -4593,6 +5233,14 @@ function suggestSort(a,b){
   if(ma!==mb) return mb-ma;   // 市場価値の高い順（自チーム以外のサジェストに使用）
   return P[b][2]-P[a][2];
 }
+// 自動配置の適性ゲート：そのポジションの選手をそのスロット役割に置いてよいか
+// GKは相互に専用（フィールド選手をGKに入れない／GKをフィールドに入れない）。同じ大枠(DF/MF/FW)はOK。越境はSUGGESTに明記された役割のみ許可。
+function slotFit(pos,role){
+  const pg=grp(pos), sg=grp(role);
+  if(pg==='gk'||sg==='gk') return pg===sg;
+  if(pg===sg) return true;
+  return (SUGGEST[role]||[]).includes(pos);
+}
 let pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
 let benchAddMode=false; // 「ベンチに追加」ピッカーかどうか
 let subFilterOn=false;  // 大枠→細ポジションのサブフィルタを出すか（wirePicker系ピッカーで有効）
@@ -4624,7 +5272,7 @@ function posChips(f=pickFilter){
   return html;
 }
 function lgChips(f=pickFilter){
-  const opts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"],["ED","オランダ"],["PT","ポルトガル"],["BE","ベルギー"]];
+  const opts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"],["ED","オランダ"],["PT","ポルトガル"],["BE","ベルギー"],["J1","Jリーグ"]];
   return opts.map(o=>`<div class="fchip ${f.lg===o[0]?'on':''}" data-lg="${o[0]}">${o[1]}</div>`).join('');
 }
 function clubChips(f=pickFilter){
@@ -4752,11 +5400,11 @@ function openReserveMenu(pid){
   };
 }
 // 3文字コード → flag-icons のコード（全端末で旗を画像表示。コソボxk・英4地域も対応）
-const FI={ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa',PUR:'pr',SYR:'sy',RWA:'rw'};
+const FI={ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa',PUR:'pr',SYR:'sy',RWA:'rw',SSD:'ss',MYA:'mm'};
 // 国籍フィールド("🏴 ENG"等) → 画像旗+略号
 function flagHTML(nat){ const code=(nat||'').trim().split(' ').pop(); const fi=FI[code]; return fi?`<span class="fi fi-${fi}"></span>`:code; }
 // 3文字コード → 英語の国名
-const NATNAME={ENG:'England',SCO:'Scotland',WAL:'Wales',NIR:'Northern Ireland',IRL:'Ireland',FRA:'France',ESP:'Spain',GER:'Germany',ITA:'Italy',NED:'Netherlands',POR:'Portugal',BEL:'Belgium',BRA:'Brazil',ARG:'Argentina',URU:'Uruguay',COL:'Colombia',ECU:'Ecuador',PAR:'Paraguay',VEN:'Venezuela',CHI:'Chile',PER:'Peru',BOL:'Bolivia',MEX:'Mexico',USA:'United States',CAN:'Canada',CRC:'Costa Rica',HON:'Honduras',PAN:'Panama',JAM:'Jamaica',TRI:'Trinidad and Tobago',HAI:'Haiti',CUW:'Curaçao',SUR:'Suriname',CPV:'Cape Verde',COD:'DR Congo',CIV:'Côte d’Ivoire',GHA:'Ghana',NGA:'Nigeria',SEN:'Senegal',MLI:'Mali',CMR:'Cameroon',MAR:'Morocco',ALG:'Algeria',EGY:'Egypt',TUN:'Tunisia',RSA:'South Africa',GAM:'Gambia',GUI:'Guinea',GNB:'Guinea-Bissau',BFA:'Burkina Faso',MOZ:'Mozambique',ZIM:'Zimbabwe',ZAM:'Zambia',ANG:'Angola',GAB:'Gabon',CGO:'Congo',BEN:'Benin',TOG:'Togo',EQG:'Equatorial Guinea',MTN:'Mauritania',COM:'Comoros',MAD:'Madagascar',KEN:'Kenya',BDI:'Burundi',CTA:'Central African Republic',DOM:'Dominican Republic',FRO:'Faroe Islands',GUF:'French Guiana',GLP:'Guadeloupe',IDN:'Indonesia',JOR:'Jordan',LBY:'Libya',MAS:'Malaysia',MDA:'Moldova',NIG:'Niger',TAN:'Tanzania',THA:'Thailand',SWE:'Sweden',NOR:'Norway',DEN:'Denmark',FIN:'Finland',ISL:'Iceland',SUI:'Switzerland',AUT:'Austria',POL:'Poland',CZE:'Czechia',SVK:'Slovakia',SVN:'Slovenia',CRO:'Croatia',SRB:'Serbia',BIH:'Bosnia and Herzegovina',MNE:'Montenegro',ALB:'Albania',KVX:'Kosovo',MKD:'North Macedonia',GRE:'Greece',TUR:'Turkey',HUN:'Hungary',ROU:'Romania',BUL:'Bulgaria',UKR:'Ukraine',RUS:'Russia',GEO:'Georgia',ARM:'Armenia',LVA:'Latvia',LTU:'Lithuania',EST:'Estonia',BLR:'Belarus',LUX:'Luxembourg',CYP:'Cyprus',MLT:'Malta',UZB:'Uzbekistan',JPN:'Japan',KOR:'South Korea',CHN:'China',AUS:'Australia',NZL:'New Zealand',IRN:'Iran',ISR:'Israel',KSA:'Saudi Arabia',QAT:'Qatar',PUR:'Puerto Rico',SYR:'Syria',RWA:'Rwanda'};
+const NATNAME={ENG:'England',SCO:'Scotland',WAL:'Wales',NIR:'Northern Ireland',IRL:'Ireland',FRA:'France',ESP:'Spain',GER:'Germany',ITA:'Italy',NED:'Netherlands',POR:'Portugal',BEL:'Belgium',BRA:'Brazil',ARG:'Argentina',URU:'Uruguay',COL:'Colombia',ECU:'Ecuador',PAR:'Paraguay',VEN:'Venezuela',CHI:'Chile',PER:'Peru',BOL:'Bolivia',MEX:'Mexico',USA:'United States',CAN:'Canada',CRC:'Costa Rica',HON:'Honduras',PAN:'Panama',JAM:'Jamaica',TRI:'Trinidad and Tobago',HAI:'Haiti',CUW:'Curaçao',SUR:'Suriname',CPV:'Cape Verde',COD:'DR Congo',CIV:'Côte d’Ivoire',GHA:'Ghana',NGA:'Nigeria',SEN:'Senegal',MLI:'Mali',CMR:'Cameroon',MAR:'Morocco',ALG:'Algeria',EGY:'Egypt',TUN:'Tunisia',RSA:'South Africa',GAM:'Gambia',GUI:'Guinea',GNB:'Guinea-Bissau',BFA:'Burkina Faso',MOZ:'Mozambique',ZIM:'Zimbabwe',ZAM:'Zambia',ANG:'Angola',GAB:'Gabon',CGO:'Congo',BEN:'Benin',TOG:'Togo',EQG:'Equatorial Guinea',MTN:'Mauritania',COM:'Comoros',MAD:'Madagascar',KEN:'Kenya',BDI:'Burundi',CTA:'Central African Republic',DOM:'Dominican Republic',FRO:'Faroe Islands',GUF:'French Guiana',GLP:'Guadeloupe',IDN:'Indonesia',JOR:'Jordan',LBY:'Libya',MAS:'Malaysia',MDA:'Moldova',NIG:'Niger',TAN:'Tanzania',THA:'Thailand',SWE:'Sweden',NOR:'Norway',DEN:'Denmark',FIN:'Finland',ISL:'Iceland',SUI:'Switzerland',AUT:'Austria',POL:'Poland',CZE:'Czechia',SVK:'Slovakia',SVN:'Slovenia',CRO:'Croatia',SRB:'Serbia',BIH:'Bosnia and Herzegovina',MNE:'Montenegro',ALB:'Albania',KVX:'Kosovo',MKD:'North Macedonia',GRE:'Greece',TUR:'Turkey',HUN:'Hungary',ROU:'Romania',BUL:'Bulgaria',UKR:'Ukraine',RUS:'Russia',GEO:'Georgia',ARM:'Armenia',LVA:'Latvia',LTU:'Lithuania',EST:'Estonia',BLR:'Belarus',LUX:'Luxembourg',CYP:'Cyprus',MLT:'Malta',UZB:'Uzbekistan',JPN:'Japan',KOR:'South Korea',CHN:'China',AUS:'Australia',NZL:'New Zealand',IRN:'Iran',ISR:'Israel',KSA:'Saudi Arabia',QAT:'Qatar',PUR:'Puerto Rico',SYR:'Syria',RWA:'Rwanda',SSD:'South Sudan',MYA:'Myanmar'};
 // FIFA男子ランキング上位20（先頭表示用）
 const NAT_TOP=['ARG','FRA','ESP','ENG','BRA','POR','NED','BEL','ITA','GER','CRO','MAR','COL','URU','USA','MEX','SUI','SEN','DEN','JPN'];
 function natCode(p){ return p[3].trim().split(' ').pop(); }
@@ -5208,7 +5856,7 @@ function clubRow(c){
 // 指定の選手プール(ids)で、適性ポジション＆市場価値順に自動配置（loadClubと同じロジック）
 function autoFillFrom(ids){
   const used=new Set(); const savedRole=pickRole;
-  state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
+  state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
   pickRole=savedRole;
   state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15);
 }
@@ -5222,19 +5870,33 @@ function autoFillNationality(code,form,name){
   const filled=state.slots.filter(s=>s.pid!=null).length;
   toast((name||NATNAME[code]||code)+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
 }
+// 前回の新規作成で選んだソート条件を保持（再度開いたときにリセットしない）
+let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
 // 新規作成：チーム名・フォーメーション・自動配置（国籍/クラブ）
 function startOriginal(){
-  let chosenForm=state.formation||'4-3-3';
-  let chosenLg='ALL';
-  const acf={nat:'ALL'};
+  let chosenForm=otLast.form||state.formation||'4-3-3';
+  let chosenLg=otLast.lg||'ALL';
+  const acf={nat:otLast.nat||'ALL'};
   const chips=FORMS.map(f=>`<div class="fchip2${f===chosenForm?' on':''}" data-f="${f}">${f}</div>`).join('');
-  const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"],["ED","オランダ"],["PT","ポルトガル"],["BE","ベルギー"]];
+  const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["LL","ラ・リーガ"],["SA","セリエA"],["BL","ブンデス"],["L1","リーグ・アン"],["ED","オランダ"],["PT","ポルトガル"],["BE","ベルギー"],["J1","Jリーグ"]];
+  // クラブ選択肢。リーグ未指定(ALL)はリーグごとにグループ化、特定リーグ指定時はそのリーグのクラブだけを表示
+  const otClubOptions=(lg)=>{
+    const head='<option value="">クラブを指定しない</option>';
+    if(lg==='ALL'){
+      return head+lgOpts.filter(o=>o[0]!=='ALL').map(([code,label])=>{
+        const clubs=[...new Set(P.filter(p=>p[5]===code).map(p=>p[4].trim()))].sort();
+        return `<optgroup label="${label}">`+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('')+`</optgroup>`;
+      }).join('');
+    }
+    const clubs=[...new Set(P.filter(p=>p[5]===lg).map(p=>p[4].trim()))].sort();
+    return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
+  };
   openSheet(`
     <h2>新規作成</h2>
     <div class="detail">
       <div class="formfield">
         <label>チーム名 <i>必須</i></label>
-        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="${(state.teamName&&!state.loadedClub)?escAttr(state.teamName):''}" autocomplete="off">
+        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="${escAttr(otLast.name||((state.teamName&&!state.loadedClub)?state.teamName:''))}" autocomplete="off">
       </div>
       <div class="formfield">
         <label>フォーメーション</label>
@@ -5247,7 +5909,12 @@ function startOriginal(){
       </div>
       <div class="formfield">
         <label>リーグ</label>
-        <div class="filters" id="otLg">${lgOpts.map(o=>`<div class="fchip ${o[0]==='ALL'?'on':''}" data-olg="${o[0]}">${o[1]}</div>`).join('')}</div>
+        <div class="filters" id="otLg">${lgOpts.map(o=>`<div class="fchip ${o[0]===chosenLg?'on':''}" data-olg="${o[0]}">${o[1]}</div>`).join('')}</div>
+      </div>
+      <div class="formfield">
+        <label>クラブ</label>
+        <select class="search" id="otClub" style="width:100%">${otClubOptions(chosenLg)}</select>
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">上で<b>リーグ</b>を選ぶと、そのリーグのクラブだけが表示されます。クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。</div>
       </div>
       <button class="bigbtn" id="otStart">自動配置 →</button>
       <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.6">条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。</div>
@@ -5259,23 +5926,45 @@ function startOriginal(){
   document.getElementById('otLg').onclick=e=>{
     const c=e.target.closest('[data-olg]');if(!c)return;
     chosenLg=c.dataset.olg;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    // リーグに合わせてクラブ候補を絞り込む（選択中のクラブはリセット）
+    const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg);
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{});
+  // 前回選んだクラブを復元（現在のリーグ候補内にあれば選択状態にする）
+  const _otClub=document.getElementById('otClub'); if(_otClub&&otLast.club) _otClub.value=otLast.club;
   document.getElementById('otStart').onclick=()=>{
     const name=(document.getElementById('otName').value||'').trim();
     if(!name){ toast('チーム名を入力してください'); document.getElementById('otName').focus(); return; }
-    buildSlots(chosenForm,false);
-    state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
-    const useNat=acf.nat&&acf.nat!=='ALL', useLg=chosenLg!=='ALL';
-    if(!useNat&&!useLg){ // 条件なし＝空のフォーメーション
-      state.bench=[]; setFormLabel(); closeSheet(); render(); save();
+    const chosenClub=(document.getElementById('otClub').value||'').trim();
+    otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name}; // 今回の条件を保持
+    const useClub=!!chosenClub, useNat=acf.nat&&acf.nat!=='ALL', useLg=chosenLg!=='ALL';
+    // クラブ単独指定：最初の画面のクラブ選択と同じ実在編成（控え・ベンチ外・第二候補つき）
+    if(useClub&&!useNat&&!useLg){
+      buildSlots(chosenForm,false);
+      placeClubSquad(chosenClub,name);
+      setFormLabel(); closeSheet(); render(); save();
+      const filled=state.slots.filter(s=>s.pid!=null).length;
+      toast(name+'（'+chosenClub+'）：'+filled+'人を配置'); return;
+    }
+    // 条件なし＝空のフォーメーション
+    if(!useClub&&!useNat&&!useLg){
+      buildSlots(chosenForm,false);
+      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.bench=[];
+      setFormLabel(); closeSheet(); render(); save();
       toast(name+' を作成（空のフォーメーション）'); return;
     }
+    // 複数条件は AND（すべて満たす選手だけ）。クラブ＋国籍など組み合わせ可
     const ids=P.map((p,i)=>i).filter(i=>{
+      if(useClub&&P[i][4].trim()!==chosenClub)return false;
       if(useNat&&natCode(P[i])!==acf.nat)return false;
       if(useLg&&P[i][5]!==chosenLg)return false;
       return true;
     });
+    if(ids.length===0){ // 該当選手なし：配置せず通知（シートは開いたまま条件を見直せる）
+      toast('条件に合う選手がいません。条件を見直してください'); return;
+    }
+    buildSlots(chosenForm,false);
+    state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
     autoFillFrom(ids);
     setFormLabel(); closeSheet(); render(); save();
     const filled=state.slots.filter(s=>s.pid!=null).length;
@@ -5283,7 +5972,8 @@ function startOriginal(){
   };
 }
 function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function loadClub(club){
+// クラブの実在編成を現在のフォーメーションに配置（スタメン・控え15・ベンチ外・第二候補）。teamNameは任意の表示名
+function placeClubSquad(club,name){
   const ids=P.map((p,i)=>i).filter(i=>P[i][4].trim()===club);
   // 各スロットを、その役割のサジェスト順で最適な選手から埋める（適性ポジション優先）
   const used=new Set();
@@ -5297,10 +5987,13 @@ function loadClub(club){
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
   state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15);
   state.loadedClub=club;
-  state.teamName=club;
+  state.teamName=name||club;
   state.teamInfo=null;
   state.captain=null;
   autoAssignSubs(); // 第二候補を初期割当（以後は手動・自動では変わらない）
+}
+function loadClub(club){
+  placeClubSquad(club,club);
   closeSheet();render();save();toast(club+' のスタメン・控え・第二候補を配置しました');
 }
 
@@ -5401,6 +6094,7 @@ function drawSilhouette(x,fx,fy,R){
   x.restore();
 }
 async function buildShareCanvas(){
+  computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   const photoImgs=await preloadPhotos();
   const flagImgs=await preloadFlags();
   const W=1080;
@@ -5473,7 +6167,7 @@ async function buildShareCanvas(){
     // 名前（＋国旗が有効なら国旗も）。ポジション名を隠す設定時は大きめに、役職は描かない
     const nmSize=state.hideRoles?30:26;
     x.font='800 '+nmSize+'px Manrope,sans-serif';
-    const nm=nameOf(s.pid,true);
+    const nm=squadShortName(s.pid);
     const code=(p[3]||'').trim().split(' ').pop();
     const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
     const nameW=x.measureText(nm).width;
@@ -5497,7 +6191,7 @@ async function buildShareCanvas(){
       subY=fy+R+92;
     }
     // 駒下：第2候補 か メモ（表示モードに応じて）
-    if(state.tokInfo==='sub'&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(nameOf(s.sub,true),fx,subY);}
+    if(state.tokInfo==='sub'&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(squadShortName(s.sub),fx,subY);}
     else if(state.tokInfo==='memo'){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 18px Manrope,sans-serif';x.fillText(mt,fx,subY);}}
     x.textAlign='left';
   });
@@ -5518,7 +6212,7 @@ async function buildShareCanvas(){
       const tx0=acx+r+16, maxW=cellW-(tx0-cx0)-14;
       x.textAlign='left';x.textBaseline='middle';
       x.fillStyle='#eafff0';x.font='800 26px Manrope,sans-serif';
-      x.fillText(fitCanvasText(x,nameOf(pid,true),maxW),tx0,cyc-11);
+      x.fillText(fitCanvasText(x,squadShortName(pid),maxW),tx0,cyc-11);
       x.fillStyle=roleCol(p[1]);x.font='700 19px Manrope,sans-serif';
       x.fillText(p[1],tx0,cyc+16);
       x.textBaseline='alphabetic';
