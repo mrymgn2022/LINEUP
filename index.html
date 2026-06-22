@@ -105,7 +105,7 @@ header{
 /* ---------- Player token ---------- */
 .tok{
   position:absolute;width:80px;transform:translate(-50%,-50%);
-  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:pan-y;z-index:2;
+  display:flex;flex-direction:column;align-items:center;cursor:grab;touch-action:none;z-index:2;
 }
 .tok.drag{z-index:30;cursor:grabbing}
 .disc{
@@ -4951,8 +4951,9 @@ function attachDrag(el,actor){
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
     if(!armed){
-      if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6){ moved=true; disarm(); } // 長押し前に動いた＝スクロール
-      return;
+      // 少し動かしたら即ドラッグ開始（長押し待ち不要）。トークンは touch-action:none なのでスクロールに奪われない
+      if(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8){ disarm(); arm(); }
+      else return;
     }
     e.preventDefault(); moved=true; lastX=e.clientX; lastY=e.clientY;
     const pr=pitch.getBoundingClientRect();
