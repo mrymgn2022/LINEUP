@@ -6202,7 +6202,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   el.addEventListener('pointerdown',e=>{
     sx=e.clientX; sy=e.clientY; lastX=e.clientX; lastY=e.clientY; psy=e.clientY;
     armed=false; didDrag=false; ptrId=e.pointerId;
-    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },250); } // タッチは0.25秒長押しでドラッグ
+    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },200); } // タッチは0.2秒長押しでドラッグ
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
@@ -6366,7 +6366,7 @@ function attachDrag(el,actor){
     lastX=sx;lastY=sy;psy=sy; // 自動スクロールの誤作動防止＋長押し前スクロール用に初期化
     rect=pitch.getBoundingClientRect();
     if(e.pointerType==='mouse'){ e.preventDefault(); arm(); }   // マウスは即ドラッグ
-    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },250); } // タッチは0.25秒長押し
+    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },200); } // タッチは0.2秒長押し
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
