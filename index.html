@@ -266,6 +266,10 @@ header{
 .mitem{display:flex;align-items:center;gap:12px;padding:15px 14px;border-radius:13px;font-weight:700;font-size:15px;cursor:pointer}
 .mitem:active{background:var(--panel2)}
 .mitem .mi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--panel2);font-size:15px}
+.micon{width:18px;height:18px;display:inline-block;vertical-align:-.18em;flex:0 0 auto}
+.mitem .mi .micon{width:19px;height:19px;display:block}
+.bigbtn .micon{width:18px;height:18px;vertical-align:-.16em;margin-right:3px}
+.statbar .micon{width:18px;height:18px;vertical-align:-.2em}
 .mitem.danger{color:var(--red)}
 .mitem.danger .mi{color:var(--red)}
 
@@ -402,7 +406,7 @@ header{
     </div>
 
     <div class="statbar" id="statbar" title="タップでスカッド詳細分析">
-      <span class="saicon">📊</span><span>スカッド詳細分析</span>
+      <span class="saicon"><svg class="micon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18"/><path d="M6.5 20v-5"/><path d="M12 20v-9.5"/><path d="M17.5 20v-3"/></svg></span><span>スカッド詳細分析</span>
     </div>
 
     <div class="scrollcue" id="scrollcue">▾ 下にスクロールでベンチ ▾</div>
@@ -4708,7 +4712,7 @@ function renderBench(){
   const xiCnt=state.slots.filter(s=>s.pid!=null).length;
   const totalCnt=xiCnt+list.length;
   const foot=`<div class="benchfoot">合計 <b>${totalCnt}</b>人 <span>(スタメン${xiCnt} ＋ 控え${list.length})</span></div>`;
-  const analyzeBtn=`<div class="statbar" id="statbarBench" title="タップでスカッド詳細分析"><span class="saicon">📊</span><span>スカッド詳細分析</span></div>`;
+  const analyzeBtn=`<div class="statbar" id="statbarBench" title="タップでスカッド詳細分析"><span class="saicon">${ICN.stats}</span><span>スカッド詳細分析</span></div>`;
   // ベンチ外（読込クラブで、スタメンにも控えにもいない選手。並びは内部基準で固定）
   const others=clubOtherIds();
   const ocards=others.map(pid=>{
@@ -5387,16 +5391,31 @@ function clubOtherIds(){
   return P.map((p,i)=>i).filter(i=>P[i][4].trim()===state.loadedClub&&!inXI(i)&&!state.bench.includes(i))
           .sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
 }
+/* ---- メニュー用 線画SVGアイコン（絵文字の代わり。stroke=currentColorで色を継承） ---- */
+const _svg=(inner)=>`<svg class="micon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+const ICN={
+  swap:_svg('<path d="M7 4v15.5"/><path d="M3.5 7.5 7 4l3.5 3.5"/><path d="M17 20V4.5"/><path d="M13.5 16.5 17 20l3.5-3.5"/>'),
+  change:_svg('<path d="M4 9h13"/><path d="M14 6l3 3-3 3"/><path d="M20 15H7"/><path d="M10 12l-3 3 3 3"/>'),
+  memo:_svg('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>'),
+  detail:_svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/>'),
+  photo:_svg('<rect x="3" y="7" width="18" height="13" rx="2.6"/><path d="M8 7l1.6-2.6h4.8L16 7"/><circle cx="12" cy="13.4" r="3.2"/>'),
+  search:_svg('<circle cx="11" cy="11" r="7"/><path d="M20 20l-4.4-4.4"/>'),
+  sub:`<svg class="micon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><text x="12" y="16.2" text-anchor="middle" font-family="Manrope,sans-serif" font-size="12" font-weight="800" fill="currentColor">2</text></svg>`,
+  crown:_svg('<path d="M4 8l3.5 4L12 5l4.5 7L20 8l-1.5 10H5.5z"/>'),
+  star:_svg('<path d="M12 3.5l2.5 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.9 19.5l1-5.8L3.7 9.6l5.8-.8z"/>'),
+  remove:_svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
+  stats:_svg('<path d="M3 20h18"/><path d="M6.5 20v-5"/><path d="M12 20v-9.5"/><path d="M17.5 20v-3"/>'),
+};
 /* ---- ベンチ外選手メニュー（タップで表示） ---- */
 function openReserveMenu(pid){
   if(!P[pid])return;
   openSheet(`
     <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>ベンチ外</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">🔁</div>選手を入れ替える</div>
-      <div class="mitem" data-act="memo"><div class="mi">📝</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="detail"><div class="mi">ℹ️</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="photo"><div class="mi">📷</div>写真を追加 / 変更</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
     </div>`);
   const _r=document.getElementById('omRename'); if(_r)_r.onclick=()=>openRename(pid);
   body.querySelector('.menu').onclick=e=>{
@@ -5409,7 +5428,7 @@ function openReserveMenu(pid){
   };
 }
 // 3文字コード → flag-icons のコード（全端末で旗を画像表示。コソボxk・英4地域も対応）
-const FI={ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa',PUR:'pr',SYR:'sy',RWA:'rw',SSD:'ss',MYA:'mm'};
+const FI={ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb-nir',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa',PUR:'pr',SYR:'sy',RWA:'rw',SSD:'ss',MYA:'mm'};
 // 国籍フィールド("🏴 ENG"等) → 画像旗+略号
 function flagHTML(nat){ const code=(nat||'').trim().split(' ').pop(); const fi=FI[code]; return fi?`<span class="fi fi-${fi}"></span>`:code; }
 // 3文字コード → 英語の国名
@@ -5477,15 +5496,15 @@ function openSlotMenu(i){
   openSheet(`
     <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">✎</span></span> <span>${s.role}</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="photo"><div class="mi">📷</div>写真を追加 / 変更</div>
-      <div class="mitem" data-act="search"><div class="mi">🔍</div>この選手の画像をネット検索</div>
-      <div class="mitem" data-act="detail"><div class="mi">ℹ️</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="swap"><div class="mi">🔁</div>選手を入れ替える</div>
-      <div class="mitem" data-act="change"><div class="mi">⇄</div>${hasBench?'選手を変更（ベンチ優先）':'選手をチーム外から追加'}</div>
-      <div class="mitem" data-act="sub"><div class="mi">②</div>${subLabel}</div>
-      <div class="mitem" data-act="memo"><div class="mi">📝</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
-      <div class="mitem" data-act="captain"><div class="mi">${isCapt?'★':'👑'}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
-      <div class="mitem danger" data-act="remove"><div class="mi">✕</div>スタメンから外す</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
+      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>この選手の画像をネット検索</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${hasBench?'選手を変更（ベンチ優先）':'選手をチーム外から追加'}</div>
+      <div class="mitem" data-act="sub"><div class="mi">${ICN.sub}</div>${subLabel}</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
+      <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
+      <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>スタメンから外す</div>
     </div>`);
   const _smr=document.getElementById('smRename'); if(_smr)_smr.onclick=()=>openRename(s.pid);
   body.querySelector('.menu').onclick=e=>{
@@ -5509,11 +5528,11 @@ function openBenchMenu(pid){
   openSheet(`
     <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>控え</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">🔁</div>選手を入れ替える</div>
-      <div class="mitem" data-act="memo"><div class="mi">📝</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="detail"><div class="mi">ℹ️</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="photo"><div class="mi">📷</div>写真を追加 / 変更</div>
-      <div class="mitem danger" data-act="unbench"><div class="mi">✕</div>ベンチから外す</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
+      <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>ベンチから外す</div>
     </div>`);
   const _r=document.getElementById('bmRename'); if(_r)_r.onclick=()=>openRename(pid);
   body.querySelector('.menu').onclick=e=>{
@@ -5697,7 +5716,7 @@ function openMemo(pid){
     <h2>メモを編集 <span>${escAttr(nameOf(pid,true))}</span></h2>
     <div class="controls">
       <input class="search" id="memoIn" maxlength="16" autocomplete="off" placeholder="例）怪我明け / 売却候補 / 新加入" value="${escAttr(cur)}">
-      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">駒の下に表示される短いメモ（最大16文字）。<br>ヘッダーの📝ボタンが点灯しているときに表示されます。</div>
+      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">駒の下に表示される短いメモ（最大16文字）。<br>ヘッダーのメモ${ICN.memo}ボタンが点灯しているときに表示されます。</div>
     </div>
     <button class="bigbtn" id="memoSave">保存</button>
     <button class="bigbtn ghost" id="memoClear">メモを削除</button>`);
@@ -5720,14 +5739,14 @@ function openDetail(pid,slotIdx){
   const inBench=state.bench.includes(pid);
   let actions;
   if(slotIdx!=null){
-    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
       <button class="bigbtn ghost" id="dChange">この選手を変更 / 移籍</button>
       <button class="bigbtn ghost" id="dRemove">スタメンから外す</button>`;
   }else if(inSquad){
-    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
       <button class="bigbtn ghost" disabled style="opacity:.5">すでにスタメン起用中</button>`;
   }else{
-    actions=`<button class="bigbtn" id="dPhoto">📷 写真を追加 / 変更</button>
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
       <button class="bigbtn" id="dAdd">スタメンに入れる</button>`+
       (inBench
         ? `<button class="bigbtn ghost" id="dUnbench">ベンチから外す</button>`
@@ -5752,7 +5771,7 @@ function openDetail(pid,slotIdx){
         <div class="dcell"><div class="dk">国籍</div><div class="dv" style="font-size:17px">${flagHTML(p[3])}</div></div>
       </div>
       ${actions}
-      <button class="bigbtn ghost" id="dSearch">🔍 この選手の画像をネット検索</button>
+      <button class="bigbtn ghost" id="dSearch">${ICN.search} この選手の画像をネット検索</button>
     </div>`);
   const $=id=>document.getElementById(id);
   if($('dRename'))$('dRename').onclick=()=>openRename(pid);
@@ -5910,8 +5929,9 @@ function startOriginal(){
     <h2>新規作成</h2>
     <div class="detail">
       <div class="formfield">
-        <label>チーム名 <i>必須</i></label>
-        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="${escAttr(otLast.name||((state.teamName&&!state.loadedClub)?state.teamName:''))}" autocomplete="off">
+        <label>チーム名 <i>任意</i></label>
+        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="" autocomplete="off">
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、France）が自動で入ります。</div>
       </div>
       <div class="formfield">
         <label>フォーメーション</label>
@@ -5948,25 +5968,31 @@ function startOriginal(){
   // 前回選んだクラブを復元（現在のリーグ候補内にあれば選択状態にする）
   const _otClub=document.getElementById('otClub'); if(_otClub&&otLast.club) _otClub.value=otLast.club;
   document.getElementById('otStart').onclick=()=>{
-    const name=(document.getElementById('otName').value||'').trim();
-    if(!name){ toast('チーム名を入力してください'); document.getElementById('otName').focus(); return; }
+    const typed=(document.getElementById('otName').value||'').trim();
     const chosenClub=(document.getElementById('otClub').value||'').trim();
-    otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name}; // 今回の条件を保持
-    const useClub=!!chosenClub, useNat=acf.nat&&acf.nat!=='ALL', useLg=chosenLg!=='ALL';
+    const useClub=!!chosenClub, useNat=acf.nat&&acf.nat!=='ALL';
+    const useLg=(chosenLg!=='ALL')&&!useClub; // クラブを選んだらリーグは「クラブ絞り込み用」とみなし、配置条件には数えない
+    // チーム名は任意。未入力なら、クラブ単独→クラブ名／国籍単独→国名 で自動命名（組み合わせ時は自動命名しない）
+    let name=typed;
+    if(!name){
+      if(useClub&&!useNat&&!useLg) name=chosenClub;
+      else if(useNat&&!useClub&&!useLg) name=NATNAME[acf.nat]||acf.nat;
+    }
+    otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name:typed}; // 入力値のみ保持（自動命名は保存しない）
     // クラブ単独指定：最初の画面のクラブ選択と同じ実在編成（控え・ベンチ外・第二候補つき）
     if(useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
       placeClubSquad(chosenClub,name);
       setFormLabel(); closeSheet(); render(); save();
       const filled=state.slots.filter(s=>s.pid!=null).length;
-      toast(name+'（'+chosenClub+'）：'+filled+'人を配置'); return;
+      toast((name&&name!==chosenClub?name+'（'+chosenClub+'）':chosenClub)+'：'+filled+'人を配置'); return;
     }
     // 条件なし＝空のフォーメーション
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
       state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.bench=[];
       setFormLabel(); closeSheet(); render(); save();
-      toast(name+' を作成（空のフォーメーション）'); return;
+      toast((name||'チーム')+' を作成（空のフォーメーション）'); return;
     }
     // 複数条件は AND（すべて満たす選手だけ）。クラブ＋国籍など組み合わせ可
     const ids=P.map((p,i)=>i).filter(i=>{
@@ -5983,7 +6009,7 @@ function startOriginal(){
     autoFillFrom(ids);
     setFormLabel(); closeSheet(); render(); save();
     const filled=state.slots.filter(s=>s.pid!=null).length;
-    toast(name+'：'+filled+'人を自動配置'+(filled<11?'（条件に合う選手が11人未満）':''));
+    toast((name?name+'：':'')+filled+'人を自動配置'+(filled<11?'（条件に合う選手が11人未満）':''));
   };
 }
 function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
