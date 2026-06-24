@@ -125,6 +125,8 @@ header{
 .pname{margin-top:2px;font-size:13px;font-weight:700;text-align:center;white-space:nowrap;text-shadow:0 1px 3px #000,0 0 4px #000}
 .psub{margin-top:1px;font-size:10px;font-weight:700;text-align:center;color:#ffc46b;opacity:.92;white-space:nowrap;text-shadow:0 1px 3px #000,0 0 4px #000}
 .pmemo{margin-top:1px;font-size:10px;font-weight:700;text-align:center;color:#7fd3ff;opacity:.97;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000,0 0 4px #000}
+/* 駒下のメモ/第2候補は絶対配置でぶら下げ、駒(ディスク+名前)の高さに影響させない＝無い選手は空白ゼロ＆段差なし */
+.tokfoot{position:absolute;top:100%;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:2}
 /* ポジション名を隠した時：選手名を大きく表示 */
 .pitch.bigname .pname{margin-top:10px;font-size:16px}
 .pitch.bigname .psub{font-size:12px}
@@ -6546,19 +6548,12 @@ function render(){
       const nm=document.createElement('div');nm.className='pname';
       if(state.showFlags){ nm.innerHTML=flagHTMLForPid(s.pid)+' '+escAttr(squadShortName(s.pid)); } else { nm.textContent=squadShortName(s.pid); }
       tok.appendChild(nm);
-      // 駒下の表示：メモ→第2候補の順で独立して表示（両方ON可）。無い駒も同じ高さを確保して段差を防ぐ
-      if(state.showMemo){
-        const m=document.createElement('div');m.className='pmemo';
-        const mt=memoOf(s.pid);
-        if(mt){ m.textContent=mt; } else { m.textContent='—'; m.style.visibility='hidden'; }
-        tok.appendChild(m);
-      }
-      if(state.showSub){
-        const sub=document.createElement('div');sub.className='psub';
-        if(s.sub!=null&&P[s.sub]){ sub.textContent=squadShortName(s.sub); }
-        else { sub.textContent='—'; sub.style.visibility='hidden'; }
-        tok.appendChild(sub);
-      }
+      // 駒下：メモ→第2候補の順。存在するものだけ表示し、絶対配置(.tokfoot)で駒の高さに影響させない。
+      // → メモの無い選手は空白を作らず、かつディスク高さは常に一定なので段差も出ない。
+      let foot=null;
+      const addFoot=el=>{ if(!foot){ foot=document.createElement('div'); foot.className='tokfoot'; tok.appendChild(foot); } foot.appendChild(el); };
+      if(state.showMemo){ const mt=memoOf(s.pid); if(mt){ const m=document.createElement('div');m.className='pmemo';m.textContent=mt; addFoot(m); } }
+      if(state.showSub && s.sub!=null && P[s.sub]){ const sub=document.createElement('div');sub.className='psub';sub.textContent=squadShortName(s.sub); addFoot(sub); }
     }
     pitch.appendChild(tok);
     tokenEls[i]=tok;
