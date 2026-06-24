@@ -8250,20 +8250,28 @@ async function buildShareCanvas(){
   const tn=teamDisplayName();
   let headBottom=150;
   if(tn){ headBottom=210; if(state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
-  const px=46,py=Math.max(270,headBottom+30),pw=W-92,ph=920;
-  const pitchBottom=py+ph;
-  // トークン配置の幾何：FW(最前線)もGK(最後尾)も、名前ラベルまで含めてピッチ内に収める。実フォーメーションを縦いっぱいに伸ばす
+  const px=46,py=Math.max(270,headBottom+30),pw=W-92;
+  // トークン配置の幾何：駒を「列(横ライン)」単位でまとめ、各行のラベル量に応じて行間を確保
+  //（上の行のラベル下端が下の行の駒円に被らない距離）。ピッチ高さは行数・ラベル量から可変。
+  // → フォーメーションに依らず文字と駒の重なりを防ぐ。
   const R=42;
   const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
-  // 駒中心から下方向のラベル伸び（名前→役職→メモ→第2候補）
+  // 駒中心から下方向のラベル伸び（役職→名前→メモ→第2候補）
   const dropOf=s=>{ let d=state.hideRoles?(R+52):(R+80); let info=R+(state.hideRoles?92:118),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*32); return d; };
-  const lowSlot=filledSlots.length?filledSlots.reduce((a,b)=>b.y<a.y?b:a):null; // 最後尾(最小y)=GK想定
-  const topPad=R+6;                                       // 上：円がピッチ上端からはみ出ない分
-  const botPad=lowSlot?Math.round(dropOf(lowSlot))+10:60;  // 下：最後尾の駒のラベルがピッチ内に収まる分
-  const yspan=Math.max(120, ph-topPad-botPad);
-  const _ys=filledSlots.map(s=>s.y), yMin=filledSlots.length?Math.min.apply(null,_ys):0, yMax=filledSlots.length?Math.max.apply(null,_ys):100, ySpanV=Math.max(1,yMax-yMin);
-  const tokY=s=>(py+ph-botPad)-((s.y-yMin)/ySpanV)*yspan;  // 最前線→上端 / 最後尾→下端、ラベル込みで内側
+  // y が近い駒（差≤11。SB/CB・WB の段差を吸収）は同じ列へ統合。GK(y<16)は必ず単独行に。配列は最小y側=GK(最後尾)→最大y側=FW(最前線)
+  const rowsV=[]; filledSlots.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ const last=rowsV[rowsV.length-1]; const sGK=s.y<16, lastGK=last&&last.maxy<16; if(last && !sGK && !lastGK && s.y-last.maxy<=11){ last.slots.push(s); last.maxy=s.y; } else rowsV.push({slots:[s],maxy:s.y}); });
+  const NV=rowsV.length;
+  const rowDrop=r=>Math.max.apply(null,r.slots.map(dropOf));
+  const topPad=R+6, GAPMARGIN=8;                           // 上端余白／行間余白
+  const order=rowsV.slice().reverse();                     // 画面 上(FW)→下(GK) の順
+  const cyOf=[]; { let cy=py+topPad; for(let k=0;k<order.length;k++){ cyOf[k]=cy; if(k<order.length-1) cy+=rowDrop(order[k])+R+GAPMARGIN; } } // 各行の駒中心Y：上の行のラベル分だけ間隔を空ける
+  const botPad=NV?Math.round(rowDrop(order[order.length-1]))+10:60; // 下：最後尾(GK)行のラベル分
+  const lastCy=cyOf.length?cyOf[cyOf.length-1]:(py+topPad);
+  const ph=Math.max(560,Math.round(lastCy-py+botPad));     // ピッチ高さは内容に合わせて可変
+  const pitchBottom=py+ph;
+  const yMapV=new Map(); order.forEach((r,k)=>r.slots.forEach(s=>yMapV.set(s,cyOf[k])));
+  const tokY=s=>yMapV.get(s);                              // 行ごとに必要分だけ離す（重なり防止）
   const benchPids=state.bench.filter(pid=>!inXI(pid)).slice(0,15); // ベンチ最大15人
   const bCols=3, bRowH=98, bHeadH=70, bGap=44;
   const bRows=Math.ceil(benchPids.length/bCols);
