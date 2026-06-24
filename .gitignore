@@ -1,0 +1,11 @@
+# --- 内部・機密ドキュメント（GitHub Pages リポジトリは公開の可能性が高いので追跡しない）---
+STARTING-XI_事業計画書.md
+STARTING-XI_事業計画書.pdf
+lineupxi-overview.md
+
+# --- 手動バックアップ（git履歴で代替）---
+*.bak
+
+# --- 開発/プレビュー用の一時ファイル・ローカル設定 ---
+_serve.pl
+.claude/
