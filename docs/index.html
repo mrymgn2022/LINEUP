@@ -8411,27 +8411,27 @@ async function shareLineup(){
   canvas.toBlob(blob=>{
     if(!blob){ toast('画像の生成に失敗しました'); return; }
     const file=new File([blob],'starting-xi.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      navigator.share({files:[file],text:shareText,url:APP_URL}).catch(()=>{});
-    }else{
-      openShareFallback(URL.createObjectURL(blob),shareText);
-    }
+    // どの端末でも先にプレビューを表示。ネイティブ共有対応端末はプレビュー内の「共有する」から起動
+    openShareFallback(URL.createObjectURL(blob),shareText,file);
   },'image/png');
 }
-// 共有非対応時：画像プレビュー＋アプリリンク（青・見切れ表示）＋保存/コピー
-function openShareFallback(imgUrl,shareText){
+// 共有プレビュー：どの端末でも先に表示。ネイティブ共有対応なら「共有する」ボタン、非対応はX/Instagram/保存/コピー
+function openShareFallback(imgUrl,shareText,file){
+  const canNative=!!(file&&navigator.canShare&&navigator.canShare({files:[file]}));
   openSheet(`
     <h2>SNSに共有 <span>プレビュー</span></h2>
     <div class="detail">
       <div class="shareprev"><img src="${imgUrl}" alt="lineup"></div>
       <div class="sharecap">${escAttr(shareText)}</div>
+      ${canNative?`<button class="bigbtn" id="shShare">共有する</button>`:''}
       <div class="sharebtns">
         <button class="snsbtn x" id="shX"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.2 2H21l-6.4 7.3L22 22h-6.3l-4.9-6.4L4.9 22H2l6.8-7.8L2 2h6.4l4.5 5.9L18.2 2Zm-1.1 18h1.7L7 3.8H5.2L17.1 20Z"/></svg>X でシェア</button>
         <button class="snsbtn ig" id="shIG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
       </div>
-      <button class="bigbtn" id="shDl">画像を保存</button>
+      <button class="bigbtn ${canNative?'ghost':''}" id="shDl">画像を保存</button>
       <button class="bigbtn ghost" id="shCopy">キャプション＋リンクをコピー</button>
     </div>`);
+  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[file],text:shareText,url:APP_URL}).catch(()=>{}); }; }
   const dlImg=()=>{const a=document.createElement('a');a.href=imgUrl;a.download='starting-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{dlImg();toast('画像を保存しました');};
   document.getElementById('shX').onclick=()=>{
