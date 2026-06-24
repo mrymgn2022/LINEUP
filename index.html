@@ -8252,6 +8252,18 @@ async function buildShareCanvas(){
   if(tn){ headBottom=210; if(state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
   const px=46,py=Math.max(270,headBottom+30),pw=W-92,ph=920;
   const pitchBottom=py+ph;
+  // トークン配置の幾何：FW(最前線)もGK(最後尾)も、名前ラベルまで含めてピッチ内に収める。実フォーメーションを縦いっぱいに伸ばす
+  const R=42;
+  const tokX=s=>px+(s.x/100)*pw;
+  const filledSlots=state.slots.filter(s=>s.pid!=null);
+  // 駒中心から下方向のラベル伸び（名前→役職→メモ→第2候補）
+  const dropOf=s=>{ let d=state.hideRoles?(R+52):(R+80); let info=R+(state.hideRoles?92:118),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*32); return d; };
+  const lowSlot=filledSlots.length?filledSlots.reduce((a,b)=>b.y<a.y?b:a):null; // 最後尾(最小y)=GK想定
+  const topPad=R+6;                                       // 上：円がピッチ上端からはみ出ない分
+  const botPad=lowSlot?Math.round(dropOf(lowSlot))+10:60;  // 下：最後尾の駒のラベルがピッチ内に収まる分
+  const yspan=Math.max(120, ph-topPad-botPad);
+  const _ys=filledSlots.map(s=>s.y), yMin=filledSlots.length?Math.min.apply(null,_ys):0, yMax=filledSlots.length?Math.max.apply(null,_ys):100, ySpanV=Math.max(1,yMax-yMin);
+  const tokY=s=>(py+ph-botPad)-((s.y-yMin)/ySpanV)*yspan;  // 最前線→上端 / 最後尾→下端、ラベル込みで内側
   const benchPids=state.bench.filter(pid=>!inXI(pid)).slice(0,15); // ベンチ最大15人
   const bCols=3, bRowH=98, bHeadH=70, bGap=44;
   const bRows=Math.ceil(benchPids.length/bCols);
@@ -8291,9 +8303,30 @@ async function buildShareCanvas(){
   x.restore();
   roundRect(x,px,py,pw,ph,24);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.12)';x.stroke();
   // トークン
+  // トークン描画：名前は絶対に省略しない。各名前は「隣と被らないbudget」に収まる最大フォントでフル表示（必要なときだけ少し小さく）
+  const maxName=state.hideRoles?40:34, minName=16;
+  // pass1: 位置と希望幅（最大サイズ・国旗込み＝保守的）を測る
+  const info=[];
+  x.font='800 '+maxName+'px Manrope,sans-serif';
   state.slots.forEach(s=>{
-    if(s.pid==null)return;const p=P[s.pid];
-    const fx=px+(s.x/100)*pw, fy=py+((100-s.y)/100)*ph, R=42;
+    if(s.pid==null)return;
+    const code=dispNatCode(s.pid);
+    const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
+    const full=squadShortName(s.pid);
+    const flagW0=fImg?Math.round(Math.round(maxName*0.82)*4/3)+8:0;
+    const wfull=x.measureText(full).width+flagW0;
+    info.push({s,fx:tokX(s),fy:tokY(s),fImg,full,wfull});
+  });
+  // pass2: 名前の行が縦に重なる近傍(40px以内)だけ見て、隣の希望幅を考慮し被らない最大幅を算出
+  info.forEach(a=>{ let b=1e9;
+    for(const o of info){ if(o===a)continue; if(Math.abs(o.fy-a.fy)<40){ const d=Math.abs(o.fx-a.fx); b=Math.min(b, 2*(d-8)-o.wfull); } }
+    a.budget = b>1e8 ? a.wfull : Math.max(60,b);
+  });
+  // budgetに収まる最大フォントを返す（省略はしない＝必ず全文表示、最小minNameまで）
+  const fitNameSize=(text,fImg,budget)=>{ for(let sz=maxName; sz>minName; sz-=1){ x.font='800 '+sz+'px Manrope,sans-serif'; const fw=fImg?Math.round(Math.round(sz*0.82)*4/3)+8:0; if(x.measureText(text).width+fw<=budget) return sz; } return minName; };
+  const fitSubSize=(text,budget)=>{ for(let sz=24; sz>13; sz-=1){ x.font='700 '+sz+'px Manrope,sans-serif'; if(x.measureText(text).width<=budget) return sz; } return 13; };
+  info.forEach(it=>{
+    const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
     x.textAlign='center';
     const im=photoImgs[s.pid];
@@ -8310,37 +8343,29 @@ async function buildShareCanvas(){
     }
     x.lineWidth=6;x.strokeStyle=roleCol(s.role);x.beginPath();x.arc(fx,fy,R,0,7);x.stroke();
     // キャプテン
-    if(state.captain===s.pid){x.beginPath();x.arc(fx-R+8,fy-R+8,16,0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 20px Manrope,sans-serif';x.fillText('C',fx-R+8,fy-R+15);}
-    // 名前（＋国旗が有効なら国旗も）。ポジション名を隠す設定時は大きめに、役職は描かない
-    const nmSize=state.hideRoles?30:26;
-    x.font='800 '+nmSize+'px Manrope,sans-serif';
-    const nm=squadShortName(s.pid);
-    const code=dispNatCode(s.pid);
-    const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
-    const nameW=x.measureText(nm).width;
-    const flagH=Math.round(nmSize*0.82), flagW=Math.round(flagH*4/3), gap=8;
-    const totalW=nameW+(fImg?flagW+gap:0);
-    const startX=fx-totalW/2, nameBaseY=fy+R+46;
+    if(state.captain===s.pid){x.beginPath();x.arc(fx-R+8,fy-R+8,18,0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 22px Manrope,sans-serif';x.fillText('C',fx-R+8,fy-R+16);}
+    // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に
+    if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font='700 24px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+40); }
+    // 名前（＋国旗）：省略せず、budgetに収まる最大サイズで。役職の下に表示
+    const sz=fitNameSize(it.full,it.fImg,it.budget);
+    x.font='800 '+sz+'px Manrope,sans-serif';
+    const flagH=Math.round(sz*0.82), flagW=Math.round(flagH*4/3), gap=8;
+    const nameW=x.measureText(it.full).width;
+    const totalW=nameW+(it.fImg?flagW+gap:0);
+    const startX=fx-totalW/2, nameBaseY=fy+R+(state.hideRoles?52:80);
     x.textAlign='left';
-    if(fImg){
-      const flagY=(nameBaseY-nmSize*0.34)-flagH/2;
-      x.drawImage(fImg,startX,flagY,flagW,flagH);
+    if(it.fImg){
+      const flagY=(nameBaseY-sz*0.34)-flagH/2;
+      x.drawImage(it.fImg,startX,flagY,flagW,flagH);
       x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH);
     }
     x.fillStyle='#eafff0';
-    x.fillText(nm,startX+(fImg?flagW+gap:0),nameBaseY);
+    x.fillText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY);
     x.textAlign='center';
-    let subY=fy+R+70;
-    if(!state.hideRoles){
-      // 役職
-      x.fillStyle=roleCol(s.role);x.font='700 19px Manrope,sans-serif';
-      x.fillText(s.role,fx,fy+R+70);
-      subY=fy+R+92;
-    }
-    // 駒下：メモ→第2候補の順で独立して表示（両方ONなら2行）
-    let infoY=subY;
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 18px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=22;}}
-    if(state.showSub&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(squadShortName(s.sub),fx,infoY);}
+    // 駒下：メモ→第2候補の順（両方ONなら2行）。これも省略せずbudgetに収まるサイズで
+    let infoY=fy+R+(state.hideRoles?92:118);
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){const ss=fitSubSize(mt,it.budget);x.fillStyle='#7fd3ff';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=32;}}
+    if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);const ss=fitSubSize(sn,it.budget);x.fillStyle='#ffc46b';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
@@ -8387,28 +8412,40 @@ async function shareLineup(){
   canvas.toBlob(blob=>{
     if(!blob){ toast('画像の生成に失敗しました'); return; }
     const file=new File([blob],'starting-xi.png',{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[file]})){
-      navigator.share({files:[file],text:shareText,url:APP_URL}).catch(()=>{});
-    }else{
-      openShareFallback(URL.createObjectURL(blob),shareText);
-    }
+    // どの端末でも先にプレビューを表示。ネイティブ共有対応端末はプレビュー内の「共有する」から起動
+    openShareFallback(URL.createObjectURL(blob),shareText,file);
   },'image/png');
 }
-// 共有非対応時：画像プレビュー＋アプリリンク（青・見切れ表示）＋保存/コピー
-function openShareFallback(imgUrl,shareText){
+// 共有プレビュー：どの端末でも先に表示。ネイティブ共有対応なら「共有する」ボタン、非対応はX/Instagram/保存/コピー
+function openShareFallback(imgUrl,shareText,file){
+  let curUrl=imgUrl, curFile=file;
+  const canNative=!!(file&&navigator.canShare&&navigator.canShare({files:[file]}));
   openSheet(`
     <h2>SNSに共有 <span>プレビュー</span></h2>
     <div class="detail">
-      <div class="shareprev"><img src="${imgUrl}" alt="lineup"></div>
+      <div class="dispgroup" id="shToggles" style="justify-content:center;margin:0 0 10px">
+        <div class="icon postog" data-tg="btnLabels" title="ポジション 表示/非表示">POS</div>
+        <div class="icon subtog" data-tg="btnSubs" title="第2候補 表示/非表示">2nd</div>
+        <div class="icon" data-tg="btnMemo" title="メモ 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="12" x2="15.5" y2="12"/><line x1="8.5" y1="16" x2="13" y2="16"/></svg></div>
+        <div class="icon" data-tg="btnFlags" title="国旗 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6c3-2.4 6 2.4 9 0s6-2.4 9 0v9.2c-3 2.4-6-2.4-9 0s-6 2.4-9 0Z"/><path d="M12 6v9.2" stroke-width="1.4" opacity=".5"/></svg></div>
+      </div>
+      <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="lineup"></div>
       <div class="sharecap">${escAttr(shareText)}</div>
+      ${canNative?`<button class="bigbtn" id="shShare">共有する</button>`:''}
       <div class="sharebtns">
         <button class="snsbtn x" id="shX"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.2 2H21l-6.4 7.3L22 22h-6.3l-4.9-6.4L4.9 22H2l6.8-7.8L2 2h6.4l4.5 5.9L18.2 2Zm-1.1 18h1.7L7 3.8H5.2L17.1 20Z"/></svg>X でシェア</button>
         <button class="snsbtn ig" id="shIG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
       </div>
-      <button class="bigbtn" id="shDl">画像を保存</button>
+      <button class="bigbtn ${canNative?'ghost':''}" id="shDl">画像を保存</button>
       <button class="bigbtn ghost" id="shCopy">キャプション＋リンクをコピー</button>
     </div>`);
-  const dlImg=()=>{const a=document.createElement('a');a.href=imgUrl;a.download='starting-xi.png';a.click();};
+  // 盤面右上と同じ表示トグル。押すと盤面ボタンと同じ処理を実行→プレビューを再生成
+  const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
+  syncTg();
+  const regen=()=>{ buildShareCanvas().then(cv=>cv.toBlob(blob=>{ if(!blob)return; if(curUrl)try{URL.revokeObjectURL(curUrl);}catch(e){} curUrl=URL.createObjectURL(blob); curFile=new File([blob],'starting-xi.png',{type:'image/png'}); const img=document.getElementById('sharePrevImg'); if(img)img.src=curUrl; },'image/png')).catch(()=>{}); };
+  document.getElementById('shToggles').onclick=e=>{ const b=e.target.closest('[data-tg]'); if(!b)return; const el=document.getElementById(b.dataset.tg); if(el)el.click(); syncTg(); regen(); };
+  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:APP_URL}).catch(()=>{}); }; }
+  const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='starting-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{dlImg();toast('画像を保存しました');};
   document.getElementById('shX').onclick=()=>{
     dlImg();
