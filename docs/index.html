@@ -8291,9 +8291,30 @@ async function buildShareCanvas(){
   x.restore();
   roundRect(x,px,py,pw,ph,24);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.12)';x.stroke();
   // トークン
+  // トークン配置：最下段(GK)のラベルがピッチからはみ出さないよう上下に余白を確保。文字は大きめ＆名前は隣の駒と被らない幅へ自動調整
+  const R=42, topPad=12, botPad=200, yspan=ph-topPad-botPad;
+  const tokX=s=>px+(s.x/100)*pw, tokY=s=>(py+ph-botPad)-(s.y/100)*yspan;
+  const nmSize=state.hideRoles?38:32;
+  // pass1: 各駒の位置と「希望する名前幅（国旗込み）」を測る
+  const info=[];
+  x.font='800 '+nmSize+'px Manrope,sans-serif';
   state.slots.forEach(s=>{
-    if(s.pid==null)return;const p=P[s.pid];
-    const fx=px+(s.x/100)*pw, fy=py+((100-s.y)/100)*ph, R=42;
+    if(s.pid==null)return;
+    const code=dispNatCode(s.pid);
+    const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
+    const flagH=Math.round(nmSize*0.82), flagW=Math.round(flagH*4/3), gap=8;
+    const full=squadShortName(s.pid);
+    const wfull=x.measureText(full).width+(fImg?flagW+gap:0);
+    info.push({s,fx:tokX(s),fy:tokY(s),fImg,flagH,flagW,gap,full,wfull});
+  });
+  // pass2: 名前の行が縦に重なる近傍(40px以内)だけを見て、隣の名前(実幅)と被らない最大幅を算出
+  info.forEach(a=>{ let b=300;
+    for(const o of info){ if(o===a)continue; if(Math.abs(o.fy-a.fy)<40){ const d=Math.abs(o.fx-a.fx); b=Math.min(b, 2*(d-8)-o.wfull); } }
+    a.budget=Math.max(96, Math.min(b, a.wfull));
+  });
+  // pass3: 描画
+  info.forEach(it=>{
+    const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
     x.textAlign='center';
     const im=photoImgs[s.pid];
@@ -8310,37 +8331,27 @@ async function buildShareCanvas(){
     }
     x.lineWidth=6;x.strokeStyle=roleCol(s.role);x.beginPath();x.arc(fx,fy,R,0,7);x.stroke();
     // キャプテン
-    if(state.captain===s.pid){x.beginPath();x.arc(fx-R+8,fy-R+8,16,0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 20px Manrope,sans-serif';x.fillText('C',fx-R+8,fy-R+15);}
-    // 名前（＋国旗が有効なら国旗も）。ポジション名を隠す設定時は大きめに、役職は描かない
-    const nmSize=state.hideRoles?30:26;
+    if(state.captain===s.pid){x.beginPath();x.arc(fx-R+8,fy-R+8,18,0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 22px Manrope,sans-serif';x.fillText('C',fx-R+8,fy-R+16);}
+    // 名前（＋国旗）
     x.font='800 '+nmSize+'px Manrope,sans-serif';
-    const nm=squadShortName(s.pid);
-    const code=dispNatCode(s.pid);
-    const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
+    const nm=fitCanvasText(x,it.full,it.budget-(it.fImg?it.flagW+it.gap:0));
     const nameW=x.measureText(nm).width;
-    const flagH=Math.round(nmSize*0.82), flagW=Math.round(flagH*4/3), gap=8;
-    const totalW=nameW+(fImg?flagW+gap:0);
-    const startX=fx-totalW/2, nameBaseY=fy+R+46;
+    const totalW=nameW+(it.fImg?it.flagW+it.gap:0);
+    const startX=fx-totalW/2, nameBaseY=fy+R+52;
     x.textAlign='left';
-    if(fImg){
-      const flagY=(nameBaseY-nmSize*0.34)-flagH/2;
-      x.drawImage(fImg,startX,flagY,flagW,flagH);
-      x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH);
+    if(it.fImg){
+      const flagY=(nameBaseY-nmSize*0.34)-it.flagH/2;
+      x.drawImage(it.fImg,startX,flagY,it.flagW,it.flagH);
+      x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,it.flagW,it.flagH);
     }
     x.fillStyle='#eafff0';
-    x.fillText(nm,startX+(fImg?flagW+gap:0),nameBaseY);
+    x.fillText(nm,startX+(it.fImg?it.flagW+it.gap:0),nameBaseY);
     x.textAlign='center';
-    let subY=fy+R+70;
-    if(!state.hideRoles){
-      // 役職
-      x.fillStyle=roleCol(s.role);x.font='700 19px Manrope,sans-serif';
-      x.fillText(s.role,fx,fy+R+70);
-      subY=fy+R+92;
-    }
-    // 駒下：メモ→第2候補の順で独立して表示（両方ONなら2行）
-    let infoY=subY;
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 18px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=22;}}
-    if(state.showSub&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 18px Manrope,sans-serif';x.fillText(squadShortName(s.sub),fx,infoY);}
+    if(!state.hideRoles){ x.fillStyle=roleCol(s.role);x.font='700 26px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+88); }
+    // 駒下：メモ→第2候補の順（両方ONなら2行）。名前と同じ幅に収める
+    let infoY=fy+R+(state.hideRoles?96:120);
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 24px Manrope,sans-serif';x.fillText(fitCanvasText(x,mt,it.budget),fx,infoY);infoY+=32;}}
+    if(state.showSub&&s.sub!=null&&P[s.sub]){x.fillStyle='#ffc46b';x.font='700 24px Manrope,sans-serif';x.fillText(fitCanvasText(x,squadShortName(s.sub),it.budget),fx,infoY);}
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
