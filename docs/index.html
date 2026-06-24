@@ -8253,9 +8253,12 @@ async function buildShareCanvas(){
   const px=46,py=Math.max(270,headBottom+30),pw=W-92,ph=920;
   const pitchBottom=py+ph;
   // トークン配置の幾何（最下段GKを下げてスペースを活用し、ラベルは下の余白に収める）
-  const R=42, topPad=12, botPad=34, yspan=ph-topPad-botPad;
-  const tokX=s=>px+(s.x/100)*pw, tokY=s=>(py+ph-botPad)-(s.y/100)*yspan;
+  const R=42, topPad=20, botPad=34, yspan=ph-topPad-botPad;
+  const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
+  // 実フォーメーションの最前線(yMax)→上端、最後尾=GK(yMin)→下端 に伸ばして縦スペースを使い切る（前方の空きを活用）
+  const _ys=filledSlots.map(s=>s.y), yMin=filledSlots.length?Math.min.apply(null,_ys):0, yMax=filledSlots.length?Math.max.apply(null,_ys):100, ySpanV=Math.max(1,yMax-yMin);
+  const tokY=s=>(py+ph-botPad)-((s.y-yMin)/ySpanV)*yspan;
   const labelBottom=s=>{ let d=state.hideRoles?(R+52):(R+88); let info=R+(state.hideRoles?96:120),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*32); return tokY(s)+d; };
   const lowestLabel=filledSlots.length?Math.max.apply(null,filledSlots.map(labelBottom)):pitchBottom;
   const benchPids=state.bench.filter(pid=>!inXI(pid)).slice(0,15); // ベンチ最大15人
