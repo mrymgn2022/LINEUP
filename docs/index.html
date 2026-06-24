@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>STARTING XI — 戦術ボード</title>
+<title>Squad XI</title>
+<meta name="apple-mobile-web-app-title" content="Squad XI"><!-- iOSでホーム画面追加時のアイコン名を「Squad XI」に固定 -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css');
@@ -368,8 +369,8 @@ header{
 <div class="app">
   <header>
     <div class="brand">
-      <div class="logo">STARTING <b>XI</b></div>
-      <div class="tag" id="teamTag">tactics board</div>
+      <div class="logo">Squad <b>XI</b></div>
+      <div class="tag" id="teamTag">build your XI</div>
     </div>
     <div class="hbtn">
       <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
@@ -6100,7 +6101,7 @@ function updateTeamTag(){
   const el=document.getElementById('teamTag');if(!el)return;
   const name=teamDisplayName();
   if(name){ el.textContent=name; el.classList.add('team'); el.title=name; }
-  else { el.textContent='tactics board'; el.classList.remove('team'); el.title=''; }
+  else { el.textContent='build your XI'; el.classList.remove('team'); el.title=''; }
 }
 
 /* ---- ベンチ（控え） ---- */
@@ -7749,8 +7750,8 @@ async function buildShareCanvas(){
   x.fillStyle=bg;x.fillRect(0,0,W,H);
   // ヘッダー：アプリ名（常に表示）
   x.textBaseline='alphabetic';x.textAlign='left';
-  x.font='800 58px Manrope,sans-serif';x.fillStyle='#eafff0';x.fillText('STARTING',56,104);
-  const w1=x.measureText('STARTING ').width;
+  x.font='800 58px Manrope,sans-serif';x.fillStyle='#eafff0';x.fillText('Squad',56,104);
+  const w1=x.measureText('Squad ').width;
   x.fillStyle=accent;x.fillText(' XI',56+w1,104);
   // フォーメーション右上
   x.textAlign='right';x.font='800 46px "Bebas Neue",Manrope,sans-serif';x.fillStyle='#7d9389';
@@ -7852,7 +7853,7 @@ async function buildShareCanvas(){
   // フッター（平均年齢は表示しない）
   const footY=H-40;
   x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#5a6b62';x.font='700 26px Manrope,sans-serif';
-  x.fillText('⚽ made with STARTING XI',56,footY);
+  x.fillText('⚽ made with Squad XI',56,footY);
   x.textAlign='right';x.fillStyle=accent;x.font='700 26px Manrope,sans-serif';
   x.fillText(APP_URL.replace('https://',''),W-56,footY);
   x.textAlign='left';
