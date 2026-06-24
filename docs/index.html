@@ -8418,11 +8418,18 @@ async function shareLineup(){
 }
 // 共有プレビュー：どの端末でも先に表示。ネイティブ共有対応なら「共有する」ボタン、非対応はX/Instagram/保存/コピー
 function openShareFallback(imgUrl,shareText,file){
+  let curUrl=imgUrl, curFile=file;
   const canNative=!!(file&&navigator.canShare&&navigator.canShare({files:[file]}));
   openSheet(`
     <h2>SNSに共有 <span>プレビュー</span></h2>
     <div class="detail">
-      <div class="shareprev"><img src="${imgUrl}" alt="lineup"></div>
+      <div class="dispgroup" id="shToggles" style="justify-content:center;margin:0 0 10px">
+        <div class="icon postog" data-tg="btnLabels" title="ポジション 表示/非表示">POS</div>
+        <div class="icon subtog" data-tg="btnSubs" title="第2候補 表示/非表示">2nd</div>
+        <div class="icon" data-tg="btnMemo" title="メモ 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="12" x2="15.5" y2="12"/><line x1="8.5" y1="16" x2="13" y2="16"/></svg></div>
+        <div class="icon" data-tg="btnFlags" title="国旗 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6c3-2.4 6 2.4 9 0s6-2.4 9 0v9.2c-3 2.4-6-2.4-9 0s-6 2.4-9 0Z"/><path d="M12 6v9.2" stroke-width="1.4" opacity=".5"/></svg></div>
+      </div>
+      <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="lineup"></div>
       <div class="sharecap">${escAttr(shareText)}</div>
       ${canNative?`<button class="bigbtn" id="shShare">共有する</button>`:''}
       <div class="sharebtns">
@@ -8432,8 +8439,13 @@ function openShareFallback(imgUrl,shareText,file){
       <button class="bigbtn ${canNative?'ghost':''}" id="shDl">画像を保存</button>
       <button class="bigbtn ghost" id="shCopy">キャプション＋リンクをコピー</button>
     </div>`);
-  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[file],text:shareText,url:APP_URL}).catch(()=>{}); }; }
-  const dlImg=()=>{const a=document.createElement('a');a.href=imgUrl;a.download='starting-xi.png';a.click();};
+  // 盤面右上と同じ表示トグル。押すと盤面ボタンと同じ処理を実行→プレビューを再生成
+  const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
+  syncTg();
+  const regen=()=>{ buildShareCanvas().then(cv=>cv.toBlob(blob=>{ if(!blob)return; if(curUrl)try{URL.revokeObjectURL(curUrl);}catch(e){} curUrl=URL.createObjectURL(blob); curFile=new File([blob],'starting-xi.png',{type:'image/png'}); const img=document.getElementById('sharePrevImg'); if(img)img.src=curUrl; },'image/png')).catch(()=>{}); };
+  document.getElementById('shToggles').onclick=e=>{ const b=e.target.closest('[data-tg]'); if(!b)return; const el=document.getElementById(b.dataset.tg); if(el)el.click(); syncTg(); regen(); };
+  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:APP_URL}).catch(()=>{}); }; }
+  const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='starting-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{dlImg();toast('画像を保存しました');};
   document.getElementById('shX').onclick=()=>{
     dlImg();
