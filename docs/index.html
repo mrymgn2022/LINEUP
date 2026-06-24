@@ -7952,6 +7952,81 @@ let tT;const toastEl=document.getElementById('toast');
 function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>toastEl.classList.remove('on'),1900);}
 
 /* =========================================================
+   開発用スモークテスト（隠し機能・ユーザーには非表示）
+   コンソール/プレビューから __selftest() を実行 → 主要フローを総点検し
+   {pass,total,failed,results} を返す。実行後は状態を完全復元（非破壊）。
+   回帰（ある修正で別の機能が壊れる）の自動検知用。本番UIには一切出ない。
+   ========================================================= */
+window.__selftest=function(){
+  const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
+  const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
+  // スナップショット（非破壊復元のため）
+  const snapState=JSON.parse(JSON.stringify(state)); const snapPLen=P.length;
+  let snapLS_s=null,snapLS_p=null; try{ snapLS_s=localStorage.getItem('xi_state_v2'); snapLS_p=localStorage.getItem('xi_photos_v2'); }catch(e){}
+  try{
+    // T1: 全フォーメーションが11枠で構築できる
+    let allForm=true; for(const fk of FORMS){ buildSlots(fk,false); if(state.slots.length!==11||state.slots.some(s=>!s.role)){allForm=false;break;} }
+    ok('formations_build_11',allForm,'一部フォーメーションが11枠で構築できない');
+    // T2: リーグ→国旗マッピング整合（SAU/KSA系バグの検知）
+    let lgOK=true,lgBad=''; for(const code of Object.keys(L)){ const nat=LGNAT[code]; if(!nat||!FI[nat]){lgOK=false;lgBad=code+'→'+nat;break;} }
+    ok('league_flag_mapping',lgOK,'リーグ旗マッピング欠落: '+lgBad);
+    // T3: クラブ自動配置（スタメン充足・重複なし）
+    loadClub('Arsenal');
+    ok('club_fill_starters',state.slots.filter(s=>s.pid!=null).length>=10,'クラブ編成のスタメン不足');
+    ok('club_fill_no_dup',noDup(state.slots.map(s=>s.pid).concat(state.bench)),'クラブ編成で選手が重複');
+    // T4: 保存キーの往復（save/load の中核＝回帰の最頻出ポイント）
+    let keyRT=true;
+    state.slots.forEach(s=>{ if(s.pid!=null&&keyToPid(pidToKey(s.pid))!==s.pid)keyRT=false; });
+    state.bench.forEach(pid=>{ if(keyToPid(pidToKey(pid))!==pid)keyRT=false; });
+    ok('save_key_roundtrip',keyRT,'安定キーの往復解決が一致しない');
+    // T5: 国籍自動配置の表示（クラブメモ・リーグ国旗・同姓一意）
+    autoFillNationality('ARG','4-3-3','ARG-test');
+    const argIds=state.slots.filter(s=>s.pid!=null).map(s=>s.pid);
+    fillClubMemos();
+    ok('nat_club_memos',argIds.every(pid=>memoOf(pid)===(P[pid][4]||'').trim()),'国籍編成のクラブメモ不一致');
+    state.flagByLeague=true;
+    ok('nat_league_flag',argIds.every(pid=>{ const c=LGNAT[P[pid][5]]; return c?dispNatCode(pid)===c:dispNatCode(pid)===natCode(P[pid]); }),'リーグ国旗の解決不一致');
+    computeSquadDups();
+    ok('squad_names_unique',noDup(argIds.concat(state.bench).map(pid=>squadShortName(pid))),'同姓判定で表示名が重複');
+    state.flagByLeague=false;
+    // T6: クラブ読込時、スタメンにベンチ選手を入れると前任者がベンチへ戻る
+    loadClub('Arsenal');
+    const occ=state.slots.findIndex(s=>s.pid!=null), oldStarter=state.slots[occ].pid, benchGuy=state.bench[0];
+    assign(occ,benchGuy);
+    ok('assign_returns_to_bench',state.slots[occ].pid===benchGuy&&state.bench.includes(oldStarter)&&!state.bench.includes(benchGuy),'入替で前任者がベンチへ戻らない');
+    // T7: カスタム選手 作成→参照→除外で消滅
+    const cpid=addCustomPlayer({name:'Selftest Dummy',pos:'ST',nat:'JPN',age:25,club:'',league:'',height:180,foot:'右'});
+    assign(0,cpid);
+    ok('custom_referenced_when_placed',referencedCustomDefs().some(d=>d.name==='Selftest Dummy'),'配置中のカスタム選手が参照されない');
+    state.slots.forEach(s=>{ if(s.pid===cpid)s.pid=null; if(s.sub===cpid)s.sub=null; }); state.bench=state.bench.filter(x=>x!==cpid);
+    ok('custom_pruned_when_removed',!referencedCustomDefs().some(d=>d.name==='Selftest Dummy'),'外したカスタム選手が消滅しない');
+    // T8: ベンチ外の本当の置き換え（除外＋追加で1対1）
+    loadClub('Vissel Kobe');
+    const resBefore=reserveIds();
+    if(resBefore.length){
+      const oldR=resBefore[0], outP=P.findIndex((p,i)=>!isCustomPid(i)&&p[4].trim()==='Real Madrid');
+      replaceReservePlayer(oldR,outP);
+      const resAfter=reserveIds();
+      ok('reserve_replace',!resAfter.includes(oldR)&&resAfter.includes(outP)&&resAfter.length===resBefore.length,'ベンチ外の1対1置き換えが不整合');
+    } else ok('reserve_replace',true,'skip: ベンチ外なし');
+    // T9: 旗ヘルパ・共有関数の健全性
+    ok('flag_helpers',flagHTML('ARG').indexOf('fi-ar')>=0&&typeof buildShareCanvas==='function','旗ヘルパ/共有関数の異常');
+  }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
+  finally{
+    try{ P.length=snapPLen; }catch(e){}
+    try{ Object.keys(snapState).forEach(k=>{ state[k]=snapState[k]; }); }catch(e){}
+    try{ if(snapLS_s!=null)localStorage.setItem('xi_state_v2',snapLS_s); else localStorage.removeItem('xi_state_v2');
+         if(snapLS_p!=null)localStorage.setItem('xi_photos_v2',snapLS_p); else localStorage.removeItem('xi_photos_v2'); }catch(e){}
+    try{ _keyMap=null; computeSquadDups(); render(); }catch(e){}
+  }
+  const fails=R.filter(r=>!r.ok);
+  const result={pass:fails.length===0,total:R.length,failed:fails.length,results:R};
+  window.__selftestResult=result;
+  try{ console.log('[selftest] '+(result.pass?'ALL PASS ('+R.length+')':'FAILED '+fails.length+'/'+R.length),fails); }catch(e){}
+  return result;
+};
+
+/* =========================================================
    Init
    ========================================================= */
 (async function init(){
