@@ -7986,8 +7986,12 @@ function startMarketBench(pid){ swapSel=null; mktPlace=null; mktBenchSwap=null; 
   mktBenchSwap=pid; closeSheet(); render(); showModeBar('交代する控えをタップ（控えが点滅中）');
 }
 function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; hideModeBar();
-  state.bench=state.bench.filter(x=>x!==targetPid); state.slots.forEach(s=>{ if(s.sub===targetPid)s.sub=null; });
-  if(!state.bench.includes(pid))state.bench.push(pid);
+  if(pid===targetPid){ render(); return; }
+  state.bench=state.bench.filter(x=>x!==pid); // 念のため重複除去（このあとindexを取る）
+  const idx=state.bench.indexOf(targetPid);
+  if(idx>=0) state.bench[idx]=pid;             // タップした控えと“同じ位置”で入れ替え（末尾に飛ばさない）
+  else state.bench.push(pid);
+  state.slots.forEach(s=>{ if(s.sub===targetPid)s.sub=null; });
   render(); save(); toast(squadShortName(targetPid)+' → '+squadShortName(pid)+' に交代'); }
 
 /* =========================================================
