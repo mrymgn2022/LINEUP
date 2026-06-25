@@ -94,6 +94,9 @@ header{
   box-shadow:inset 0 0 0 2px rgba(255,255,255,.10), var(--shadow);
 }
 .pitch .markings{position:absolute;inset:0;pointer-events:none}
+/* アプリ名の透かし：トークン(z-index2)の背面・ピッチ中央。選手名は手前に出るので隠れず、中央なのでスクショ/トリミングで切られにくい */
+.pitchwm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;pointer-events:none;font-family:'Bebas Neue',sans-serif;font-size:31px;letter-spacing:4px;line-height:1;color:rgba(234,255,240,.15);white-space:nowrap;user-select:none}
+.pitchwm b{font-weight:400;color:rgba(200,255,79,.22)}
 .mk{position:absolute;border:2px solid rgba(255,255,255,.16)}
 .mk.center-line{left:5%;right:5%;top:50%;height:0;border-width:2px 0 0 0}
 .mk.center-circle{left:50%;top:50%;width:34%;padding-bottom:34%;height:0;border-radius:50%;transform:translate(-50%,-50%)}
@@ -404,6 +407,7 @@ header{
           <div class="mk box-bot"></div>
           <div class="mk box-bot-s"></div>
         </div>
+        <div class="pitchwm" aria-hidden="true">Squad <b>XI</b></div>
         <div class="hint" id="hint">空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え</div>
       </div>
     </div>
@@ -8407,6 +8411,13 @@ async function buildShareCanvas(){
   x.beginPath();x.arc(px+pw/2,py+ph/2,pw*0.13,0,7);x.stroke();
   x.restore();
   roundRect(x,px,py,pw,ph,24);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.12)';x.stroke();
+  // アプリ名の透かし：トークンより先に＝背面に描画。選手名は後で手前に来るので隠れない。ピッチ中央＝トリミングで切られにくい
+  (function(){ x.save(); x.textBaseline='middle'; const wmY=py+ph/2, fs=Math.round(pw*0.085);
+    x.font=fs+'px "Bebas Neue",Manrope,sans-serif'; x.letterSpacing=Math.round(fs*0.06)+'px'; x.textAlign='left';
+    const sq='SQUAD ', xi='XI', wSq=x.measureText(sq).width, total=wSq+x.measureText(xi).width, sx=px+pw/2-total/2;
+    x.fillStyle='rgba(234,255,240,.15)'; x.fillText(sq,sx,wmY);
+    x.fillStyle='rgba(200,255,79,.22)'; x.fillText(xi,sx+wSq,wmY);
+    x.letterSpacing='0px'; x.restore(); })();
   // トークン描画：名前は省略せず全文表示。サイズは全員で統一（盤面のようにバラつかせない）
   const maxName=m(state.hideRoles?16:13), minName=m(8); // 盤面の名前フォント(13/bigname16)を基準に
   // pass1: 各駒の位置・表示名・国旗を測る
