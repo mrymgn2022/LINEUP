@@ -6406,7 +6406,20 @@ function buildSlots(formKey,keepPlayers){
    Persistence (window.storage / fallback, localStorage不使用)
    ========================================================= */
 // 保存用の安定ID：選手名＋国籍コード。配列番号(index)が変わっても選手を特定できる。
-function pidToKey(pid){ if(pid==null) return null; const p=P[pid]; if(!p) return null; return p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); }
+// 安定ID：選手名＋国籍コード。ただし同名・同国籍の別人（例: ポルトガルのVitinhaが2人）は基底キーが衝突し
+// メモ/愛称/写真/保存復元/keyToPid が混ざるため、その選手だけクラブを付けて一意化する。
+let _dupKeyLen=-1,_dupKeySet=null;
+function dupBaseKeys(){ // 実データ内で「名前|国籍」が複数人いる基底キーの集合（この選手だけクラブで区別）
+  if(_dupKeyLen===P.length && _dupKeySet) return _dupKeySet;
+  const cnt={};
+  for(let i=0;i<P.length;i++){ if(isCustomPid(i))continue; const p=P[i]; if(!p)continue; const b=p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); cnt[b]=(cnt[b]||0)+1; }
+  _dupKeySet=new Set(); for(const b in cnt){ if(cnt[b]>1)_dupKeySet.add(b); }
+  _dupKeyLen=P.length; return _dupKeySet;
+}
+function pidToKey(pid){ if(pid==null) return null; const p=P[pid]; if(!p) return null;
+  const base=p[0].trim()+'|'+(p[3].trim().split(' ').pop()||'');
+  // 同名・同国籍が複数いる選手だけ、クラブ＋ポジション＋年齢を付けて一意化（例: ポルトガルVitinha2人 / FC東京の同名Hashimoto2人）
+  return dupBaseKeys().has(base) ? base+'|'+(p[4]||'').trim()+'|'+(p[1]||'')+'|'+(p[2]||'') : base; }
 // 表示名：ユーザーが設定した愛称があればそれ、なければ元の名前（short=苗字のみ）
 function nameOf(pid,short){ if(pid==null||!P[pid])return ''; const c=state.names&&state.names[pidToKey(pid)]; if(c)return c; return short?shortName(P[pid][0]):P[pid][0].trim(); }
 // 同名（同じ苗字）が26人(スタメン+ベンチ)の中に複数いる場合の表示名（pid→"Kai. Sano"等）
@@ -8563,6 +8576,10 @@ window.__selftest=function(){
     state.slots.forEach(s=>{ if(s.pid!=null&&keyToPid(pidToKey(s.pid))!==s.pid)keyRT=false; });
     state.bench.forEach(pid=>{ if(keyToPid(pidToKey(pid))!==pid)keyRT=false; });
     ok('save_key_roundtrip',keyRT,'安定キーの往復解決が一致しない');
+    // T4b: 安定キーが全選手で一意（同名・同国籍の別人=ポルトガルVitinha等のキー衝突を検知＝再発防止）
+    _keyMap=null; let keyUniq=true,keyBad='';
+    for(let i=0;i<P.length;i++){ if(isCustomPid(i))continue; if(keyToPid(pidToKey(i))!==i){ keyUniq=false; keyBad=P[i][0]+'|'+natCode(P[i]); break; } }
+    ok('stable_key_unique',keyUniq,'安定キー衝突（同名同国籍）: '+keyBad);
     // T5: 国籍自動配置の表示（クラブメモ・リーグ国旗・同姓一意）
     autoFillNationality('ARG','4-3-3','ARG-test');
     const argIds=state.slots.filter(s=>s.pid!=null).map(s=>s.pid);
