@@ -8062,6 +8062,12 @@ function fillClubMemos(){
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
+// 自動入力されたクラブ名メモ（memo === その選手の所属クラブ）だけ削除。手入力のメモは残す。
+// 国籍縛りチームで付いたクラブ名メモが、別チーム（クラブ編成など）に持ち越されて誤表示されるのを防ぐ。
+function clearAutoClubMemos(){
+  if(!state.memos) return;
+  for(const k in state.memos){ const pid=keyToPid(k); if(pid!=null&&P[pid]&&state.memos[k]===(P[pid][4]||'').trim()) delete state.memos[k]; }
+}
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
 function autoFillNationality(code,form,name){
   buildSlots(form,false);
@@ -8188,6 +8194,7 @@ function startOriginal(){
     buildSlots(chosenForm,false);
     state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
     autoFillFrom(ids);
+    clearAutoClubMemos(); // 前のチームで自動入力されたクラブ名メモを持ち越さない（国籍のみの場合は直後に貼り直す）
     if(useNat&&!useClub&&!useLg){ fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true; } // 国籍のみ：所属クラブ名をメモに自動入力＆表示、旗は所属リーグの国に
     setFormLabel(); closeSheet(); render(); save();
     const filled=state.slots.filter(s=>s.pid!=null).length;
@@ -8199,6 +8206,7 @@ function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'
 function placeClubSquad(club,name){
   state.flagByLeague=false; // クラブ編成は本人の国籍旗
   state.excluded=[]; state.reserveAdds=[]; // 新しいクラブ編成はベンチ外の除外/追加をリセット
+  clearAutoClubMemos(); // 前のチーム（国籍縛り等）で自動入力されたクラブ名メモを持ち越さない
   const ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][4].trim()===club);
   // 各スロットを、その役割のサジェスト順で最適な選手から埋める（適性ポジション優先）
   const used=new Set();
