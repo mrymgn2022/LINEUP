@@ -8275,7 +8275,7 @@ async function buildShareCanvas(){
   const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
   // 駒中心から下方向のラベル伸び（役職→名前→メモ→第2候補）
-  const dropOf=s=>{ let d=state.hideRoles?(R+sc(52)):(R+sc(80)); let info=R+(state.hideRoles?sc(92):sc(118)),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*sc(32)); return d; };
+  const dropOf=s=>{ let d=state.hideRoles?(R+sc(44)):(R+sc(66)); let info=R+(state.hideRoles?sc(72):sc(94)),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*sc(26)); return d; };
   // y が近い駒（差≤11。SB/CB・WB の段差を吸収）は同じ列へ統合。GK(y<16)は必ず単独行に。配列は最小y側=GK(最後尾)→最大y側=FW(最前線)
   const rowsV=[]; filledSlots.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ const last=rowsV[rowsV.length-1]; const sGK=s.y<16, lastGK=last&&last.maxy<16; if(last && !sGK && !lastGK && s.y-last.maxy<=11){ last.slots.push(s); last.maxy=s.y; } else rowsV.push({slots:[s],maxy:s.y}); });
   const NV=rowsV.length;
@@ -8376,14 +8376,14 @@ async function buildShareCanvas(){
     // キャプテン
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+sc(8),fy-R+sc(8),sc(18),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+sc(22)+'px Manrope,sans-serif';x.fillText('C',fx-R+sc(8),fy-R+sc(16));}
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に
-    if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font='700 '+sc(24)+'px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+sc(40)); }
+    if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font='700 '+sc(24)+'px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+sc(34)); }
     // 名前（＋国旗）：省略せず、budgetに収まる最大サイズで。役職の下に表示
     const sz=fitNameSize(it.full,it.fImg,it.budget);
     x.font='800 '+sz+'px Manrope,sans-serif';
     const flagH=Math.round(sz*0.82), flagW=Math.round(flagH*4/3), gap=sc(8);
     const nameW=x.measureText(it.full).width;
     const totalW=nameW+(it.fImg?flagW+gap:0);
-    const startX=fx-totalW/2, nameBaseY=fy+R+(state.hideRoles?sc(52):sc(80));
+    const startX=fx-totalW/2, nameBaseY=fy+R+(state.hideRoles?sc(44):sc(66));
     x.textAlign='left';
     if(it.fImg){
       const flagY=(nameBaseY-sz*0.34)-flagH/2;
@@ -8394,8 +8394,8 @@ async function buildShareCanvas(){
     x.fillText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY);
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。これも省略せずbudgetに収まるサイズで
-    let infoY=fy+R+(state.hideRoles?sc(92):sc(118));
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){const ss=fitSubSize(mt,it.budget);x.fillStyle='#7fd3ff';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=sc(32);}}
+    let infoY=fy+R+(state.hideRoles?sc(72):sc(94));
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){const ss=fitSubSize(mt,it.budget);x.fillStyle='#7fd3ff';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=sc(26);}}
     if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);const ss=fitSubSize(sn,it.budget);x.fillStyle='#ffc46b';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
     x.textAlign='left';
   });
