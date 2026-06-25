@@ -205,6 +205,12 @@ header{
 .tok.swapsel .disc{animation:swapblink .7s ease-in-out infinite;border-color:#fff!important}
 @keyframes swapblinkcard{0%,100%{opacity:1;box-shadow:0 0 0 2px var(--lime),0 0 14px var(--lime)}50%{opacity:.45;box-shadow:0 0 0 2px var(--lime),0 0 3px var(--lime)}}
 .bcard.swapsel{animation:swapblinkcard .7s ease-in-out infinite;border-color:var(--lime)!important}
+/* 移籍市場からの配置/交代モード：候補を全部点滅させて選ばせる */
+.tok.pickslot .disc{animation:swapblink .7s ease-in-out infinite;border-color:#fff!important;cursor:pointer}
+.bcard.pickbench{animation:swapblinkcard .7s ease-in-out infinite;border-color:var(--lime)!important;cursor:pointer}
+.modebar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--lime);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(0,0,0,.55);font-size:13px;color:var(--ink);max-width:92vw}
+.modebar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modebar button{background:var(--lime);color:#0a0e0c;border:0;border-radius:999px;padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
 /* ベンチ外 */
 .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;padding-bottom:4px}
 .reservehead{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
@@ -6372,6 +6378,8 @@ let pickCurIdx=[]; // 現在フィルター済み選手インデックス（pick
 let mktCurIdx=[]; // 現在フィルター済み選手インデックス（市場用）
 let currentSlot=-1;
 let swapSel=null; // 入れ替えモード：{t:'slot',i}|{t:'bench',pid}|null（選択中＝点滅）
+let mktPlace=null;     // 移籍市場→スタメン：配置したい選手pid。11枠を点滅させ、タップした枠に配置
+let mktBenchSwap=null; // 移籍市場→ベンチ満杯時：加えたい選手pid。控え全員を点滅させ、タップした控えと交代
 
 // 既定配置：各「列(横ライン)」を、最前列(FW)と最後列(GK)の位置はそのままに、間の列を均等な縦間隔へ再配置。
 // 4-3-3のFW-MF間のような無駄な空きを無くし、列間隔を一定化して名前と駒の重なりを防ぐ。列内の段差(SB/CB・WB)は維持。
@@ -6567,7 +6575,7 @@ function render(){
   let filled=0,ages=[];
   state.slots.forEach((s,i)=>{
     const tok=document.createElement('div');
-    tok.className='tok'+((swapSel&&swapSel.t==='slot'&&swapSel.i===i)?' swapsel':'');tok.style.left=s.x+'%';tok.style.top=(100-s.y)+'%';
+    tok.className='tok'+((swapSel&&swapSel.t==='slot'&&swapSel.i===i)?' swapsel':'')+(mktPlace!=null?' pickslot':'');tok.style.left=s.x+'%';tok.style.top=(100-s.y)+'%';
     tok.dataset.i=i;
     const disc=document.createElement('div');
     if(s.pid==null){
@@ -6659,7 +6667,7 @@ function renderBench(){
   if(cue)cue.style.display='block';
   const cards=list.map(pid=>{
     const p=P[pid],ph=state.photos[pid];
-    return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
+    return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}${mktBenchSwap!=null?' pickbench':''}" data-pid="${pid}" draggable="false">
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
       <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
@@ -6788,6 +6796,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   // タップ＝click（タッチで確実に発火）。ドラッグ後のclickは抑制
   el.addEventListener('click',()=>{
     if(didDrag){ didDrag=false; return; }
+    if(mktBenchSwap!=null){ if(pool==='bench') benchSwapMarket(pid); return; } // ベンチ交代モード：控えタップで交代
     if(swapSel){ pool==='bench'?tapBenchInSwap(pid):tapReserveInSwap(pid); }
     else { pool==='bench'?openBenchMenu(pid):openReserveMenu(pid); }
   });
@@ -7026,6 +7035,7 @@ photoInput.addEventListener('change',()=>{
 });
 
 function onSlotTap(i){
+  if(mktPlace!=null){ placeMarketIntoSlot(i); return; } // 移籍市場の配置モード：タップした枠に配置
   if(swapSel){ tapSlotInSwap(i); return; }   // 入れ替えモード中はスロットタップで交換
   currentSlot=i;
   if(state.slots[i].pid==null){ openPicker(i); }
@@ -7944,8 +7954,8 @@ function openDetail(pid,slotIdx){
   if($('dPhoto'))$('dPhoto').onclick=()=>pickPhoto(pid);
   if($('dChange'))$('dChange').onclick=()=>{const useBench=slotIdx!=null&&state.loadedClub&&state.bench.length>0;useBench?openBenchPicker(slotIdx):openPicker(slotIdx);};
   if($('dRemove'))$('dRemove').onclick=()=>{const out=state.slots[slotIdx].pid;state.slots[slotIdx].pid=null;benchReturn(out);closeSheet();render();save();toast('外しました');};
-  if($('dAdd'))$('dAdd').onclick=()=>{ state.bench=state.bench.filter(x=>x!==pid); addToXI(pid); };
-  if($('dBench'))$('dBench').onclick=()=>{ if(state.bench.filter(b=>!inXI(b)).length>=15){toast('ベンチは最大15人です');return;} if(!state.bench.includes(pid))state.bench.push(pid); closeSheet();render();save();toast('ベンチに加えました'); };
+  if($('dAdd'))$('dAdd').onclick=()=>startMarketPlace(pid);
+  if($('dBench'))$('dBench').onclick=()=>startMarketBench(pid);
   if($('dUnbench'))$('dUnbench').onclick=()=>{ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast('ベンチから外しました'); };
 }
 function addToXI(pid){
@@ -7956,6 +7966,29 @@ function addToXI(pid){
   if(target<0){toast('スタメンが11人埋まっています。誰かを外してください');return;}
   assign(target,pid);
 }
+/* ---- 移籍市場からの配置/交代モード（候補を点滅させて選ばせる） ---- */
+function showModeBar(text){
+  let b=document.getElementById('modebar');
+  if(!b){ b=document.createElement('div'); b.id='modebar'; b.className='modebar'; document.body.appendChild(b); }
+  b.innerHTML='<span></span><button type="button">キャンセル</button>';
+  b.querySelector('span').textContent=text;
+  b.querySelector('button').onclick=cancelMarketMode;
+  b.style.display='flex';
+}
+function hideModeBar(){ const b=document.getElementById('modebar'); if(b)b.style.display='none'; }
+function cancelMarketMode(){ const was=(mktPlace!=null||mktBenchSwap!=null); mktPlace=null; mktBenchSwap=null; hideModeBar(); if(was){ render(); toast('キャンセルしました'); } }
+// スタメンに入れる：11枠を点滅→タップした枠に配置
+function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); mktPlace=pid; closeSheet(); render(); showModeBar('入れたいポジションをタップ（11枠が点滅中）'); }
+function placeMarketIntoSlot(i){ const pid=mktPlace; mktPlace=null; hideModeBar(); state.bench=state.bench.filter(x=>x!==pid); assign(i,pid); }
+// ベンチに加える：空きがあれば自動配置、満杯なら控え全員を点滅→タップした控えと交代
+function startMarketBench(pid){ swapSel=null; mktPlace=null; mktBenchSwap=null; hideModeBar();
+  if(state.bench.filter(b=>!inXI(b)).length<15){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(squadShortName(pid)+' をベンチに加えました'); return; }
+  mktBenchSwap=pid; closeSheet(); render(); showModeBar('交代する控えをタップ（控えが点滅中）');
+}
+function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; hideModeBar();
+  state.bench=state.bench.filter(x=>x!==targetPid); state.slots.forEach(s=>{ if(s.sub===targetPid)s.sub=null; });
+  if(!state.bench.includes(pid))state.bench.push(pid);
+  render(); save(); toast(squadShortName(targetPid)+' → '+squadShortName(pid)+' に交代'); }
 
 /* =========================================================
    Header actions
