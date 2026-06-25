@@ -8415,7 +8415,7 @@ async function buildShareCanvas(){
       for(let i=0;i<info.length&&ok;i++){ const a=info[i];
         for(let j=0;j<info.length;j++){ const o=info[j]; if(o===a)continue; if(Math.abs(o.fy-a.fy)<m(18)){ const wa=widthAt(a,U),wo=widthAt(o,U); if(wa<=0||wo<=0)continue; if((wa+wo)/2+m(3)>Math.abs(a.fx-o.fx)){ ok=false; break; } } } }
       if(ok) return U; } return lo; };
-  const uniName=info.length?findUni((it,U)=>{ x.font='800 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
+  const uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
   const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=memoOf(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
   const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ const t=subText(it); if(!t)return 0; x.font='700 '+U+'px Manrope,sans-serif'; return x.measureText(t).width; },m(10),m(6)):m(10);
   info.forEach(it=>{
@@ -8438,10 +8438,10 @@ async function buildShareCanvas(){
     // キャプテン
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+m(7),fy-R+m(7),m(8),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+m(9)+'px Manrope,sans-serif';x.fillText('C',fx-R+m(7),fy-R+m(10));}
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に（盤面: role12px, 縁から+12）
-    if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font='700 '+m(12)+'px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+m(22)); }
+    if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font=m(12)+'px "Bebas Neue",Manrope,sans-serif';x.letterSpacing=m(1)+'px';x.fillText(s.role,fx,fy+R+m(22));x.letterSpacing='0px'; } // 役職は盤面同様 Bebas Neue
     // 名前（＋国旗）：統一サイズ。役職の下に詰めて表示
     const sz=uniName;
-    x.font='800 '+sz+'px Manrope,sans-serif';
+    x.font='700 '+sz+'px Manrope,sans-serif';
     const flagH=Math.round(sz*0.82), flagW=Math.round(flagH*4/3), gap=m(3);
     const nameW=x.measureText(it.full).width;
     const totalW=nameW+(it.fImg?flagW+gap:0);
@@ -8453,12 +8453,14 @@ async function buildShareCanvas(){
       x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH);
     }
     x.fillStyle='#eafff0';
+    x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=m(3);x.shadowOffsetX=0;x.shadowOffsetY=m(1); // 盤面と同じ文字影（名前）
     x.fillText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY);
     x.textAlign='center';
-    // 駒下：メモ→第2候補の順（両方ONなら2行）。これも省略せずbudgetに収まるサイズで
+    // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
     let infoY=fy+R+(state.hideRoles?m(33):m(53));
     if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=m(15);}}
     if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
+    x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
