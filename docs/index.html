@@ -97,6 +97,9 @@ header{
 /* アプリ名の透かし：トークン(z-index2)の背面・ピッチ中央。選手名は手前に出るので隠れず、中央なのでスクショ/トリミングで切られにくい */
 .pitchwm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;pointer-events:none;font-family:'Bebas Neue',sans-serif;font-size:31px;letter-spacing:4px;line-height:1;color:rgba(234,255,240,.15);white-space:nowrap;user-select:none}
 .pitchwm b{font-weight:400;color:rgba(200,255,79,.22)}
+/* 右下の署名的なアプリ名（同じく背面・名前は手前） */
+.pitchwm-br{position:absolute;right:16px;bottom:13px;z-index:1;pointer-events:none;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;line-height:1;color:rgba(234,255,240,.20);white-space:nowrap;user-select:none}
+.pitchwm-br b{font-weight:400;color:rgba(200,255,79,.30)}
 .mk{position:absolute;border:2px solid rgba(255,255,255,.16)}
 .mk.center-line{left:5%;right:5%;top:50%;height:0;border-width:2px 0 0 0}
 .mk.center-circle{left:50%;top:50%;width:34%;padding-bottom:34%;height:0;border-radius:50%;transform:translate(-50%,-50%)}
@@ -408,6 +411,7 @@ header{
           <div class="mk box-bot-s"></div>
         </div>
         <div class="pitchwm" aria-hidden="true">Squad <b>XI</b></div>
+        <div class="pitchwm-br" aria-hidden="true">Squad <b>XI</b></div>
         <div class="hint" id="hint">空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え</div>
       </div>
     </div>
@@ -8418,6 +8422,13 @@ async function buildShareCanvas(){
     x.fillStyle='rgba(234,255,240,.15)'; x.fillText(sq,sx,wmY);
     x.fillStyle='rgba(200,255,79,.22)'; x.fillText(xi,sx+wSq,wmY);
     x.letterSpacing='0px'; x.restore(); })();
+  // 右下にもアプリ名（背面・小さめ）。中央＝トリミング対策、右下＝署名的なブランド表示
+  (function(){ x.save(); x.textBaseline='alphabetic'; const fs=Math.round(pw*0.034), pad=Math.round(pw*0.03);
+    x.font=fs+'px "Bebas Neue",Manrope,sans-serif'; x.letterSpacing=Math.round(fs*0.08)+'px'; x.textAlign='left';
+    const sq='SQUAD ', xi='XI', wSq=x.measureText(sq).width, startX=px+pw-pad-(wSq+x.measureText(xi).width), baseY=py+ph-pad;
+    x.fillStyle='rgba(234,255,240,.20)'; x.fillText(sq,startX,baseY);
+    x.fillStyle='rgba(200,255,79,.30)'; x.fillText(xi,startX+wSq,baseY);
+    x.letterSpacing='0px'; x.restore(); })();
   // トークン描画：名前は省略せず全文表示。サイズは全員で統一（盤面のようにバラつかせない）
   const maxName=m(state.hideRoles?16:13), minName=m(8); // 盤面の名前フォント(13/bigname16)を基準に
   // pass1: 各駒の位置・表示名・国旗を測る
@@ -8505,12 +8516,10 @@ async function buildShareCanvas(){
       x.textBaseline='alphabetic';
     });
   }
-  // フッター（平均年齢は表示しない）
+  // フッター（平均年齢は表示しない）。旧名由来の starting-xi.app 表記は削除（ブランド名 Squad XI と不一致のため）
   const footY=H-40;
   x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#5a6b62';x.font='700 26px Manrope,sans-serif';
   x.fillText('⚽ made with Squad XI',56,footY);
-  x.textAlign='right';x.fillStyle=accent;x.font='700 26px Manrope,sans-serif';
-  x.fillText(APP_URL.replace('https://',''),W-56,footY);
   x.textAlign='left';
   return cv;
 }
