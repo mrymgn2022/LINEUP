@@ -8333,29 +8333,25 @@ async function buildShareCanvas(){
   x.beginPath();x.arc(px+pw/2,py+ph/2,pw*0.13,0,7);x.stroke();
   x.restore();
   roundRect(x,px,py,pw,ph,24);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.12)';x.stroke();
-  // トークン
-  // トークン描画：名前は絶対に省略しない。各名前は「隣と被らないbudget」に収まる最大フォントでフル表示（必要なときだけ少し小さく）
+  // トークン描画：名前は省略せず全文表示。サイズは全員で統一（盤面のようにバラつかせない）
   const maxName=sc(state.hideRoles?40:34), minName=sc(16);
-  // pass1: 位置と希望幅（最大サイズ・国旗込み＝保守的）を測る
+  // pass1: 各駒の位置・表示名・国旗を測る
   const info=[];
-  x.font='800 '+maxName+'px Manrope,sans-serif';
   state.slots.forEach(s=>{
     if(s.pid==null)return;
     const code=dispNatCode(s.pid);
     const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
-    const full=squadShortName(s.pid);
-    const flagW0=fImg?Math.round(Math.round(maxName*0.82)*4/3)+sc(8):0;
-    const wfull=x.measureText(full).width+flagW0;
-    info.push({s,fx:tokX(s),fy:tokY(s),fImg,full,wfull});
+    info.push({s,fx:tokX(s),fy:tokY(s),fImg,full:squadShortName(s.pid)});
   });
-  // pass2: 名前の行が縦に重なる近傍だけ見て、隣の希望幅を考慮し被らない最大幅を算出
-  info.forEach(a=>{ let b=1e9;
-    for(const o of info){ if(o===a)continue; if(Math.abs(o.fy-a.fy)<sc(40)){ const d=Math.abs(o.fx-a.fx); b=Math.min(b, 2*(d-sc(8))-o.wfull); } }
-    a.budget = b>1e8 ? a.wfull : Math.max(sc(60),b);
-  });
-  // budgetに収まる最大フォントを返す（省略はしない＝必ず全文表示、最小minNameまで）
-  const fitNameSize=(text,fImg,budget)=>{ for(let sz=maxName; sz>minName; sz-=1){ x.font='800 '+sz+'px Manrope,sans-serif'; const fw=fImg?Math.round(Math.round(sz*0.82)*4/3)+sc(8):0; if(x.measureText(text).width+fw<=budget) return sz; } return minName; };
-  const fitSubSize=(text,budget)=>{ for(let sz=sc(24); sz>sc(13); sz-=1){ x.font='700 '+sz+'px Manrope,sans-serif'; if(x.measureText(text).width<=budget) return sz; } return sc(13); };
+  // 名前/メモ/第2候補は全員同じフォントサイズに統一（盤面のようにバラつかせない）。
+  // 「全員を同じサイズUで描いたとき、同一行の隣同士が被らない最大のU」を探す（隣も縮む前提なので過小評価しない）。
+  const findUni=(widthAt,hi,lo)=>{ for(let U=hi;U>=lo;U--){ let ok=true;
+      for(let i=0;i<info.length&&ok;i++){ const a=info[i];
+        for(let j=0;j<info.length;j++){ const o=info[j]; if(o===a)continue; if(Math.abs(o.fy-a.fy)<sc(40)){ const wa=widthAt(a,U),wo=widthAt(o,U); if(wa<=0||wo<=0)continue; if((wa+wo)/2+sc(8)>Math.abs(a.fx-o.fx)){ ok=false; break; } } } }
+      if(ok) return U; } return lo; };
+  const uniName=info.length?findUni((it,U)=>{ x.font='800 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+sc(8):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
+  const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const m=memoOf(s.pid); if(m&&m.length>t.length)t=m;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
+  const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ const t=subText(it); if(!t)return 0; x.font='700 '+U+'px Manrope,sans-serif'; return x.measureText(t).width; },sc(24),sc(13)):sc(24);
   info.forEach(it=>{
     const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
@@ -8378,7 +8374,7 @@ async function buildShareCanvas(){
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に
     if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font='700 '+sc(24)+'px Manrope,sans-serif';x.fillText(s.role,fx,fy+R+sc(34)); }
     // 名前（＋国旗）：省略せず、budgetに収まる最大サイズで。役職の下に表示
-    const sz=fitNameSize(it.full,it.fImg,it.budget);
+    const sz=uniName;
     x.font='800 '+sz+'px Manrope,sans-serif';
     const flagH=Math.round(sz*0.82), flagW=Math.round(flagH*4/3), gap=sc(8);
     const nameW=x.measureText(it.full).width;
@@ -8395,8 +8391,8 @@ async function buildShareCanvas(){
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。これも省略せずbudgetに収まるサイズで
     let infoY=fy+R+(state.hideRoles?sc(72):sc(94));
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){const ss=fitSubSize(mt,it.budget);x.fillStyle='#7fd3ff';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=sc(26);}}
-    if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);const ss=fitSubSize(sn,it.budget);x.fillStyle='#ffc46b';x.font='700 '+ss+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=sc(26);}}
+    if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
