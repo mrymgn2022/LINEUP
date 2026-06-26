@@ -12163,9 +12163,9 @@ function posChips(f=pickFilter){
 // 検索フィルタのリーグ表示は「国でまとめ、複数部門の国(英・仏)はタップで展開」
 const LGGROUP=[["イングランド",["PL","EC"]],["スペイン",["LL","S2"]],["イタリア",["SA","SB"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["トルコ",["TR"]],["ベルギー",["BE"]],["スコットランド",["SC"]],["デンマーク",["DK"]],["スイス",["CH"]],["日本",["J1"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]]];
 function lgFlag(code){ const n=LGNAT[code]; const fi=n&&FI[n]; return fi?`<span class="fi fi-${fi}"></span> `:''; }
-function lgChips(f=pickFilter){
-  // 上段＝国（複数部門は▾）。展開時は下段に部門を別行で表示（横並びではなく下に出す）
-  let countries=`<div class="fchip ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
+function lgChips(f=pickFilter, extra=''){
+  // 上段＝国（複数部門は▾）。展開時は下段に部門を別行で表示（横並びではなく下に出す）。extra＝全リーグの隣に足す任意チップ
+  let countries=`<div class="fchip ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`+(extra||'');
   let divs='';
   for(const [jp,codes] of LGGROUP){
     if(codes.length===1){
@@ -12988,18 +12988,19 @@ function startOriginal(){
   const acf={nat:otLast.nat||'ALL'};
   const chips=FORMS.map(f=>`<div class="fchip2${f===chosenForm?' on':''}" data-f="${f}">${f}</div>`).join('');
   const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["J1","Jリーグ"],["ML","MLS"],["SP","サウジ"]];
-  // クラブ選択肢。リーグ未指定(ALL)はリーグごとにグループ化、特定リーグ指定時はそのリーグのクラブだけを表示
+  // 人気クラブ（UEFAクラブランキング上位100）。順位リストは後日設定するため今は空
+  const POP_CLUBS=[];
+  // クラブ選択肢。特定リーグ＝そのリーグのクラブ／人気クラブ(POP)＝上位100。先頭はプレースホルダ（未選択＝リーグのみで作成）
   const otClubOptions=(lg)=>{
-    const head='<option value="">クラブを指定しない</option>';
-    if(lg==='ALL'){
-      return head+lgOpts.filter(o=>o[0]!=='ALL').map(([code,label])=>{
-        const clubs=[...new Set(P.filter(p=>p[5]===code).map(p=>p[4].trim()))].sort();
-        return `<optgroup label="${label}">`+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('')+`</optgroup>`;
-      }).join('');
-    }
+    const head='<option value="">クラブを選択…</option>';
+    if(lg==='POP') return head+POP_CLUBS.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
     const clubs=[...new Set(P.filter(p=>p[5]===lg).map(p=>p[4].trim()))].sort();
     return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
   };
+  // 「人気クラブ」チップ（全リーグの隣）。タップでクラブ欄に上位100を出す
+  const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">⭐ 人気クラブ</div>`;
+  // クラブ欄はリーグ/人気クラブを選んで初めて表示。ALL（全リーグ）では非表示
+  const updateClubField=()=>{ const f=document.getElementById('otClubField'); if(!f)return; const show=(chosenLg!=='ALL'); f.style.display=show?'':'none'; if(show){ const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg); } };
   openSheet(`
     <h2>新規作成</h2>
     <div class="detail">
@@ -13024,12 +13025,12 @@ function startOriginal(){
       </div>
       <div class="formfield">
         <label>リーグ</label>
-        <div class="filters" id="otLg">${lgChips({lg:chosenLg,expand:otExpand})}</div>
+        <div class="filters" id="otLg">${lgChips({lg:chosenLg,expand:otExpand},popChip())}</div>
       </div>
-      <div class="formfield">
+      <div class="formfield" id="otClubField" style="display:none">
         <label>クラブ</label>
         <select class="search" id="otClub" style="width:100%">${otClubOptions(chosenLg)}</select>
-        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">上で<b>リーグ</b>を選ぶと、そのリーグのクラブだけが表示されます。クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。</div>
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。</div>
       </div>
       <div class="filters" style="margin:2px 0 4px"><div class="fchip" id="otClear">× 条件をクリア</div></div>
       <button class="bigbtn" id="otStart">自動配置 →</button>
@@ -13040,13 +13041,14 @@ function startOriginal(){
     chosenForm=c.dataset.f;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
   };
   document.getElementById('otLg').onclick=e=>{
+    const pop=e.target.closest('[data-pop]');
+    if(pop){ chosenLg='POP'; otExpand=null; document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip()); updateClubField(); return; }
     const ctry=e.target.closest('[data-country]');
-    if(ctry){ otExpand=(otExpand===ctry.dataset.country?null:ctry.dataset.country); document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand}); return; }
+    if(ctry){ otExpand=(otExpand===ctry.dataset.country?null:ctry.dataset.country); document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip()); return; }
     const c=e.target.closest('[data-lg]');if(!c)return;
     chosenLg=c.dataset.lg; otExpand=lgExpandFor(chosenLg);
-    document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand});
-    // リーグに合わせてクラブ候補を絞り込む（選択中のクラブはリセット）
-    const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg);
+    document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip());
+    updateClubField(); // リーグ/人気クラブを選んで初めてクラブ欄を表示・絞り込み
   };
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
   const otClubLg={};
@@ -13061,13 +13063,15 @@ function startOriginal(){
   };
   if(otSug) otSug.onclick=e=>{
     const d=e.target.closest('[data-club]'); if(!d)return;
-    const club=d.dataset.club; chosenLg='ALL';
-    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null});
-    const cs=document.getElementById('otClub'); if(cs){ cs.innerHTML=otClubOptions('ALL'); cs.value=club; }
+    const club=d.dataset.club; chosenLg=otClubLg[club]||'ALL'; otExpand=lgExpandFor(chosenLg);
+    const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip());
+    updateClubField();
+    const cs=document.getElementById('otClub'); if(cs) cs.value=club;
     otSearchEl.value=club; otSug.innerHTML='';
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{});
-  // 前回選んだクラブを復元（現在のリーグ候補内にあれば選択状態にする）
+  // 復元時：リーグ/人気クラブ指定があればクラブ欄を表示。前回選んだクラブも復元
+  updateClubField();
   const _otClub=document.getElementById('otClub'); if(_otClub&&otLast.club) _otClub.value=otLast.club;
   // 自動配置の条件（国籍・リーグ・クラブ）をクリア。チーム名・フォーメーションは保持
   const _otClr=document.getElementById('otClear');
@@ -13075,14 +13079,14 @@ function startOriginal(){
     acf.nat='ALL'; chosenLg='ALL';
     const scope=document.querySelector('[data-natscope]'), chip=scope&&scope.querySelector('[data-natchip]');
     if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{}); }
-    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null});
-    const cs=document.getElementById('otClub'); if(cs){ cs.innerHTML=otClubOptions('ALL'); cs.value=''; }
+    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null},popChip());
+    const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField(); // ALL＝クラブ欄を隠す
   };
   document.getElementById('otStart').onclick=()=>{
     const typed=(document.getElementById('otName').value||'').trim();
     const chosenClub=(document.getElementById('otClub').value||'').trim();
     const useClub=!!chosenClub, useNat=acf.nat&&acf.nat!=='ALL';
-    const useLg=(chosenLg!=='ALL')&&!useClub; // クラブを選んだらリーグは「クラブ絞り込み用」とみなし、配置条件には数えない
+    const useLg=(chosenLg!=='ALL'&&chosenLg!=='POP')&&!useClub; // クラブを選んだらリーグは「クラブ絞り込み用」とみなし配置条件に数えない。POP（人気クラブ）はリーグ扱いしない
     state.flagByLeague=false; // 既定は本人の国籍旗（国籍のみ指定のときだけ後でtrueにする）
     state.excluded=[]; state.reserveAdds=[]; // 新規作成はベンチ外の除外/追加をリセット
     // チーム名は任意。未入力なら、クラブ単独→クラブ名／国籍単独→国名 で自動命名（組み合わせ時は自動命名しない）
