@@ -256,6 +256,11 @@ header{
 .fchip.on{background:var(--ink);color:#0a0e0c;border-color:var(--ink)}
 .fchip.sub{border-style:dashed;border-color:var(--lime)}
 .fchip[data-country]{padding-right:9px}
+.otsuggest{margin-top:5px;max-height:210px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.otsuggest:empty{display:none}
+.otsug{padding:8px 10px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.otsug:hover{border-color:var(--lime)}
+.otsug-empty{padding:8px 10px;color:var(--mut);font-size:12px}
 .fchip.subchip.on{background:var(--lime);color:#0a0e0c;border-color:var(--lime)}
 .filters .fchipdiv{flex:0 0 auto;width:1px;align-self:center;height:18px;background:var(--line);margin:0 5px}
 
@@ -13001,6 +13006,11 @@ function startOriginal(){
       </div>
       <div class="otsep">自動配置の条件（任意・組み合わせ可）</div>
       <div class="formfield">
+        <label>チーム検索</label>
+        <input class="search" id="otSearch" placeholder="チーム名で検索（例：Barcelona、Schalke）" autocomplete="off">
+        <div id="otSuggest" class="otsuggest"></div>
+      </div>
+      <div class="formfield">
         <label>国籍</label>
         ${natFilterHTML(acf)}
       </div>
@@ -13026,6 +13036,24 @@ function startOriginal(){
     chosenLg=c.dataset.olg;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
     // リーグに合わせてクラブ候補を絞り込む（選択中のクラブはリセット）
     const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg);
+  };
+  // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
+  const otClubLg={};
+  P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(c&&!(c in otClubLg)) otClubLg[c]=p[5]; } });
+  const otAllClubs=Object.keys(otClubLg).sort();
+  const otSearchEl=document.getElementById('otSearch'), otSug=document.getElementById('otSuggest');
+  if(otSearchEl) otSearchEl.oninput=()=>{
+    const q=otSearchEl.value.trim().toLowerCase();
+    if(!q){ otSug.innerHTML=''; return; }
+    const ms=otAllClubs.filter(c=>c.toLowerCase().includes(q)).slice(0,12);
+    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(c)}</div>`).join(''):'<div class="otsug-empty">該当するチームがありません</div>';
+  };
+  if(otSug) otSug.onclick=e=>{
+    const d=e.target.closest('[data-club]'); if(!d)return;
+    const club=d.dataset.club; chosenLg='ALL';
+    const lgEl=document.getElementById('otLg'); if(lgEl)[...lgEl.children].forEach(x=>x.classList.toggle('on',x.dataset.olg==='ALL'));
+    const cs=document.getElementById('otClub'); if(cs){ cs.innerHTML=otClubOptions('ALL'); cs.value=club; }
+    otSearchEl.value=club; otSug.innerHTML='';
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{});
   // 前回選んだクラブを復元（現在のリーグ候補内にあれば選択状態にする）
