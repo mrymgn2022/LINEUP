@@ -261,6 +261,10 @@ header{
 .otsug{padding:8px 10px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
 .otsug:hover{border-color:var(--lime)}
 .otsug-empty{padding:8px 10px;color:var(--mut);font-size:12px}
+.lgbox{display:flex;flex-direction:column;gap:6px;width:100%}
+.lgrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.lgrow::-webkit-scrollbar{display:none}
+.fchip.open{border-color:var(--lime);color:var(--ink)}
 .fchip.subchip.on{background:var(--lime);color:#0a0e0c;border-color:var(--lime)}
 .filters .fchipdiv{flex:0 0 auto;width:1px;align-self:center;height:18px;background:var(--line);margin:0 5px}
 
@@ -12160,20 +12164,23 @@ function posChips(f=pickFilter){
 const LGGROUP=[["イングランド",["PL","EC"]],["スペイン",["LL","S2"]],["イタリア",["SA","SB"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["トルコ",["TR"]],["ベルギー",["BE"]],["スコットランド",["SC"]],["デンマーク",["DK"]],["スイス",["CH"]],["日本",["J1"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]]];
 function lgFlag(code){ const n=LGNAT[code]; const fi=n&&FI[n]; return fi?`<span class="fi fi-${fi}"></span> `:''; }
 function lgChips(f=pickFilter){
-  let h=`<div class="fchip ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
+  // 上段＝国（複数部門は▾）。展開時は下段に部門を別行で表示（横並びではなく下に出す）
+  let countries=`<div class="fchip ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
+  let divs='';
   for(const [jp,codes] of LGGROUP){
     if(codes.length===1){
       const c=codes[0];
-      h+=`<div class="fchip ${f.lg===c?'on':''}" data-lg="${c}">${lgFlag(c)}${jp}</div>`;
+      countries+=`<div class="fchip ${f.lg===c?'on':''}" data-lg="${c}">${lgFlag(c)}${jp}</div>`;
     } else {
-      const expanded = f.expand===jp || codes.includes(f.lg);
-      const anyOn = codes.includes(f.lg);
-      h+=`<div class="fchip ${anyOn&&!expanded?'on':''}" data-country="${jp}">${lgFlag(codes[0])}${jp} ${expanded?'▴':'▾'}</div>`;
-      if(expanded) for(const c of codes) h+=`<div class="fchip sub ${f.lg===c?'on':''}" data-lg="${c}">${L[c]}</div>`;
+      const expanded = f.expand===jp || (f.expand==null && codes.includes(f.lg));
+      countries+=`<div class="fchip ${expanded?'open':''}" data-country="${jp}">${lgFlag(codes[0])}${jp} ${expanded?'▴':'▾'}</div>`;
+      if(expanded) divs=codes.map(c=>`<div class="fchip sub ${f.lg===c?'on':''}" data-lg="${c}">${L[c]}</div>`).join('');
     }
   }
-  return h;
+  return `<div class="lgbox"><div class="lgrow">${countries}</div>`+(divs?`<div class="lgrow lgsub">${divs}</div>`:'')+`</div>`;
 }
+// 複数部門リーグのコード→展開すべき国名（単独リーグ/ALLはnull）
+function lgExpandFor(code){ for(const [jp,codes] of LGGROUP){ if(codes.length>1 && codes.includes(code)) return jp; } return null; }
 function clubChips(f=pickFilter){
   const clubs=f.lg==='ALL'
     ?[...new Set(P.filter((p,i)=>!isCustomPid(i)).map(p=>p[4].trim()))].sort()
@@ -12208,7 +12215,7 @@ function wirePicker(slotIdx){
     posF.innerHTML=posChips(); drawPickList(slotIdx);
   };
   const lgF=document.getElementById('lgF');
-  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx)};
+  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.expand=lgExpandFor(c.dataset.lg);pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx)};
   // 国籍フィルタを挿入（クラブフィルタの前）
   const clubF0=document.getElementById('clubF');
   if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('beforebegin',natFilterHTML(pickFilter));
@@ -12513,7 +12520,7 @@ function wireSubPickerFull(slotIdx){
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
-  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx)};
+  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.expand=lgExpandFor(c.dataset.lg);pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx)};
   const clubF=document.getElementById('clubF');
   if(clubF) clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx);};
   drawSubFull(slotIdx);
@@ -12870,7 +12877,7 @@ function openMarket(){
   document.getElementById('mq').oninput=e=>{mktFilter.q=e.target.value.toLowerCase();drawMkt()};
   document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
-  document.getElementById('mlgF').onclick=e=>{const mlg=document.getElementById('mlgF');const ctry=e.target.closest('[data-country]');if(ctry){mktFilter.expand=(mktFilter.expand===ctry.dataset.country?null:ctry.dataset.country);mlg.innerHTML=lgChips(mktFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;mktFilter.lg=c.dataset.lg;mktFilter.club='ALL';mlg.innerHTML=lgChips(mktFilter);document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt()};
+  document.getElementById('mlgF').onclick=e=>{const mlg=document.getElementById('mlgF');const ctry=e.target.closest('[data-country]');if(ctry){mktFilter.expand=(mktFilter.expand===ctry.dataset.country?null:ctry.dataset.country);mlg.innerHTML=lgChips(mktFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;mktFilter.lg=c.dataset.lg;mktFilter.expand=lgExpandFor(c.dataset.lg);mktFilter.club='ALL';mlg.innerHTML=lgChips(mktFilter);document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt()};
   wireMktClub();
   drawMkt();
 }
@@ -12977,6 +12984,7 @@ let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
 function startOriginal(){
   let chosenForm=otLast.form||state.formation||'4-3-3';
   let chosenLg=otLast.lg||'ALL';
+  let otExpand=lgExpandFor(chosenLg); // 複数部門リーグの展開状態（検索画面と同じ国グループUI）
   const acf={nat:otLast.nat||'ALL'};
   const chips=FORMS.map(f=>`<div class="fchip2${f===chosenForm?' on':''}" data-f="${f}">${f}</div>`).join('');
   const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["J1","Jリーグ"],["ML","MLS"],["SP","サウジ"]];
@@ -13016,7 +13024,7 @@ function startOriginal(){
       </div>
       <div class="formfield">
         <label>リーグ</label>
-        <div class="filters" id="otLg">${lgOpts.map(o=>`<div class="fchip ${o[0]===chosenLg?'on':''}" data-olg="${o[0]}">${o[1]}</div>`).join('')}</div>
+        <div class="filters" id="otLg">${lgChips({lg:chosenLg,expand:otExpand})}</div>
       </div>
       <div class="formfield">
         <label>クラブ</label>
@@ -13032,8 +13040,11 @@ function startOriginal(){
     chosenForm=c.dataset.f;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
   };
   document.getElementById('otLg').onclick=e=>{
-    const c=e.target.closest('[data-olg]');if(!c)return;
-    chosenLg=c.dataset.olg;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
+    const ctry=e.target.closest('[data-country]');
+    if(ctry){ otExpand=(otExpand===ctry.dataset.country?null:ctry.dataset.country); document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand}); return; }
+    const c=e.target.closest('[data-lg]');if(!c)return;
+    chosenLg=c.dataset.lg; otExpand=lgExpandFor(chosenLg);
+    document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand});
     // リーグに合わせてクラブ候補を絞り込む（選択中のクラブはリセット）
     const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg);
   };
@@ -13051,7 +13062,7 @@ function startOriginal(){
   if(otSug) otSug.onclick=e=>{
     const d=e.target.closest('[data-club]'); if(!d)return;
     const club=d.dataset.club; chosenLg='ALL';
-    const lgEl=document.getElementById('otLg'); if(lgEl)[...lgEl.children].forEach(x=>x.classList.toggle('on',x.dataset.olg==='ALL'));
+    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null});
     const cs=document.getElementById('otClub'); if(cs){ cs.innerHTML=otClubOptions('ALL'); cs.value=club; }
     otSearchEl.value=club; otSug.innerHTML='';
   };
@@ -13064,7 +13075,7 @@ function startOriginal(){
     acf.nat='ALL'; chosenLg='ALL';
     const scope=document.querySelector('[data-natscope]'), chip=scope&&scope.querySelector('[data-natchip]');
     if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{}); }
-    const lgEl=document.getElementById('otLg'); if(lgEl)[...lgEl.children].forEach(x=>x.classList.toggle('on',x.dataset.olg==='ALL'));
+    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null});
     const cs=document.getElementById('otClub'); if(cs){ cs.innerHTML=otClubOptions('ALL'); cs.value=''; }
   };
   document.getElementById('otStart').onclick=()=>{
