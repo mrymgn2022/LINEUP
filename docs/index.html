@@ -265,6 +265,21 @@ header{
 .lgrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .lgrow::-webkit-scrollbar{display:none}
 .fchip.open{border-color:var(--lime);color:var(--ink)}
+/* リーグ選択プルダウン（検索付き） */
+.lgsel{position:relative;width:100%}
+.lgsel-btn{display:flex;align-items:center;gap:7px;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);font-size:14px;font-weight:700;cursor:pointer}
+.lgsel-btn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lgsel-btn .lgcar{margin-left:auto;color:var(--mut);font-size:11px}
+.lgsel.open .lgsel-btn{border-color:var(--lime)}
+.lgsel-panel{margin-top:6px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:8px;display:flex;flex-direction:column;gap:7px}
+.lgsel-q{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:'Manrope';outline:none}
+.lgsel-q::placeholder{color:var(--mut)}
+.lgsel-list{max-height:46dvh;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.lgrow2{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--mut)}
+.lgrow2:hover{background:var(--panel)}
+.lgrow2.on{background:var(--ink);color:#0a0e0c}
+.lgrow2.sub{margin-left:16px;border-left:2px solid var(--lime)}
+.lgrow2 .lgcar{margin-left:auto;color:var(--mut);font-size:11px}
 .fchip.subchip.on{background:var(--lime);color:#0a0e0c;border-color:var(--lime)}
 .filters .fchipdiv{flex:0 0 auto;width:1px;align-self:center;height:18px;background:var(--line);margin:0 5px}
 
@@ -15596,23 +15611,53 @@ function posChips(f=pickFilter){
   return html;
 }
 // 検索フィルタのリーグ表示は「国でまとめ、複数部門の国(英・仏)はタップで展開」
-const LGGROUP=[["イングランド",["PL","EC"]],["スペイン",["LL","S2"]],["イタリア",["SA","SB"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["トルコ",["TR"]],["ベルギー",["BE"]],["スコットランド",["SC"]],["デンマーク",["DK"]],["スイス",["CH"]],["オーストリア",["AT"]],["ギリシャ",["GR"]],["チェコ",["CZ"]],["ポーランド",["PO"]],["セルビア",["RS"]],["ノルウェー",["NO"]],["キプロス",["CY"]],["日本",["J1"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]]];
+// UEFA5年（国別係数）順。5大リーグ→J1→以降。複数部門の国は[1部,2部…]。末尾は単クラブ国＋非UEFA(米/サウジ)
+const LGGROUP=[["イングランド",["PL","EC"]],["イタリア",["SA","SB"]],["スペイン",["LL","S2"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["日本",["J1"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["ベルギー",["BE"]],["トルコ",["TR"]],["チェコ",["CZ"]],["ギリシャ",["GR"]],["ノルウェー",["NO"]],["オーストリア",["AT"]],["デンマーク",["DK"]],["スイス",["CH"]],["ポーランド",["PO"]],["スコットランド",["SC"]],["イスラエル",["IL"]],["セルビア",["RS"]],["キプロス",["CY"]],["スウェーデン",["SE"]],["クロアチア",["HR"]],["ハンガリー",["HU"]],["ルーマニア",["RO"]],["ウクライナ",["UA"]],["ブルガリア",["BG"]],["アゼルバイジャン",["AZ"]],["スロバキア",["SK"]],["スロベニア",["SI"]],["モルドバ",["MD"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]]];
 function lgFlag(code){ const n=LGNAT[code]; const fi=n&&FI[n]; return fi?`<span class="fi fi-${fi}"></span> `:''; }
-function lgChips(f=pickFilter, extra=''){
-  // 上段＝国（複数部門は▾）。展開時は下段に部門を別行で表示（横並びではなく下に出す）。extra＝全リーグの隣に足す任意チップ
-  let countries=`<div class="fchip ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`+(extra||'');
-  let divs='';
+// 後方互換：全呼び出し元（ピッカー/市場/新規作成）は検索付きプルダウンになる
+function lgChips(f=pickFilter, extra=''){ return lgSelectHTML(f, extra); }
+function lgSelLabel(f){ if(f.lg==='ALL')return '全リーグ'; if(f.lg==='POP')return '⭐ 人気クラブ'; return L[f.lg]||f.lg; }
+// リーグ選択プルダウン本体（ボタン＋開いている時は検索窓＋国リスト）
+function lgSelectHTML(f=pickFilter, extra=''){
+  const open=!!f.lgopen;
+  const flag=(f.lg!=='ALL'&&f.lg!=='POP')?lgFlag(f.lg):'';
+  return `<div class="lgsel ${open?'open':''}">`+
+    `<div class="lgsel-btn" data-lgtoggle>${flag}<span>${lgSelLabel(f)}</span><b class="lgcar">${open?'▴':'▾'}</b></div>`+
+    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="国名・リーグ名で検索" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
+  `</div>`;
+}
+// 国でまとめた縦リスト。検索q一致でフィルタ、複数部門は▾で展開（検索中は自動展開）
+function lgSelRows(f, extra=''){
+  const q=(f.lgq||'').trim().toLowerCase();
+  let h=`<div class="lgrow2 ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
+  if(extra) h+=extra;
   for(const [jp,codes] of LGGROUP){
+    const hit = !q || jp.toLowerCase().includes(q) || codes.some(c=>(L[c]||'').toLowerCase().includes(q));
+    if(!hit) continue;
     if(codes.length===1){
-      const c=codes[0];
-      countries+=`<div class="fchip ${f.lg===c?'on':''}" data-lg="${c}">${lgFlag(c)}${jp}</div>`;
+      h+=`<div class="lgrow2 ${f.lg===codes[0]?'on':''}" data-lg="${codes[0]}">${lgFlag(codes[0])}${jp}</div>`;
     } else {
-      const expanded = f.expand===jp || (f.expand==null && codes.includes(f.lg));
-      countries+=`<div class="fchip ${expanded?'open':''}" data-country="${jp}">${lgFlag(codes[0])}${jp} ${expanded?'▴':'▾'}</div>`;
-      if(expanded) divs=codes.map(c=>`<div class="fchip sub ${f.lg===c?'on':''}" data-lg="${c}">${L[c]}</div>`).join('');
+      const expanded = !!q || f.expand===jp || (f.expand==null && codes.includes(f.lg));
+      h+=`<div class="lgrow2 country ${expanded?'open':''}" data-country="${jp}">${lgFlag(codes[0])}${jp}<b class="lgcar">${expanded?'▴':'▾'}</b></div>`;
+      if(expanded) for(const c of codes) h+=`<div class="lgrow2 sub ${f.lg===c?'on':''}" data-lg="${c}">${L[c]}</div>`;
     }
   }
-  return `<div class="lgbox"><div class="lgrow">${countries}</div>`+(divs?`<div class="lgrow lgsub">${divs}</div>`:'')+`</div>`;
+  return h;
+}
+// プルダウンの操作（開閉・検索入力・国展開・リーグ選択）を配線。選択時 onChange() を呼ぶ。container._lgextra=先頭追加行(任意)
+function wireLgSelect(container, f, onChange){
+  if(!container) return;
+  const xtra=()=>container._lgextra||'';
+  const rerenderList=()=>{ const l=container.querySelector('.lgsel-list'); if(l) l.innerHTML=lgSelRows(f, xtra()); };
+  const full=()=>{ container.innerHTML=lgSelectHTML(f, xtra()); const inp=container.querySelector('.lgsel-q'); if(inp){ inp.oninput=()=>{ f.lgq=inp.value; rerenderList(); }; inp.focus(); } };
+  container.onclick=e=>{
+    if(e.target.closest('.lgsel-q')) return;
+    if(e.target.closest('[data-lgtoggle]')){ f.lgopen=!f.lgopen; if(!f.lgopen)f.lgq=''; full(); return; }
+    const ctry=e.target.closest('[data-country]');
+    if(ctry){ f.expand=(f.expand===ctry.dataset.country?null:ctry.dataset.country); rerenderList(); return; }
+    const c=e.target.closest('[data-lg]');
+    if(c){ f.lg=c.dataset.lg; f.expand=lgExpandFor(f.lg); f.lgopen=false; f.lgq=''; if('club' in f)f.club='ALL'; full(); onChange&&onChange(); }
+  };
 }
 // 複数部門リーグのコード→展開すべき国名（単独リーグ/ALLはnull）
 function lgExpandFor(code){ for(const [jp,codes] of LGGROUP){ if(codes.length>1 && codes.includes(code)) return jp; } return null; }
@@ -15650,7 +15695,7 @@ function wirePicker(slotIdx){
     posF.innerHTML=posChips(); drawPickList(slotIdx);
   };
   const lgF=document.getElementById('lgF');
-  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.expand=lgExpandFor(c.dataset.lg);pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx)};
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx);});
   // 国籍フィルタを挿入（クラブフィルタの前）
   const clubF0=document.getElementById('clubF');
   if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('beforebegin',natFilterHTML(pickFilter));
@@ -15955,7 +16000,7 @@ function wireSubPickerFull(slotIdx){
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
-  if(lgF) lgF.onclick=e=>{const ctry=e.target.closest('[data-country]');if(ctry){pickFilter.expand=(pickFilter.expand===ctry.dataset.country?null:ctry.dataset.country);lgF.innerHTML=lgChips(pickFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;pickFilter.lg=c.dataset.lg;pickFilter.expand=lgExpandFor(c.dataset.lg);pickFilter.club='ALL';lgF.innerHTML=lgChips(pickFilter);const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx)};
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx);});
   const clubF=document.getElementById('clubF');
   if(clubF) clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx);};
   drawSubFull(slotIdx);
@@ -16312,7 +16357,7 @@ function openMarket(){
   document.getElementById('mq').oninput=e=>{mktFilter.q=e.target.value.toLowerCase();drawMkt()};
   document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
-  document.getElementById('mlgF').onclick=e=>{const mlg=document.getElementById('mlgF');const ctry=e.target.closest('[data-country]');if(ctry){mktFilter.expand=(mktFilter.expand===ctry.dataset.country?null:ctry.dataset.country);mlg.innerHTML=lgChips(mktFilter);return;}const c=e.target.closest('[data-lg]');if(!c)return;mktFilter.lg=c.dataset.lg;mktFilter.expand=lgExpandFor(c.dataset.lg);mktFilter.club='ALL';mlg.innerHTML=lgChips(mktFilter);document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt()};
+  wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
   drawMkt();
 }
@@ -16419,7 +16464,9 @@ let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
 function startOriginal(){
   let chosenForm=otLast.form||state.formation||'4-3-3';
   let chosenLg=otLast.lg||'ALL';
-  let otExpand=lgExpandFor(chosenLg); // 複数部門リーグの展開状態（検索画面と同じ国グループUI）
+  let otExpand=lgExpandFor(chosenLg);
+  const POP_ROW='<div class="lgrow2" data-lg="POP">⭐ 人気クラブ</div>';
+  const otF={lg:chosenLg, expand:otExpand, lgopen:false, lgq:''}; // リーグ選択プルダウン用
   const acf={nat:otLast.nat||'ALL'};
   const chips=FORMS.map(f=>`<div class="fchip2${f===chosenForm?' on':''}" data-f="${f}">${f}</div>`).join('');
   const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["AT","オーストリア"],["GR","ギリシャ"],["CZ","チェコ"],["PO","ポーランド"],["RS","セルビア"],["NO","ノルウェー"],["CY","キプロス"],["J1","Jリーグ"],["ML","MLS"],["SP","サウジ"]];
@@ -16460,7 +16507,7 @@ function startOriginal(){
       </div>
       <div class="formfield">
         <label>リーグ</label>
-        <div class="filters" id="otLg">${lgChips({lg:chosenLg,expand:otExpand},popChip())}</div>
+        <div id="otLg">${lgSelectHTML(otF, POP_ROW)}</div>
       </div>
       <div class="formfield" id="otClubField" style="display:none">
         <label>クラブ</label>
@@ -16475,16 +16522,8 @@ function startOriginal(){
     const c=e.target.closest('[data-f]');if(!c)return;
     chosenForm=c.dataset.f;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
   };
-  document.getElementById('otLg').onclick=e=>{
-    const pop=e.target.closest('[data-pop]');
-    if(pop){ chosenLg='POP'; otExpand=null; document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip()); updateClubField(); return; }
-    const ctry=e.target.closest('[data-country]');
-    if(ctry){ otExpand=(otExpand===ctry.dataset.country?null:ctry.dataset.country); document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip()); return; }
-    const c=e.target.closest('[data-lg]');if(!c)return;
-    chosenLg=c.dataset.lg; otExpand=lgExpandFor(chosenLg);
-    document.getElementById('otLg').innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip());
-    updateClubField(); // リーグ/人気クラブを選んで初めてクラブ欄を表示・絞り込み
-  };
+  const _otLgEl=document.getElementById('otLg');
+  if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); }); }
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
   const otClubLg={};
   P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(c&&!(c in otClubLg)) otClubLg[c]=p[5]; } });
@@ -16498,8 +16537,8 @@ function startOriginal(){
   };
   if(otSug) otSug.onclick=e=>{
     const d=e.target.closest('[data-club]'); if(!d)return;
-    const club=d.dataset.club; chosenLg=otClubLg[club]||'ALL'; otExpand=lgExpandFor(chosenLg);
-    const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:chosenLg,expand:otExpand},popChip());
+    const club=d.dataset.club; otF.lg=otClubLg[club]||'ALL'; otF.expand=lgExpandFor(otF.lg); otF.lgopen=false; chosenLg=otF.lg;
+    const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
     updateClubField();
     const cs=document.getElementById('otClub'); if(cs) cs.value=club;
     otSearchEl.value=club; otSug.innerHTML='';
@@ -16511,11 +16550,11 @@ function startOriginal(){
   // 自動配置の条件（国籍・リーグ・クラブ）をクリア。チーム名・フォーメーションは保持
   const _otClr=document.getElementById('otClear');
   if(_otClr) _otClr.onclick=()=>{
-    acf.nat='ALL'; chosenLg='ALL';
+    acf.nat='ALL'; chosenLg='ALL'; otF.lg='ALL'; otF.expand=null; otF.lgopen=false; otF.lgq='';
     const scope=document.querySelector('[data-natscope]'), chip=scope&&scope.querySelector('[data-natchip]');
     if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{}); }
-    otExpand=null; const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgChips({lg:'ALL',expand:null},popChip());
-    const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField(); // ALL＝クラブ欄を隠す
+    const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
+    const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField();
   };
   document.getElementById('otStart').onclick=()=>{
     const typed=(document.getElementById('otName').value||'').trim();
