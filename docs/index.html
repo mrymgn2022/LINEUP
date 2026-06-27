@@ -25031,6 +25031,7 @@ const FORM={
 };
 const FORMS=Object.keys(FORM);
 let layoutMoved=false; // 駒を手動でドラッグ移動したか。falseなら整列リセットは反応しない（自動配置直後など）
+let cleanJson=null;    // 最後に保存/読込した時点のスカッドJSON。これと現状が違えば「未保存の変更あり」（新規作成/読込時に確認）
 
 /* position grouping for color/filter */
 const GRP={GK:"gk",RB:"df",LB:"df",CB:"df",RWB:"df",LWB:"df",CDM:"mf",CM:"mf",CAM:"mf",RM:"mf",LM:"mf",DM:"mf",AM:"mf",RW:"fw",LW:"fw",ST:"fw",CF:"fw"};
@@ -25273,6 +25274,7 @@ function applyRaw(saved){
   }
   layoutMoved=false; // 読込直後＝未移動（ドラッグするまで整列リセットは反応しない）
   setFormLabel();
+  cleanJson=JSON.stringify(serializeTeam()); // 読込直後＝未保存の変更なし
 }
 
 /* ---------- 複数チーム保存（ハンバーガーのチーム一覧。無料10／課金無制限） ---------- */
@@ -25290,36 +25292,26 @@ function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDispl
 // 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
 function saveCurrentTeam(){
   const teams=getTeams(); const data=serializeTeam();
-  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); return 'updated'; } }
+  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); cleanJson=JSON.stringify(serializeTeam()); return 'updated'; } }
   if(teams.length>=teamCap()) return 'limit';
   const id='t'+Date.now()+Math.floor(Math.random()*1000);
   state.teamId=id; data.teamId=id;
   teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
-  setTeams(teams); save();
+  setTeams(teams); save(); cleanJson=JSON.stringify(serializeTeam());
   return 'added';
 }
 async function loadTeamFromList(id){
   const t=getTeams().find(x=>x.id===id); if(!t) return;
   applyRaw(resolveRaw(JSON.parse(JSON.stringify(t.data)))); state.teamId=id;
-  render(); save();
+  render(); save(); cleanJson=JSON.stringify(serializeTeam());
 }
+// 現在のスカッドが「未保存の変更あり」か（選手が居て、最後の保存/読込から変化している）
+function isDirty(){ if(!state.slots||state.slots.filter(s=>s.pid!=null).length===0) return false; return JSON.stringify(serializeTeam())!==cleanJson; }
 function deleteTeam(id){ setTeams(getTeams().filter(t=>t.id!==id)); if(state.teamId===id){ state.teamId=null; save(); } }
 function renameTeamInList(id,name){ const teams=getTeams(),i=teams.findIndex(t=>t.id===id); if(i<0)return; teams[i].name=name; if(teams[i].data)teams[i].data.teamName=name; setTeams(teams); if(state.teamId===id){ state.teamName=name; save(); } }
-// アプリ/画面を閉じる時に現在のチームを一覧へ自動保存（同じteamIdは上書き、新規は追加、空チームは除外）。
-// 同期的にlocalStorageへ書く＝閉じても最後のチームが一覧に残り、再起動時に読み込める。
-function autoSaveToList(){
-  try{
-    if(typeof state==='undefined'||!state.slots) return;
-    if(state.slots.filter(s=>s.pid!=null).length===0) return; // 空のフォーメーションは一覧に出さない
-    const teams=getTeams(); const data=serializeTeam();
-    if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); lsSet('xi_state_v2',JSON.stringify(data)); return; } }
-    if(teams.length>=teamCap()){ lsSet('xi_state_v2',JSON.stringify(serializeTeam())); return; } // 上限時：一覧へは足さず自動保存だけ（再起動時は読込可）
-    const id='t'+Date.now()+Math.floor(Math.random()*1000);
-    state.teamId=id; data.teamId=id;
-    teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
-    setTeams(teams); lsSet('xi_state_v2',JSON.stringify(data));
-  }catch(e){}
-}
+// アプリ/画面を閉じる時に「作業中の下書き」だけ同期保存（一覧には足さない）。
+// → 再起動時は最後のスカッドが復元される。保存一覧は手動保存したものだけにしておく（散らからない）。
+function autoSaveDraft(){ try{ if(typeof state!=='undefined'&&state.slots){ lsSet('xi_state_v2', JSON.stringify(serializeTeam())); } }catch(e){} }
 
 /* =========================================================
    Rendering
@@ -27423,7 +27415,7 @@ function drawMkt(){
 }
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
-document.getElementById('btnLoad').onclick=startOriginal;
+document.getElementById('btnLoad').onclick=()=>newTeamFlow();
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
@@ -27442,10 +27434,7 @@ function drawerHTML(){
       <div class="dwtrash" data-del="${t.id}" aria-label="削除">${ICN.remove}</div>
     </div>`).join('') : `<div class="dwempty">まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。</div>`;
   const curInList = state.teamId && teams.some(t=>t.id===state.teamId);
-  const atLimit = !isPaidUser() && teams.length>=cap && !curInList;
-  const saveRow = atLimit
-    ? `<div class="dwempty" style="color:var(--gold);padding-top:8px">無料プランは${cap}チームまで。プレミアムで無制限に保存できます。</div>`
-    : `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?'このチームを上書き保存':'現在のチームを保存'}</div>`;
+  const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?'このチームを上書き保存':'現在のチームを保存'}</div>`;
   return `
     <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="閉じる">✕</div></div>
     <div class="dwnew" id="dwNew"><span class="di">＋</span> チームを新規作成</div>
@@ -27465,9 +27454,9 @@ function wireDrawer(){
   const d=document.getElementById('drawer');
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
-  d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); startOriginal(); };
-  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ toast('無料プランは'+teamCap()+'チームまでです'); } else { toast(r==='updated'?'上書き保存しました':'チームを保存しました'); openDrawer(); } };
-  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; closeDrawer(); loadTeamFromList(el.dataset.team).then(()=>toast('チームを読み込みました')); });
+  d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
+  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?'上書き保存しました':'チームを保存しました'); openDrawer(); } };
+  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast('チームを読み込みました'))); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast('削除しました'); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
@@ -27493,10 +27482,53 @@ function openInfoPage(kind){
   const m=M[kind]||['',''];
   openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
 }
+// 未保存の変更があれば確認してから proceed() を実行（新規作成・他チーム読込の前に呼ぶ）
+function guardUnsaved(proceed){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed); }
+function openConfirmSave(proceed){
+  openSheet(`
+    <h2>未保存のスカッド</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">いま編集中のスカッドはまだ保存されていません。保存しますか？</div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="csSave">保存して新規作成</button>
+      <button class="bigbtn ghost" id="csSkip">保存せず新規作成</button>
+      <button class="bigbtn ghost" id="csCancel">キャンセル</button>
+    </div>`);
+  document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast('保存しました'); closeSheet(); proceed(); } }}); return; } toast(r==='updated'?'上書き保存しました':'保存しました'); closeSheet(); proceed(); };
+  document.getElementById('csSkip').onclick=()=>{ closeSheet(); proceed(); };
+  document.getElementById('csCancel').onclick=()=>{ closeSheet(); };
+}
+// 保存上限ダイアログ：無制限プラン誘導 ／ 保存済みを削除して空ける
+function openLimitDialog(opts){ opts=opts||{};
+  openSheet(`
+    <h2>保存できる上限です</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">無料プランで保存できるのは <b>${FREE_TEAM_LIMIT}チーム</b> までです。<br>無制限にするか、保存済みを削除して空けてください。</div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="ldPremium">無制限プランにする</button>
+      <button class="bigbtn ghost" id="ldDelete">保存済みを削除して空ける</button>
+      <button class="bigbtn ghost" id="ldCancel">キャンセル</button>
+    </div>`);
+  document.getElementById('ldPremium').onclick=()=>{ openInfoPage('premium'); };
+  document.getElementById('ldDelete').onclick=()=>{ openDeleteList(opts); };
+  document.getElementById('ldCancel').onclick=()=>{ closeSheet(); };
+}
+// 保存済みスカッドを選んで削除（空けたら pending を実行して元の操作を続行）
+function openDeleteList(opts){ opts=opts||{};
+  const render=()=>{
+    const teams=getTeams();
+    const rows = teams.length ? teams.map(t=>`<div class="dwteam" style="margin:4px 16px" data-del2="${t.id}"><div class="tn">${escAttr(t.name||'マイチーム')}<small>${fmtTeamDate(t.ts)} 保存</small></div><div class="dwtrash">${ICN.remove}</div></div>`).join('') : '<div class="dwempty" style="padding:18px">保存済みのチームはありません</div>';
+    openSheet(`<h2>保存済みを削除 <span>${teams.length}/${FREE_TEAM_LIMIT}</span></h2><div style="font-size:12px;color:var(--mut);margin:0 16px 12px">削除すると新しいチームを保存できます</div><div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${rows}</div>`);
+    document.querySelectorAll('[data-del2]').forEach(el=>el.onclick=()=>{ deleteTeam(el.dataset.del2); toast('削除しました');
+      if(opts.pending && getTeams().length<teamCap()){ opts.pending(); } else render(); });
+  };
+  render();
+}
+// 新規作成：未保存なら確認してから作成フローへ
+function newTeamFlow(){ guardUnsaved(()=>startOriginal()); }
+
 document.getElementById('btnMenu').onclick=openDrawer;
-// 画面/アプリを閉じる時に現在のチームを自動保存（一覧にも反映＆再起動時に読込）
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') autoSaveToList(); });
-window.addEventListener('pagehide',autoSaveToList);
+// 画面/アプリを閉じる時に作業中の下書きだけ同期保存（再起動時に最後のスカッドを復元。一覧へは手動保存のみ）
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') autoSaveDraft(); });
+window.addEventListener('pagehide',autoSaveDraft);
 // ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
 (function initDrawerSwipe(){
   const d=document.getElementById('drawer'); if(!d) return;
