@@ -243,6 +243,42 @@ header{
 .sheet h2{font-family:'Bebas Neue';font-size:24px;letter-spacing:1.5px;margin:4px 16px 8px;display:flex;align-items:center;gap:8px}
 .sheet h2 span{font-size:11px;font-family:'Manrope';font-weight:700;color:var(--lime);background:rgba(202,255,58,.12);padding:3px 9px;border-radius:999px;margin-left:auto}
 
+/* ---------- Drawer (左ハンバーガーメニュー) ---------- */
+.dscrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:72;opacity:0;pointer-events:none;transition:.2s}
+.dscrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;left:max(0px,calc(50% - 280px));width:min(86vw,326px);z-index:73;
+  background:var(--panel);border-right:1px solid var(--line);box-shadow:10px 0 44px rgba(0,0,0,.55);
+  transform:translateX(-104%);transition:transform .26s cubic-bezier(.3,.9,.3,1);
+  display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.drawer.on{transform:translateX(0)}
+.dwhead{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 14px) 14px 10px;border-bottom:1px solid var(--line)}
+.dwlogo{font-family:'Bebas Neue';font-size:22px;letter-spacing:1.2px;color:var(--ink)}
+.dwlogo b{color:var(--lime)}
+.dwx{margin-left:auto;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);display:grid;place-items:center;cursor:pointer;font-size:17px}
+.dwx:active{transform:scale(.92)}
+.dwsec{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);font-weight:800;padding:15px 16px 5px;display:flex;align-items:center}
+.dwsec .dwcount{margin-left:auto;letter-spacing:.5px}
+.dwnew{display:flex;align-items:center;gap:11px;margin:12px 12px 2px;border:1px solid var(--lime);border-radius:13px;color:var(--lime);
+  padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;background:rgba(202,255,58,.06)}
+.dwnew:active{background:rgba(202,255,58,.14)}
+.dwnew .di{font-size:20px;line-height:1}
+.dwteam{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;margin:3px 8px;border-radius:11px;cursor:pointer;border:1px solid transparent}
+.dwteam:active{background:var(--panel2)}
+.dwteam.cur{border-color:var(--line);background:var(--panel2)}
+.dwteam .tn{flex:1;min-width:0;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dwteam .tn small{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-top:2px}
+.dwtrash{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--mut);flex-shrink:0}
+.dwtrash:active{color:var(--red);background:var(--bg)}
+.dwempty{padding:6px 16px 2px;color:var(--mut);font-size:12px;line-height:1.7}
+.dwsave{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 12px 2px;border:1px dashed var(--line);border-radius:11px;color:var(--mut);padding:11px;font-size:13px;font-weight:700;cursor:pointer}
+.dwsave:active{background:var(--panel2);color:var(--ink)}
+.dwitem{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;color:var(--ink);font-size:14px;font-weight:700}
+.dwitem:active{background:var(--panel2)}
+.dwitem .di{width:22px;display:grid;place-items:center;color:var(--mut);flex-shrink:0}
+.dwitem .dchev{margin-left:auto;color:var(--mut);font-size:12px}
+.dwfoot{margin-top:auto;padding:14px 16px calc(env(safe-area-inset-bottom) + 16px);color:var(--mut);font-size:10px;border-top:1px solid var(--line);line-height:1.6}
+.dwdiv{height:1px;background:var(--line);margin:8px 0}
+
 /* search + filters */
 .controls{padding:0 16px 8px}
 .search{
@@ -410,6 +446,7 @@ header{
 
 <div class="app">
   <header>
+    <div class="icon" id="btnMenu" title="メニュー" aria-label="メニュー" style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg></div>
     <div class="brand">
       <div class="logo">Squad <b>XI</b></div>
       <div class="tag" id="teamTag">build your XI</div>
@@ -464,6 +501,8 @@ header{
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet"><div class="grabzone" id="grabzone"><div class="grab"></div></div><div id="sheetBody"></div></div>
 <div class="toast" id="toast"></div>
+<div class="dscrim" id="dscrim"></div>
+<aside class="drawer" id="drawer" aria-label="メニュー"></aside>
 
 <script>
 /* =========================================================
@@ -25028,7 +25067,7 @@ function roleFromXY(x,y){
 /* =========================================================
    State
    ========================================================= */
-let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,showBench:true}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,teamId:null,showBench:true}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
 let tokenEls={};
 const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M3.5 21c0-4.2 4-6.5 8.5-6.5s8.5 2.3 8.5 6.5"/></svg>';
 let memFallback=null; // 保存フォールバック
@@ -25147,15 +25186,19 @@ function keyToPid(key){
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
-async function save(){
-  const data={ v:3, formation:state.formation,
+// 現在のスカッドを保存形式(v3, キー化)に変換。自動保存・複数チーム保存の両方で使う。
+function serializeTeam(){
+  return { v:3, formation:state.formation,
     slots:state.slots.map(s=>({role:s.role,x:s.x,y:s.y,pid:pidToKey(s.pid),sub:pidToKey(s.sub)})),
     bench:state.bench.map(pidToKey).filter(k=>k!=null),
     captain:pidToKey(state.captain),
-    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,
+    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,teamId:state.teamId,
     excluded:(state.excluded||[]).map(pidToKey).filter(k=>k!=null),
     reserveAdds:(state.reserveAdds||[]).map(pidToKey).filter(k=>k!=null),
     custom:referencedCustomDefs() };
+}
+async function save(){
+  const data=serializeTeam();
   const json=JSON.stringify(data);
   try{ if(window.storage){ await window.storage.set('xi_state_v2',json,false); } }catch(e){}
   lsSet('xi_state_v2',json);
@@ -25168,13 +25211,10 @@ async function savePhotos(){
   lsSet('xi_photos_v2',json);
   memPhotos=state.photos;
 }
-async function load(){
-  let raw=null;
-  try{ if(window.storage){ const r=await window.storage.get('xi_state_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
-  if(!raw){ const s=lsGet('xi_state_v2'); if(s){ try{ raw=JSON.parse(s); }catch(e){} } }
-  if(!raw) raw=memFallback;
+// 保存データ(キー形式v3)を現在のindexへ解決。データ更新で番号がズレても正しい選手に復元。複数チーム読込でも使う。
+function resolveRaw(raw){
   if(!raw) return null;
-  if(raw.v>=3){ // キー形式 → 現在のindexへ解決（データ更新で番号がズレても正しい選手に復元）
+  if(raw.v>=3){
     if(Array.isArray(raw.custom)) raw.custom.forEach(injectCustomDef); // このスカッドのカスタム選手をPへ復元（キー解決の前に）
     _keyMap=null; buildKeyMap();
     raw=Object.assign({},raw,{
@@ -25186,6 +25226,14 @@ async function load(){
   }
   return raw;
 }
+async function load(){
+  let raw=null;
+  try{ if(window.storage){ const r=await window.storage.get('xi_state_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
+  if(!raw){ const s=lsGet('xi_state_v2'); if(s){ try{ raw=JSON.parse(s); }catch(e){} } }
+  if(!raw) raw=memFallback;
+  if(!raw) return null;
+  return resolveRaw(raw);
+}
 async function loadPhotos(){
   let raw=null;
   try{ if(window.storage){ const r=await window.storage.get('xi_photos_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
@@ -25194,6 +25242,66 @@ async function loadPhotos(){
   if(raw.v>=3&&raw.photos){ if(!_keyMap) buildKeyMap(); const out={}; for(const k in raw.photos){ const i=keyToPid(k); if(i!=null) out[i]=raw.photos[k]; } return out; }
   return raw; // 旧形式(index-keyed)
 }
+// 解決済み保存データ(saved)をstateへ適用。初回起動・複数チーム読込の両方で使う（呼び出し側でrender()）。
+function applyRaw(saved){
+  state.names=(saved&&saved.names&&typeof saved.names==='object')?saved.names:{};
+  state.memos=(saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{};
+  state.hideRoles=!!(saved&&saved.hideRoles);
+  state.showFlags=(saved&&typeof saved.showFlags==='boolean')?saved.showFlags:true;
+  if(saved&&typeof saved.showSub==='boolean'){ state.showSub=saved.showSub; state.showMemo=!!saved.showMemo; }
+  else if(saved){ state.showSub=(saved.tokInfo==='sub')||(saved.tokInfo==null&&saved.showSubs!==false); state.showMemo=(saved.tokInfo==='memo'); }
+  else { state.showSub=true; state.showMemo=false; }
+  state.showBench=saved?(saved.showBench!==false):true;
+  state.flagByLeague=!!(saved&&saved.flagByLeague);
+  syncLabelBtn();syncFlagBtn();syncSubBtn();syncMemoBtn();
+  if(saved&&saved.slots&&saved.slots.length===11){
+    state.formation=saved.formation||"4-3-3";
+    state.slots=saved.slots;
+    state.bench=Array.isArray(saved.bench)?saved.bench:[];
+    state.excluded=Array.isArray(saved.excluded)?saved.excluded:[];
+    state.reserveAdds=Array.isArray(saved.reserveAdds)?saved.reserveAdds:[];
+    state.loadedClub=saved.loadedClub||null;
+    state.captain=(saved.captain!=null)?saved.captain:null;
+    state.teamName=saved.teamName||null;
+    state.teamInfo=saved.teamInfo||null;
+    state.teamCond=saved.teamCond||null;
+    state.teamId=saved.teamId||null;
+  }else{
+    buildSlots("4-3-3",false);
+  }
+  setFormLabel();
+}
+
+/* ---------- 複数チーム保存（ハンバーガーのチーム一覧。無料10／課金無制限） ---------- */
+let memTeams=null;
+const FREE_TEAM_LIMIT=10;
+function isPaidUser(){ return false; }            // 課金判定（将来差し込み。trueで無制限）
+function teamCap(){ return isPaidUser()?Infinity:FREE_TEAM_LIMIT; }
+function getTeams(){
+  if(memTeams) return memTeams;
+  const s=lsGet('xi_teams_v1'); if(s){ try{ const a=JSON.parse(s); if(Array.isArray(a)){ memTeams=a; return a; } }catch(e){} }
+  memTeams=[]; return memTeams;
+}
+function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} }
+function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||'マイチーム'; }
+// 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
+function saveCurrentTeam(){
+  const teams=getTeams(); const data=serializeTeam();
+  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); return 'updated'; } }
+  if(teams.length>=teamCap()) return 'limit';
+  const id='t'+Date.now()+Math.floor(Math.random()*1000);
+  state.teamId=id; data.teamId=id;
+  teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
+  setTeams(teams); save();
+  return 'added';
+}
+async function loadTeamFromList(id){
+  const t=getTeams().find(x=>x.id===id); if(!t) return;
+  applyRaw(resolveRaw(JSON.parse(JSON.stringify(t.data)))); state.teamId=id;
+  render(); save();
+}
+function deleteTeam(id){ setTeams(getTeams().filter(t=>t.id!==id)); if(state.teamId===id){ state.teamId=null; save(); } }
+function renameTeamInList(id,name){ const teams=getTeams(),i=teams.findIndex(t=>t.id===id); if(i<0)return; teams[i].name=name; if(teams[i].data)teams[i].data.teamName=name; setTeams(teams); if(state.teamId===id){ state.teamName=name; save(); } }
 
 /* =========================================================
    Rendering
@@ -27298,6 +27406,76 @@ function drawMkt(){
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
 document.getElementById('btnLoad').onclick=startOriginal;
+
+/* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
+// 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
+const FEATURED_SQUADS=[];
+// 注目移籍：発生した移籍・噂。{title, sub, body} を配列に追加して更新する。
+const FEATURED_TRANSFERS=[];
+const _ICN_SAVE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>';
+function fmtTeamDate(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate(); }catch(e){ return ''; } }
+function openDrawer(){ const d=document.getElementById('drawer'); d.innerHTML=drawerHTML(); document.getElementById('dscrim').classList.add('on'); d.classList.add('on'); wireDrawer(); }
+function closeDrawer(){ document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); }
+function drawerHTML(){
+  const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
+  const teamRows = teams.length ? teams.map(t=>`
+    <div class="dwteam ${t.id===state.teamId?'cur':''}" data-team="${t.id}">
+      <div class="tn">${escAttr(t.name||'マイチーム')}<small>${t.id===state.teamId?'編集中・':''}${fmtTeamDate(t.ts)} 保存</small></div>
+      <div class="dwtrash" data-del="${t.id}" aria-label="削除">${ICN.remove}</div>
+    </div>`).join('') : `<div class="dwempty">まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。</div>`;
+  const curInList = state.teamId && teams.some(t=>t.id===state.teamId);
+  const atLimit = !isPaidUser() && teams.length>=cap && !curInList;
+  const saveRow = atLimit
+    ? `<div class="dwempty" style="color:var(--gold);padding-top:8px">無料プランは${cap}チームまで。プレミアムで無制限に保存できます。</div>`
+    : `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?'このチームを上書き保存':'現在のチームを保存'}</div>`;
+  return `
+    <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="閉じる">✕</div></div>
+    <div class="dwnew" id="dwNew"><span class="di">＋</span> チームを新規作成</div>
+    <div class="dwsec">保存したチーム <span class="dwcount">${teams.length}/${capLabel}</span></div>
+    ${teamRows}
+    ${saveRow}
+    <div class="dwdiv"></div>
+    <div class="dwitem" data-feat="squad"><span class="di">${ICN.sub}</span>注目スカッド<span class="dchev">›</span></div>
+    <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>注目移籍<span class="dchev">›</span></div>
+    <div class="dwdiv"></div>
+    <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="feedback"><span class="di">✉</span>ご意見・不具合報告<span class="dchev">›</span></div>
+    <div class="dwfoot">Squad XI — build your XI<br>v0.9（プレビュー）</div>`;
+}
+function wireDrawer(){
+  const d=document.getElementById('drawer');
+  document.getElementById('dscrim').onclick=closeDrawer;
+  d.querySelector('#dwClose').onclick=closeDrawer;
+  d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); startOriginal(); };
+  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ toast('無料プランは'+teamCap()+'チームまでです'); } else { toast(r==='updated'?'上書き保存しました':'チームを保存しました'); openDrawer(); } };
+  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; closeDrawer(); loadTeamFromList(el.dataset.team).then(()=>toast('チームを読み込みました')); });
+  d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast('削除しました'); });
+  d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
+  d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
+}
+function openFeatured(kind){
+  const isSquad=kind==='squad';
+  const list=isSquad?FEATURED_SQUADS:FEATURED_TRANSFERS;
+  const title=isSquad?'注目スカッド':'注目移籍', tag=isSquad?'予想':'NEWS';
+  const sub=isSquad?'近日の注目カードの予想スタメンを随時更新':'発生した移籍・噂を随時更新';
+  const body = list.length ? list.map(it=>`
+    <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
+      <div style="font-weight:800;color:var(--ink);font-size:15px">${escAttr(it.title||'')}</div>
+      ${it.sub?`<div style="font-size:11px;color:var(--mut);margin-top:3px">${escAttr(it.sub)}</div>`:''}
+      ${it.body?`<div style="font-size:13px;color:var(--ink);margin-top:8px;line-height:1.7;white-space:pre-wrap">${escAttr(it.body)}</div>`:''}
+    </div>`).join('')
+    : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${sub}します。</div>`;
+  openSheet(`<h2>${title} <span>${tag}</span></h2><div style="font-size:11px;color:var(--mut);margin:0 16px 12px">${sub}</div><div style="padding-bottom:20px">${body}</div>`);
+}
+function openInfoPage(kind){
+  const M={ premium:['プレミアム','課金で「保存チーム無制限」などを予定しています。準備中です。'],
+            help:['使い方','① 下の「フォーメーション」を選ぶ\n② 駒をタップして選手を配置\n③ ＋ から国籍・リーグ・クラブで自動編成もできる\n④ 共有ボタンで画像にして友達にシェア\n⑤ 左メニューでチームを保存・切り替え'],
+            feedback:['ご意見・不具合報告','改善要望や不具合があれば教えてください。連絡先は準備中です。'] };
+  const m=M[kind]||['',''];
+  openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
+}
+document.getElementById('btnMenu').onclick=openDrawer;
 /* クラブ名から決定的に色を生成してエンブレム風バッジを作る */
 function clubColors(c){
   let h=0;for(let k=0;k<c.length;k++)h=(h*31+c.charCodeAt(k))>>>0;
@@ -27346,7 +27524,7 @@ function autoFillNationality(code,form,name){
   buildSlots(form,false);
   const ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&natCode(P[i])===code);
   autoFillFrom(ids);
-  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null; state.teamCond={nat:code,lg:null};
+  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null; state.teamCond={nat:code,lg:null}; state.teamId=null;
   setFormLabel(); closeSheet(); render(); save();
   const filled=state.slots.filter(s=>s.pid!=null).length;
   toast((name||natJa(code))+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
@@ -27475,7 +27653,7 @@ function startOriginal(){
     // 条件なし＝空のフォーメーション
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
-      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.bench=[];
+      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.teamId=null; state.bench=[];
       setFormLabel(); closeSheet(); render(); save();
       toast((name||'チーム')+' を作成（空のフォーメーション）'); return;
     }
@@ -27492,7 +27670,7 @@ function startOriginal(){
     }
     buildSlots(chosenForm,false);
     state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
-    state.teamCond={nat:useNat?acf.nat:null, lg:useLg?chosenLg:null}; // 新規作成の条件をピッカーへ引き継ぐ
+    state.teamCond={nat:useNat?acf.nat:null, lg:useLg?chosenLg:null}; state.teamId=null; // 新規作成の条件をピッカーへ引き継ぐ
     autoFillFrom(ids);
     clearAutoClubMemos(); // 前のチームで自動入力されたクラブ名メモを持ち越さない（国籍のみの場合は直後に貼り直す）
     if(useNat&&!useClub&&!useLg){ fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true; } // 国籍のみ：所属クラブ名をメモに自動入力＆表示、旗は所属リーグの国に
@@ -27522,7 +27700,7 @@ function placeClubSquad(club,name){
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
-  state.teamCond=null; // クラブ編成はピッカー既定を所属クラブ(loadedClub)で出すため条件なし
+  state.teamCond=null; state.teamId=null; // クラブ編成はピッカー既定を所属クラブ(loadedClub)で出すため条件なし
   state.captain=null;
   autoAssignSubs(); // 第二候補を初期割当（以後は手動・自動では変わらない）
 }
@@ -28131,32 +28309,7 @@ window.__selftest=function(){
   const saved=await load();
   const ph=await loadPhotos();
   if(ph&&typeof ph==='object')state.photos=ph;
-  state.names=(saved&&saved.names&&typeof saved.names==='object')?saved.names:{};
-  state.memos=(saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{};
-  state.hideRoles=!!(saved&&saved.hideRoles);
-  state.showFlags=(saved&&typeof saved.showFlags==='boolean')?saved.showFlags:true;
-  // 第2候補・メモの表示フラグ（独立）。旧tokInfo/showSubs からの移行も対応
-  if(saved&&typeof saved.showSub==='boolean'){ state.showSub=saved.showSub; state.showMemo=!!saved.showMemo; }
-  else if(saved){ state.showSub=(saved.tokInfo==='sub')||(saved.tokInfo==null&&saved.showSubs!==false); state.showMemo=(saved.tokInfo==='memo'); }
-  else { state.showSub=true; state.showMemo=false; }
-  state.showBench=saved?(saved.showBench!==false):true; // 共有画像にベンチを載せるか（既定ON）
-  state.flagByLeague=!!(saved&&saved.flagByLeague); // 国籍縛りチームの「リーグ国の旗」表示を復元
-  syncLabelBtn();syncFlagBtn();syncSubBtn();syncMemoBtn();
-  if(saved&&saved.slots&&saved.slots.length===11){
-    state.formation=saved.formation||"4-3-3";
-    state.slots=saved.slots;
-    state.bench=Array.isArray(saved.bench)?saved.bench:[];
-    state.excluded=Array.isArray(saved.excluded)?saved.excluded:[];
-    state.reserveAdds=Array.isArray(saved.reserveAdds)?saved.reserveAdds:[];
-    state.loadedClub=saved.loadedClub||null;
-    state.captain=(saved.captain!=null)?saved.captain:null;
-    state.teamName=saved.teamName||null;
-    state.teamInfo=saved.teamInfo||null;
-    state.teamCond=saved.teamCond||null;
-  }else{
-    buildSlots("4-3-3",false);
-  }
-  setFormLabel();
+  applyRaw(saved); // 表示フラグ・スタメン・ベンチ等をまとめて適用（初回起動）
   render();
 })();
 </script>
