@@ -26759,10 +26759,17 @@ function prowHTML(i){
 function assign(slotIdx,pid){
   // 同じ選手が他スロットにいたら外す（重複起用防止）
   const outgoing=state.slots[slotIdx].pid;
+  const benchIdx=state.bench.indexOf(pid); // 交代先がこのスカッドのベンチにいるか
   state.slots.forEach(s=>{if(s.pid===pid)s.pid=null});
   state.slots[slotIdx].pid=pid;
   if(state.slots[slotIdx].sub===pid) state.slots[slotIdx].sub=null; // 同枠のスタメン＝第2候補の重複を解消
-  if(outgoing!=null&&outgoing!==pid) benchReturn(outgoing); // 元の選手を控えへ戻す
+  if(benchIdx>=0){
+    // ベンチ選手をスタメンへ昇格＝ベンチ⇄スタメンのスワップ。外れた先発を金子のいたベンチ枠へ入れる（ベンチ外に落とさない）
+    if(outgoing!=null&&outgoing!==pid) state.bench[benchIdx]=outgoing;
+    else state.bench.splice(benchIdx,1); // 空きスロットへの配置ならベンチから抜くだけ
+  } else if(outgoing!=null&&outgoing!==pid){
+    benchReturn(outgoing); // 元の選手を控えへ戻す（クラブ編成時のみ。国籍/リーグ等はベンチ外扱い）
+  }
   closeSheet();render();save();
   toast(P[pid][0].trim()+' を '+state.slots[slotIdx].role+' に配置');
 }
