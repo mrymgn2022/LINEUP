@@ -502,7 +502,7 @@ header{
     <div class="hbtn">
       <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
       <div class="icon" id="btnLoad" title="新規作成">＋</div>
-      <div class="icon" id="btnMarket" title="移籍市場">⇄</div>
+      <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       <div class="icon" id="btnReset" title="整列リセット">⟲</div>
     </div>
   </header>
@@ -25527,7 +25527,7 @@ function renderBench(){
     </div>`;
   }).join('');
   const reserveSec = others.length ? `<div class="bh reservehead"><b>ベンチ外</b><span>${others.length}人</span><i>長押しでベンチへドラッグ</i></div><div class="rgrid">${ocards}</div>` : '';
-  const empty=list.length?'':'<div class="benchEmpty">控え選手がいません。<b>＋</b> から追加、または上の <b>⬇</b> でクラブを読み込めます。</div>';
+  const empty=list.length?'':'<div class="benchEmpty">控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。</div>';
   wrap.innerHTML=`<div class="bh"><b>ベンチ</b><span>控え ${list.length}人</span><i>タップでメニュー・長押しでドラッグ</i></div>`+
     empty+`<div class="bgrid">${cards}${addCard}</div>`+foot+reserveSec+analyzeBtn;
   wrap.querySelectorAll('.bgrid .bcard[data-pid]').forEach(card=>attachCardDrag(card,+card.dataset.pid,'bench'));
@@ -27112,7 +27112,7 @@ function openBenchPicker(slotIdx){
     <div class="controls">
       <div class="filters" id="benchModeF">
         <div class="fchip on" data-bm="bench">ベンチ（${blen}人）</div>
-        <div class="fchip" data-bm="transfer">✈ 移籍市場から</div>
+        <div class="fchip" data-bm="transfer">✈ 全選手から</div>
       </div>
       <div id="transferExtra" style="display:none;padding-top:6px">
         <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
@@ -27405,7 +27405,7 @@ let mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
 function openMarket(){
   mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
   openSheet(`
-    <h2>移籍市場 <span>全${P.length}選手</span></h2>
+    <h2>選手を検索 <span>全${P.length}選手</span></h2>
     <div class="controls">
       <input class="search" id="mq" placeholder="選手名・クラブで検索…" autocomplete="off">
       <div class="filters"><div class="fchip" id="mClear">× 検索条件をクリア</div></div>
@@ -27562,14 +27562,14 @@ function openHelp(){
       ${sec('もっと使いこなす')}
       ${step('＋','まとめて自動配置','右上の ＋ から、クラブ・国籍・リーグを選ぶと11人を自動配置。「レアル」「日本代表」なども一発。')}
       ${step('☰','チームを保存・切り替え','左上メニューで保存（最大10チーム／無制限はプレミアム）。作ったチームの切り替えもここから。')}
-      ${step('⇄','移籍市場で探す','全選手を市場価値順などで一覧。誰がいるか眺めたり、そのまま起用できます。')}
+      ${step('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>','選手を検索','全選手を市場価値順などで一覧。誰がいるか眺めたり、そのまま起用できます。')}
       ${step('✎','選手をカスタム','駒をタップ → 写真追加・キャプテン・第2候補・メモ・入れ替え。名前は長押しで短縮や愛称に変更。')}
       ${step('↔','位置を微調整','駒を長押ししてドラッグで移動。⟲（整列リセット）でいつでも既定の配置に戻せます。')}
       ${div}
       ${sec('画面のボタン')}
       ${leg('☰','メニュー','チームの保存・切り替え、各ページ')}
       ${leg('＋','新規作成','自動配置でチームを作る')}
-      ${leg('⇄','移籍市場','全選手を一覧から探す')}
+      ${leg('<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>','選手を検索','全選手を一覧から探す')}
       ${leg('⟲','整列リセット','動かした駒を既定の配置へ')}
       ${leg('POS','ポジション名','駒の下の役職表示を ON/OFF')}
       ${leg('2nd','第2候補','控え候補の表示を ON/OFF')}
