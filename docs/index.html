@@ -26477,16 +26477,23 @@ function lgSelectHTML(f=pickFilter, extra=''){
   const flag=(f.lg!=='ALL'&&f.lg!=='POP')?lgFlag(f.lg):'';
   return `<div class="lgsel ${open?'open':''}">`+
     `<div class="lgsel-btn" data-lgtoggle>${flag}<span>${lgSelLabel(f)}</span><b class="lgcar">${open?'▴':'▾'}</b></div>`+
-    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="国名・リーグ名で検索" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
+    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="国名・リーグ名で検索（日本語・英語可）" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
   `</div>`;
 }
 // 国でまとめた縦リスト。検索q一致でフィルタ、複数部門は▾で展開（検索中は自動展開）
 function lgSelRows(f, extra=''){
-  const q=(f.lgq||'').trim().toLowerCase();
+  const q=(f.lgq||'').trim().toLowerCase(); const qk=natNorm(q);
   let h=`<div class="lgrow2 ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
   if(extra) h+=extra;
   for(const [jp,codes] of LGGROUP){
-    const hit = !q || jp.toLowerCase().includes(q) || codes.some(c=>(L[c]||'').toLowerCase().includes(q));
+    // 日本語国名/リーグ名（かな正規化）・英語国名・国コード・リーグコードのいずれでもヒット（例: "England"でも"いんぐらんど"でも"PL"でもOK）
+    const ncode=LGNAT[codes[0]]||'';
+    const hit = !q
+      || natNorm(jp).includes(qk)
+      || codes.some(c=>natNorm(L[c]||'').includes(qk))
+      || (NATNAME[ncode]||'').toLowerCase().includes(q)
+      || ncode.toLowerCase().includes(q)
+      || codes.some(c=>c.toLowerCase().includes(q));
     if(!hit) continue;
     if(codes.length===1){
       h+=`<div class="lgrow2 ${f.lg===codes[0]?'on':''}" data-lg="${codes[0]}">${lgFlag(codes[0])}${jp}</div>`;
@@ -27314,10 +27321,10 @@ function autoFillNationality(code,form,name){
   buildSlots(form,false);
   const ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&natCode(P[i])===code);
   autoFillFrom(ids);
-  state.loadedClub=null; state.teamName=name||NATNAME[code]||code; state.captain=null; state.teamInfo=null;
+  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null;
   setFormLabel(); closeSheet(); render(); save();
   const filled=state.slots.filter(s=>s.pid!=null).length;
-  toast((name||NATNAME[code]||code)+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
+  toast((name||natJa(code))+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
 }
 // 前回の新規作成で選んだソート条件を保持（再度開いたときにリセットしない）
 let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
@@ -27350,7 +27357,7 @@ function startOriginal(){
       <div class="formfield">
         <label>チーム名 <i>任意</i></label>
         <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="" autocomplete="off">
-        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、France）が自動で入ります。</div>
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、日本）が自動で入ります。</div>
       </div>
       <div class="formfield">
         <label>フォーメーション</label>
@@ -27428,7 +27435,7 @@ function startOriginal(){
     let name=typed;
     if(!name){
       if(useClub&&!useNat&&!useLg) name=chosenClub;
-      else if(useNat&&!useClub&&!useLg) name=NATNAME[acf.nat]||acf.nat;
+      else if(useNat&&!useClub&&!useLg) name=natJa(acf.nat);
     }
     otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name:typed}; // 入力値のみ保持（自動命名は保存しない）
     // クラブ単独指定：最初の画面のクラブ選択と同じ実在編成（控え・ベンチ外・第二候補つき）
