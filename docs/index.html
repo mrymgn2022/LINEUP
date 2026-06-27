@@ -301,6 +301,7 @@ header{
 .prow .price{font-family:'Bebas Neue';font-size:17px;color:var(--lime);letter-spacing:.5px}
 .prow.inxi{opacity:.4}
 .prow .badge{font-size:9px;color:var(--gold);font-weight:800}
+.prow .badge.benchbadge{color:#58c4ff}
 .empty-msg{text-align:center;color:var(--mut);padding:40px 20px;font-size:13px}
 
 /* action menu */
@@ -26746,12 +26747,13 @@ function attachNatFilter(scope,f,redraw){
     setTimeout(()=>{try{inp.focus();}catch(_){}} ,80);
   };
 }
-function prowHTML(i){
+function prowHTML(i,hideBench){
   const p=P[i],g=grp(p[1]),already=inXI(i);
+  const onBench=!already&&!hideBench&&state.bench.includes(i); // チーム外ではなくこのスカッドのベンチにいる選手
   return `<div class="prow ${already?'inxi':''}" data-pid="${i}">
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
-      <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">●起用中</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">自作</span>':''}</div>
+      <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">●起用中</span>':''}${onBench?'<span class="badge benchbadge">●ベンチ</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">自作</span>':''}</div>
       <div class="sub">${flagHTML(p[3])}${p[4]?' · '+p[4]:''}${p[2]>0?' · '+p[2]+'歳':''}</div>
     </div>
   </div>`;
@@ -26863,7 +26865,7 @@ function openSubPicker(slotIdx){
     const usebench=!document.getElementById('transferExtra')||document.getElementById('transferExtra').style.display==='none';
     if(hasBench&&usebench){
       const pids=state.bench;
-      list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid)).join(''):'<div class="empty-msg">ベンチに選手がいません</div>';
+      list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join(''):'<div class="empty-msg">ベンチに選手がいません</div>';
       list.onscroll=null;
       list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
     }else{
@@ -26967,7 +26969,7 @@ function drawBenchList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   const pids=state.bench;
   if(!pids.length){list.innerHTML='<div class="empty-msg">ベンチに選手がいません</div>';return;}
-  list.innerHTML=pids.slice().sort(suggestSort).map(pid=>prowHTML(pid)).join('');
+  list.innerHTML=pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join('');
   list.onscroll=null;
   list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assign(slotIdx,+row.dataset.pid);};
 }
