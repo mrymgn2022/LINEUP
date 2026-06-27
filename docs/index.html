@@ -25689,8 +25689,14 @@ function dropZone(x,y){
 function initials(name){const c=name.trim().replace(/\s+$/,'').split(' ');return (c[0][0]+(c.length>1?c[c.length-1][0]:'')).toUpperCase()}
 // 表示名の上書き（苗字ロジックだと愛称とズレる選手だけ。キー＝データ上のフルネーム）
 const KNOWN_AS={"Vinicius Junior":"Vinicius","Alexis Mac Allister":"Mac Allister","Kevin Mac Allister":"Mac Allister"};
-// 苗字の前置詞（オランダ van/van der/van den・独 von・de/der/den 等）。苗字に含めて表示する（例: Virgil van Dijk → van Dijk, Kevin De Bruyne → De Bruyne）
-const NAME_PARTICLES=new Set(['van','von','de','der','den','ten','ter','te']);
+// 苗字の前置詞（各言語）。苗字に含めて表示。例: van Dijk / De Bruyne / Di María / da Silva / dos Santos / Le Normand / de la Fuente
+const NAME_PARTICLES=new Set([
+  'van','von','vom','zu',                                   // オランダ・ドイツ
+  'der','den','ten','ter','te','op',"'t",                   // オランダ
+  'de','del','della','dello','dei','degli','delle','dal','dalla','di','da','das','dos','do', // 伊・西・葡
+  'du','des','le','la','lo',                                // 仏・伊の冠詞
+  'al','el'                                                 // アラビア語の冠詞（多くは連結だが念のため）
+]);
 function shortName(name){
   const t=(name||'').trim(); if(KNOWN_AS[t])return KNOWN_AS[t];
   const c=t.split(/\s+/); if(c.length<=1) return t;
