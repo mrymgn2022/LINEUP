@@ -27657,7 +27657,12 @@ async function buildShareCanvas(){
   const rowDrop=r=>Math.max.apply(null,r.slots.map(dropOf));
   const topPad=R+m(5), GAPMARGIN=m(5);                     // 上端余白／行間余白
   const order=rowsV.slice().reverse();                     // 画面 上(FW)→下(GK) の順
-  const cyOf=[]; { let cy=py+topPad; for(let k=0;k<order.length;k++){ cyOf[k]=cy; if(k<order.length-1) cy+=rowDrop(order[k])+R+GAPMARGIN; } } // 各行の駒中心Y：上の行のラベル分だけ間隔を空ける
+  // 盤面と同じ縦密度で配置（盤面アスペクト≒盤面高さ600/ピッチ幅REF405≒1.48を忠実再現）。
+  // ハイブリッド：基本は盤面比率のまま。上の行のラベルが下の駒に被る場合だけ、その行間を必要分だけ広げる。
+  const VDENS=kk*6;                                        // y1単位あたりの縦px（盤面高さ≒600px/100 × 倍率kk）
+  const ryOf=r=>r.slots.reduce((a,s)=>a+s.y,0)/r.slots.length; // 行の代表y（平均）
+  const cyOf=[]; { let cy=py+topPad; for(let k=0;k<order.length;k++){ cyOf[k]=cy;
+      if(k<order.length-1){ const prop=(ryOf(order[k])-ryOf(order[k+1]))*VDENS, need=rowDrop(order[k])+R+GAPMARGIN; cy+=Math.max(prop,need); } } } // 盤面比率(prop)を基本に、被る所(need)だけ広げる
   const botPad=NV?Math.round(rowDrop(order[order.length-1]))+m(8):60; // 下：最後尾(GK)行のラベル分
   const lastCy=cyOf.length?cyOf[cyOf.length-1]:(py+topPad);
   let ph=Math.max(m(280),Math.round(lastCy-py+botPad)); // ピッチ高さは内容に合わせて可変
@@ -27739,7 +27744,10 @@ async function buildShareCanvas(){
       for(let i=0;i<info.length&&ok;i++){ const a=info[i];
         for(let j=0;j<info.length;j++){ const o=info[j]; if(o===a)continue; if(Math.abs(o.fy-a.fy)<m(18)){ const wa=widthAt(a,U),wo=widthAt(o,U); if(wa<=0||wo<=0)continue; if((wa+wo)/2+m(3)>Math.abs(a.fx-o.fx)){ ok=false; break; } } } }
       if(ok) return U; } return lo; };
-  const uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
+  // 名前サイズは「行ごと」に最大化：混雑した行だけ縮め、空いている行は大きいまま（全体一律で小さくしない＝盤面に近い）。
+  const nameWAt=(it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; };
+  const fitRowName=items=>{ if(items.length<=1) return maxName; for(let U=maxName;U>=minName;U--){ let ok=true; for(let i=0;i<items.length&&ok;i++)for(let j=i+1;j<items.length;j++){ const a=items[i],o=items[j], dx=Math.abs(a.fx-o.fx); if(dx<=0) continue; if((nameWAt(a,U)+nameWAt(o,U))/2+m(3)>dx){ ok=false; break; } } if(ok) return U; } return minName; };
+  order.forEach(r=>{ const items=info.filter(it=>r.slots.indexOf(it.s)>=0); const U=fitRowName(items); items.forEach(it=>it.nameU=U); });
   const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=memoOf(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
   const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ const t=subText(it); if(!t)return 0; x.font='700 '+U+'px Manrope,sans-serif'; return x.measureText(t).width; },m(10),m(6)):m(10);
   info.forEach(it=>{
@@ -27763,8 +27771,8 @@ async function buildShareCanvas(){
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+m(7),fy-R+m(7),m(8),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+m(9)+'px Manrope,sans-serif';x.fillText('C',fx-R+m(7),fy-R+m(10));}
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に（盤面: role12px, 縁から+12）
     if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font=m(12)+'px "Bebas Neue",Manrope,sans-serif';x.letterSpacing=m(1)+'px';x.fillText(s.role,fx,fy+R+m(22));x.letterSpacing='0px'; } // 役職は盤面同様 Bebas Neue
-    // 名前（＋国旗）：統一サイズ。役職の下に詰めて表示
-    const sz=uniName;
+    // 名前（＋国旗）：行ごとに最大化したサイズ。役職の下に詰めて表示
+    const sz=it.nameU||maxName;
     x.font='700 '+sz+'px Manrope,sans-serif';
     const flagH=Math.round(sz*0.82), flagW=Math.round(flagH*4/3), gap=m(3);
     const nameW=x.measureText(it.full).width;
