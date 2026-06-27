@@ -25689,7 +25689,15 @@ function dropZone(x,y){
 function initials(name){const c=name.trim().replace(/\s+$/,'').split(' ');return (c[0][0]+(c.length>1?c[c.length-1][0]:'')).toUpperCase()}
 // 表示名の上書き（苗字ロジックだと愛称とズレる選手だけ。キー＝データ上のフルネーム）
 const KNOWN_AS={"Vinicius Junior":"Vinicius","Alexis Mac Allister":"Mac Allister","Kevin Mac Allister":"Mac Allister"};
-function shortName(name){const t=(name||'').trim();if(KNOWN_AS[t])return KNOWN_AS[t];const c=t.split(' ');return c.length>1?c[c.length-1]:t}
+// 苗字の前置詞（オランダ van/van der/van den・独 von・de/der/den 等）。苗字に含めて表示する（例: Virgil van Dijk → van Dijk, Kevin De Bruyne → De Bruyne）
+const NAME_PARTICLES=new Set(['van','von','de','der','den','ten','ter','te']);
+function shortName(name){
+  const t=(name||'').trim(); if(KNOWN_AS[t])return KNOWN_AS[t];
+  const c=t.split(/\s+/); if(c.length<=1) return t;
+  let i=c.length-1;                       // 苗字＝最後の語
+  while(i-1>=1 && NAME_PARTICLES.has(c[i-1].toLowerCase())) i--; // 直前に連なる前置詞を含める（先頭＝下の名前は必ず残す）
+  return c.slice(i).join(' ');
+}
 
 /* フォーメーション：ボタン＋イラスト付きピッカーに集約 */
 function setFormLabel(){ const el=document.getElementById('curForm'); if(el)el.textContent=state.formation; }
