@@ -26640,6 +26640,11 @@ Object.assign(HEIGHT,{"Bruno Henrique|BRA|CR Flamengo|ST":184,"Santiago Sosa|ARG
 Object.assign(FOOT,{"Bruno Henrique|BRA|CR Flamengo|ST":"右","Santiago Sosa|ARG|Defensa y Justicia|CM":"右","Jhon Córdoba|COL|Instituto ACC|RW":"右"});
 Object.assign(BIRTH,{"Bruno Henrique|BRA|CR Flamengo|ST":"1990-12-30","Santiago Sosa|ARG|Defensa y Justicia|CM":"2005-01-30","Jhon Córdoba|COL|Instituto ACC|RW":"2000-07-15"});
 Object.assign(MV,{"Bruno Henrique|BRA|CR Flamengo|ST":800,"Santiago Sosa|ARG|Defensa y Justicia|CM":2000,"Jhon Córdoba|COL|Instituto ACC|RW":1200});
+/* ③ batch3 recovered from Transfermarkt 2026-06-27 (famous BR same-name; extended keys; club+age verified) */
+Object.assign(HEIGHT,{"Pedro|BRA|CR Flamengo|ST":185,"Everton|BRA|CR Flamengo|LW":174,"Tetê|BRA|Grêmio Foot-Ball Porto Alegrense|RW":175,"Renê|BRA|Fluminense Football Club|LB":174});
+Object.assign(FOOT,{"Pedro|BRA|CR Flamengo|ST":"右","Everton|BRA|CR Flamengo|LW":"右","Tetê|BRA|Grêmio Foot-Ball Porto Alegrense|RW":"左","Renê|BRA|Fluminense Football Club|LB":"左"});
+Object.assign(BIRTH,{"Pedro|BRA|CR Flamengo|ST":"1997-06-20","Everton|BRA|CR Flamengo|LW":"1996-03-22","Tetê|BRA|Grêmio Foot-Ball Porto Alegrense|RW":"2000-02-15","Renê|BRA|Fluminense Football Club|LB":"1992-09-14"});
+Object.assign(MV,{"Pedro|BRA|CR Flamengo|ST":20000,"Everton|BRA|CR Flamengo|LW":7000,"Tetê|BRA|Grêmio Foot-Ball Porto Alegrense|RW":9000,"Renê|BRA|Fluminense Football Club|LB":700});
 window.__selftest=function(){
   const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
