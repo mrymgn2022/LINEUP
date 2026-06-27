@@ -26635,6 +26635,11 @@ Object.assign(FOOT,{"Idrissa Gueye|SEN|Everton|CDM":"右","Idrissa Gueye|SEN|Udi
 Object.assign(BIRTH,{"Idrissa Gueye|SEN|Everton|CDM":"1989-09-26","Idrissa Gueye|SEN|Udinese|ST":"2006-09-16","Santiago Sosa|ARG|Racing Club|CDM":"1999-05-03","Sergio Arribas|ESP|UD Almería|CAM":"2001-09-30"});
 /* ③ batch1 market values from Transfermarkt 2026-06-27 (thousands of €; extended keys) */
 Object.assign(MV,{"Idrissa Gueye|SEN|Everton|CDM":500,"Idrissa Gueye|SEN|Udinese|ST":8000,"Santiago Sosa|ARG|Racing Club|CDM":8000,"Sergio Arribas|ESP|UD Almería|CAM":20000});
+/* ③ batch2 recovered from Transfermarkt 2026-06-27 (extended keys; club+age verified) */
+Object.assign(HEIGHT,{"Bruno Henrique|BRA|CR Flamengo|ST":184,"Santiago Sosa|ARG|Defensa y Justicia|CM":175,"Jhon Córdoba|COL|Instituto ACC|RW":184});
+Object.assign(FOOT,{"Bruno Henrique|BRA|CR Flamengo|ST":"右","Santiago Sosa|ARG|Defensa y Justicia|CM":"右","Jhon Córdoba|COL|Instituto ACC|RW":"右"});
+Object.assign(BIRTH,{"Bruno Henrique|BRA|CR Flamengo|ST":"1990-12-30","Santiago Sosa|ARG|Defensa y Justicia|CM":"2005-01-30","Jhon Córdoba|COL|Instituto ACC|RW":"2000-07-15"});
+Object.assign(MV,{"Bruno Henrique|BRA|CR Flamengo|ST":800,"Santiago Sosa|ARG|Defensa y Justicia|CM":2000,"Jhon Córdoba|COL|Instituto ACC|RW":1200});
 window.__selftest=function(){
   const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
