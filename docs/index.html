@@ -26633,6 +26633,8 @@ function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout
 Object.assign(HEIGHT,{"Idrissa Gueye|SEN|Everton|CDM":174,"Idrissa Gueye|SEN|Udinese|ST":185,"Santiago Sosa|ARG|Racing Club|CDM":182,"Sergio Arribas|ESP|UD Almería|CAM":174});
 Object.assign(FOOT,{"Idrissa Gueye|SEN|Everton|CDM":"右","Idrissa Gueye|SEN|Udinese|ST":"右","Santiago Sosa|ARG|Racing Club|CDM":"右","Sergio Arribas|ESP|UD Almería|CAM":"左"});
 Object.assign(BIRTH,{"Idrissa Gueye|SEN|Everton|CDM":"1989-09-26","Idrissa Gueye|SEN|Udinese|ST":"2006-09-16","Santiago Sosa|ARG|Racing Club|CDM":"1999-05-03","Sergio Arribas|ESP|UD Almería|CAM":"2001-09-30"});
+/* ③ batch1 market values from Transfermarkt 2026-06-27 (thousands of €; extended keys) */
+Object.assign(MV,{"Idrissa Gueye|SEN|Everton|CDM":500,"Idrissa Gueye|SEN|Udinese|ST":8000,"Santiago Sosa|ARG|Racing Club|CDM":8000,"Sergio Arribas|ESP|UD Almería|CAM":20000});
 window.__selftest=function(){
   const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
