@@ -249,7 +249,7 @@ header{
 .drawer{position:fixed;top:0;bottom:0;left:max(0px,calc(50% - 280px));width:min(86vw,326px);z-index:73;
   background:var(--panel);border-right:1px solid var(--line);box-shadow:10px 0 44px rgba(0,0,0,.55);
   transform:translateX(-104%);transition:transform .26s cubic-bezier(.3,.9,.3,1);
-  display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .drawer.on{transform:translateX(0)}
 .dwhead{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 14px) 14px 10px;border-bottom:1px solid var(--line)}
 .dwlogo{font-family:'Bebas Neue';font-size:22px;letter-spacing:1.2px;color:var(--ink)}
@@ -25030,6 +25030,7 @@ const FORM={
 "5-2-1-2":[["GK",50,12],["LWB",11,34],["CB",30,23],["CB",50,23],["CB",70,23],["RWB",89,34],["CM",38,52],["CM",62,52],["CAM",50,66],["ST",40,85],["ST",60,85]]
 };
 const FORMS=Object.keys(FORM);
+let layoutMoved=false; // 駒を手動でドラッグ移動したか。falseなら整列リセットは反応しない（自動配置直後など）
 
 /* position grouping for color/filter */
 const GRP={GK:"gk",RB:"df",LB:"df",CB:"df",RWB:"df",LWB:"df",CDM:"mf",CM:"mf",CAM:"mf",RM:"mf",LM:"mf",DM:"mf",AM:"mf",RW:"fw",LW:"fw",ST:"fw",CF:"fw"};
@@ -25104,6 +25105,7 @@ function buildSlots(formKey,keepPlayers){
   state.slots=f.map(s=>({role:s[0],x:s[1],y:s[2],pid:null,sub:null}));
   spreadRowsEven(); // 列を均等間隔へ（無駄な空き解消・重なり防止）
   state.formation=formKey;
+  layoutMoved=false; // 既定レイアウトを敷いた直後＝未移動
   if(keepPlayers && keptPids.length){
     // 各枠を、その役割のサジェスト順（適性ポジション優先）で最適な選手から埋める
     const used=new Set(); const savedRole=pickRole;
@@ -25269,6 +25271,7 @@ function applyRaw(saved){
   }else{
     buildSlots("4-3-3",false);
   }
+  layoutMoved=false; // 読込直後＝未移動（ドラッグするまで整列リセットは反応しない）
   setFormLabel();
 }
 
@@ -25302,6 +25305,21 @@ async function loadTeamFromList(id){
 }
 function deleteTeam(id){ setTeams(getTeams().filter(t=>t.id!==id)); if(state.teamId===id){ state.teamId=null; save(); } }
 function renameTeamInList(id,name){ const teams=getTeams(),i=teams.findIndex(t=>t.id===id); if(i<0)return; teams[i].name=name; if(teams[i].data)teams[i].data.teamName=name; setTeams(teams); if(state.teamId===id){ state.teamName=name; save(); } }
+// アプリ/画面を閉じる時に現在のチームを一覧へ自動保存（同じteamIdは上書き、新規は追加、空チームは除外）。
+// 同期的にlocalStorageへ書く＝閉じても最後のチームが一覧に残り、再起動時に読み込める。
+function autoSaveToList(){
+  try{
+    if(typeof state==='undefined'||!state.slots) return;
+    if(state.slots.filter(s=>s.pid!=null).length===0) return; // 空のフォーメーションは一覧に出さない
+    const teams=getTeams(); const data=serializeTeam();
+    if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); lsSet('xi_state_v2',JSON.stringify(data)); return; } }
+    if(teams.length>=teamCap()){ lsSet('xi_state_v2',JSON.stringify(serializeTeam())); return; } // 上限時：一覧へは足さず自動保存だけ（再起動時は読込可）
+    const id='t'+Date.now()+Math.floor(Math.random()*1000);
+    state.teamId=id; data.teamId=id;
+    teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
+    setTeams(teams); lsSet('xi_state_v2',JSON.stringify(data));
+  }catch(e){}
+}
 
 /* =========================================================
    Rendering
@@ -25715,7 +25733,7 @@ function attachDrag(el,actor){
     }else{
       const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
       const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
-      base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';
+      base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';layoutMoved=true; // 手動移動した
     }
   });
   el.addEventListener('pointerup',e=>{
@@ -27476,6 +27494,22 @@ function openInfoPage(kind){
   openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
 }
 document.getElementById('btnMenu').onclick=openDrawer;
+// 画面/アプリを閉じる時に現在のチームを自動保存（一覧にも反映＆再起動時に読込）
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') autoSaveToList(); });
+window.addEventListener('pagehide',autoSaveToList);
+// ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
+(function initDrawerSwipe(){
+  const d=document.getElementById('drawer'); if(!d) return;
+  let sx=0,sy=0,dx=0,mode=0,drag=false,suppress=false;
+  function move(e){ if(!drag)return; dx=e.clientX-sx; const dy=e.clientY-sy;
+    if(mode===0){ if(Math.abs(dx)>8||Math.abs(dy)>8){ mode=(Math.abs(dx)>Math.abs(dy))?1:-1; if(mode===1) d.style.transition='none'; } }
+    if(mode===1){ if(dx>0)dx=0; d.style.transform='translateX('+dx+'px)'; } }
+  function end(){ if(!drag)return; drag=false; window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',end);
+    if(mode===1){ d.style.transition=''; d.style.transform=''; suppress=Math.abs(dx)>10; if(dx<-66) closeDrawer(); } mode=0; }
+  d.addEventListener('pointerdown',e=>{ if(!d.classList.contains('on'))return; drag=true; sx=e.clientX; sy=e.clientY; dx=0; mode=0;
+    window.addEventListener('pointermove',move); window.addEventListener('pointerup',end); });
+  d.addEventListener('click',e=>{ if(suppress){ e.stopPropagation(); e.preventDefault(); suppress=false; } },true);
+})();
 /* クラブ名から決定的に色を生成してエンブレム風バッジを作る */
 function clubColors(c){
   let h=0;for(let k=0;k<c.length;k++)h=(h*31+c.charCodeAt(k))>>>0;
@@ -28097,10 +28131,13 @@ document.getElementById('btnMemo').onclick=()=>{
   toast(state.showMemo?'メモを表示':'メモを非表示');
 };
 
-// 整列リセット（フォーメーション既定位置へ）
+// 整列リセット（フォーメーション既定位置へ）。手動で動かしていなければ反応しない（自動配置直後など）
 document.getElementById('btnReset').onclick=()=>{
+  if(!layoutMoved){ toast('既に既定の配置です'); return; }
   const f=FORM[state.formation];
   state.slots.forEach((s,i)=>{s.role=f[i][0];s.x=f[i][1];s.y=f[i][2];});
+  spreadRowsEven(); // 自動配置と同じ均等レイアウトに揃える（生のFORM既定だと詰まって見にくくなる）
+  layoutMoved=false;
   render();save();toast('既定の配置に戻しました');
 };
 
