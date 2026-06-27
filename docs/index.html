@@ -26679,6 +26679,12 @@ const FI={PRK:'kp',ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb-nir',IRL:'ie',
 function flagHTML(nat){ const code=(nat||'').trim().split(' ').pop(); const fi=FI[code]; return fi?`<span class="fi fi-${fi}"></span>`:code; }
 // 3文字コード → 英語の国名
 const NATNAME={ENG:'England',SCO:'Scotland',WAL:'Wales',NIR:'Northern Ireland',IRL:'Ireland',FRA:'France',ESP:'Spain',GER:'Germany',ITA:'Italy',NED:'Netherlands',POR:'Portugal',BEL:'Belgium',BRA:'Brazil',ARG:'Argentina',URU:'Uruguay',COL:'Colombia',ECU:'Ecuador',PAR:'Paraguay',VEN:'Venezuela',CHI:'Chile',PER:'Peru',BOL:'Bolivia',MEX:'Mexico',USA:'United States',CAN:'Canada',CRC:'Costa Rica',HON:'Honduras',PAN:'Panama',JAM:'Jamaica',TRI:'Trinidad and Tobago',HAI:'Haiti',CUW:'Curaçao',SUR:'Suriname',CPV:'Cape Verde',COD:'DR Congo',CIV:'Côte d’Ivoire',GHA:'Ghana',NGA:'Nigeria',SEN:'Senegal',MLI:'Mali',CMR:'Cameroon',MAR:'Morocco',ALG:'Algeria',EGY:'Egypt',TUN:'Tunisia',RSA:'South Africa',GAM:'Gambia',GUI:'Guinea',GNB:'Guinea-Bissau',BFA:'Burkina Faso',MOZ:'Mozambique',ZIM:'Zimbabwe',ZAM:'Zambia',ANG:'Angola',GAB:'Gabon',CGO:'Congo',BEN:'Benin',TOG:'Togo',EQG:'Equatorial Guinea',MTN:'Mauritania',COM:'Comoros',MAD:'Madagascar',KEN:'Kenya',BDI:'Burundi',CTA:'Central African Republic',DOM:'Dominican Republic',FRO:'Faroe Islands',GUF:'French Guiana',GLP:'Guadeloupe',IDN:'Indonesia',JOR:'Jordan',LBY:'Libya',MAS:'Malaysia',MDA:'Moldova',NIG:'Niger',TAN:'Tanzania',THA:'Thailand',SWE:'Sweden',NOR:'Norway',DEN:'Denmark',FIN:'Finland',ISL:'Iceland',SUI:'Switzerland',AUT:'Austria',POL:'Poland',CZE:'Czechia',SVK:'Slovakia',SVN:'Slovenia',CRO:'Croatia',SRB:'Serbia',BIH:'Bosnia and Herzegovina',MNE:'Montenegro',ALB:'Albania',KVX:'Kosovo',MKD:'North Macedonia',GRE:'Greece',TUR:'Turkey',HUN:'Hungary',ROU:'Romania',BUL:'Bulgaria',UKR:'Ukraine',RUS:'Russia',GEO:'Georgia',ARM:'Armenia',LVA:'Latvia',LTU:'Lithuania',EST:'Estonia',BLR:'Belarus',LUX:'Luxembourg',CYP:'Cyprus',MLT:'Malta',UZB:'Uzbekistan',JPN:'Japan',KOR:'South Korea',CHN:'China',AUS:'Australia',NZL:'New Zealand',IRN:'Iran',ISR:'Israel',KSA:'Saudi Arabia',QAT:'Qatar',PUR:'Puerto Rico',SYR:'Syria',RWA:'Rwanda',SSD:'South Sudan',MYA:'Myanmar',PHI:'Philippines',GUA:'Guatemala',SLV:'El Salvador',SUD:'Sudan',LBR:'Liberia',IRQ:'Iraq',GUY:'Guyana',YEM:'Yemen',VIN:'St. Vincent & Grenadines',IND:'India',ETH:'Ethiopia',UGA:'Uganda',LCA:'St. Lucia',SOM:'Somalia',SLE:'Sierra Leone',SAM:'Samoa',PLE:'Palestine',NCA:'Nicaragua',NCL:'New Caledonia',MTQ:'Martinique',GRN:'Grenada',ERI:'Eritrea',CHA:'Chad',CAM:'Cambodia',AZE:'Azerbaijan',BAN:'Bangladesh',NAM:'Namibia',AND:'Andorra',ARU:'Aruba',CUB:'Cuba',LIB:'Lebanon',MWI:'Malawi',SRI:'Sri Lanka',BHR:'Bahrain',MRI:'Mauritius',VIE:'Vietnam',UAE:'United Arab Emirates',KAZ:'Kazakhstan',HKG:'Hong Kong',SGP:'Singapore',TJK:'Tajikistan',LES:'Lesotho',OMA:'Oman',LAO:'Laos',KGZ:'Kyrgyzstan',SWZ:'Eswatini',TLS:'Timor-Leste',ZAN:'Zanzibar',BOT:'Botswana',BRU:'Brunei',AFG:'Afghanistan',TPE:'Chinese Taipei'};
+// 3文字コード → 日本語の国名（検索フィルタの表示用。英語名・コードでも検索ヒットする）
+const NATJA={ENG:'イングランド',SCO:'スコットランド',WAL:'ウェールズ',NIR:'北アイルランド',IRL:'アイルランド',FRA:'フランス',ESP:'スペイン',GER:'ドイツ',ITA:'イタリア',NED:'オランダ',POR:'ポルトガル',BEL:'ベルギー',BRA:'ブラジル',ARG:'アルゼンチン',URU:'ウルグアイ',COL:'コロンビア',ECU:'エクアドル',PAR:'パラグアイ',VEN:'ベネズエラ',CHI:'チリ',PER:'ペルー',BOL:'ボリビア',MEX:'メキシコ',USA:'アメリカ合衆国',CAN:'カナダ',CRC:'コスタリカ',HON:'ホンジュラス',PAN:'パナマ',JAM:'ジャマイカ',TRI:'トリニダード・トバゴ',HAI:'ハイチ',CUW:'キュラソー',SUR:'スリナム',CPV:'カーボベルデ',COD:'コンゴ民主共和国',CIV:'コートジボワール',GHA:'ガーナ',NGA:'ナイジェリア',SEN:'セネガル',MLI:'マリ',CMR:'カメルーン',MAR:'モロッコ',ALG:'アルジェリア',EGY:'エジプト',TUN:'チュニジア',RSA:'南アフリカ',GAM:'ガンビア',GUI:'ギニア',GNB:'ギニアビサウ',BFA:'ブルキナファソ',MOZ:'モザンビーク',ZIM:'ジンバブエ',ZAM:'ザンビア',ANG:'アンゴラ',GAB:'ガボン',CGO:'コンゴ共和国',BEN:'ベナン',TOG:'トーゴ',EQG:'赤道ギニア',MTN:'モーリタニア',COM:'コモロ',MAD:'マダガスカル',KEN:'ケニア',BDI:'ブルンジ',CTA:'中央アフリカ共和国',DOM:'ドミニカ共和国',FRO:'フェロー諸島',GUF:'フランス領ギアナ',GLP:'グアドループ',IDN:'インドネシア',JOR:'ヨルダン',LBY:'リビア',MAS:'マレーシア',MDA:'モルドバ',NIG:'ニジェール',TAN:'タンザニア',THA:'タイ',SWE:'スウェーデン',NOR:'ノルウェー',DEN:'デンマーク',FIN:'フィンランド',ISL:'アイスランド',SUI:'スイス',AUT:'オーストリア',POL:'ポーランド',CZE:'チェコ',SVK:'スロバキア',SVN:'スロベニア',CRO:'クロアチア',SRB:'セルビア',BIH:'ボスニア・ヘルツェゴビナ',MNE:'モンテネグロ',ALB:'アルバニア',KVX:'コソボ',MKD:'北マケドニア',GRE:'ギリシャ',TUR:'トルコ',HUN:'ハンガリー',ROU:'ルーマニア',BUL:'ブルガリア',UKR:'ウクライナ',RUS:'ロシア',GEO:'ジョージア',ARM:'アルメニア',LVA:'ラトビア',LTU:'リトアニア',EST:'エストニア',BLR:'ベラルーシ',LUX:'ルクセンブルク',CYP:'キプロス',MLT:'マルタ',UZB:'ウズベキスタン',JPN:'日本',KOR:'韓国',CHN:'中国',AUS:'オーストラリア',NZL:'ニュージーランド',IRN:'イラン',ISR:'イスラエル',KSA:'サウジアラビア',QAT:'カタール',PUR:'プエルトリコ',SYR:'シリア',RWA:'ルワンダ',SSD:'南スーダン',MYA:'ミャンマー',PHI:'フィリピン',GUA:'グアテマラ',SLV:'エルサルバドル',SUD:'スーダン',LBR:'リベリア',IRQ:'イラク',GUY:'ガイアナ',YEM:'イエメン',VIN:'セントビンセント・グレナディーン',IND:'インド',ETH:'エチオピア',UGA:'ウガンダ',LCA:'セントルシア',SOM:'ソマリア',SLE:'シエラレオネ',SAM:'サモア',PLE:'パレスチナ',NCA:'ニカラグア',NCL:'ニューカレドニア',MTQ:'マルティニーク',GRN:'グレナダ',ERI:'エリトリア',CHA:'チャド',CAM:'カンボジア',AZE:'アゼルバイジャン',BAN:'バングラデシュ',NAM:'ナミビア',AND:'アンドラ',ARU:'アルバ',CUB:'キューバ',LIB:'レバノン',MWI:'マラウイ',SRI:'スリランカ',BHR:'バーレーン',MRI:'モーリシャス',VIE:'ベトナム',UAE:'アラブ首長国連邦',KAZ:'カザフスタン',HKG:'香港',SGP:'シンガポール',TJK:'タジキスタン',LES:'レソト',OMA:'オマーン',LAO:'ラオス',KGZ:'キルギス',SWZ:'エスワティニ',TLS:'東ティモール',ZAN:'ザンジバル',BOT:'ボツワナ',BRU:'ブルネイ',AFG:'アフガニスタン',TPE:'チャイニーズタイペイ'};
+// 国籍コード→日本語名（無ければ英語名→コードの順でフォールバック）。検索フィルタの表示はこちらを使う。
+function natJa(c){ return NATJA[c]||NATNAME[c]||c; }
+// 検索クエリ/対象の正規化：小文字化＋ひらがな→カタカナ（「ぶらじる」でも「ブラジル」にヒット）
+function natNorm(s){ return (s||'').toLowerCase().replace(/[ぁ-ゖ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60)); }
 // FIFA男子ランキング上位20（先頭表示用）
 const NAT_TOP=['ARG','FRA','ESP','ENG','BRA','POR','NED','BEL','ITA','GER','CRO','MAR','COL','URU','USA','MEX','SUI','SEN','DEN','JPN'];
 function natCode(p){ return p[3].trim().split(' ').pop(); }
@@ -26689,18 +26695,19 @@ function dispNatCode(pid){ const p=P[pid]; if(!p)return ''; if(state.flagByLeagu
 function flagHTMLForPid(pid){ return flagHTML(dispNatCode(pid)); }
 function natsInData(){ const s=new Set(); for(let i=0;i<P.length;i++){ if(isCustomPid(i))continue; const c=natCode(P[i]); if(c)s.add(c); } return s; }
 function natOptionsHTML(q){
-  const present=natsInData(); q=(q||'').trim().toLowerCase();
-  const m=c=>!q||(NATNAME[c]||c).toLowerCase().includes(q)||c.toLowerCase().includes(q);
+  const present=natsInData(); q=(q||'').trim().toLowerCase(); const qk=natNorm(q);
+  // 日本語名（かな正規化）・英語名・コードのいずれかにヒットすれば一致（例: "Japan"でも"日本"でも"JPN"でもOK）
+  const m=c=>!q||natNorm(NATJA[c]||'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase().includes(q);
   const top=NAT_TOP.filter(c=>present.has(c)&&m(c));
-  const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=>(NATNAME[a]||a).localeCompare(NATNAME[b]||b));
-  const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${NATNAME[c]||c}</span></div>`;
-  let h=`<div class="natrow allrow" data-nat="ALL">All countries</div>`;
-  if(top.length) h+=`<div class="natsec">FIFA Ranking (Top 20)</div>`+top.map(row).join('');
-  if(rest.length) h+=`<div class="natsec">Others (A–Z)</div>`+rest.map(row).join('');
-  if(!top.length&&!rest.length) h+=`<div class="empty-msg" style="padding:14px">No match</div>`;
+  const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=>natJa(a).localeCompare(natJa(b),'ja'));
+  const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${natJa(c)}</span></div>`;
+  let h=`<div class="natrow allrow" data-nat="ALL">すべての国</div>`;
+  if(top.length) h+=`<div class="natsec">FIFAランキング上位20</div>`+top.map(row).join('');
+  if(rest.length) h+=`<div class="natsec">その他（五十音）</div>`+rest.map(row).join('');
+  if(!top.length&&!rest.length) h+=`<div class="empty-msg" style="padding:14px">該当なし</div>`;
   return h;
 }
-function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>🏳 ${on?(NATNAME[f.nat]||f.nat):'国籍'} ▾</div>`; }
+function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>🏳 ${on?natJa(f.nat):'国籍'} ▾</div>`; }
 function natFilterHTML(f){ return `<div class="natwrap" data-natscope><div class="filters">${natChipHTML(f)}</div><div class="natpanel" data-natpanel style="display:none"></div></div>`; }
 function attachNatFilter(scope,f,redraw){
   if(!scope)return;
@@ -26708,7 +26715,7 @@ function attachNatFilter(scope,f,redraw){
   if(!chip||!panel)return;
   chip.onclick=()=>{
     if(panel.style.display!=='none'){ panel.style.display='none'; return; }
-    panel.innerHTML=`<input class="search natq" placeholder="Search country (English)…" autocomplete="off"><div class="natlist">${natOptionsHTML('')}</div>`;
+    panel.innerHTML=`<input class="search natq" placeholder="国名で検索（日本語・英語可）…" autocomplete="off"><div class="natlist">${natOptionsHTML('')}</div>`;
     panel.style.display='block';
     const inp=panel.querySelector('.natq'), lst=panel.querySelector('.natlist');
     inp.oninput=()=>{ lst.innerHTML=natOptionsHTML(inp.value); };
