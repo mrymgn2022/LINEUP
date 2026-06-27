@@ -25442,6 +25442,7 @@ function render(){
     attachDrag(tok,i);
   });
   spreadFlanks();
+  liftBottomLabels();
   document.getElementById('hint').style.display=filled?'none':'block';
   renderBench();
   updateTeamTag();
@@ -25483,6 +25484,17 @@ function spreadFlanks(){
     else      { nx=Math.max(o.x, Math.min(nx, 100-halfPct)); }
     nx=Math.max(3,Math.min(97,nx));
     o.tok.style.left=nx+'%';
+  });
+}
+// 最下段の駒（GK等）のメモ/第2候補がピッチ下端(overflow:hidden)で見切れないよう、はみ出した分だけ実ピクセルで上へ持ち上げる。
+function liftBottomLabels(){
+  const pr=pitch.getBoundingClientRect(); if(!pr.height) return;
+  const limit=pr.bottom-6; // 下に6pxの余白を残す
+  state.slots.forEach((s,i)=>{
+    const tok=tokenEls[i]; if(!tok||s.pid==null) return;
+    const foot=tok.querySelector('.tokfoot'); if(!foot) return;
+    const over=foot.getBoundingClientRect().bottom-limit;
+    if(over>0){ const cur=parseFloat(tok.style.top)||(100-s.y); tok.style.top=(cur-over/pr.height*100)+'%'; }
   });
 }
 function teamDisplayName(){ return state.teamName||state.loadedClub||null; }
