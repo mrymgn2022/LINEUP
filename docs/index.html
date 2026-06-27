@@ -27716,7 +27716,7 @@ function startOriginal(){
   const POP_ROW='<div class="lgrow2" data-lg="POP">⭐ 人気クラブ</div>';
   const otF={lg:chosenLg, expand:otExpand, lgopen:false, lgq:''}; // リーグ選択プルダウン用
   const acf={nat:otLast.nat||'ALL'};
-  const chips=FORMS.map(f=>`<div class="fchip2${f===chosenForm?' on':''}" data-f="${f}">${f}</div>`).join('');
+  const formOpts=FORMS.map(f=>`<option value="${f}"${f===chosenForm?' selected':''}>${f}</option>`).join('');
   const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["AT","オーストリア"],["GR","ギリシャ"],["CZ","チェコ"],["PO","ポーランド"],["RS","セルビア"],["NO","ノルウェー"],["CY","キプロス"],["J1","Jリーグ"],["J2","J2リーグ"],["J3","J3リーグ"],["ML","MLS"],["SP","サウジ"]];
   // 人気クラブ（UEFAクラブランキング上位100）。順位リストは後日設定するため今は空
   const POP_CLUBS=["Bayern München","Real Madrid","Paris Saint-Germain","Liverpool","Inter","Manchester City","Arsenal","Barcelona","Bayer Leverkusen","Atlético Madrid","Borussia Dortmund","Chelsea","AS Roma","SL Benfica","Atalanta","Sporting CP","Eintracht Frankfurt","Tottenham","Aston Villa","FC Porto","Manchester United","Fiorentina","Club Brugge KV","Real Betis","Juventus","PSV Eindhoven","Feyenoord Rotterdam","West Ham United","Lille","AC Milan","Olympique Lyon","FK Bodø/Glimt","SC Braga","Napoli","AZ Alkmaar","Olympiacos Piraeus","RB Leipzig","Rangers","Lazio","Villarreal","Ajax Amsterdam","Fenerbahce","Real Sociedad","Freiburg","Shakhtar Donetsk","AS Monaco","FC Copenhagen","Marseille","Galatasaray","FC Viktoria Plzen","Ferencvárosi TC","PAOK Thessaloniki","FC Midtjylland","Union Saint-Gilloise","GNK Dinamo Zagreb","Red Star Belgrade","Red Bull Salzburg","SK Slavia Prague","Celtic","Qarabağ FK","KAA Gent","Sevilla","Athletic Club","AC Sparta Prague","Slovan Bratislava","Stade Rennais","FC Basel","Legia Warszawa","Maccabi Tel Aviv","Djurgårdens IF","Bologna","RSC Anderlecht","Newcastle United","Rapid Vienna","BSC Young Boys","Panathinaikos","KRC Genk","Ludogorets Razgrad","VfB Stuttgart","Lech Poznan","SK Sturm Graz","FCSB","Pafos FC","AEK Athens","Nottingham Forest","Union Berlin","Raków Częstochowa","Rayo Vallecano","Jagiellonia Bialystok","FK Partizan Belgrade","NK Celje","Molde FK","Omonia Nicosia","FC Lugano","LASK","AEK Larnaca","FC Sheriff Tiraspol","OGC Nice","Crystal Palace","Basaksehir FK"];
@@ -27742,7 +27742,7 @@ function startOriginal(){
       </div>
       <div class="formfield">
         <label>フォーメーション</label>
-        <div class="fchipgrid" id="otForm">${chips}</div>
+        <select class="search" id="otForm" style="width:100%">${formOpts}</select>
       </div>
       <div class="otsep">自動配置の条件（任意・組み合わせ可）</div>
       <div class="formfield">
@@ -27767,10 +27767,7 @@ function startOriginal(){
       <button class="bigbtn" id="otStart">自動配置 →</button>
       <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.6">条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。</div>
     </div>`);
-  document.getElementById('otForm').onclick=e=>{
-    const c=e.target.closest('[data-f]');if(!c)return;
-    chosenForm=c.dataset.f;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
-  };
+  document.getElementById('otForm').onchange=e=>{ chosenForm=e.target.value; };
   const _otLgEl=document.getElementById('otLg');
   if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); }); }
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
