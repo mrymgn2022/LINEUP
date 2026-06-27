@@ -25027,7 +25027,7 @@ function roleFromXY(x,y){
 /* =========================================================
    State
    ========================================================= */
-let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,showBench:true}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,showBench:true}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
 let tokenEls={};
 const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M3.5 21c0-4.2 4-6.5 8.5-6.5s8.5 2.3 8.5 6.5"/></svg>';
 let memFallback=null; // 保存フォールバック
@@ -25151,7 +25151,7 @@ async function save(){
     slots:state.slots.map(s=>({role:s.role,x:s.x,y:s.y,pid:pidToKey(s.pid),sub:pidToKey(s.sub)})),
     bench:state.bench.map(pidToKey).filter(k=>k!=null),
     captain:pidToKey(state.captain),
-    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,
+    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,
     excluded:(state.excluded||[]).map(pidToKey).filter(k=>k!=null),
     reserveAdds:(state.reserveAdds||[]).map(pidToKey).filter(k=>k!=null),
     custom:referencedCustomDefs() };
@@ -26431,13 +26431,19 @@ function slotFit(pos,role){
   if(pg===sg) return true;
   return (SUGGEST[role]||[]).includes(pos);
 }
-let pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+let pickFilter=basePickFilter();
+// ピッカーの既定フィルタ。チーム新規作成時の条件（国籍・リーグ）を全ての選手変更/追加画面に引き継ぐ。
+// extra で各画面ごとの上書き（pos・club・sort等）を渡す。
+function basePickFilter(extra){
+  const tc=state.teamCond||{};
+  return Object.assign({pos:'ALL',lg:tc.lg||'ALL',club:'ALL',q:'',nat:tc.nat||'ALL'}, extra||{});
+}
 let pickReopen=null;    // 「検索条件をクリア」用：現在のピッカーを既定状態で開き直すための関数
 let pickOnPick=null;    // 選手選択時の差し替え動作（チーム外の選手と交代）。null＝既定（スロット配置／ベンチ追加）
 let benchAddMode=false; // 「ベンチに追加」ピッカーかどうか
 let subFilterOn=false;  // 大枠→細ポジションのサブフィルタを出すか（wirePicker系ピッカーで有効）
 function openPicker(slotIdx){
-  pickFilter={pos:'ALL',lg:'ALL',club:state.loadedClub||'ALL',q:''};
+  pickFilter=basePickFilter({club:state.loadedClub||'ALL'});
   const role=state.slots[slotIdx].role;
   pickRole=role; benchAddMode=false; pickOnPick=null;
   pickReopen=()=>openPicker(slotIdx);
@@ -26595,7 +26601,8 @@ function drawPickList(slotIdx){
   if(so==='age_desc') pickCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
   else if(so==='age_asc') pickCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
   else if(so==='pop') pickCurIdx.sort((a,b)=>{const ma=mvScore(P[a]),mb=mvScore(P[b]); if(ma!==mb)return mb-ma; return P[b][2]-P[a][2];}); // 人気順（注目度＝内部指標で降順）
-  else pickCurIdx.sort(suggestSort);
+  else if(pickRole) pickCurIdx.sort(suggestSort); // スロット押下時：そのポジションを優先表示→市場価値順
+  else pickCurIdx.sort((a,b)=>{const ma=mvScore(P[a]),mb=mvScore(P[b]); if(ma!==mb)return mb-ma; return P[b][2]-P[a][2];}); // ポジション指定なし(ベンチ/ベンチ外追加等)：市場価値の高い順
   if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">▾ さらに ${pickCurIdx.length-PAGE}人</div>`);
@@ -26615,7 +26622,7 @@ function drawPickList(slotIdx){
 }
 // ベンチに追加（読込クラブをポジション順で優先表示）
 function openBenchAdd(){
-  pickFilter={pos:'ALL',lg:'ALL',club:state.loadedClub||'ALL',q:''};
+  pickFilter=basePickFilter({club:state.loadedClub||'ALL'});
   pickRole=null; pickOnPick=null;
   pickReopen=()=>openBenchAdd();
   openSheet(`
@@ -26823,7 +26830,7 @@ function openBenchMenu(pid){
 
 /* ---- 第二候補ピッカー（slot.sub に割り当て） ---- */
 function openSubPicker(slotIdx){
-  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+  pickFilter=basePickFilter();
   const role=state.slots[slotIdx].role;
   pickRole=role;
   const hasBench=state.loadedClub&&state.bench.length>0;
@@ -26862,7 +26869,7 @@ function openSubPicker(slotIdx){
       [...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
       const te=document.getElementById('transferExtra');
       if(c.dataset.bm==='bench'){ te.style.display='none'; drawSub(); }
-      else{ te.style.display='block'; pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+      else{ te.style.display='block'; pickFilter=basePickFilter();
         document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();document.getElementById('clubF').innerHTML=clubChips();
         wireSubPickerFull(slotIdx); }
     };
@@ -26912,7 +26919,7 @@ function assignSub(slotIdx,pid){
 
 /* ---- Bench-first picker (チーム読込後) ---- */
 function openBenchPicker(slotIdx){
-  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+  pickFilter=basePickFilter();
   const role=state.slots[slotIdx].role;
   pickRole=role; pickOnPick=null;
   const blen=state.bench.length;
@@ -26941,7 +26948,7 @@ function openBenchPicker(slotIdx){
       drawBenchList(slotIdx);
     }else{
       te.style.display='block';
-      pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:''};
+      pickFilter=basePickFilter();
       document.getElementById('posF').innerHTML=posChips();
       document.getElementById('lgF').innerHTML=lgChips();
       document.getElementById('clubF').innerHTML=clubChips();
@@ -26960,7 +26967,7 @@ function drawBenchList(slotIdx){
 
 /* ---- チーム外から選手を追加：全選手検索（既定＝全チームの人気順） ---- */
 function openSlotAddSearch(slotIdx){
-  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'pop'};
+  pickFilter=basePickFilter();
   const role=state.slots[slotIdx].role;
   pickRole=role; benchAddMode=false; pickOnPick=null;
   pickReopen=()=>openSlotAddSearch(slotIdx);
@@ -26969,7 +26976,7 @@ function openSlotAddSearch(slotIdx){
 }
 // チーム外の選手と交代（汎用）：onPick(pid)で選んだ選手の反映先を指定。ベンチ／ベンチ外から呼ぶ
 function openOutsideSwap(title,onPick){
-  pickFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'pop'};
+  pickFilter=basePickFilter();
   pickRole=null; benchAddMode=false; pickOnPick=onPick;
   pickReopen=()=>openOutsideSwap(title,onPick);
   openSheet(pickerHTML(-1,'',title));
@@ -27330,7 +27337,7 @@ function autoFillNationality(code,form,name){
   buildSlots(form,false);
   const ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&natCode(P[i])===code);
   autoFillFrom(ids);
-  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null;
+  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null; state.teamCond={nat:code,lg:null};
   setFormLabel(); closeSheet(); render(); save();
   const filled=state.slots.filter(s=>s.pid!=null).length;
   toast((name||natJa(code))+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
@@ -27459,7 +27466,7 @@ function startOriginal(){
     // 条件なし＝空のフォーメーション
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
-      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.bench=[];
+      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.bench=[];
       setFormLabel(); closeSheet(); render(); save();
       toast((name||'チーム')+' を作成（空のフォーメーション）'); return;
     }
@@ -27476,6 +27483,7 @@ function startOriginal(){
     }
     buildSlots(chosenForm,false);
     state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
+    state.teamCond={nat:useNat?acf.nat:null, lg:useLg?chosenLg:null}; // 新規作成の条件をピッカーへ引き継ぐ
     autoFillFrom(ids);
     clearAutoClubMemos(); // 前のチームで自動入力されたクラブ名メモを持ち越さない（国籍のみの場合は直後に貼り直す）
     if(useNat&&!useClub&&!useLg){ fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true; } // 国籍のみ：所属クラブ名をメモに自動入力＆表示、旗は所属リーグの国に
@@ -27505,6 +27513,7 @@ function placeClubSquad(club,name){
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
+  state.teamCond=null; // クラブ編成はピッカー既定を所属クラブ(loadedClub)で出すため条件なし
   state.captain=null;
   autoAssignSubs(); // 第二候補を初期割当（以後は手動・自動では変わらない）
 }
@@ -28128,6 +28137,7 @@ window.__selftest=function(){
     state.captain=(saved.captain!=null)?saved.captain:null;
     state.teamName=saved.teamName||null;
     state.teamInfo=saved.teamInfo||null;
+    state.teamCond=saved.teamCond||null;
   }else{
     buildSlots("4-3-3",false);
   }
