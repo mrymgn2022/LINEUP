@@ -462,6 +462,18 @@ header{
 @keyframes sp-pulse{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#splash *{animation-duration:.01s!important}}
 
+/* ---------- お知らせモーダル ---------- */
+.annwrap{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s}
+.annwrap.show{display:flex}
+.annwrap.on{opacity:1}
+.anncard{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:380px;width:100%;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.6);transform:translateY(14px) scale(.97);transition:transform .26s cubic-bezier(.3,.9,.3,1)}
+.annwrap.on .anncard{transform:none}
+.annhead{padding:18px 18px 0}
+.anndate{font-size:11px;letter-spacing:1.5px;color:var(--lime);font-weight:800}
+.anntitle{font-size:17px;font-weight:800;color:var(--ink);margin-top:6px;line-height:1.45}
+.annbody{padding:11px 18px 6px;color:var(--ink);font-size:14px;line-height:1.85;white-space:pre-wrap;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.annbtns{padding:8px 18px calc(env(safe-area-inset-bottom) + 18px);display:flex;flex-direction:column;gap:9px}
+
 </style>
 
 <div id="splash">
@@ -551,13 +563,14 @@ header{
 <div class="toast" id="toast"></div>
 <div class="dscrim" id="dscrim"></div>
 <aside class="drawer" id="drawer" aria-label="メニュー"></aside>
+<div class="annwrap" id="annwrap" aria-label="お知らせ"></div>
 
 <script>
 /* 起動スプラッシュ：タップで即スキップ／約2.8秒で自動的に消える */
 (function(){
   var sp=document.getElementById('splash'); if(!sp) return;
   var done=false;
-  function hide(){ if(done)return; done=true; sp.classList.add('out'); setTimeout(function(){ if(sp&&sp.parentNode) sp.style.display='none'; },520); }
+  function hide(){ if(done)return; done=true; sp.classList.add('out'); setTimeout(function(){ if(sp&&sp.parentNode) sp.style.display='none'; try{ maybeShowAnnouncement(); }catch(e){} },520); } // スプラッシュ後にお知らせ
   sp.addEventListener('pointerdown',hide);
   var t=setTimeout(hide,2800);
   window.addEventListener('pagehide',function(){ clearTimeout(t); });
@@ -27530,6 +27543,29 @@ function drawMkt(){
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
 document.getElementById('btnLoad').onclick=()=>newTeamFlow();
+
+/* ---------- お知らせ（起動時モーダル） ----------
+   更新があったらここを書き換える。id を変えると全員に再表示される（lsの既読が id 一致でないため）。
+   出したくないときは null。body は \n で改行可。 */
+const ANNOUNCEMENT = {
+  id: '2026-06-28-1',
+  date: '2026/6/28',
+  title: 'お知らせ機能を追加しました',
+  body: 'アプリ起動時に最新のお知らせを表示するようにしました。\n\n「今後表示しない」を押すと、次のお知らせが来るまで表示されません。'
+};
+function maybeShowAnnouncement(){ try{ if(!ANNOUNCEMENT||!ANNOUNCEMENT.id) return; if(lsGet('xi_announce_seen')===ANNOUNCEMENT.id) return; openAnnouncement(); }catch(e){} }
+function openAnnouncement(){
+  const a=ANNOUNCEMENT, w=document.getElementById('annwrap'); if(!w) return;
+  w.innerHTML=`<div class="anncard">
+    <div class="annhead"><div class="anndate">${escAttr(a.date||'お知らせ')}</div><div class="anntitle">${escAttr(a.title||'')}</div></div>
+    <div class="annbody">${escAttr(a.body||'')}</div>
+    <div class="annbtns"><button class="bigbtn" id="annDismiss">今後表示しない</button><button class="bigbtn ghost" id="annLater">閉じる</button></div>
+  </div>`;
+  w.classList.add('show'); requestAnimationFrame(()=>w.classList.add('on'));
+  document.getElementById('annDismiss').onclick=()=>{ lsSet('xi_announce_seen', a.id); closeAnnouncement(); }; // 次の更新まで非表示
+  document.getElementById('annLater').onclick=closeAnnouncement;                                              // 今回だけ閉じる（次回起動でまた表示）
+}
+function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
