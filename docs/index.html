@@ -27584,8 +27584,16 @@ function openAnnouncementList(){
 }
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
-// 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
-const FEATURED_SQUADS=[];
+// 注目スカッド：注目試合の予想スタメン（ピッチ図・両チーム）。1エントリ=1試合。目標は1日1試合以上。
+//   { comp:'大会名(必須)', kickoff:'2026-06-29T20:00'(ISO・24時間前表示の判定に使用),
+//     home/away:{ team:'チーム名', nat:'FIキー(RSA/CAN等)', form:'FORMのキー(4-3-3等)',
+//                 xi:[GK→DF→MF→FWの順に11名。FORM[form] と同じ並びで置く] } }
+//   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
+const FEATURED_SQUADS=[
+  { comp:'FIFAワールドカップ ラウンド32', kickoff:'',
+    home:{ team:'南アフリカ', nat:'RSA', form:'', xi:[] },
+    away:{ team:'カナダ',     nat:'CAN', form:'', xi:[] } }
+];
 // 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) の確定移籍を出典に、人気クラブ100(POP_CLUBS)が
 //   移籍元 or 移籍先に絡むものだけを新しい順に並べる。人気クラブからのフリー（退団・無所属含む）もOK。
 // 更新の手順（この方式で随時更新）：fotmobの移籍行をコピペ → 人気クラブ絡みだけ抽出 → 先頭へ追記。
@@ -27705,7 +27713,68 @@ function transferCardHTML(it){
     </div>
   </div>`;
 }
+// ===== 注目スカッド（予想スタメン：ピッチ図） =====
+// キックオフ24時間前〜終了後3時間だけ表示（日時未設定なら常時表示）
+function squadInWindow(m){
+  if(!m||!m.kickoff) return true;
+  const ko=new Date(m.kickoff).getTime(); if(isNaN(ko)) return true;
+  const now=Date.now();
+  return now >= ko-24*3600e3 && now <= ko+3*3600e3;
+}
+function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w='日月火水木金土'[d.getDay()];
+  return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; }
+// ミニピッチ：FORMの座標(GK下→FW上)を再利用。xi[i] を FORM[form][i] の位置に配置。
+function squadPitchHTML(side){
+  const coords = FORM[side.form] || FORM['4-3-3'];
+  const xi = side.xi||[];
+  const tokens = coords.map((c,i)=>`<div style="position:absolute;left:${c[1]}%;top:${100-c[2]}%;transform:translate(-50%,-50%);width:22%;text-align:center;pointer-events:none">
+      <div style="width:13px;height:13px;border-radius:50%;background:var(--lime);border:2px solid rgba(0,0,0,.4);margin:0 auto"></div>
+      <div style="font-size:8.5px;line-height:1.15;color:#fff;font-weight:700;margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.95);word-break:break-word">${escAttr(xi[i]!=null?xi[i]:'')}</div>
+    </div>`).join('');
+  return `<div style="position:relative;width:100%;max-width:300px;margin:8px auto 0;aspect-ratio:3/4;background:repeating-linear-gradient(0deg,#2f7d47 0 12.5%,#2b7341 12.5% 25%);border:1px solid rgba(255,255,255,.25);border-radius:10px;overflow:hidden">
+    <div style="position:absolute;left:7%;right:7%;top:50%;height:1px;background:rgba(255,255,255,.35)"></div>
+    <div style="position:absolute;left:50%;top:50%;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:50%;transform:translate(-50%,-50%)"></div>
+    <div style="position:absolute;left:50%;bottom:-1px;width:38%;height:8.5%;border:1px solid rgba(255,255,255,.3);border-bottom:none;transform:translateX(-50%)"></div>
+    <div style="position:absolute;left:50%;top:-1px;width:38%;height:8.5%;border:1px solid rgba(255,255,255,.3);border-top:none;transform:translateX(-50%)"></div>
+    ${tokens}
+  </div>`;
+}
+function squadTeamBlockHTML(side){
+  const ready = side && side.xi && side.xi.length;
+  return `<div style="margin:14px 16px 0">
+    <div style="display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);font-size:14px">
+      ${flagHTML(side.nat||'')}<span>${escAttr(side.team||'')}</span>
+      ${side.form?`<span style="margin-left:auto;font-size:11px;color:var(--mut);font-weight:700">${escAttr(side.form)}</span>`:''}
+    </div>
+    ${ready ? squadPitchHTML(side)
+      : `<div style="margin:8px 0 0;padding:18px;text-align:center;color:var(--mut);font-size:12px;border:1px dashed var(--line);border-radius:10px">予想スタメン準備中</div>`}
+  </div>`;
+}
+function squadMatchHTML(m){
+  const ko = m.kickoff ? fmtKickoff(m.kickoff) : '';
+  return `<div style="margin:0 0 22px;border-bottom:1px solid var(--line);padding-bottom:16px">
+    <div style="margin:0 16px 3px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--lime)">${escAttr(m.comp||'')}</div>
+    <div style="margin:0 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:800;color:var(--ink);font-size:15px">
+      ${flagHTML(m.home.nat||'')}<span>${escAttr(m.home.team||'')}</span>
+      <span style="color:var(--mut);font-weight:700;font-size:12px">vs</span>
+      <span>${escAttr(m.away.team||'')}</span>${flagHTML(m.away.nat||'')}
+    </div>
+    ${ko?`<div style="margin:3px 16px 0;font-size:11px;color:var(--mut)">${ko} キックオフ</div>`:''}
+    ${squadTeamBlockHTML(m.home)}
+    ${squadTeamBlockHTML(m.away)}
+  </div>`;
+}
 function openFeatured(kind){
+  if(kind==='squad'){
+    const matches=FEATURED_SQUADS.filter(squadInWindow).sort((a,b)=> new Date(a.kickoff||0)-new Date(b.kickoff||0));
+    const body = matches.length ? matches.map(squadMatchHTML).join('')
+      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">本日の注目試合はありません。<br>キックオフ24時間前から表示されます。</div>`;
+    openSheet(`<h2>注目スカッド <span>予想</span></h2>
+      <div style="font-size:11.5px;color:var(--mut);margin:0 16px 5px;line-height:1.7">注目試合の予想スタメンを随時更新。</div>
+      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 14px;line-height:1.6">※キックオフ24時間前から表示します</div>
+      <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
+    return;
+  }
   if(kind==='transfer'){
     const list=FEATURED_TRANSFERS;
     const desc='高額移籍金、ビッグネームの移籍を随時更新。';
@@ -27717,18 +27786,6 @@ function openFeatured(kind){
       <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
     return;
   }
-  const CFG={
-    squad:    {list:FEATURED_SQUADS,    title:'注目スカッド', tag:'予想', sub:'近日の注目カードの予想スタメンを随時更新'}
-  };
-  const c=CFG[kind]||CFG.squad, list=c.list, title=c.title, tag=c.tag, sub=c.sub;
-  const body = list.length ? list.map(it=>`
-    <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
-      <div style="font-weight:800;color:var(--ink);font-size:15px">${escAttr(it.title||'')}</div>
-      ${it.sub?`<div style="font-size:11px;color:var(--mut);margin-top:3px">${escAttr(it.sub)}</div>`:''}
-      ${it.body?`<div style="font-size:13px;color:var(--ink);margin-top:8px;line-height:1.7;white-space:pre-wrap">${escAttr(it.body)}</div>`:''}
-    </div>`).join('')
-    : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${sub}します。</div>`;
-  openSheet(`<h2>${title} <span>${tag}</span></h2><div style="font-size:11px;color:var(--mut);margin:0 16px 12px">${sub}</div><div style="padding-bottom:20px">${body}</div>`);
 }
 function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
