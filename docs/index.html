@@ -27586,31 +27586,31 @@ function openAnnouncementList(){
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
 const FEATURED_SQUADS=[];
-// 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) を出典に、人気クラブ100(POP_CLUBS)が
-//   移籍元 or 移籍先に絡む 6/15 以降の移籍だけを新しい順に並べる。人気クラブからのフリー移籍もOK。
-// 更新の手順（この方式で随時更新）：fotmob/ja/transfers の行をコピペ → POP100×6/15以降で絞り → ここへ反映。
+// 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) の確定移籍を出典に、人気クラブ100(POP_CLUBS)が
+//   移籍元 or 移籍先に絡むものだけを新しい順に並べる。人気クラブからのフリー（退団・無所属含む）もOK。
+// 更新の手順（この方式で随時更新）：fotmobの移籍行をコピペ → 人気クラブ絡みだけ抽出 → 先頭へ追記。
 //   1) 新しく加える移籍は配列の先頭に { date, player, from, to, fee, isNew:true } を追加
 //   2) 前回追加分の isNew を外す（NEW! は最新更新分だけに付く）
-//   3) from/to は POP_CLUBS（人気クラブ100）の表記に合わせる（掲載は人気クラブ絡みの移籍のみ）
-//   fee は表示用文字列、通貨は € で統一（fotmob準拠）：'フリー' / '€80.0m' / '非公開' / 'ローン' など。
-//   ※下記の初期16件は £ の暫定値（fotmob未取得）。fotmobの行を貼ってもらい次第 € の正確値へ差し替える。
+//   3) クラブ名・金額・日付・フリー表記は fotmob の表記をそのまま使う（fee 例：'自由移籍' / '€2300万' / '非公開'）
+//   ※ to が「フリー」= fotmob で「Free agent」（退団・移籍先未定）。実移籍先が決まれば差し替える。
 const FEATURED_TRANSFERS=[
-  { date:'7/1',  player:'Anthony Gordon',     from:'Newcastle United',  to:'Barcelona',         fee:'£69.3m', isNew:true },
-  { date:'7/1',  player:'Jérémy Jacquet',     from:'Stade Rennais',     to:'Liverpool',         fee:'£60m',   isNew:true },
-  { date:'7/1',  player:'Marc Cucurella',     from:'Chelsea',           to:'Real Madrid',       fee:'£47.5m', isNew:true },
-  { date:'7/1',  player:'Geovany Quenda',     from:'Sporting CP',       to:'Chelsea',           fee:'£40m',   isNew:true },
-  { date:'7/1',  player:'Ibrahima Konaté',    from:'Liverpool',         to:'Real Madrid',       fee:'フリー', isNew:true },
-  { date:'7/1',  player:'Bernardo Silva',     from:'Manchester City',   to:'Real Madrid',       fee:'フリー', isNew:true },
-  { date:'7/1',  player:'Andy Robertson',     from:'Liverpool',         to:'Tottenham',         fee:'フリー', isNew:true },
-  { date:'6/29', player:'Rasmus Højlund',     from:'Manchester United', to:'Napoli',            fee:'£38m',   isNew:true },
-  { date:'6/29', player:'Donyell Malen',      from:'Aston Villa',       to:'AS Roma',           fee:'£21.6m', isNew:true },
-  { date:'6/25', player:'Piero Hincapié',     from:'Bayer Leverkusen',  to:'Arsenal',           fee:'£34.5m' },
-  { date:'6/18', player:'Jan Paul van Hecke', from:'Brighton',          to:'Tottenham',         fee:'£52m'   },
-  { date:'6/18', player:'Víctor Muñoz',       from:'Osasuna',           to:'Liverpool',         fee:'£34.5m' },
-  { date:'6/15', player:'Jannik Schuster',    from:'Red Bull Salzburg', to:'Brentford',         fee:'£12m'   },
-  { date:'6/15', player:'Costinha',           from:'Olympiacos Piraeus',to:'Brighton',          fee:'£11m'   },
-  { date:'6/15', player:'Modou Kéba Cissé',   from:'LASK',              to:'Aston Villa',        fee:'£4m'    },
-  { date:'6/15', player:'Chuba Akpom',        from:'Ajax Amsterdam',    to:'Ipswich Town',       fee:'非公開' }
+  { date:'6/13', player:'Wout Weghorst',          from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/12', player:'André Silva',            from:'Elche',        to:'FC Porto',    fee:'自由移籍', isNew:true },
+  { date:'6/12', player:'Florentino',             from:'Benfica',      to:'Burnley',     fee:'€2400万',  isNew:true },
+  { date:'6/11', player:'Raheem Sterling',        from:'Feyenoord',    to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/11', player:'Jadon Sancho',           from:'Man United',   to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/11', player:'Casemiro',               from:'Man United',   to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/11', player:'John Stones',            from:'Man City',     to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/11', player:'Bernardo Silva',         from:'Man City',     to:'Real Madrid', fee:'自由移籍', isNew:true },
+  { date:'6/7',  player:'Orkun Kökcü',            from:'Benfica',      to:'Beşiktaş',    fee:'€3000万'  },
+  { date:'6/6',  player:'Thomas Partey',          from:'Villarreal',   to:'フリー',      fee:'自由移籍' },
+  { date:'6/6',  player:'Timothy Weah',           from:'Juventus',     to:'Marseille',   fee:'€1450万'  },
+  { date:'6/6',  player:'Vanja Milinkovic-Savic', from:'Torino',       to:'Napoli',      fee:'€600万'   },
+  { date:'6/6',  player:'Loïs Openda',            from:'RB Leipzig',   to:'Juventus',    fee:'€4275万'  },
+  { date:'6/5',  player:'Andrew Robertson',       from:'Liverpool',    to:'Tottenham',   fee:'自由移籍' },
+  { date:'6/5',  player:'Aleksandar Stankovic',   from:'Club Brugge',  to:'Inter',       fee:'€2300万'  },
+  { date:'6/2',  player:'Issa Doumbia',           from:'Venezia',      to:'Sporting CP', fee:'€2053万'  },
+  { date:'6/1',  player:'Ibrahima Konaté',        from:'Liverpool',    to:'フリー',      fee:'自由移籍' }
 ];
 // 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
 const TRANSFER_NEWS=[];
@@ -27676,7 +27676,7 @@ function transferCardHTML(it){
 }
 function openFeatured(kind){
   if(kind==='transfer'){
-    const list=FEATURED_TRANSFERS, sub='fotmob を出典に、人気クラブ100に絡む 6/15 以降の移籍を随時更新';
+    const list=FEATURED_TRANSFERS, sub='fotmob を出典に、人気クラブ100 が絡む移籍を随時更新';
     const body = list.length ? list.map(transferCardHTML).join('')
       : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${sub}します。</div>`;
     openSheet(`<h2>注目移籍 <span>NEWS</span></h2>
