@@ -25432,6 +25432,7 @@ function render(){
   // remove existing tokens
   pitch.querySelectorAll('.tok').forEach(t=>t.remove());
   pitch.classList.toggle('bigname',!!state.hideRoles);
+  autoFillClubMemosForNat(); // 国籍縛りチームでは、外部から入った選手にも所属クラブ名メモを自動補完
   computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   tokenEls={};
   let filled=0,ages=[];
@@ -27762,6 +27763,15 @@ function autoFillFrom(ids){
 function fillClubMemos(){
   if(!state.memos)state.memos={};
   const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[pidToKey(pid)]=club; };
+  state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
+  (state.bench||[]).forEach(set);
+}
+// 国籍縛りチーム(flagByLeague)用：メモ未設定の在籍選手だけ所属クラブ名を補完（手入力メモは上書きしない）。
+// renderから毎回呼ぶことで、外部から交換/追加した選手にもクラブ名メモが付く。
+function autoFillClubMemosForNat(){
+  if(!state.flagByLeague) return;
+  if(!state.memos) state.memos={};
+  const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); if(state.memos[k])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[k]=club; };
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
