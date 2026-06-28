@@ -27588,11 +27588,12 @@ function openAnnouncementList(){
 const FEATURED_SQUADS=[];
 // 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) を出典に、人気クラブ100(POP_CLUBS)が
 //   移籍元 or 移籍先に絡む 6/15 以降の移籍だけを新しい順に並べる。人気クラブからのフリー移籍もOK。
-// 更新の手順（この方式で随時更新）：
+// 更新の手順（この方式で随時更新）：fotmob/ja/transfers の行をコピペ → POP100×6/15以降で絞り → ここへ反映。
 //   1) 新しく加える移籍は配列の先頭に { date, player, from, to, fee, isNew:true } を追加
 //   2) 前回追加分の isNew を外す（NEW! は最新更新分だけに付く）
 //   3) from/to は POP_CLUBS（人気クラブ100）の表記に合わせる（掲載は人気クラブ絡みの移籍のみ）
-//   fee は表示用文字列：'フリー' / '£69.3m' / '非公開' / 'ローン' など。
+//   fee は表示用文字列、通貨は € で統一（fotmob準拠）：'フリー' / '€80.0m' / '非公開' / 'ローン' など。
+//   ※下記の初期16件は £ の暫定値（fotmob未取得）。fotmobの行を貼ってもらい次第 € の正確値へ差し替える。
 const FEATURED_TRANSFERS=[
   { date:'7/1',  player:'Anthony Gordon',     from:'Newcastle United',  to:'Barcelona',         fee:'£69.3m', isNew:true },
   { date:'7/1',  player:'Jérémy Jacquet',     from:'Stade Rennais',     to:'Liverpool',         fee:'£60m',   isNew:true },
