@@ -27746,7 +27746,15 @@ function autoFillFrom(ids){
   const benchSet=new Set();
   state.slots.forEach(s=>{ if(s.pid==null)return; pickRole=s.role; const back=ids.filter(id=>!used.has(id)&&!benchSet.has(id)&&grp(P[id][1])===grp(s.role)).sort(suggestSort)[0]; if(back!=null) benchSet.add(back); });
   pickRole=savedRole;
-  for(const id of ids.filter(id=>!used.has(id)&&!benchSet.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]))){ if(benchSet.size>=15)break; benchSet.add(id); }
+  // ベンチGKは最大2人（スタメン込み3人）。ただしXI(11枠)が埋まらない＝薄い選手層なら制限しない。
+  const fullXI=state.slots.filter(s=>s.pid!=null).length===11;
+  let benchGK=[...benchSet].filter(pid=>P[pid][1]==='GK').length;
+  for(const id of ids.filter(id=>!used.has(id)&&!benchSet.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]))){
+    if(benchSet.size>=15)break;
+    if(fullXI && P[id][1]==='GK' && benchGK>=2) continue; // GKは2人まで
+    if(P[id][1]==='GK') benchGK++;
+    benchSet.add(id);
+  }
   state.bench=[...benchSet].sort(benchPosSort); // 表示はポジション順（選出は市場価値）
   autoAssignSubs(); // 第二候補も初期割当（条件指定の自動配置でも全ポジションに付くように）
 }
@@ -27939,7 +27947,11 @@ function placeClubSquad(club,name){
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
   optimizeCMDepth(); // 3CMのとき、最も守備寄りの選手をアンカー(最深/真ん中)へ
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
-  state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15).sort(benchPosSort); // 選出は市場価値の上位15人、表示はポジション順
+  // ベンチGKは最大2人（スタメン込み3人）。ただしXI(11枠)が埋まらない＝薄い選手層なら制限しない。
+  const fullXI=state.slots.filter(s=>s.pid!=null).length===11;
+  let rest=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
+  if(fullXI){ let gk=0; rest=rest.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
+  state.bench=rest.slice(0,15).sort(benchPosSort); // 選出は市場価値の上位15人(GK最大2)、表示はポジション順
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
