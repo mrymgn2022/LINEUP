@@ -27710,14 +27710,13 @@ function transferCardHTML(it){
 }
 function openFeatured(kind){
   if(kind==='transfer'){
-    const list=FEATURED_TRANSFERS, sub='fotmob を出典に、人気クラブ100 が絡む移籍を随時更新';
+    const list=FEATURED_TRANSFERS;
+    const desc='高額移籍金、ビッグネームの移籍を随時更新。';
     const body = list.length ? list.map(transferCardHTML).join('')
-      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${sub}します。</div>`;
+      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${desc}</div>`;
     openSheet(`<h2>注目移籍 <span>NEWS</span></h2>
-      <div style="font-size:11px;color:var(--mut);margin:0 16px 4px">${sub}（2026年夏ウィンドウ）</div>
-      <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:var(--mut);margin:0 16px 12px">
-        <span><b style="color:var(--ink)">移籍元</b> → <b style="color:var(--ink)">移籍先</b></span><span>右端＝移籍金</span><span style="color:var(--lime);font-weight:900">NEW!＝最新更新</span>
-      </div>
+      <div style="font-size:11.5px;color:var(--mut);margin:0 16px 5px;line-height:1.7">${desc}</div>
+      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 12px;line-height:1.6">※この移籍がデータベースに更新されるまで時間を要する場合があります</div>
       <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
     return;
   }
