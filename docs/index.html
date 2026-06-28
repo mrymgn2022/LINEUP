@@ -27594,14 +27594,27 @@ const FEATURED_SQUADS=[];
 //   3) クラブ名・金額・日付・フリー表記は fotmob の表記をそのまま使う（fee 例：'自由移籍' / '€2300万' / '非公開'）
 //   ※ to が「フリー」= fotmob で「Free agent」（退団・移籍先未定）。実移籍先が決まれば差し替える。
 const FEATURED_TRANSFERS=[
-  { date:'6/13', player:'Wout Weghorst',          from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/12', player:'André Silva',            from:'Elche',        to:'FC Porto',    fee:'自由移籍', isNew:true },
-  { date:'6/12', player:'Florentino',             from:'Benfica',      to:'Burnley',     fee:'€2400万',  isNew:true },
-  { date:'6/11', player:'Raheem Sterling',        from:'Feyenoord',    to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/11', player:'Jadon Sancho',           from:'Man United',   to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/11', player:'Casemiro',               from:'Man United',   to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/11', player:'John Stones',            from:'Man City',     to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/11', player:'Bernardo Silva',         from:'Man City',     to:'Real Madrid', fee:'自由移籍', isNew:true },
+  { date:'6/27', player:'Wout Weghorst',          from:'Ajax',         to:'FC Twente',   fee:'自由移籍', isNew:true },
+  { date:'6/26', player:'Stefan de Vrij',         from:'Inter',        to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/26', player:'Piero Hincapié',         from:'Leverkusen',   to:'Arsenal',     fee:'€4000万',  isNew:true },
+  { date:'6/24', player:'Mauro Icardi',           from:'Galatasaray',  to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/24', player:'Remo Freuler',           from:'Bologna',      to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/19', player:'Jan Paul van Hecke',     from:'Brighton',     to:'Tottenham',   fee:'€6000万',  isNew:true },
+  { date:'6/19', player:'Víctor Muñoz',           from:'Osasuna',      to:'Liverpool',   fee:'€4000万',  isNew:true },
+  { date:'6/19', player:'Afonso Moreira',         from:'Lyon',         to:'Leverkusen',  fee:'€2950万',  isNew:true },
+  { date:'6/18', player:'Ibrahima Konaté',        from:'Liverpool',    to:'Real Madrid', fee:'自由移籍', isNew:true },
+  { date:'6/18', player:'Oleksandr Zinchenko',    from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/16', player:'Álvaro Morata',          from:'Milan',        to:'Como',        fee:'€1200万',  isNew:true },
+  { date:'6/16', player:'Takehiro Tomiyasu',      from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
+  { date:'6/15', player:'Marc Cucurella',         from:'Chelsea',      to:'Real Madrid', fee:'€5500万',  isNew:true },
+  { date:'6/13', player:'Ewen Jaouen',            from:'Reims',        to:'Newcastle',   fee:'€2150万',  isNew:true },
+  { date:'6/12', player:'André Silva',            from:'Elche',        to:'FC Porto',    fee:'自由移籍' },
+  { date:'6/12', player:'Florentino',             from:'Benfica',      to:'Burnley',     fee:'€2400万'  },
+  { date:'6/11', player:'Raheem Sterling',        from:'Feyenoord',    to:'フリー',      fee:'自由移籍' },
+  { date:'6/11', player:'Jadon Sancho',           from:'Man United',   to:'フリー',      fee:'自由移籍' },
+  { date:'6/11', player:'Casemiro',               from:'Man United',   to:'フリー',      fee:'自由移籍' },
+  { date:'6/11', player:'John Stones',            from:'Man City',     to:'フリー',      fee:'自由移籍' },
+  { date:'6/11', player:'Bernardo Silva',         from:'Man City',     to:'Real Madrid', fee:'自由移籍' },
   { date:'6/7',  player:'Orkun Kökcü',            from:'Benfica',      to:'Beşiktaş',    fee:'€3000万'  },
   { date:'6/6',  player:'Thomas Partey',          from:'Villarreal',   to:'フリー',      fee:'自由移籍' },
   { date:'6/6',  player:'Timothy Weah',           from:'Juventus',     to:'Marseille',   fee:'€1450万'  },
@@ -27609,8 +27622,7 @@ const FEATURED_TRANSFERS=[
   { date:'6/6',  player:'Loïs Openda',            from:'RB Leipzig',   to:'Juventus',    fee:'€4275万'  },
   { date:'6/5',  player:'Andrew Robertson',       from:'Liverpool',    to:'Tottenham',   fee:'自由移籍' },
   { date:'6/5',  player:'Aleksandar Stankovic',   from:'Club Brugge',  to:'Inter',       fee:'€2300万'  },
-  { date:'6/2',  player:'Issa Doumbia',           from:'Venezia',      to:'Sporting CP', fee:'€2053万'  },
-  { date:'6/1',  player:'Ibrahima Konaté',        from:'Liverpool',    to:'フリー',      fee:'自由移籍' }
+  { date:'6/2',  player:'Issa Doumbia',           from:'Venezia',      to:'Sporting CP', fee:'€2053万'  }
 ];
 // 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
 const TRANSFER_NEWS=[];
