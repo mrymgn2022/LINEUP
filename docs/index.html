@@ -27544,18 +27544,18 @@ function drawMkt(){
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
 document.getElementById('btnLoad').onclick=()=>newTeamFlow();
 
-/* ---------- お知らせ（起動時モーダル） ----------
-   更新があったらここを書き換える。id を変えると全員に再表示される（lsの既読が id 一致でないため）。
-   出したくないときは null。body は \n で改行可。 */
-const ANNOUNCEMENT = {
-  id: '2026-06-28-1',
-  date: '2026/6/28',
-  title: 'お知らせ機能を追加しました',
-  body: 'アプリ起動時に最新のお知らせを表示するようにしました。\n\n「今後表示しない」を押すと、次のお知らせが来るまで表示されません。'
-};
-function maybeShowAnnouncement(){ try{ if(!ANNOUNCEMENT||!ANNOUNCEMENT.id) return; if(lsGet('xi_announce_seen')===ANNOUNCEMENT.id) return; openAnnouncement(); }catch(e){} }
-function openAnnouncement(){
-  const a=ANNOUNCEMENT, w=document.getElementById('annwrap'); if(!w) return;
+/* ---------- お知らせ ----------
+   ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
+   メニュー「お知らせ」で過去分も全件閲覧できる。空配列ならポップアップ無し。body は \n で改行可。 */
+const ANNOUNCEMENTS = [
+  { id:'2026-06-28-1', date:'2026/6/28', title:'お知らせ機能を追加しました',
+    body:'アプリ起動時に最新のお知らせを表示するようにしました。\n\n「今後表示しない」を押すと、次のお知らせが来るまで表示されません。過去のお知らせはメニューの「お知らせ」からいつでも読み返せます。' }
+];
+function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNOUNCEMENTS[0]:null; }
+function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_seen')===a.id) return; openAnnouncement(a); }catch(e){} }
+function openAnnouncement(a){
+  a=a||latestAnnouncement(); if(!a) return;
+  const w=document.getElementById('annwrap'); if(!w) return;
   w.innerHTML=`<div class="anncard">
     <div class="annhead"><div class="anndate">${escAttr(a.date||'お知らせ')}</div><div class="anntitle">${escAttr(a.title||'')}</div></div>
     <div class="annbody">${escAttr(a.body||'')}</div>
@@ -27566,6 +27566,18 @@ function openAnnouncement(){
   document.getElementById('annLater').onclick=closeAnnouncement;                                              // 今回だけ閉じる（次回起動でまた表示）
 }
 function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
+// メニュー「お知らせ」：過去のお知らせを新しい順に一覧表示
+function openAnnouncementList(){
+  const list=ANNOUNCEMENTS||[];
+  const body = list.length ? list.map(a=>`
+    <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
+      <div style="font-size:11px;letter-spacing:1px;color:var(--lime);font-weight:800">${escAttr(a.date||'')}</div>
+      <div style="font-weight:800;color:var(--ink);font-size:15px;margin-top:4px">${escAttr(a.title||'')}</div>
+      ${a.body?`<div style="font-size:13px;color:var(--ink);margin-top:8px;line-height:1.8;white-space:pre-wrap">${escAttr(a.body)}</div>`:''}
+    </div>`).join('')
+    : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;border:1px dashed var(--line);border-radius:13px">お知らせはまだありません。</div>`;
+  openSheet(`<h2>お知らせ</h2><div style="padding:4px 0 calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
+}
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
@@ -27575,6 +27587,7 @@ const FEATURED_TRANSFERS=[];
 // 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
 const TRANSFER_NEWS=[];
 const _ICN_SAVE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>';
+const _ICN_BELL='<svg class="micon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>';
 function fmtTeamDate(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate(); }catch(e){ return ''; } }
 function renderDrawer(){ const d=document.getElementById('drawer'); d.innerHTML=drawerHTML(); wireDrawer(); }
 function openDrawer(){ renderDrawer(); document.getElementById('dscrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); }
@@ -27599,6 +27612,7 @@ function drawerHTML(){
     <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>注目移籍<span class="dchev">›</span></div>
     <div class="dwitem" data-feat="news"><span class="di">${ICN.detail}</span>移籍ニュース<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
+    <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>お知らせ<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
     <div class="dwitem" data-page="feedback"><span class="di">✉</span>ご意見・不具合報告<span class="dchev">›</span></div>
@@ -27633,6 +27647,7 @@ function openFeatured(kind){
 }
 function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
+  if(kind==='announcements'){ openAnnouncementList(); return; }
   const M={ premium:['プレミアム','課金で「保存チーム無制限」などを予定しています。準備中です。'],
             feedback:['ご意見・不具合報告','改善要望や不具合があれば教えてください。連絡先は準備中です。'] };
   const m=M[kind]||['',''];
