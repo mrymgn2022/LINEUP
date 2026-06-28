@@ -25676,6 +25676,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
     const z=dropZone(e.clientX,e.clientY); if(!z)return;
     if(pool==='bench'){
       if(z.z==='slot') benchToSlot(pid,z.i);
+      else if(z.z==='benchcard' && z.pid!==pid && state.bench.includes(z.pid)) benchSwap(pid,z.pid); // ベンチ同士を交換
       else if(z.z==='reservecard'||z.z==='reservearea') benchToReserve(pid);
     }else{ // reserve
       if(z.z==='slot') reserveToSlot(pid,z.i);
@@ -25722,6 +25723,12 @@ function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあ�
 function benchToReserve(pid){ // ベンチ→ベンチ外（控えから外す＝同クラブなら自動でベンチ外に）
   state.bench=state.bench.filter(b=>b!==pid);
   render();save();toast(shortName(P[pid][0])+' をベンチ外へ');
+}
+function benchSwap(a,b){ // ベンチ内の2人をドラッグで入れ替え（並び順を交換）
+  const ia=state.bench.indexOf(a), ib=state.bench.indexOf(b);
+  if(ia<0||ib<0||ia===ib) return;
+  state.bench[ia]=b; state.bench[ib]=a;
+  render();save();toast(shortName(P[a][0])+' ⇄ '+shortName(P[b][0]));
 }
 function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（外れた先発はベンチへ、満員ならベンチ外へ）
   const outgoing=state.slots[slotIdx].pid;
@@ -26846,7 +26853,8 @@ function playerMatches(p){
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
 function drawPickList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
-  pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i])&&(!benchAddMode||(!inXI(i)&&!state.bench.includes(i))));
+  // ベンチ追加でも在籍中(起用中/ベンチ)の選手は除外せず表示する（prowHTMLで選択不可にする）
+  pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   const so=pickFilter.sort||'suggest';
   if(so==='age_desc') pickCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
   else if(so==='age_asc') pickCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
@@ -26998,8 +27006,10 @@ function attachNatFilter(scope,f,redraw){
 }
 function prowHTML(i,hideBench){
   const p=P[i],g=grp(p[1]),already=inXI(i);
-  const onBench=!already&&!hideBench&&state.bench.includes(i); // チーム外ではなくこのスカッドのベンチにいる選手
-  return `<div class="prow ${already?'inxi':''}" data-pid="${i}">
+  const onBenchNow=state.bench.includes(i);
+  const onBench=!already&&!hideBench&&onBenchNow; // チーム外ではなくこのスカッドのベンチにいる選手
+  const lock=benchAddMode&&(already||onBenchNow); // ベンチ追加：在籍者は「起用中/ベンチ」表示で選択不可
+  return `<div class="prow ${already?'inxi':''}${lock?' locked':''}" ${lock?'':`data-pid="${i}"`}${lock?' style="opacity:.5;pointer-events:none"':''}>
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
       <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">●起用中</span>':''}${onBench?'<span class="badge benchbadge">●ベンチ</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">自作</span>':''}</div>
