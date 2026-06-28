@@ -25384,9 +25384,11 @@ function autoAssignSubs(){
   state.slots.forEach(s=>{
     if(s.pid==null){s.sub=null;return;}
     pickRole=s.role;
-    // 控えのうち「同じ大枠(GK/DF/MF/FW)」の未使用選手だけを、その枠のサジェスト順で1人
-    // （先に大枠で絞らないと、LM/RM枠でサジェスト上位のウイング等が選ばれて大枠不一致→nullになる）
-    const avail=state.bench.filter(pid=>!inXI(pid)&&!used.has(pid)&&grp(P[pid][1])===grp(s.role)).sort(suggestSort);
+    // 控えのうち「その役割に適性のある選手」(同POS or SUGGESTの代替位置)だけを対象に、完全一致優先→サジェスト順で1人。
+    // 適性外（例: RM枠にCDM）は選ばない。適性のある控えがいなければ第2候補は付けない。
+    const role=s.role;
+    const avail=state.bench.filter(pid=>!inXI(pid)&&!used.has(pid)&&subEligible(P[pid][1],role))
+      .sort((a,b)=>{ const ea=(P[a][1]===role)?0:1, eb=(P[b][1]===role)?0:1; if(ea!==eb)return ea-eb; return suggestSort(a,b); });
     const pid=avail[0];
     if(pid!=null){ used.add(pid); s.sub=pid; } else s.sub=null;
   });
@@ -26592,6 +26594,9 @@ const SUGGEST={
   LM:['LW','LB'], RM:['RW','RB'],
   LW:['LW','LM'], RW:['RW','RM'], ST:['ST']
 };
+// 第2候補の適性：そのPOSがロール自身か、SUGGESTに載る代替位置なら適性あり。
+// （例: RM枠の第2候補は RM/RW/RB のみ。CDM等の「同じ大枠だが別役」は適性外として除外）
+function subEligible(pos,role){ return pos===role || (SUGGEST[role]||[]).includes(pos); }
 let pickRole=null; // 現在ピッカー対象スロットの役割
 // 大枠内でのポジション並び順（同じ大枠の選手をポジションごとに固める）
 const POSORDER={GK:0,CB:1,RB:2,LB:3,RWB:4,LWB:5,CDM:1,CM:2,CAM:3,RM:4,LM:5,RW:1,LW:2,ST:3};
