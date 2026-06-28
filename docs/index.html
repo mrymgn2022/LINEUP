@@ -27600,9 +27600,12 @@ function openAnnouncementList(){
 //                 xi:[GK→DF→MF→FWの順に11名。FORM[form] と同じ並びで置く] } }
 //   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
 const FEATURED_SQUADS=[
-  { comp:'FIFAワールドカップ ラウンド32', kickoff:'',
-    home:{ team:'南アフリカ', nat:'RSA', form:'', xi:[] },
-    away:{ team:'カナダ',     nat:'CAN', form:'', xi:[] } }
+  { comp:'FIFAワールドカップ2026 ラウンド32', kickoff:'2026-06-30T02:00',
+    home:{ team:'日本', nat:'JPN', form:'3-4-2-1',
+      xi:['Z. Suzuki','H. Ito','Taniguchi','Tomiyasu','Nakamura','Tanaka','Sano','Doan','Maeda','Kamada','Ueda'] },
+    away:{ team:'ブラジル', nat:'BRA', form:'4-3-3',
+      xi:['Alisson','Santos','Gabriel','Marquinhos','Danilo','Guimarães','Casemiro','Paquetá','Vinicius','Cunha','Rayan'] },
+    preview:'2025年10月の親善試合では、日本が前半0-2から後半に3点を返し、3-2で対ブラジル初勝利を挙げた。約8カ月後の再戦は、一発勝負のラウンド32で実現する。\n\n■ 日本（3-4-2-1）\n前線からの守備で相手のビルドアップを制限し、ウエダを起点に鎌田・前田の2シャドーが絡む。3バックの脇とウイングバックの上下動が鍵。\n\n■ ブラジル（4-3-3）\nヴィニシウスとクーニャの推進力、カゼミロとB.グマランイスの中盤が軸。アリソンを最後尾に、マルキーニョスとガブリエウが最終ラインを統率する。\n\n■ 焦点\n・日本の前線守備とブラジルのビルドアップの攻防\n・ヴィニシウス vs 日本の右サイド（堂安・冨安）\n・セットプレーやカウンターでのウエダの空中戦' }
 ];
 // 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) の確定移籍を出典に、人気クラブ100(POP_CLUBS)が
 //   移籍元 or 移籍先に絡むものだけを新しい順に並べる。人気クラブからのフリー（退団・無所属含む）もOK。
@@ -27772,6 +27775,10 @@ function squadMatchHTML(m){
     ${ko?`<div style="margin:3px 16px 0;font-size:11px;color:var(--mut)">${ko} キックオフ</div>`:''}
     ${squadTeamBlockHTML(m.home)}
     ${squadTeamBlockHTML(m.away)}
+    ${m.preview?`<div style="margin:18px 16px 0">
+      <div style="font-size:12px;font-weight:800;color:var(--lime);letter-spacing:.4px;margin-bottom:7px">試合の見どころ</div>
+      <div style="font-size:12.5px;color:var(--ink);line-height:1.9;white-space:pre-wrap">${escAttr(m.preview)}</div>
+    </div>`:''}
   </div>`;
 }
 function openFeatured(kind){
