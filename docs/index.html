@@ -244,11 +244,11 @@ header{
 .sheet h2 span{font-size:11px;font-family:'Manrope';font-weight:700;color:var(--lime);background:rgba(202,255,58,.12);padding:3px 9px;border-radius:999px;margin-left:auto}
 
 /* ---------- Drawer (左ハンバーガーメニュー) ---------- */
-.dscrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:72;opacity:0;pointer-events:none;transition:.2s}
+.dscrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:72;opacity:0;pointer-events:none;transition:opacity .2s}
 .dscrim.on{opacity:1;pointer-events:auto}
 .drawer{position:fixed;top:0;bottom:0;left:max(0px,calc(50% - 280px));width:min(86vw,326px);z-index:73;
   background:var(--panel);border-right:1px solid var(--line);box-shadow:10px 0 44px rgba(0,0,0,.55);
-  transform:translateX(-104%);transition:transform .26s cubic-bezier(.3,.9,.3,1);
+  transform:translateX(-104%);transition:transform .26s cubic-bezier(.3,.9,.3,1);will-change:transform;
   display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 .drawer.on{transform:translateX(0)}
 .dwhead{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 14px) 14px 10px;border-bottom:1px solid var(--line)}
@@ -25394,6 +25394,19 @@ function autoAssignSubs(){
   });
   pickRole=savedRole;
 }
+// CB配置の利き足最適化：選手の「選定」は市場価値順のまま。選ばれたCB同士の左右割当だけ利き足で最適化する
+// （左利き→左、右利き→右）。同じ利き足で並べ替えても意味がない所は元の順（＝市場価値順）を維持。
+function optimizeCBFeet(){
+  const cbs=state.slots.filter(s=>s.role==='CB'&&s.pid!=null);
+  if(cbs.length<2) return;
+  cbs.sort((a,b)=>a.x-b.x); // 左→右
+  const leftScore=pid=>{ const f=footOf(P[pid]); return f==='左'?2:(f==='両'?1:0); }; // 左寄り度（左>両>右/不明）
+  const ordered=cbs.map(s=>s.pid)
+    .map((pid,idx)=>({pid,idx,sc:leftScore(pid)}))
+    .sort((a,b)=> b.sc-a.sc || a.idx-b.idx) // 左寄り度↓、同点は元の順(=市場価値順)を維持
+    .map(o=>o.pid);
+  cbs.forEach((s,k)=>{ s.pid=ordered[k]; }); // 最左=最も左利き … 最右=最も右利き
+}
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
 function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人
 function benchReturn(pid){
@@ -27510,6 +27523,8 @@ document.getElementById('btnLoad').onclick=()=>newTeamFlow();
 const FEATURED_SQUADS=[];
 // 注目移籍：発生した移籍・噂。{title, sub, body} を配列に追加して更新する。
 const FEATURED_TRANSFERS=[];
+// 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
+const TRANSFER_NEWS=[];
 const _ICN_SAVE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>';
 function fmtTeamDate(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate(); }catch(e){ return ''; } }
 function renderDrawer(){ const d=document.getElementById('drawer'); d.innerHTML=drawerHTML(); wireDrawer(); }
@@ -27533,6 +27548,7 @@ function drawerHTML(){
     <div class="dwdiv"></div>
     <div class="dwitem" data-feat="squad"><span class="di">${ICN.sub}</span>注目スカッド<span class="dchev">›</span></div>
     <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>注目移籍<span class="dchev">›</span></div>
+    <div class="dwitem" data-feat="news"><span class="di">${ICN.detail}</span>移籍ニュース<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
@@ -27551,10 +27567,12 @@ function wireDrawer(){
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
 }
 function openFeatured(kind){
-  const isSquad=kind==='squad';
-  const list=isSquad?FEATURED_SQUADS:FEATURED_TRANSFERS;
-  const title=isSquad?'注目スカッド':'注目移籍', tag=isSquad?'予想':'NEWS';
-  const sub=isSquad?'近日の注目カードの予想スタメンを随時更新':'発生した移籍・噂を随時更新';
+  const CFG={
+    squad:    {list:FEATURED_SQUADS,    title:'注目スカッド', tag:'予想', sub:'近日の注目カードの予想スタメンを随時更新'},
+    transfer: {list:FEATURED_TRANSFERS, title:'注目移籍',     tag:'NEWS', sub:'発生した注目移籍・噂を随時更新'},
+    news:     {list:TRANSFER_NEWS,      title:'移籍ニュース', tag:'NEWS', sub:'最新の移籍ニュースを随時更新'}
+  };
+  const c=CFG[kind]||CFG.squad, list=c.list, title=c.title, tag=c.tag, sub=c.sub;
   const body = list.length ? list.map(it=>`
     <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
       <div style="font-weight:800;color:var(--ink);font-size:15px">${escAttr(it.title||'')}</div>
@@ -27662,23 +27680,27 @@ window.addEventListener('pagehide',autoSaveDraft);
   let active=false, opening=false, decided=0, prepped=false, sx=0, sy=0, w=300, curX=0, suppress=false;
   const tx=x=>{ d.style.transition='none'; d.style.transform='translateX('+x+'px)'; };
   const setOp=o=>{ sc.style.transition='none'; sc.style.opacity=o; };
-  const reset=()=>{ d.style.transition=''; d.style.transform=''; sc.style.transition=''; sc.style.opacity=''; };
+  const clearInline=()=>{ d.style.transition=''; d.style.transform=''; sc.style.transition=''; sc.style.opacity=''; };
   const stop=()=>{ active=false; window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',en); window.removeEventListener('pointercancel',en); };
-  function prep(){ renderDrawer(); sc.classList.add('on'); d.classList.add('on'); tx(-w); setOp('0'); prepped=true; }
+  const undoPrep=()=>{ if(prepped){ d.classList.remove('on'); sc.classList.remove('on'); clearInline(); prepped=false; } };
   function start(open,e){ active=true; opening=open; decided=0; prepped=false; curX=open?-9999:0; sx=e.clientX; sy=e.clientY; w=d.getBoundingClientRect().width||300;
+    if(open){ renderDrawer(); sc.classList.add('on'); d.classList.add('on'); tx(-w); setOp('0'); prepped=true; } // 事前に描画＆画面外に置く→ドラッグ開始から滑らか
     window.addEventListener('pointermove',mv,{passive:false}); window.addEventListener('pointerup',en); window.addEventListener('pointercancel',en); }
   function mv(e){ if(!active)return; const dx=e.clientX-sx, dy=e.clientY-sy;
-    if(!decided){ if(Math.abs(dx)<6&&Math.abs(dy)<6)return; decided=(Math.abs(dx)>=Math.abs(dy))?1:-1; if(decided===-1){ stop(); return; } }
+    if(!decided){ if(Math.abs(dx)<6&&Math.abs(dy)<6)return; decided=(Math.abs(dx)>=Math.abs(dy))?1:-1; if(decided===-1){ if(opening) undoPrep(); stop(); return; } } // 縦＝スクロール意図：開きかけを戻す
     if(decided!==1)return; if(e.cancelable)e.preventDefault();
-    if(opening){ if(!prepped)prep(); curX=Math.max(-w,Math.min(0,-w+dx)); } else { curX=Math.max(-w,Math.min(0,dx)); }
-    tx(curX); setOp(String(Math.max(0,Math.min(1,(w+curX)/w))*0.55)); }
+    curX = opening ? Math.max(-w,Math.min(0,-w+dx)) : Math.max(-w,Math.min(0,dx));
+    tx(curX); setOp(String(Math.max(0,Math.min(1,(w+curX)/w))*0.5)); }
   function en(){ if(!active)return; const o=opening, dec=decided, x=curX; stop();
-    if(dec!==1){ if(o&&prepped){ d.classList.remove('on'); sc.classList.remove('on'); reset(); } return; }
-    suppress=!o; reset();
-    if(o){ if(x>-w*0.55){ d.classList.add('on'); sc.classList.add('on'); } else { d.classList.remove('on'); sc.classList.remove('on'); } }
-    else { if(x<-w*0.34){ closeDrawer(); } else { d.classList.add('on'); sc.classList.add('on'); } } }
-  // 開く：画面左端(<24px)から、本体スクロール領域上で右スワイプ
-  document.addEventListener('pointerdown',e=>{ if(active||d.classList.contains('on'))return; if(e.clientX>24)return; if(!e.target.closest('#scroll'))return; start(true,e); });
+    if(dec!==1){ if(o) undoPrep(); return; }                 // 横スワイプにならなかった（タップ等）
+    suppress=!o;
+    const openIt = o ? (x>-w*0.42) : !(x<-w*0.34);           // 開く方に決着するか（開き=42%超ドラッグ／閉じ=34%超で閉じる）
+    d.style.transition=''; sc.style.transition='';           // CSSトランジション復帰
+    if(openIt){ d.classList.add('on'); sc.classList.add('on'); } else { d.classList.remove('on'); sc.classList.remove('on'); prepped=false; }
+    d.style.transform=''; sc.style.opacity='';               // inline解除→現在位置からCSSの開/閉へ滑らかにアニメ
+  }
+  // 開く：画面左端(<30px)から、本体スクロール領域上で右スワイプ
+  document.addEventListener('pointerdown',e=>{ if(active||d.classList.contains('on'))return; if(e.clientX>30)return; if(!e.target.closest('#scroll'))return; start(true,e); });
   // 閉じる：開いているドロワー上で左スワイプ
   d.addEventListener('pointerdown',e=>{ if(active||!d.classList.contains('on'))return; start(false,e); });
   // 閉じスワイプ直後の誤クリック（チーム読込/新規作成など）を1回だけ無効化
@@ -27705,6 +27727,7 @@ function clubRow(c){
 function autoFillFrom(ids){
   const used=new Set(); const savedRole=pickRole;
   state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
+  optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
   // 控え構成：まず各スタメン枠に同じ大枠(GK/DF/MF/FW)のバックアップを1人ずつ確保し、
   // 残り枠を市場価値順で埋める（こうしないと高額なFW/MFに偏ってDFの第二候補が付かない）
   const benchSet=new Set();
@@ -27900,6 +27923,7 @@ function placeClubSquad(club,name){
     if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null;
   });
   pickRole=savedRole;
+  optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
   state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15).sort(benchPosSort); // 選出は市場価値の上位15人、表示はポジション順
   state.loadedClub=club;
