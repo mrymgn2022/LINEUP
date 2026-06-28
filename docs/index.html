@@ -27589,40 +27589,41 @@ const FEATURED_SQUADS=[];
 // 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) の確定移籍を出典に、人気クラブ100(POP_CLUBS)が
 //   移籍元 or 移籍先に絡むものだけを新しい順に並べる。人気クラブからのフリー（退団・無所属含む）もOK。
 // 更新の手順（この方式で随時更新）：fotmobの移籍行をコピペ → 人気クラブ絡みだけ抽出 → 先頭へ追記。
-//   1) 新しく加える移籍は配列の先頭に { date, player, from, to, fee, isNew:true } を追加
+//   1) 新しく加える移籍は配列の先頭に { date, player, nat, from, to, fee, isNew:true } を追加
 //   2) 前回追加分の isNew を外す（NEW! は最新更新分だけに付く）
-//   3) クラブ名・金額・日付・フリー表記は fotmob の表記をそのまま使う（fee 例：'自由移籍' / '€2300万' / '非公開'）
+//   3) nat=選手の国籍コード(FIキー: POR/ESP/ENG/SCO/BRA…)。from/to のクラブ名は TR_CLUB_NAT に国コードを足すと国旗が出る
+//   4) クラブ名・金額・日付は fotmob 表記。移籍金なし/無所属は fee:'フリー'（赤丸斜線で表示）
 //   ※ to が「フリー」= fotmob で「Free agent」（退団・移籍先未定）。実移籍先が決まれば差し替える。
 const FEATURED_TRANSFERS=[
-  { date:'6/27', player:'Wout Weghorst',          from:'Ajax',         to:'FC Twente',   fee:'自由移籍', isNew:true },
-  { date:'6/26', player:'Stefan de Vrij',         from:'Inter',        to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/26', player:'Piero Hincapié',         from:'Leverkusen',   to:'Arsenal',     fee:'€4000万',  isNew:true },
-  { date:'6/24', player:'Mauro Icardi',           from:'Galatasaray',  to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/24', player:'Remo Freuler',           from:'Bologna',      to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/19', player:'Jan Paul van Hecke',     from:'Brighton',     to:'Tottenham',   fee:'€6000万',  isNew:true },
-  { date:'6/19', player:'Víctor Muñoz',           from:'Osasuna',      to:'Liverpool',   fee:'€4000万',  isNew:true },
-  { date:'6/19', player:'Afonso Moreira',         from:'Lyon',         to:'Leverkusen',  fee:'€2950万',  isNew:true },
-  { date:'6/18', player:'Ibrahima Konaté',        from:'Liverpool',    to:'Real Madrid', fee:'自由移籍', isNew:true },
-  { date:'6/18', player:'Oleksandr Zinchenko',    from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/16', player:'Álvaro Morata',          from:'Milan',        to:'Como',        fee:'€1200万',  isNew:true },
-  { date:'6/16', player:'Takehiro Tomiyasu',      from:'Ajax',         to:'フリー',      fee:'自由移籍', isNew:true },
-  { date:'6/15', player:'Marc Cucurella',         from:'Chelsea',      to:'Real Madrid', fee:'€5500万',  isNew:true },
-  { date:'6/13', player:'Ewen Jaouen',            from:'Reims',        to:'Newcastle',   fee:'€2150万',  isNew:true },
-  { date:'6/12', player:'André Silva',            from:'Elche',        to:'FC Porto',    fee:'自由移籍' },
-  { date:'6/12', player:'Florentino',             from:'Benfica',      to:'Burnley',     fee:'€2400万'  },
-  { date:'6/11', player:'Raheem Sterling',        from:'Feyenoord',    to:'フリー',      fee:'自由移籍' },
-  { date:'6/11', player:'Jadon Sancho',           from:'Man United',   to:'フリー',      fee:'自由移籍' },
-  { date:'6/11', player:'Casemiro',               from:'Man United',   to:'フリー',      fee:'自由移籍' },
-  { date:'6/11', player:'John Stones',            from:'Man City',     to:'フリー',      fee:'自由移籍' },
-  { date:'6/11', player:'Bernardo Silva',         from:'Man City',     to:'Real Madrid', fee:'自由移籍' },
-  { date:'6/7',  player:'Orkun Kökcü',            from:'Benfica',      to:'Beşiktaş',    fee:'€3000万'  },
-  { date:'6/6',  player:'Thomas Partey',          from:'Villarreal',   to:'フリー',      fee:'自由移籍' },
-  { date:'6/6',  player:'Timothy Weah',           from:'Juventus',     to:'Marseille',   fee:'€1450万'  },
-  { date:'6/6',  player:'Vanja Milinkovic-Savic', from:'Torino',       to:'Napoli',      fee:'€600万'   },
-  { date:'6/6',  player:'Loïs Openda',            from:'RB Leipzig',   to:'Juventus',    fee:'€4275万'  },
-  { date:'6/5',  player:'Andrew Robertson',       from:'Liverpool',    to:'Tottenham',   fee:'自由移籍' },
-  { date:'6/5',  player:'Aleksandar Stankovic',   from:'Club Brugge',  to:'Inter',       fee:'€2300万'  },
-  { date:'6/2',  player:'Issa Doumbia',           from:'Venezia',      to:'Sporting CP', fee:'€2053万'  }
+  { date:'6/27', player:'Wout Weghorst',          nat:'NED', from:'Ajax',         to:'FC Twente',   fee:'フリー',  isNew:true },
+  { date:'6/26', player:'Stefan de Vrij',         nat:'NED', from:'Inter',        to:'フリー',      fee:'フリー',  isNew:true },
+  { date:'6/26', player:'Piero Hincapié',         nat:'ECU', from:'Leverkusen',   to:'Arsenal',     fee:'€4000万', isNew:true },
+  { date:'6/24', player:'Mauro Icardi',           nat:'ARG', from:'Galatasaray',  to:'フリー',      fee:'フリー',  isNew:true },
+  { date:'6/24', player:'Remo Freuler',           nat:'SUI', from:'Bologna',      to:'フリー',      fee:'フリー',  isNew:true },
+  { date:'6/19', player:'Jan Paul van Hecke',     nat:'NED', from:'Brighton',     to:'Tottenham',   fee:'€6000万', isNew:true },
+  { date:'6/19', player:'Víctor Muñoz',           nat:'ESP', from:'Osasuna',      to:'Liverpool',   fee:'€4000万', isNew:true },
+  { date:'6/19', player:'Afonso Moreira',         nat:'POR', from:'Lyon',         to:'Leverkusen',  fee:'€2950万', isNew:true },
+  { date:'6/18', player:'Ibrahima Konaté',        nat:'FRA', from:'Liverpool',    to:'Real Madrid', fee:'フリー',  isNew:true },
+  { date:'6/18', player:'Oleksandr Zinchenko',    nat:'UKR', from:'Ajax',         to:'フリー',      fee:'フリー',  isNew:true },
+  { date:'6/16', player:'Álvaro Morata',          nat:'ESP', from:'Milan',        to:'Como',        fee:'€1200万', isNew:true },
+  { date:'6/16', player:'Takehiro Tomiyasu',      nat:'JPN', from:'Ajax',         to:'フリー',      fee:'フリー',  isNew:true },
+  { date:'6/15', player:'Marc Cucurella',         nat:'ESP', from:'Chelsea',      to:'Real Madrid', fee:'€5500万', isNew:true },
+  { date:'6/13', player:'Ewen Jaouen',            nat:'FRA', from:'Reims',        to:'Newcastle',   fee:'€2150万', isNew:true },
+  { date:'6/12', player:'André Silva',            nat:'POR', from:'Elche',        to:'FC Porto',    fee:'フリー'  },
+  { date:'6/12', player:'Florentino',             nat:'POR', from:'Benfica',      to:'Burnley',     fee:'€2400万' },
+  { date:'6/11', player:'Raheem Sterling',        nat:'ENG', from:'Feyenoord',    to:'フリー',      fee:'フリー'  },
+  { date:'6/11', player:'Jadon Sancho',           nat:'ENG', from:'Man United',   to:'フリー',      fee:'フリー'  },
+  { date:'6/11', player:'Casemiro',               nat:'BRA', from:'Man United',   to:'フリー',      fee:'フリー'  },
+  { date:'6/11', player:'John Stones',            nat:'ENG', from:'Man City',     to:'フリー',      fee:'フリー'  },
+  { date:'6/11', player:'Bernardo Silva',         nat:'POR', from:'Man City',     to:'Real Madrid', fee:'フリー'  },
+  { date:'6/7',  player:'Orkun Kökcü',            nat:'TUR', from:'Benfica',      to:'Beşiktaş',    fee:'€3000万' },
+  { date:'6/6',  player:'Thomas Partey',          nat:'GHA', from:'Villarreal',   to:'フリー',      fee:'フリー'  },
+  { date:'6/6',  player:'Timothy Weah',           nat:'USA', from:'Juventus',     to:'Marseille',   fee:'€1450万' },
+  { date:'6/6',  player:'Vanja Milinkovic-Savic', nat:'SRB', from:'Torino',       to:'Napoli',      fee:'€600万'  },
+  { date:'6/6',  player:'Loïs Openda',            nat:'BEL', from:'RB Leipzig',   to:'Juventus',    fee:'€4275万' },
+  { date:'6/5',  player:'Andrew Robertson',       nat:'SCO', from:'Liverpool',    to:'Tottenham',   fee:'フリー'  },
+  { date:'6/5',  player:'Aleksandar Stankovic',   nat:'SRB', from:'Club Brugge',  to:'Inter',       fee:'€2300万' },
+  { date:'6/2',  player:'Issa Doumbia',           nat:'CIV', from:'Venezia',      to:'Sporting CP', fee:'€2053万' }
 ];
 // 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
 const TRANSFER_NEWS=[];
@@ -27669,20 +27670,41 @@ function wireDrawer(){
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
 }
-// 注目移籍カード：日付＋NEW!、選手名、移籍元 → 移籍先、移籍金。見やすさ優先のシンプルな1枚。
+// 注目移籍カード用：クラブ名 → 国コード(FI)。to が 'フリー'(無所属)のときは旗の代わりに赤丸斜線マーク。
+const TR_CLUB_NAT={
+  'Ajax':'NED','FC Twente':'NED','Inter':'ITA','Leverkusen':'GER','Arsenal':'ENG','Galatasaray':'TUR',
+  'Bologna':'ITA','Brighton':'ENG','Tottenham':'ENG','Osasuna':'ESP','Liverpool':'ENG','Lyon':'FRA',
+  'Real Madrid':'ESP','Milan':'ITA','Como':'ITA','Chelsea':'ENG','Reims':'FRA','Newcastle':'ENG',
+  'Elche':'ESP','FC Porto':'POR','Benfica':'POR','Burnley':'ENG','Feyenoord':'NED','Man United':'ENG',
+  'Man City':'ENG','Beşiktaş':'TUR','Villarreal':'ESP','Juventus':'ITA','Marseille':'FRA','Torino':'ITA',
+  'Napoli':'ITA','RB Leipzig':'GER','Club Brugge':'BEL','Venezia':'ITA','Sporting CP':'POR'
+};
+// フリー（移籍金なし／無所属）＝赤丸に斜線のマーク＋「フリー」
+const _ICN_FREE='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#e5484d" stroke-width="2.2" style="flex:0 0 auto;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
+function trFreeCell(){ return `${_ICN_FREE}<span style="color:#e5484d;font-weight:800">フリー</span>`; }
+// 注目移籍カード：日付＋NEW!＋移籍金、選手名(国旗)、移籍元 → 移籍先（各クラブに国旗、フリーは赤丸斜線）。
 function transferCardHTML(it){
   const arrow=`<span style="color:var(--lime);font-weight:900;font-size:15px;flex:0 0 auto">→</span>`;
+  const clubCell=(club,side)=>{ const right=side==='from';
+    const base=`flex:1 1 0;min-width:0;display:flex;align-items:center;gap:5px;${right?'justify-content:flex-end;color:var(--mut)':'color:var(--ink);font-weight:800'}`;
+    const inner = club==='フリー' ? trFreeCell()
+      : `${flagHTML(TR_CLUB_NAT[club]||'')}<span style="overflow-wrap:anywhere">${escAttr(club)}</span>`;
+    return `<span style="${base}">${inner}</span>`;
+  };
+  const feeHTML = it.fee==='フリー' ? trFreeCell() : escAttr(it.fee||'—');
   return `<div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:0 16px 10px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
       <span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--mut)">${escAttr(it.date||'')}</span>
       ${it.isNew?`<span style="font-size:10px;font-weight:900;letter-spacing:.5px;color:#0a0a0a;background:var(--lime);border-radius:5px;padding:2px 6px;line-height:1.2">NEW!</span>`:''}
-      <span style="margin-left:auto;font-size:12px;font-weight:800;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px">${escAttr(it.fee||'—')}</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px">${feeHTML}</span>
     </div>
-    <div style="font-weight:800;color:var(--ink);font-size:15.5px;margin-bottom:8px">${escAttr(it.player||'')}</div>
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+      ${flagHTML(it.nat||'')}<span style="font-weight:800;color:var(--ink);font-size:15.5px">${escAttr(it.player||'')}</span>
+    </div>
     <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
-      <span style="flex:1 1 0;min-width:0;text-align:right;color:var(--mut);overflow-wrap:anywhere">${escAttr(it.from||'—')}</span>
+      ${clubCell(it.from||'—','from')}
       ${arrow}
-      <span style="flex:1 1 0;min-width:0;color:var(--ink);font-weight:800;overflow-wrap:anywhere">${escAttr(it.to||'—')}</span>
+      ${clubCell(it.to||'—','to')}
     </div>
   </div>`;
 }
