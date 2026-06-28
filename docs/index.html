@@ -27586,8 +27586,31 @@ function openAnnouncementList(){
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：近日の注目カードの予想スタメン。{title, sub, body} を配列に追加して更新する。
 const FEATURED_SQUADS=[];
-// 注目移籍：発生した移籍・噂。{title, sub, body} を配列に追加して更新する。
-const FEATURED_TRANSFERS=[];
+// 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) を出典に、人気クラブ100(POP_CLUBS)が
+//   移籍元 or 移籍先に絡む 6/15 以降の移籍だけを新しい順に並べる。人気クラブからのフリー移籍もOK。
+// 更新の手順（この方式で随時更新）：
+//   1) 新しく加える移籍は配列の先頭に { date, player, from, to, fee, isNew:true } を追加
+//   2) 前回追加分の isNew を外す（NEW! は最新更新分だけに付く）
+//   3) from/to は POP_CLUBS（人気クラブ100）の表記に合わせる（掲載は人気クラブ絡みの移籍のみ）
+//   fee は表示用文字列：'フリー' / '£69.3m' / '非公開' / 'ローン' など。
+const FEATURED_TRANSFERS=[
+  { date:'7/1',  player:'Anthony Gordon',     from:'Newcastle United',  to:'Barcelona',         fee:'£69.3m', isNew:true },
+  { date:'7/1',  player:'Jérémy Jacquet',     from:'Stade Rennais',     to:'Liverpool',         fee:'£60m',   isNew:true },
+  { date:'7/1',  player:'Marc Cucurella',     from:'Chelsea',           to:'Real Madrid',       fee:'£47.5m', isNew:true },
+  { date:'7/1',  player:'Geovany Quenda',     from:'Sporting CP',       to:'Chelsea',           fee:'£40m',   isNew:true },
+  { date:'7/1',  player:'Ibrahima Konaté',    from:'Liverpool',         to:'Real Madrid',       fee:'フリー', isNew:true },
+  { date:'7/1',  player:'Bernardo Silva',     from:'Manchester City',   to:'Real Madrid',       fee:'フリー', isNew:true },
+  { date:'7/1',  player:'Andy Robertson',     from:'Liverpool',         to:'Tottenham',         fee:'フリー', isNew:true },
+  { date:'6/29', player:'Rasmus Højlund',     from:'Manchester United', to:'Napoli',            fee:'£38m',   isNew:true },
+  { date:'6/29', player:'Donyell Malen',      from:'Aston Villa',       to:'AS Roma',           fee:'£21.6m', isNew:true },
+  { date:'6/25', player:'Piero Hincapié',     from:'Bayer Leverkusen',  to:'Arsenal',           fee:'£34.5m' },
+  { date:'6/18', player:'Jan Paul van Hecke', from:'Brighton',          to:'Tottenham',         fee:'£52m'   },
+  { date:'6/18', player:'Víctor Muñoz',       from:'Osasuna',           to:'Liverpool',         fee:'£34.5m' },
+  { date:'6/15', player:'Jannik Schuster',    from:'Red Bull Salzburg', to:'Brentford',         fee:'£12m'   },
+  { date:'6/15', player:'Costinha',           from:'Olympiacos Piraeus',to:'Brighton',          fee:'£11m'   },
+  { date:'6/15', player:'Modou Kéba Cissé',   from:'LASK',              to:'Aston Villa',        fee:'£4m'    },
+  { date:'6/15', player:'Chuba Akpom',        from:'Ajax Amsterdam',    to:'Ipswich Town',       fee:'非公開' }
+];
 // 移籍ニュース：最新の移籍ニュース。{title, sub, body} を配列に追加して更新する。
 const TRANSFER_NEWS=[];
 const _ICN_SAVE='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>';
@@ -27633,10 +27656,38 @@ function wireDrawer(){
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
 }
+// 注目移籍カード：日付＋NEW!、選手名、移籍元 → 移籍先、移籍金。見やすさ優先のシンプルな1枚。
+function transferCardHTML(it){
+  const arrow=`<span style="color:var(--lime);font-weight:900;font-size:15px;flex:0 0 auto">→</span>`;
+  return `<div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:0 16px 10px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--mut)">${escAttr(it.date||'')}</span>
+      ${it.isNew?`<span style="font-size:10px;font-weight:900;letter-spacing:.5px;color:#0a0a0a;background:var(--lime);border-radius:5px;padding:2px 6px;line-height:1.2">NEW!</span>`:''}
+      <span style="margin-left:auto;font-size:12px;font-weight:800;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:2px 10px">${escAttr(it.fee||'—')}</span>
+    </div>
+    <div style="font-weight:800;color:var(--ink);font-size:15.5px;margin-bottom:8px">${escAttr(it.player||'')}</div>
+    <div style="display:flex;align-items:center;gap:9px;font-size:12.5px">
+      <span style="flex:1 1 0;min-width:0;text-align:right;color:var(--mut);overflow-wrap:anywhere">${escAttr(it.from||'—')}</span>
+      ${arrow}
+      <span style="flex:1 1 0;min-width:0;color:var(--ink);font-weight:800;overflow-wrap:anywhere">${escAttr(it.to||'—')}</span>
+    </div>
+  </div>`;
+}
 function openFeatured(kind){
+  if(kind==='transfer'){
+    const list=FEATURED_TRANSFERS, sub='fotmob を出典に、人気クラブ100に絡む 6/15 以降の移籍を随時更新';
+    const body = list.length ? list.map(transferCardHTML).join('')
+      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${sub}します。</div>`;
+    openSheet(`<h2>注目移籍 <span>NEWS</span></h2>
+      <div style="font-size:11px;color:var(--mut);margin:0 16px 4px">${sub}（2026年夏ウィンドウ）</div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:var(--mut);margin:0 16px 12px">
+        <span><b style="color:var(--ink)">移籍元</b> → <b style="color:var(--ink)">移籍先</b></span><span>右端＝移籍金</span><span style="color:var(--lime);font-weight:900">NEW!＝最新更新</span>
+      </div>
+      <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
+    return;
+  }
   const CFG={
     squad:    {list:FEATURED_SQUADS,    title:'注目スカッド', tag:'予想', sub:'近日の注目カードの予想スタメンを随時更新'},
-    transfer: {list:FEATURED_TRANSFERS, title:'注目移籍',     tag:'NEWS', sub:'発生した注目移籍・噂を随時更新'},
     news:     {list:TRANSFER_NEWS,      title:'移籍ニュース', tag:'NEWS', sub:'最新の移籍ニュースを随時更新'}
   };
   const c=CFG[kind]||CFG.squad, list=c.list, title=c.title, tag=c.tag, sub=c.sub;
