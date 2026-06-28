@@ -27597,15 +27597,22 @@ function openAnnouncementList(){
 // 注目スカッド：注目試合の予想スタメン（ピッチ図・両チーム）。1エントリ=1試合。目標は1日1試合以上。
 //   { comp:'大会名(必須)', kickoff:'2026-06-29T20:00'(ISO・24時間前表示の判定に使用),
 //     home/away:{ team:'チーム名', nat:'FIキー(RSA/CAN等)', form:'FORMのキー(4-3-3等)',
-//                 xi:[GK→DF→MF→FWの順に11名。FORM[form] と同じ並びで置く] } }
+//                 xi:[{name,club} を11個。GK→DF→MF→FWの順＝FORM[form]と同じ並びで置く。clubは省略可] } }
+//     preview:'試合の見どころ(任意・\nで改行)' }  ※記事は必ず日本のサイトで選手名表記をダブルチェック
 //   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
 const FEATURED_SQUADS=[
   { comp:'FIFAワールドカップ2026 ラウンド32', kickoff:'2026-06-30T02:00',
-    home:{ team:'日本', nat:'JPN', form:'3-4-2-1',
-      xi:['Z. Suzuki','H. Ito','Taniguchi','Tomiyasu','Nakamura','Tanaka','Sano','Doan','Maeda','Kamada','Ueda'] },
-    away:{ team:'ブラジル', nat:'BRA', form:'4-3-3',
-      xi:['Alisson','Santos','Gabriel','Marquinhos','Danilo','Guimarães','Casemiro','Paquetá','Vinicius','Cunha','Rayan'] },
-    preview:'2025年10月の親善試合では、日本が前半0-2から後半に3点を返し、3-2で対ブラジル初勝利を挙げた。約8カ月後の再戦は、一発勝負のラウンド32で実現する。\n\n■ 日本（3-4-2-1）\n前線からの守備で相手のビルドアップを制限し、ウエダを起点に鎌田・前田の2シャドーが絡む。3バックの脇とウイングバックの上下動が鍵。\n\n■ ブラジル（4-3-3）\nヴィニシウスとクーニャの推進力、カゼミロとB.グマランイスの中盤が軸。アリソンを最後尾に、マルキーニョスとガブリエウが最終ラインを統率する。\n\n■ 焦点\n・日本の前線守備とブラジルのビルドアップの攻防\n・ヴィニシウス vs 日本の右サイド（堂安・冨安）\n・セットプレーやカウンターでのウエダの空中戦' }
+    home:{ team:'日本', nat:'JPN', form:'3-4-2-1', xi:[
+      {name:'Z. Suzuki',club:'Parma'},{name:'H. Ito',club:'Bayern München'},{name:'Taniguchi',club:'Sint-Truidense VV'},
+      {name:'Tomiyasu',club:'Ajax'},{name:'Nakamura',club:'Stade Reims'},{name:'Tanaka',club:'Leeds'},
+      {name:'Sano',club:'Mainz 05'},{name:'Doan',club:'Frankfurt'},{name:'Maeda',club:'Celtic'},
+      {name:'Kamada',club:'Crystal Palace'},{name:'Ueda',club:'Feyenoord'}] },
+    away:{ team:'ブラジル', nat:'BRA', form:'4-3-3', xi:[
+      {name:'Alisson',club:'Liverpool'},{name:'Santos',club:'Zenit'},{name:'Gabriel',club:'Arsenal'},
+      {name:'Marquinhos',club:'PSG'},{name:'Danilo',club:'Flamengo'},{name:'Guimarães',club:'Newcastle United'},
+      {name:'Casemiro',club:'Manchester United'},{name:'Paquetá',club:'CR Flamengo'},{name:'Vinicius',club:'Real Madrid'},
+      {name:'Cunha',club:'Manchester United'},{name:'Rayan',club:'Bournemouth'}] },
+    preview:'2025年10月の親善試合では、日本が前半0-2から後半に3点を返し、3-2で対ブラジル初勝利を挙げた。約8カ月後の再戦は、一発勝負のラウンド32で実現する。\n\n■ 日本（3-4-2-1）\n前線からの守備で相手のビルドアップを制限し、上田を起点に鎌田・前田の2シャドーが絡む。3バックの脇とウイングバックの上下動が鍵。\n\n■ ブラジル（4-3-3）\nヴィニシウスとクーニャの推進力、カゼミーロとブルーノ・ギマランイスの中盤が軸。アリソンを最後尾に、マルキーニョスとガブリエウが最終ラインを統率する。\n\n■ 焦点\n・日本の前線守備とブラジルのビルドアップの攻防\n・ヴィニシウス vs 日本の右サイド（堂安・冨安）\n・セットプレーやカウンターでの上田の空中戦' }
 ];
 // 注目移籍：fotmob(https://www.fotmob.com/ja/transfers) の確定移籍を出典に、人気クラブ100(POP_CLUBS)が
 //   移籍元 or 移籍先に絡むものだけを新しい順に並べる。人気クラブからのフリー（退団・無所属含む）もOK。
@@ -27740,15 +27747,21 @@ function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w
 function squadPitchHTML(side){
   const coords = FORM[side.form] || FORM['4-3-3'];
   const xi = side.xi||[];
-  const tokens = coords.map((c,i)=>`<div style="position:absolute;left:${c[1]}%;top:${100-c[2]}%;transform:translate(-50%,-50%);width:22%;text-align:center;pointer-events:none">
-      <div style="width:13px;height:13px;border-radius:50%;background:var(--lime);border:2px solid rgba(0,0,0,.4);margin:0 auto"></div>
-      <div style="font-size:8.5px;line-height:1.15;color:#fff;font-weight:700;margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,.95);word-break:break-word">${escAttr(xi[i]!=null?xi[i]:'')}</div>
-    </div>`).join('');
-  return `<div style="position:relative;width:100%;max-width:300px;margin:8px auto 0;aspect-ratio:3/4;background:repeating-linear-gradient(0deg,#2f7d47 0 12.5%,#2b7341 12.5% 25%);border:1px solid rgba(255,255,255,.25);border-radius:10px;overflow:hidden">
+  const tokens = coords.map((c,i)=>{
+    const pl=xi[i];
+    const nm=(pl&&typeof pl==='object')?(pl.name||''):(pl!=null?pl:'');
+    const cl=(pl&&typeof pl==='object')?(pl.club||''):'';
+    return `<div style="position:absolute;left:${c[1]}%;top:${100-c[2]}%;transform:translate(-50%,-50%);width:24%;text-align:center;pointer-events:none">
+      <div style="width:18px;height:18px;border-radius:50%;background:var(--lime);border:2px solid rgba(0,0,0,.45);margin:0 auto"></div>
+      <div style="font-size:10.5px;line-height:1.15;color:#fff;font-weight:800;margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,.95);word-break:break-word">${escAttr(nm)}</div>
+      ${cl?`<div style="font-size:7.5px;line-height:1.12;color:rgba(255,255,255,.72);font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.95);word-break:break-word">${escAttr(cl)}</div>`:''}
+    </div>`;
+  }).join('');
+  return `<div style="position:relative;width:100%;max-width:440px;margin:10px auto 0;aspect-ratio:3/4;background:repeating-linear-gradient(0deg,#2f7d47 0 12.5%,#2b7341 12.5% 25%);border:1px solid rgba(255,255,255,.25);border-radius:12px;overflow:hidden">
     <div style="position:absolute;left:7%;right:7%;top:50%;height:1px;background:rgba(255,255,255,.35)"></div>
-    <div style="position:absolute;left:50%;top:50%;width:44px;height:44px;border:1px solid rgba(255,255,255,.35);border-radius:50%;transform:translate(-50%,-50%)"></div>
-    <div style="position:absolute;left:50%;bottom:-1px;width:38%;height:8.5%;border:1px solid rgba(255,255,255,.3);border-bottom:none;transform:translateX(-50%)"></div>
-    <div style="position:absolute;left:50%;top:-1px;width:38%;height:8.5%;border:1px solid rgba(255,255,255,.3);border-top:none;transform:translateX(-50%)"></div>
+    <div style="position:absolute;left:50%;top:50%;width:58px;height:58px;border:1px solid rgba(255,255,255,.35);border-radius:50%;transform:translate(-50%,-50%)"></div>
+    <div style="position:absolute;left:50%;bottom:-1px;width:40%;height:9%;border:1px solid rgba(255,255,255,.3);border-bottom:none;transform:translateX(-50%)"></div>
+    <div style="position:absolute;left:50%;top:-1px;width:40%;height:9%;border:1px solid rgba(255,255,255,.3);border-top:none;transform:translateX(-50%)"></div>
     ${tokens}
   </div>`;
 }
