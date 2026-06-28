@@ -25407,6 +25407,18 @@ function optimizeCBFeet(){
     .map(o=>o.pid);
   cbs.forEach((s,k)=>{ s.pid=ordered[k]; }); // 最左=最も左利き … 最右=最も右利き
 }
+// 3CM配置の最適化：選手の「選定」は市場価値順のまま。3つのCM枠の中で最も守備寄りの選手(CDM>CM>CAM)を
+// アンカー枠へ置く。アンカー＝高さに差があれば最も低い位置(y最小=最深)、フラットなら真ん中(x中央)。
+function optimizeCMDepth(){
+  const cms=state.slots.filter(s=>s.role==='CM'&&s.pid!=null);
+  if(cms.length!==3) return; // ちょうど3CMのときだけ
+  const depth=pid=>{ const p=P[pid][1]; return p==='CDM'?2:(p==='CAM'?0:1); }; // 守備寄り度
+  const ys=cms.map(s=>s.y), flat=(Math.max.apply(null,ys)-Math.min.apply(null,ys))<=0.5;
+  const anchor = flat ? cms.slice().sort((a,b)=>a.x-b.x)[1] : cms.slice().sort((a,b)=>a.y-b.y)[0];
+  const best = cms.map(s=>s.pid).slice().sort((a,b)=> depth(b)-depth(a) || mvScore(P[b])-mvScore(P[a]))[0];
+  if(depth(best) <= depth(anchor.pid)) return; // アンカーが既に最も守備寄りなら何もしない
+  const from=cms.find(s=>s.pid===best); from.pid=anchor.pid; anchor.pid=best; // bestをアンカーへスワップ
+}
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
 function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人
 function benchReturn(pid){
@@ -27728,6 +27740,7 @@ function autoFillFrom(ids){
   const used=new Set(); const savedRole=pickRole;
   state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
+  optimizeCMDepth(); // 3CMのとき、最も守備寄りの選手をアンカー(最深/真ん中)へ
   // 控え構成：まず各スタメン枠に同じ大枠(GK/DF/MF/FW)のバックアップを1人ずつ確保し、
   // 残り枠を市場価値順で埋める（こうしないと高額なFW/MFに偏ってDFの第二候補が付かない）
   const benchSet=new Set();
@@ -27924,6 +27937,7 @@ function placeClubSquad(club,name){
   });
   pickRole=savedRole;
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
+  optimizeCMDepth(); // 3CMのとき、最も守備寄りの選手をアンカー(最深/真ん中)へ
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
   state.bench=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a])).slice(0,15).sort(benchPosSort); // 選出は市場価値の上位15人、表示はポジション順
   state.loadedClub=club;
