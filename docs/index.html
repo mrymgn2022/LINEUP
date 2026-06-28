@@ -25420,17 +25420,21 @@ function optimizeCBFeet(){
     .map(o=>o.pid);
   cbs.forEach((s,k)=>{ s.pid=ordered[k]; }); // 最左=最も左利き … 最右=最も右利き
 }
-// 3CM配置の最適化：選手の「選定」は市場価値順のまま。3つのCM枠の中で最も守備寄りの選手(CDM>CM>CAM)を
-// アンカー枠へ置く。アンカー＝高さに差があれば最も低い位置(y最小=最深)、フラットなら真ん中(x中央)。
-function optimizeCMDepth(){
-  const cms=state.slots.filter(s=>s.role==='CM'&&s.pid!=null);
-  if(cms.length!==3) return; // ちょうど3CMのときだけ
-  const depth=pid=>{ const p=P[pid][1]; return p==='CDM'?2:(p==='CAM'?0:1); }; // 守備寄り度
-  const ys=cms.map(s=>s.y), flat=(Math.max.apply(null,ys)-Math.min.apply(null,ys))<=0.5;
-  const anchor = flat ? cms.slice().sort((a,b)=>a.x-b.x)[1] : cms.slice().sort((a,b)=>a.y-b.y)[0];
-  const best = cms.map(s=>s.pid).slice().sort((a,b)=> depth(b)-depth(a) || mvScore(P[b])-mvScore(P[a]))[0];
-  if(depth(best) <= depth(anchor.pid)) return; // アンカーが既に最も守備寄りなら何もしない
-  const from=cms.find(s=>s.pid===best); from.pid=anchor.pid; anchor.pid=best; // bestをアンカーへスワップ
+// 中盤の配置最適化：選手の「選定」は市場価値順のまま。中央3レーン枠(CDM/CM/CAM)に入った選手だけを、
+// 守備度が揃うよう枠へ再割り当てする。最も守備的な枠(CDM枠→CM枠→CAM枠／同度は深い・中央寄り)に
+// 最も守備的な選手(POS CDM>CM>CAM、同度は市場価値↓)を置く。
+// 例) 4-1-4-1で CDM枠に高MVのCM、CM枠に本職CDMが入った場合 → CDM枠へ本職CDMを戻す。3CMもこれで内包。
+function optimizeMidfield(){
+  const CENTRAL=new Set(['CDM','CM','CAM']);
+  const slots=state.slots.filter(s=>CENTRAL.has(s.role)&&s.pid!=null);
+  if(slots.length<2) return;
+  const roleDef=r=>r==='CDM'?2:(r==='CAM'?0:1);             // 枠の守備度
+  const posDef=pid=>{ const p=P[pid][1]; return p==='CDM'?2:(p==='CAM'?0:1); }; // 選手の守備度
+  // 枠を守備的な順に：CDM枠→CM枠→CAM枠、同度は深い(y小)→中央寄り(|x-50|小)
+  const orderedSlots=slots.slice().sort((a,b)=> roleDef(b.role)-roleDef(a.role) || a.y-b.y || Math.abs(a.x-50)-Math.abs(b.x-50));
+  // 選手を守備的な順に：CDM→CM→CAM、同度は市場価値の高い順（＝今まで通りの選定優先を維持）
+  const players=slots.map(s=>s.pid).sort((a,b)=> posDef(b)-posDef(a) || mvScore(P[b])-mvScore(P[a]));
+  orderedSlots.forEach((s,k)=>{ s.pid=players[k]; }); // 最も守備的な枠←最も守備的な選手 …
 }
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
 function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人
@@ -27792,7 +27796,7 @@ function autoFillFrom(ids){
   const used=new Set(); const savedRole=pickRole;
   state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
-  optimizeCMDepth(); // 3CMのとき、最も守備寄りの選手をアンカー(最深/真ん中)へ
+  optimizeMidfield(); // 中盤枠(CDM/CM/CAM)で守備度を揃える：CDM枠に本職CDM、CAM枠に攻撃的な選手
   // 控え構成：まず各スタメン枠に同じ大枠(GK/DF/MF/FW)のバックアップを1人ずつ確保し、
   // 残り枠を市場価値順で埋める（こうしないと高額なFW/MFに偏ってDFの第二候補が付かない）
   const benchSet=new Set();
@@ -28006,7 +28010,7 @@ function placeClubSquad(club,name){
   });
   pickRole=savedRole;
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
-  optimizeCMDepth(); // 3CMのとき、最も守備寄りの選手をアンカー(最深/真ん中)へ
+  optimizeMidfield(); // 中盤枠(CDM/CM/CAM)で守備度を揃える：CDM枠に本職CDM、CAM枠に攻撃的な選手
   // 起用しなかった残りの選手はベンチへ。市場価値の高い順に最大15人（残りはベンチ外＝「他の選手」で閲覧）
   // ベンチGKは最大2人（スタメン込み3人）。ただしXI(11枠)が埋まらない＝薄い選手層なら制限しない。
   const fullXI=state.slots.filter(s=>s.pid!=null).length===11;
