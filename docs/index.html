@@ -28039,7 +28039,20 @@ const CLUB_SHORT={
   'Associação Chapecoense de Futebol':'Chapecoense','Mirassol Futebol Clube (SP)':'Mirassol','Clube do Remo (PA)':'Remo',
   // その他（フォールバックで拾えない確実な欧州クラブ）
   'West Bromwich Albion':'West Brom','Queens Park Rangers':'QPR','Deportivo de La Coruña':'Deportivo',
-  "Borussia M'gladbach":'Gladbach','FC Twente Enschede':'Twente','Delfino Pescara 1936':'Pescara','Stade Lavallois':'Laval'
+  "Borussia M'gladbach":'Gladbach','FC Twente Enschede':'Twente','Delfino Pescara 1936':'Pescara','Stade Lavallois':'Laval',
+  // Jリーグ（ニックネームで短縮。短い名前のクラブ＝FC東京/G大阪等はそのまま）
+  'Kashima Antlers':'Antlers','Urawa Red Diamonds':'Urawa Reds','Kashiwa Reysol':'Reysol','Machida Zelvia':'Zelvia',
+  'Kawasaki Frontale':'Frontale','Yokohama F. Marinos':'F. Marinos','Shimizu S-Pulse':'S-Pulse','Nagoya Grampus':'Grampus',
+  'Sanfrecce Hiroshima':'Sanfrecce','Avispa Fukuoka':'Avispa','V-Varen Nagasaki':'V-Varen','Shonan Bellmare':'Bellmare',
+  'Hokkaido Consadole Sapporo':'Consadole','Albirex Niigata':'Albirex','Fagiano Okayama':'Fagiano','Mito HollyHock':'HollyHock',
+  'JEF United Chiba':'JEF United','Vegalta Sendai':'Vegalta','Blaublitz Akita':'Blaublitz','Montedio Yamagata':'Montedio',
+  'Ventforet Kofu':'Ventforet','Kataller Toyama':'Kataller','Tokushima Vortis':'Vortis','Tegevajaro Miyazaki':'Tegevajaro',
+  'Fukushima United':'Fukushima Utd','Matsumoto Yamaga':'Yamaga','Nagano Parceiro':'Parceiro','Zweigen Kanazawa':'Zweigen',
+  'Gainare Tottori':'Gainare','Renofa Yamaguchi':'Renofa','Kamatamare Sanuki':'Kamatamare','Giravanz Kitakyushu':'Giravanz',
+  'Roasso Kumamoto':'Roasso','Kagoshima United':'Kagoshima Utd','Ryukyu Okinawa':'Ryukyu','Vanraure Hachinohe':'Vanraure',
+  // 日本の「FC/SC」は名前の一部（接尾辞除去で都市名だけにしない＝そのまま保護）
+  'FC Tokyo':'FC Tokyo','Yokohama FC':'Yokohama FC','FC Gifu':'FC Gifu','FC Osaka':'FC Osaka',
+  'FC Imabari':'FC Imabari','Iwaki FC':'Iwaki FC','Ehime FC':'Ehime FC','Tochigi SC':'Tochigi SC','SC Sagamihara':'SC Sagamihara'
 };
 function shortClub(name){
   const n=(name||'').trim(); if(!n) return n;
