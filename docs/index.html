@@ -27993,9 +27993,55 @@ function autoFillFrom(ids){
   autoAssignSubs(); // 第二候補も初期割当（条件指定の自動配置でも全ポジションに付くように）
 }
 // 配置中の選手のメモ欄へ所属クラブ名を自動入力（国籍縛りチーム用。安定キーで保存）
+// クラブ名の短縮（代表編成時の「メモ＝所属クラブ」表示でのみ使用。実データ P[][4] や検索・国旗には不使用）。
+// まず慣用短縮表、無ければ接頭/接尾のクラブ種別語(FC/AC/SL/CP…)だけ機械的に除去。
+const CLUB_SHORT={
+  // ドイツ（都市名・愛称へ）
+  'Bayern München':'Bayern','FC Bayern München':'Bayern','Borussia Dortmund':'Dortmund',
+  'Bayer 04 Leverkusen':'Leverkusen','Bayer Leverkusen':'Leverkusen','Eintracht Frankfurt':'Frankfurt',
+  'Borussia Mönchengladbach':'Gladbach','VfL Borussia Mönchengladbach':'Gladbach','VfB Stuttgart':'Stuttgart',
+  'RB Leipzig':'Leipzig','VfL Wolfsburg':'Wolfsburg','TSG 1899 Hoffenheim':'Hoffenheim','TSG Hoffenheim':'Hoffenheim',
+  'SV Werder Bremen':'Bremen','Werder Bremen':'Bremen','1.FC Köln':'Köln','1. FC Köln':'Köln',
+  '1.FSV Mainz 05':'Mainz','1. FSV Mainz 05':'Mainz','Mainz 05':'Mainz','FSV Mainz 05':'Mainz',
+  'FC Augsburg':'Augsburg','1.FC Union Berlin':'Union Berlin','1. FC Union Berlin':'Union Berlin','FC St. Pauli':'St. Pauli',
+  // スペイン
+  'Atlético de Madrid':'Atlético','Atlético Madrid':'Atlético','Club Atlético de Madrid':'Atlético',
+  'Athletic Club':'Athletic','Real Betis Balompié':'Betis','Real Betis':'Betis',
+  'RC Celta de Vigo':'Celta','Celta de Vigo':'Celta','Rayo Vallecano':'Rayo','Real Valladolid CF':'Valladolid',
+  // イタリア
+  'Internazionale':'Inter','FC Internazionale':'Inter','Inter Milan':'Inter','Hellas Verona':'Verona','SSC Napoli':'Napoli',
+  // ポルトガル
+  'Sporting CP':'Sporting','Sporting Clube de Portugal':'Sporting','SL Benfica':'Benfica','SC Braga':'Braga',
+  // フランス
+  'Paris Saint-Germain':'PSG','Olympique Lyon':'Lyon','Olympique Lyonnais':'Lyon',
+  'Olympique de Marseille':'Marseille','Olympique Marseille':'Marseille','Stade Rennais FC':'Rennes',
+  'Stade Rennais':'Rennes','Stade de Reims':'Reims','Stade Reims':'Reims','Stade Brestois 29':'Brest',
+  'RC Strasbourg Alsace':'Strasbourg','OGC Nice':'Nice','LOSC Lille':'Lille',
+  // イングランド
+  'Manchester United':'Man Utd','Manchester City':'Man City','Tottenham Hotspur':'Tottenham',
+  'Wolverhampton Wanderers':'Wolves','Brighton & Hove Albion':'Brighton','West Ham United':'West Ham',
+  'Newcastle United':'Newcastle','Nottingham Forest':"Nott'm Forest",'Leeds United':'Leeds',
+  'Sheffield United':'Sheffield Utd','AFC Bournemouth':'Bournemouth',
+  // ロシア・オランダ・ベルギー・トルコ等
+  'Zenit St. Petersburg':'Zenit','FC Zenit':'Zenit','Spartak Moscow':'Spartak','CSKA Moscow':'CSKA',
+  'PSV Eindhoven':'PSV','Feyenoord Rotterdam':'Feyenoord','AZ Alkmaar':'AZ','Ajax Amsterdam':'Ajax',
+  'Sint-Truidense VV':'Sint-Truiden','Royale Union Saint-Gilloise':'Union SG','Union Saint-Gilloise':'Union SG',
+  'Club Brugge KV':'Club Brugge','KAA Gent':'Gent','KRC Genk':'Genk','RSC Anderlecht':'Anderlecht',
+  'Galatasaray SK':'Galatasaray','Fenerbahçe SK':'Fenerbahçe','Beşiktaş JK':'Beşiktaş',
+  'Olympiacos Piraeus':'Olympiacos','PAOK Thessaloniki':'PAOK','Red Star Belgrade':'Red Star'
+};
+function shortClub(name){
+  const n=(name||'').trim(); if(!n) return n;
+  if(CLUB_SHORT[n]) return CLUB_SHORT[n];
+  let s=n;
+  s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AC|AS|SSC|SS|SL|SC|CF|RC|CD|CA|RCD|UD|SD|OGC|LOSC|VfB|VfL|TSG|BSC|RB|AFC)\s+/,''); // 接頭の種別語
+  s=s.replace(/\s+(FC|CF|CP|SC|AC|SAD|SK|JK|KV|VV)$/,'');                                                                  // 接尾の種別語
+  s=s.trim();
+  return s.length>=2 ? s : n; // 削り過ぎは元に戻す
+}
 function fillClubMemos(){
   if(!state.memos)state.memos={};
-  const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[pidToKey(pid)]=club; };
+  const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[pidToKey(pid)]=shortClub(club); };
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
@@ -28004,7 +28050,8 @@ function fillClubMemos(){
 function autoFillClubMemosForNat(){
   if(!state.flagByLeague) return;
   if(!state.memos) state.memos={};
-  const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); if(state.memos[k])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[k]=club; };
+  const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); const club=(P[pid][4]||'').trim(); if(!club)return;
+    const cur=state.memos[k]; if(cur===undefined||cur===club) state.memos[k]=shortClub(club); }; // 未設定 or 旧フル表記(自動)のみ短縮版へ。手入力メモは保持
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
@@ -28012,7 +28059,7 @@ function autoFillClubMemosForNat(){
 // 国籍縛りチームで付いたクラブ名メモが、別チーム（クラブ編成など）に持ち越されて誤表示されるのを防ぐ。
 function clearAutoClubMemos(){
   if(!state.memos) return;
-  for(const k in state.memos){ const pid=keyToPid(k); if(pid!=null&&P[pid]&&state.memos[k]===(P[pid][4]||'').trim()) delete state.memos[k]; }
+  for(const k in state.memos){ const pid=keyToPid(k); if(pid==null||!P[pid])continue; const club=(P[pid][4]||'').trim(); if(state.memos[k]===club||state.memos[k]===shortClub(club)) delete state.memos[k]; } // フル表記/短縮どちらの自動メモも掃除
 }
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
 function autoFillNationality(code,form,name){
@@ -28743,7 +28790,7 @@ window.__selftest=function(){
     autoFillNationality('ARG','4-3-3','ARG-test');
     const argIds=state.slots.filter(s=>s.pid!=null).map(s=>s.pid);
     fillClubMemos();
-    ok('nat_club_memos',argIds.every(pid=>memoOf(pid)===(P[pid][4]||'').trim()),'国籍編成のクラブメモ不一致');
+    ok('nat_club_memos',argIds.every(pid=>memoOf(pid)===shortClub((P[pid][4]||'').trim())),'国籍編成のクラブメモ（短縮表示）不一致');
     state.flagByLeague=true;
     ok('nat_league_flag',argIds.every(pid=>{ const c=LGNAT[P[pid][5]]; return c?dispNatCode(pid)===c:dispNatCode(pid)===natCode(P[pid]); }),'リーグ国旗の解決不一致');
     computeSquadDups();
