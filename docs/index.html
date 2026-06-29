@@ -151,6 +151,13 @@ header{
 .snsbtn:active{transform:scale(.97)}
 .flag{font-size:9px}
 .disc .capt{position:absolute;top:-6px;left:-6px;width:15px;height:15px;border-radius:50%;background:var(--gold);color:#0a0e0c;font-size:9px;font-weight:800;display:grid;place-items:center;border:1.5px solid #0a0e0c}
+.disc .cardm{position:absolute;top:-7px;right:-5px;width:11px;height:15px;border-radius:2px;border:1px solid #0a0e0c}
+.disc .cardm.y{background:#f4c81f}
+.disc .cardm.r{background:#e5384d}
+.disc .ycount{position:absolute;top:-12px;right:-14px;background:#10160f;color:#f4c81f;font-size:8px;font-weight:800;border-radius:5px;padding:0 3px;border:1px solid #0a0e0c;line-height:1.5}
+.disc .injm{position:absolute;bottom:-6px;right:-6px;width:15px;height:15px;border-radius:50%;background:#fff;border:1.5px solid #e5384d;display:grid;place-items:center}
+.disc .injm::before{content:"";position:absolute;width:8px;height:2.5px;background:#e5384d;border-radius:1px}
+.disc .injm::after{content:"";position:absolute;width:2.5px;height:8px;background:#e5384d;border-radius:1px}
 
 /* ---------- Club emblem ---------- */
 .emblem{
@@ -25248,6 +25255,15 @@ function squadShortName(pid){
 }
 // 選手メモ（安定IDキー。駒下に表示する自由テキスト）
 function memoOf(pid){ if(pid==null||!P[pid])return ''; return (state.memos&&state.memos[pidToKey(pid)])||''; }
+// 負傷/カードのマーカー（有料機能）。メモと同じく安定キーで保存＝起用先(スロット/チーム)が変わっても保持。
+// 形式: state.marks[key]={inj:0|1, yc:0..15(イエロー枚数), red:0|1}。イエローとレッドは排他。
+function markOf(pid){ if(pid==null||!P[pid])return {inj:0,yc:0,red:0}; const m=state.marks&&state.marks[pidToKey(pid)]; return {inj:(m&&m.inj)?1:0, yc:(m&&m.yc)||0, red:(m&&m.red)?1:0}; }
+function setMark(pid,patch){ if(pid==null||!P[pid])return; if(!state.marks)state.marks={}; const k=pidToKey(pid); const m=markOf(pid); Object.assign(m,patch);
+  if(patch.yc>0)m.red=0; if(patch.red)m.yc=0;                                  // イエロー↔レッドは排他
+  m.yc=Math.max(0,Math.min(15,m.yc|0)); m.red=m.red?1:0; m.inj=m.inj?1:0;
+  if(m.inj||m.yc||m.red) state.marks[k]=m; else delete state.marks[k]; save(); }
+function markSummary(pid){ const m=markOf(pid),a=[]; if(m.inj)a.push('負傷'); if(m.yc>0)a.push('イエロー'+(m.yc>=2?'×'+m.yc:'')); else if(m.red)a.push('レッド'); return a.length?'（'+a.join('・')+'）':''; }
+function marksHTML(pid){ const m=markOf(pid); let h=''; if(m.yc>0){ h+='<span class="cardm y"></span>'; if(m.yc>=2)h+='<span class="ycount">×'+m.yc+'</span>'; } else if(m.red){ h+='<span class="cardm r"></span>'; } if(m.inj)h+='<span class="injm"></span>'; return h; }
 let _keyMap=null;
 function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; } }
 function keyToPid(key){
@@ -25265,7 +25281,7 @@ function serializeTeam(){
     slots:state.slots.map(s=>({role:s.role,x:s.x,y:s.y,pid:pidToKey(s.pid),sub:pidToKey(s.sub)})),
     bench:state.bench.map(pidToKey).filter(k=>k!=null),
     captain:pidToKey(state.captain),
-    names:state.names,memos:state.memos,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,teamId:state.teamId,
+    names:state.names,memos:state.memos,marks:state.marks,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,showMarks:state.showMarks,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,teamId:state.teamId,
     excluded:(state.excluded||[]).map(pidToKey).filter(k=>k!=null),
     reserveAdds:(state.reserveAdds||[]).map(pidToKey).filter(k=>k!=null),
     custom:referencedCustomDefs() };
@@ -25319,6 +25335,8 @@ async function loadPhotos(){
 function applyRaw(saved){
   state.names=(saved&&saved.names&&typeof saved.names==='object')?saved.names:{};
   state.memos=(saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{};
+  state.marks=(saved&&saved.marks&&typeof saved.marks==='object')?saved.marks:{};
+  state.showMarks=saved?(saved.showMarks!==false):true;
   state.hideRoles=!!(saved&&saved.hideRoles);
   state.showFlags=(saved&&typeof saved.showFlags==='boolean')?saved.showFlags:true;
   if(saved&&typeof saved.showSub==='boolean'){ state.showSub=saved.showSub; state.showMemo=!!saved.showMemo; }
@@ -25350,7 +25368,8 @@ function applyRaw(saved){
 /* ---------- 複数チーム保存（ハンバーガーのチーム一覧。無料10／課金無制限） ---------- */
 let memTeams=null;
 const FREE_TEAM_LIMIT=10;
-function isPaidUser(){ return false; }            // 課金判定（将来差し込み。trueで無制限）
+function isPaidUser(){ return lsGet('xi_paid_dev')==='1'; }  // 課金判定（本番は基本false。テスト解放：コンソールで __unlockPaid()）
+window.__unlockPaid=function(on){ lsSet('xi_paid_dev', on===false?'0':'1'); try{toast(on===false?'プレミアムOFF':'プレミアムON（テスト）');render();}catch(e){} }; // 開発用アンロック
 function teamCap(){ return isPaidUser()?Infinity:FREE_TEAM_LIMIT; }
 function getTeams(){
   if(memTeams) return memTeams;
@@ -25469,6 +25488,7 @@ function render(){
       if(ph)disc.style.backgroundImage="url('"+ph+"')";
       let extra='';
       if(state.captain===s.pid) extra+='<span class="capt">C</span>';
+      extra+=marksHTML(s.pid); // 負傷・カード（盤面は常に表示。共有画像は showMarks で切替）
       disc.innerHTML=SIL+extra;
       tok.appendChild(disc);
       if(!state.hideRoles){ const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role); }
@@ -27073,6 +27093,7 @@ function openSlotMenu(i){
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
       <div class="mitem" data-act="sub"><div class="mi">${ICN.sub}</div>${subLabel}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(s.pid):'（プレミアム）'}</div>
       <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>スタメンから外す</div>
     </div>`);
@@ -27087,11 +27108,47 @@ function openSlotMenu(i){
     if(a==='change') openSlotAddSearch(i);
     if(a==='sub') openSubPicker(i);
     if(a==='memo') openMemo(s.pid);
+    if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(s.pid); }
     if(a==='captain'){ state.captain=isCapt?null:s.pid; closeSheet();render();save();toast(isCapt?'キャプテンを解除':nameOf(s.pid,true)+' をキャプテンに指定'); }
     if(a==='remove'){ if(state.captain===s.pid)state.captain=null; const out=s.pid; s.pid=null; s.sub=null; benchReturn(out); closeSheet();render();save();toast('外しました'); }
   };
 }
 
+// 負傷・カードの設定シート（有料）。負傷トグル＋カード(なし/イエロー枚数/レッド、排他)。盤面・共有に即反映。
+function openMarkMenu(pid){
+  if(!P[pid])return;
+  const draw=()=>{
+    const m=markOf(pid);
+    const cardChip=(v,label)=>{ const on=(v==='Y')?m.yc>0:(v==='R')?!!m.red:(!m.yc&&!m.red); return `<div class="fchip${on?' on':''}" data-card="${v}">${label}</div>`; };
+    openSheet(`
+      <h2>負傷・カード <span>${nameOf(pid,true)}</span></h2>
+      <div class="detail" style="padding:4px 16px calc(env(safe-area-inset-bottom) + 18px)">
+        <div style="font-weight:800;color:var(--ink);margin:8px 0 6px">負傷</div>
+        <div class="filters" style="overflow:visible"><div class="fchip${m.inj?' on':''}" data-inj="1"><span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:#fff;border:1.5px solid #e5384d;position:relative;vertical-align:-2px;margin-right:6px"><span style="position:absolute;left:50%;top:50%;width:7px;height:2px;background:#e5384d;transform:translate(-50%,-50%)"></span><span style="position:absolute;left:50%;top:50%;width:2px;height:7px;background:#e5384d;transform:translate(-50%,-50%)"></span></span>${m.inj?'ON':'OFF'}</div></div>
+        <div style="font-weight:800;color:var(--ink);margin:16px 0 6px">カード <span style="font-size:11px;color:var(--mut);font-weight:600">（イエロー／レッドは同時不可）</span></div>
+        <div class="filters" style="overflow:visible">${cardChip('','なし')}${cardChip('Y','イエロー')}${cardChip('R','レッド')}</div>
+        ${m.yc>0?`<div style="font-weight:800;color:var(--ink);margin:16px 0 8px">イエロー枚数（最大15）</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:20px">
+            <button class="bigbtn ghost" data-yc="-1" style="width:56px;font-size:22px">−</button>
+            <div style="font-size:30px;font-weight:800;min-width:44px;text-align:center;color:#f4c81f">${m.yc}</div>
+            <button class="bigbtn ghost" data-yc="1" style="width:56px;font-size:22px">＋</button>
+          </div>
+          <div style="font-size:11px;color:var(--mut);text-align:center;margin-top:8px">2枚以上で四角の右上に ×枚数 を表示</div>`:''}
+        <button class="bigbtn ghost" id="mkClose" style="margin-top:20px">閉じる</button>
+      </div>`);
+    body.querySelector('.detail').onclick=e=>{
+      const inj=e.target.closest('[data-inj]'); if(inj){ setMark(pid,{inj:markOf(pid).inj?0:1}); render(); draw(); return; }
+      const cd=e.target.closest('[data-card]'); if(cd){ const v=cd.dataset.card;
+        if(v==='Y') setMark(pid,{yc:Math.max(1,markOf(pid).yc),red:0});
+        else if(v==='R') setMark(pid,{red:1,yc:0});
+        else setMark(pid,{yc:0,red:0});
+        render(); draw(); return; }
+      const yc=e.target.closest('[data-yc]'); if(yc){ const cur=markOf(pid).yc; setMark(pid,{yc:Math.max(1,Math.min(15,cur+(+yc.dataset.yc))),red:0}); render(); draw(); return; }
+    };
+    const cl=document.getElementById('mkClose'); if(cl)cl.onclick=closeSheet;
+  };
+  draw();
+}
 /* ---- ベンチ選手メニュー（タップで表示。入れ替えボタン付き） ---- */
 function openBenchMenu(pid){
   if(!P[pid])return;
@@ -27101,6 +27158,7 @@ function openBenchMenu(pid){
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(pid):'（プレミアム）'}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
       <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>ベンチから外す</div>
@@ -27112,6 +27170,7 @@ function openBenchMenu(pid){
     if(a==='swap') startSwapBench(pid);
     if(a==='change') openBenchSwap(pid);
     if(a==='memo') openMemo(pid);
+    if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(pid); }
     if(a==='detail') openDetail(pid,null);
     if(a==='photo') pickPhoto(pid);
     if(a==='unbench'){ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast('ベンチから外しました'); }
@@ -28540,6 +28599,15 @@ async function buildShareCanvas(){
     x.lineWidth=m(2.5);x.strokeStyle=roleCol(s.role);x.beginPath();x.arc(fx,fy,R,0,7);x.stroke();
     // キャプテン
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+m(7),fy-R+m(7),m(8),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+m(9)+'px Manrope,sans-serif';x.fillText('C',fx-R+m(7),fy-R+m(10));}
+    // 負傷・カード（showMarksオフなら共有画像には出さない）。カード=右上 / 負傷=右下、キャプテン(左上)と併存
+    if(state.showMarks!==false){ const mk=markOf(s.pid);
+      if(mk.yc>0||mk.red){ const cw=m(12),ch=m(17),cx0=fx+R-m(7),cy0=fy-R-m(7);
+        x.fillStyle=mk.red?'#e5384d':'#f4c81f'; roundRect(x,cx0,cy0,cw,ch,m(2)); x.fill(); x.lineWidth=m(1.2); x.strokeStyle='#0a0e0c'; x.stroke();
+        if(mk.yc>=2){ x.textAlign='left';x.textBaseline='alphabetic'; x.font='800 '+m(10)+'px Manrope,sans-serif'; const t='×'+mk.yc, tw=x.measureText(t).width, bw=tw+m(6), bx=cx0+cw-m(3), by=cy0-m(3);
+          x.fillStyle='#10160f'; roundRect(x,bx,by-m(11),bw,m(13),m(4)); x.fill(); x.lineWidth=m(1);x.strokeStyle='#0a0e0c';x.stroke(); x.fillStyle='#f4c81f'; x.fillText(t,bx+m(3),by-m(1)); } }
+      if(mk.inj){ const ix=fx+R-m(3),iy=fy+R-m(3),ir=m(9);
+        x.beginPath();x.arc(ix,iy,ir,0,7);x.fillStyle='#fff';x.fill();x.lineWidth=m(1.5);x.strokeStyle='#e5384d';x.stroke();
+        x.fillStyle='#e5384d'; const a=m(6),b=m(2.2); x.fillRect(ix-a/2,iy-b/2,a,b); x.fillRect(ix-b/2,iy-a/2,b,a); } }
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に（盤面: role12px, 縁から+12）
     if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font=m(12)+'px "Bebas Neue",Manrope,sans-serif';x.letterSpacing=m(1)+'px';x.fillText(s.role,fx,fy+R+m(22));x.letterSpacing='0px'; } // 役職は盤面同様 Bebas Neue
     // 名前（＋国旗）：全員一律サイズ。役職の下に詰めて表示
@@ -28638,6 +28706,7 @@ function openShareFallback(imgUrl,shareText,file){
         <div class="icon" data-tg="btnMemo" title="メモ 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="12" x2="15.5" y2="12"/><line x1="8.5" y1="16" x2="13" y2="16"/></svg></div>
         <div class="icon" data-tg="btnFlags" title="国旗 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6c3-2.4 6 2.4 9 0s6-2.4 9 0v9.2c-3 2.4-6-2.4-9 0s-6 2.4-9 0Z"/><path d="M12 6v9.2" stroke-width="1.4" opacity=".5"/></svg></div>
         <div class="icon" data-tg="bench" title="ベンチ（控え）表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="7" r="1.3" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="5" cy="17" r="1.3" fill="currentColor" stroke="none"/><line x1="9" y1="7" x2="19" y2="7"/><line x1="9" y1="12" x2="19" y2="12"/><line x1="9" y1="17" x2="19" y2="17"/></svg></div>
+        <div class="icon" data-tg="marks" title="負傷・カード 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="9" height="13" rx="1.5"/><circle cx="17" cy="16" r="4.4"/><line x1="17" y1="13.6" x2="17" y2="18.4"/><line x1="14.6" y1="16" x2="19.4" y2="16"/></svg></div>
       </div>
       <div class="dispgroup" id="shFmt" style="justify-content:center;margin:0 0 10px;gap:6px;flex-wrap:wrap"><div class="icon" data-fmt="auto" title="内容なりの縦長（全部入り）">自動</div><div class="icon" data-fmt="feed" title="フィード 4:5">4:5</div><div class="icon" data-fmt="sq" title="正方形 1:1">1:1</div><div class="icon" data-fmt="story" title="ストーリー 9:16">9:16</div></div>
       <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="lineup"></div>
@@ -28651,11 +28720,12 @@ function openShareFallback(imgUrl,shareText,file){
       <button class="bigbtn ghost" id="shCopy">キャプション＋リンクをコピー</button>
     </div>`);
   // 盤面右上と同じ表示トグル。押すと盤面ボタンと同じ処理を実行→プレビューを再生成
-  const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags,bench:state.showBench!==false}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
+  const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags,bench:state.showBench!==false,marks:state.showMarks!==false}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
   syncTg();
   const regen=()=>{ buildShareCanvas().then(cv=>cv.toBlob(blob=>{ if(!blob)return; if(curUrl)try{URL.revokeObjectURL(curUrl);}catch(e){} curUrl=URL.createObjectURL(blob); curFile=new File([blob],'squad-xi.png',{type:'image/png'}); const img=document.getElementById('sharePrevImg'); if(img)img.src=curUrl; },'image/png')).catch(()=>{}); };
   document.getElementById('shToggles').onclick=e=>{ const b=e.target.closest('[data-tg]'); if(!b)return;
     if(b.dataset.tg==='bench'){ state.showBench=(state.showBench===false); save(); } // 共有専用：ベンチを画像に載せるか
+    else if(b.dataset.tg==='marks'){ state.showMarks=(state.showMarks===false); save(); } // 共有画像に負傷・カードを載せるか
     else { const el=document.getElementById(b.dataset.tg); if(el)el.click(); }            // それ以外は盤面ボタンと同処理
     syncTg(); regen(); };
   // SNSフォーマット選択（自動/4:5/1:1/9:16）
