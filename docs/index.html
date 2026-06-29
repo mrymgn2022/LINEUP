@@ -28036,16 +28036,21 @@ const CLUB_SHORT={
   'Grêmio Foot-Ball Porto Alegrense':'Grêmio','Sport Club Internacional':'Internacional','Cruzeiro Esporte Clube':'Cruzeiro',
   'Clube Atlético Mineiro':'Atlético-MG','Club Athletico Paranaense':'Athletico-PR','Esporte Clube Bahia':'Bahia',
   'Esporte Clube Vitória':'Vitória','Red Bull Bragantino':'Bragantino','Coritiba Foot Ball Club':'Coritiba',
-  'Associação Chapecoense de Futebol':'Chapecoense','Mirassol Futebol Clube (SP)':'Mirassol','Clube do Remo (PA)':'Remo'
+  'Associação Chapecoense de Futebol':'Chapecoense','Mirassol Futebol Clube (SP)':'Mirassol','Clube do Remo (PA)':'Remo',
+  // その他（フォールバックで拾えない確実な欧州クラブ）
+  'West Bromwich Albion':'West Brom','Queens Park Rangers':'QPR','Deportivo de La Coruña':'Deportivo',
+  "Borussia M'gladbach":'Gladbach','FC Twente Enschede':'Twente','Delfino Pescara 1936':'Pescara','Stade Lavallois':'Laval'
 };
 function shortClub(name){
   const n=(name||'').trim(); if(!n) return n;
   if(CLUB_SHORT[n]) return CLUB_SHORT[n];
   let s=n;
-  s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AC|AS|SSC|SS|SL|SC|CF|RC|CD|CA|RCD|UD|SD|OGC|LOSC|VfB|VfL|TSG|BSC|RB|AFC)\s+/,''); // 接頭の種別語
-  s=s.replace(/\s+(FC|CF|CP|SC|AC|SAD|SK|JK|KV|VV)$/,'');                                                                  // 接尾の種別語
+  s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AFC|AC|AS|SSC|SS|SL|SC|SV|SG|SpVgg|SSV|FSV|TSV|VfB|VfL|TSG|BSC|RB|RC|RCD|CD|CA|CF|UD|SD|US|UC|OGC|LOSC|KAA|KRC|GNK|NK|FK)\s+/,''); // 接頭の種別語
+  s=s.replace(/^\d{2,4}\s+/,'');                                                                  // 接頭の番号（"07 Elversberg" 等）
+  s=s.replace(/\s+\d{2,4}$/,'');                                                                  // 末尾の創設年（98 / 1912 等）
+  s=s.replace(/\s+(Calcio|Balompié|Football Club|Foot|FC|CF|CP|SC|AC|SAD|SK|JK|KV|VV|HSC)$/,''); // 接尾の種別語
   s=s.trim();
-  return s.length>=2 ? s : n; // 削り過ぎは元に戻す
+  return s.length>=3 ? s : n; // 削り過ぎは元に戻す
 }
 function fillClubMemos(){
   if(!state.memos)state.memos={};
