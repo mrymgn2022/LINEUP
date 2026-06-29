@@ -26715,7 +26715,7 @@ function pickerHTML(slotIdx,role,title){
     <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
-    <div class="filters" id="clubF">${clubSelectHTML()}</div>
+    <div class="filters" id="clubF" style="display:none"></div>
   </div>
   <div class="list" id="plist"></div>`;
 }
@@ -26808,6 +26808,13 @@ function clubSelectHTML(f=pickFilter){
   const o=(v,label,sel)=>`<option value="${escAttr(v)}"${sel?' selected':''}>${escAttr(label)}</option>`;
   return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL','全クラブ',(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,c,f.club===c)).join('')+`</select>`;
 }
+// クラブ欄の表示制御（新規作成画面と同じ：リーグ未指定なら隠す／リーグ選択時のみ表示し、そのリーグのクラブを出す）
+function syncClubField(id, f){
+  const c=document.getElementById(id); if(!c) return;
+  const show=(f.lg&&f.lg!=='ALL') || (f.club&&f.club!=='ALL'); // リーグ指定 or 既にクラブ指定済みなら表示
+  if(show){ c.style.display=''; c.innerHTML=clubSelectHTML(f); }
+  else { c.style.display='none'; c.innerHTML=''; if(f.club!=='ALL') f.club='ALL'; }
+}
 // ソート切替チップ（おすすめ順/年齢↓↑）。drawPickList系ピッカーで使用
 function sortChips(f=pickFilter){
   const opts=[['suggest','おすすめ順'],['pop','人気順'],['age_desc','年齢 高い順'],['age_asc','年齢 低い順']];
@@ -26835,12 +26842,13 @@ function wirePicker(slotIdx){
     posF.innerHTML=posChips(); drawPickList(slotIdx);
   };
   const lgF=document.getElementById('lgF');
-  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubSelectHTML();wirePickClub(slotIdx);drawPickList(slotIdx);});
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';syncClubField('clubF',pickFilter);wirePickClub(slotIdx);drawPickList(slotIdx);});
   // 国籍フィルタを挿入（クラブフィルタの前）
   const clubF0=document.getElementById('clubF');
   if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('beforebegin',natFilterHTML(pickFilter));
   attachNatFilter(document.querySelector('[data-natscope]'),pickFilter,()=>drawPickList(slotIdx));
   wirePickClub(slotIdx);
+  syncClubField('clubF',pickFilter); // リーグ指定時のみクラブ欄を表示（新規作成と同じ）
   drawPickList(slotIdx);
 }
 function wirePickClub(slotIdx){
@@ -26897,7 +26905,7 @@ function openBenchAdd(){
     <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
-    <div class="filters" id="clubF">${clubSelectHTML()}</div>
+    <div class="filters" id="clubF" style="display:none"></div>
   </div>
   <div class="list" id="plist"></div>`);
   benchAddMode=true;
@@ -27128,7 +27136,7 @@ function openSubPicker(slotIdx){
         <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
-        <div class="filters" id="clubF">${clubSelectHTML()}</div>
+        <div class="filters" id="clubF" style="display:none"></div>
       </div>
       ${cur!=null?`<div class="bench-badge">現在の第二候補：<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">解除</span></div>`:''}
     </div>
@@ -27152,7 +27160,7 @@ function openSubPicker(slotIdx){
       const te=document.getElementById('transferExtra');
       if(c.dataset.bm==='bench'){ te.style.display='none'; drawSub(); }
       else{ te.style.display='block'; pickFilter=basePickFilter();
-        document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();document.getElementById('clubF').innerHTML=clubSelectHTML();
+        document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();syncClubField('clubF',pickFilter);
         wireSubPickerFull(slotIdx); }
     };
   }
@@ -27166,9 +27174,10 @@ function wireSubPickerFull(slotIdx){
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
-  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubSelectHTML();drawSubFull(slotIdx);});
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';syncClubField('clubF',pickFilter);drawSubFull(slotIdx);});
   const clubF=document.getElementById('clubF');
   if(clubF) clubF.onchange=()=>{const sel=clubF.querySelector('select');if(sel){pickFilter.club=sel.value||'ALL';drawSubFull(slotIdx);}};
+  syncClubField('clubF',pickFilter); // リーグ指定時のみクラブ欄を表示
   drawSubFull(slotIdx);
 }
 function drawSubFull(slotIdx){
@@ -27216,7 +27225,7 @@ function openBenchPicker(slotIdx){
         <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
-        <div class="filters" id="clubF">${clubSelectHTML()}</div>
+        <div class="filters" id="clubF" style="display:none"></div>
       </div>
     </div>
     <div class="list" id="plist"></div>`);
@@ -27233,7 +27242,7 @@ function openBenchPicker(slotIdx){
       pickFilter=basePickFilter();
       document.getElementById('posF').innerHTML=posChips();
       document.getElementById('lgF').innerHTML=lgChips();
-      document.getElementById('clubF').innerHTML=clubSelectHTML();
+      syncClubField('clubF',pickFilter);
       wirePicker(slotIdx);
     }
   };
@@ -27515,7 +27524,7 @@ function openMarket(){
       <div class="filters" id="mposF">${posChips(mktFilter)}</div>
       <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
       ${natFilterHTML(mktFilter)}
-      <div class="filters" id="mclubF">${clubSelectHTML(mktFilter)}</div>
+      <div class="filters" id="mclubF" style="display:none"></div>
     </div>
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
@@ -27523,8 +27532,9 @@ function openMarket(){
   document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase();drawMkt()};
   document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
-  wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';document.getElementById('mclubF').innerHTML=clubSelectHTML(mktFilter);wireMktClub();drawMkt();});
+  wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';syncClubField('mclubF',mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
+  syncClubField('mclubF',mktFilter); // リーグ指定時のみクラブ欄を表示
   drawMkt();
 }
 document.getElementById('btnMarket').onclick=openMarket;
