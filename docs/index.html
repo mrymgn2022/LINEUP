@@ -26715,7 +26715,7 @@ function pickerHTML(slotIdx,role,title){
     <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
-    <div class="filters" id="clubF">${clubChips()}</div>
+    <div class="filters" id="clubF">${clubSelectHTML()}</div>
   </div>
   <div class="list" id="plist"></div>`;
 }
@@ -26801,6 +26801,13 @@ function clubChips(f=pickFilter){
   return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">全クラブ</div>`+
     clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${c}">${c}</div>`).join('');
 }
+// クラブ選択プルダウン（チーム作成以外のピッカー用。横並びチップ→<select>）。リーグ選択後に絞り込みやすく。
+function clubSelectHTML(f=pickFilter){
+  const mem=lgMembers(f.lg);
+  const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
+  const o=(v,label,sel)=>`<option value="${escAttr(v)}"${sel?' selected':''}>${escAttr(label)}</option>`;
+  return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL','全クラブ',(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,c,f.club===c)).join('')+`</select>`;
+}
 // ソート切替チップ（おすすめ順/年齢↓↑）。drawPickList系ピッカーで使用
 function sortChips(f=pickFilter){
   const opts=[['suggest','おすすめ順'],['pop','人気順'],['age_desc','年齢 高い順'],['age_asc','年齢 低い順']];
@@ -26828,7 +26835,7 @@ function wirePicker(slotIdx){
     posF.innerHTML=posChips(); drawPickList(slotIdx);
   };
   const lgF=document.getElementById('lgF');
-  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();wirePickClub(slotIdx);drawPickList(slotIdx);});
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubSelectHTML();wirePickClub(slotIdx);drawPickList(slotIdx);});
   // 国籍フィルタを挿入（クラブフィルタの前）
   const clubF0=document.getElementById('clubF');
   if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('beforebegin',natFilterHTML(pickFilter));
@@ -26839,7 +26846,7 @@ function wirePicker(slotIdx){
 function wirePickClub(slotIdx){
   const clubF=document.getElementById('clubF');
   if(!clubF)return;
-  clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
+  clubF.onchange=()=>{const sel=clubF.querySelector('select');if(sel){pickFilter.club=sel.value||'ALL';drawPickList(slotIdx);}}; // プルダウン選択で絞り込み（コンテナ委譲＝再描画後も有効）
 }
 function playerMatches(p){
   if(!inLgFilter(p,pickFilter.lg))return false;
@@ -26890,7 +26897,7 @@ function openBenchAdd(){
     <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
-    <div class="filters" id="clubF">${clubChips()}</div>
+    <div class="filters" id="clubF">${clubSelectHTML()}</div>
   </div>
   <div class="list" id="plist"></div>`);
   benchAddMode=true;
@@ -27121,7 +27128,7 @@ function openSubPicker(slotIdx){
         <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
-        <div class="filters" id="clubF">${clubChips()}</div>
+        <div class="filters" id="clubF">${clubSelectHTML()}</div>
       </div>
       ${cur!=null?`<div class="bench-badge">現在の第二候補：<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">解除</span></div>`:''}
     </div>
@@ -27145,7 +27152,7 @@ function openSubPicker(slotIdx){
       const te=document.getElementById('transferExtra');
       if(c.dataset.bm==='bench'){ te.style.display='none'; drawSub(); }
       else{ te.style.display='block'; pickFilter=basePickFilter();
-        document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();document.getElementById('clubF').innerHTML=clubChips();
+        document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();document.getElementById('clubF').innerHTML=clubSelectHTML();
         wireSubPickerFull(slotIdx); }
     };
   }
@@ -27159,9 +27166,9 @@ function wireSubPickerFull(slotIdx){
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
-  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubChips();const cF=document.getElementById('clubF');if(cF)cF.onclick=ev=>{const cc=ev.target.closest('[data-club]');if(!cc)return;pickFilter.club=cc.dataset.club;[...cc.parentNode.children].forEach(x=>x.classList.remove('on'));cc.classList.add('on');drawSubFull(slotIdx);};drawSubFull(slotIdx);});
+  if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';const cf=document.getElementById('clubF');if(cf)cf.innerHTML=clubSelectHTML();drawSubFull(slotIdx);});
   const clubF=document.getElementById('clubF');
-  if(clubF) clubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;pickFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx);};
+  if(clubF) clubF.onchange=()=>{const sel=clubF.querySelector('select');if(sel){pickFilter.club=sel.value||'ALL';drawSubFull(slotIdx);}};
   drawSubFull(slotIdx);
 }
 function drawSubFull(slotIdx){
@@ -27209,7 +27216,7 @@ function openBenchPicker(slotIdx){
         <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
-        <div class="filters" id="clubF">${clubChips()}</div>
+        <div class="filters" id="clubF">${clubSelectHTML()}</div>
       </div>
     </div>
     <div class="list" id="plist"></div>`);
@@ -27226,7 +27233,7 @@ function openBenchPicker(slotIdx){
       pickFilter=basePickFilter();
       document.getElementById('posF').innerHTML=posChips();
       document.getElementById('lgF').innerHTML=lgChips();
-      document.getElementById('clubF').innerHTML=clubChips();
+      document.getElementById('clubF').innerHTML=clubSelectHTML();
       wirePicker(slotIdx);
     }
   };
@@ -27508,7 +27515,7 @@ function openMarket(){
       <div class="filters" id="mposF">${posChips(mktFilter)}</div>
       <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
       ${natFilterHTML(mktFilter)}
-      <div class="filters" id="mclubF">${clubChips(mktFilter)}</div>
+      <div class="filters" id="mclubF">${clubSelectHTML(mktFilter)}</div>
     </div>
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
@@ -27516,14 +27523,14 @@ function openMarket(){
   document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase();drawMkt()};
   document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
-  wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt();});
+  wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';document.getElementById('mclubF').innerHTML=clubSelectHTML(mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
   drawMkt();
 }
 document.getElementById('btnMarket').onclick=openMarket;
 function wireMktClub(){
   const mclubF=document.getElementById('mclubF');if(!mclubF)return;
-  mclubF.onclick=e=>{const c=e.target.closest('[data-club]');if(!c)return;mktFilter.club=c.dataset.club;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt();};
+  mclubF.onchange=()=>{const sel=mclubF.querySelector('select');if(sel){mktFilter.club=sel.value||'ALL';drawMkt();}};
 }
 function drawMkt(){
   const list=document.getElementById('mlist');if(!list)return;
