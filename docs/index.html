@@ -27747,9 +27747,16 @@ function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w
 function squadPitchHTML(side){
   const coords = FORM[side.form] || FORM['4-3-3'];
   const xi = side.xi||[];
-  // 選手をピッチの縦いっぱい(6%〜94%)に引き伸ばして配置（上下の空きグラスを詰める）
-  const ys=coords.map(c=>c[2]), ymin=Math.min.apply(null,ys), ymax=Math.max.apply(null,ys);
-  const topOf=y=> (ymax===ymin)?50 : (94-(y-ymin)*88/(ymax-ymin));
+  // 各ライン(GK/DF/MF/前線…)を均等な高さに並べてピッチ全体を埋める（前後の空きを解消）。
+  // 近いy値は同一ラインとしてまとめ、ライン内の前後差だけ僅かに残す。
+  const ys=coords.map(c=>c[2]);
+  const uniq=[...new Set(ys)].sort((a,b)=>a-b);
+  const rows=[]; uniq.forEach(y=>{ const r=rows[rows.length-1]; if(r&&y-r.max<=5){ r.list.push(y); r.max=y; } else rows.push({list:[y],max:y}); });
+  const nRows=rows.length, TOP=6, BOT=93; // 前線=上6%, 最深(GK)=下93%
+  const topOf=y=>{ if(nRows<=1) return 50;
+    const ri=rows.findIndex(r=>r.list.includes(y));
+    const mean=rows[ri].list.reduce((a,b)=>a+b,0)/rows[ri].list.length;
+    return (BOT-ri*(BOT-TOP)/(nRows-1)) - (y-mean)*0.9; }; // ライン均等＋ライン内の前後差を僅かに反映
   const tokens = coords.map((c,i)=>{
     const pl=xi[i];
     const nm=(pl&&typeof pl==='object')?(pl.name||''):(pl!=null?pl:'');
