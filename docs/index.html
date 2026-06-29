@@ -26816,7 +26816,7 @@ function wirePicker(slotIdx){
     if(e.target.closest('[data-create]')){ openCreatePlayer(slotIdx); return; }
     const c=e.target.closest('[data-sort]');if(!c)return;pickFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
   const q=document.getElementById('pq');
-  if(q) q.oninput=()=>{pickFilter.q=q.value.toLowerCase();drawPickList(slotIdx)};
+  if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase();drawPickList(slotIdx)};
   const clr=document.getElementById('pickClear');
   if(clr) clr.onclick=()=>{ if(pickReopen)pickReopen(); }; // 既定状態で開き直す＝全条件クリア
 
@@ -26847,7 +26847,7 @@ function playerMatches(p){
   else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
   if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
   if(pickFilter.nat&&pickFilter.nat!=='ALL'&&natCode(p)!==pickFilter.nat)return false;
-  if(pickFilter.q&&!(p[0].toLowerCase().includes(pickFilter.q)||p[4].toLowerCase().includes(pickFilter.q)))return false;
+  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）
   return true;
 }
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
@@ -26966,6 +26966,13 @@ const NATJA={ENG:'イングランド',SCO:'スコットランド',WAL:'ウェー
 function natJa(c){ return NATJA[c]||NATNAME[c]||c; }
 // 検索クエリ/対象の正規化：小文字化＋ひらがな→カタカナ（「ぶらじる」でも「ブラジル」にヒット）
 function natNorm(s){ return (s||'').toLowerCase().replace(/[ぁ-ゖ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60)); }
+// 発音記号を畳む（João→joao, São→sao, Atlético→atletico 等）。検索をローマ字でもヒットさせる。
+function deaccent(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/ø/g,'o').replace(/Ø/g,'O').replace(/ł/g,'l').replace(/Ł/g,'L').replace(/đ/g,'d').replace(/Đ/g,'D')
+  .replace(/ı/g,'i').replace(/İ/g,'I').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/Æ/g,'AE').replace(/œ/g,'oe').replace(/Œ/g,'OE')
+  .replace(/ð/g,'d').replace(/Ð/g,'D').replace(/þ/g,'th').replace(/Þ/g,'Th'); }
+const _deaccCache=new Map(); // 名前の畳み込みをキャッシュ（毎キーストロークの再計算を避ける）
+function deaccLower(s){ let v=_deaccCache.get(s); if(v===undefined){ v=deaccent(String(s==null?'':s)).toLowerCase(); _deaccCache.set(s,v); } return v; }
 // FIFA男子ランキング上位20（先頭表示用）
 const NAT_TOP=['ARG','FRA','ESP','ENG','BRA','POR','NED','BEL','ITA','GER','CRO','MAR','COL','URU','USA','MEX','SUI','SEN','DEN','JPN'];
 function natCode(p){ return p[3].trim().split(' ').pop(); }
@@ -27148,7 +27155,7 @@ function openSubPicker(slotIdx){
 }
 function wireSubPickerFull(slotIdx){
   const q=document.getElementById('pq');
-  if(q) q.oninput=()=>{pickFilter.q=q.value.toLowerCase();drawSubFull(slotIdx)};
+  if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase();drawSubFull(slotIdx)};
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
@@ -27506,7 +27513,7 @@ function openMarket(){
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
   const _mc=document.getElementById('mClear'); if(_mc)_mc.onclick=()=>openMarket(); // 既定状態で開き直す＝全条件クリア
-  document.getElementById('mq').oninput=e=>{mktFilter.q=e.target.value.toLowerCase();drawMkt()};
+  document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase();drawMkt()};
   document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{document.getElementById('mclubF').innerHTML=clubChips(mktFilter);wireMktClub();drawMkt();});
@@ -27528,7 +27535,7 @@ function drawMkt(){
     if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
     if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
     if(f.nat&&f.nat!=='ALL'&&natCode(p)!==f.nat)return false;
-    if(f.q&&!(p[0].toLowerCase().includes(f.q)||p[4].toLowerCase().includes(f.q)))return false;
+    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)))return false; // 発音記号を畳んで一致
     return true;
   });
   const so=f.sort||'mv';
@@ -28167,9 +28174,9 @@ function startOriginal(){
   const otAllClubs=Object.keys(otClubLg).sort();
   const otSearchEl=document.getElementById('otSearch'), otSug=document.getElementById('otSuggest');
   if(otSearchEl) otSearchEl.oninput=()=>{
-    const q=otSearchEl.value.trim().toLowerCase();
+    const q=deaccent(otSearchEl.value.trim()).toLowerCase();
     if(!q){ otSug.innerHTML=''; return; }
-    const ms=otAllClubs.filter(c=>c.toLowerCase().includes(q)).slice(0,12);
+    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)).slice(0,12);
     otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(c)}</div>`).join(''):'<div class="otsug-empty">該当するチームがありません</div>';
   };
   if(otSug) otSug.onclick=e=>{
