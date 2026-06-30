@@ -27766,7 +27766,7 @@ function drawerHTML(){
     <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>お知らせ<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="feedback"><span class="di">✉</span>ご意見・不具合報告<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="feedback"><span class="di">✉</span>選手追加依頼・不具合報告<span class="dchev">›</span></div>
     <div class="dwfoot">Squad XI — build your XI<br>v0.9（プレビュー）</div>`;
 }
 function wireDrawer(){
@@ -27916,7 +27916,7 @@ function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
   if(kind==='announcements'){ openAnnouncementList(); return; }
   const M={ premium:['プレミアム','課金で「保存チーム無制限」などを予定しています。準備中です。'],
-            feedback:['ご意見・不具合報告','改善要望や不具合があれば教えてください。連絡先は準備中です。'] };
+            feedback:['選手追加依頼・不具合報告','未掲載の選手の追加依頼や、不具合・改善要望があれば教えてください。連絡先は準備中です。'] };
   const m=M[kind]||['',''];
   openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
 }
