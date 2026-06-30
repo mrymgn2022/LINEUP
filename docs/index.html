@@ -25264,6 +25264,8 @@ function setMark(pid,patch){ if(pid==null||!P[pid])return; if(!state.marks)state
   if(m.inj||m.yc||m.red) state.marks[k]=m; else delete state.marks[k]; save(); }
 function markSummary(pid){ const m=markOf(pid),a=[]; if(m.inj)a.push('負傷'); if(m.yc>0)a.push('イエロー'+(m.yc>=2?'×'+m.yc:'')); else if(m.red)a.push('レッド'); return a.length?'（'+a.join('・')+'）':''; }
 function marksHTML(pid){ const m=markOf(pid); let h=''; if(m.yc>0){ h+='<span class="cardm y"></span>'; if(m.yc>=2)h+='<span class="ycount">×'+m.yc+'</span>'; } else if(m.red){ h+='<span class="cardm r"></span>'; } if(m.inj)h+='<span class="injm"></span>'; return h; }
+// プレミアム未加入時の金の南京錠（メニューでテキスト「（プレミアム）」の代わりに表示。タップでプレミアム画面へ）
+const _ICN_GOLDLOCK=' <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;margin-left:6px" aria-label="プレミアム"><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="#e0a92e" stroke-width="2.2"/><rect x="5" y="10" width="14" height="10" rx="2.5" fill="#ffd470" stroke="#b8862a" stroke-width="1.2"/><circle cx="12" cy="14.3" r="1.7" fill="#6e5212"/><rect x="11.15" y="14.6" width="1.7" height="3.6" rx="0.85" fill="#6e5212"/></svg>';
 let _keyMap=null;
 function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; } }
 function keyToPid(key){
@@ -27093,7 +27095,7 @@ function openSlotMenu(i){
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
       <div class="mitem" data-act="sub"><div class="mi">${ICN.sub}</div>${subLabel}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(s.pid):'（プレミアム）'}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(s.pid):_ICN_GOLDLOCK}</div>
       <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>スタメンから外す</div>
     </div>`);
@@ -27158,7 +27160,7 @@ function openBenchMenu(pid){
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(pid):'（プレミアム）'}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
       <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>ベンチから外す</div>
