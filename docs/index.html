@@ -2,6 +2,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Squad XI</title>
 <meta name="apple-mobile-web-app-title" content="Squad XI"><!-- iOSでホーム画面追加時のアイコン名を「Squad XI」に固定 -->
+<meta name="description" content="サッカーの最強スタメンを作って共有。23,000人超の選手から国籍・クラブ別に自由に編成できる無料の布陣メーカー。">
+<!-- PWA（インストール可能・ホーム画面追加） -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0a0e0c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- OGP / Twitterカード（X・LINE・Discord等のリンク展開用） -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Squad XI">
+<meta property="og:title" content="Squad XI — build your XI">
+<meta property="og:description" content="サッカーの最強スタメンを作って共有。国籍・クラブ別に自由に編成できる無料の布陣メーカー。">
+<meta property="og:url" content="https://squadxi.app/">
+<meta property="og:image" content="https://squadxi.app/icon-1024.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Squad XI — build your XI">
+<meta name="twitter:description" content="サッカーの最強スタメンを作って共有。無料の布陣メーカー。">
+<meta name="twitter:image" content="https://squadxi.app/icon-1024.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css');
@@ -27921,7 +27941,7 @@ function openFeatured(kind){
 function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
   if(kind==='announcements'){ openAnnouncementList(); return; }
-  const M={ premium:['プレミアム','課金で「保存チーム無制限」などを予定しています。準備中です。'],
+  const M={ premium:['プレミアム（近日公開）','負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。'],
             feedback:['選手追加依頼・不具合報告','未掲載の選手の追加依頼や、不具合・改善要望があれば教えてください。連絡先は準備中です。'] };
   const m=M[kind]||['',''];
   openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
@@ -28430,7 +28450,7 @@ function openSquadAnalysis(scope){
 /* =========================================================
    SNS共有：スタメン画像を生成して共有（画像＋アプリリンク）
    ========================================================= */
-const APP_URL='https://starting-xi.app';
+const APP_URL='https://squadxi.app';
 function roleCol(role){const g=grp(role);return {gk:'#ffd166',df:'#4fc3f7',mf:'#caff3a',fw:'#ff8a65'}[g]||'#caff3a';}
 // キャンバス用：幅に収まるよう末尾を省略
 function fitCanvasText(x,str,maxW){ if(x.measureText(str).width<=maxW)return str; let s=str; while(s.length>1&&x.measureText(s+'…').width>maxW)s=s.slice(0,-1); return s+'…'; }
