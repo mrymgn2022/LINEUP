@@ -603,10 +603,7 @@ header{
 (function(){
   var sp=document.getElementById('splash'); if(!sp) return;
   var done=false;
-  function hide(){ if(done)return; done=true; sp.classList.add('out'); setTimeout(function(){ if(sp&&sp.parentNode) sp.style.display='none'; try{
-    if(!lsGet('xi_guide_done')){ try{ var _a=latestAnnouncement(); if(_a&&_a.id) lsSet('xi_announce_popped', _a.id); }catch(e){} startTour(); } // 初回＝ガイド優先（お知らせは自動ポップせず未読ドットで残す）
-    else { maybeShowAnnouncement(); } // 2回目以降＝通常のお知らせ
-  }catch(e){} },520); }
+  function hide(){ if(done)return; done=true; sp.classList.add('out'); setTimeout(function(){ if(sp&&sp.parentNode) sp.style.display='none'; try{ maybeShowAnnouncement(); }catch(e){} },520); } // スプラッシュ後にお知らせ
   sp.addEventListener('pointerdown',hide);
   var t=setTimeout(hide,2800);
   window.addEventListener('pagehide',function(){ clearTimeout(t); });
@@ -27696,79 +27693,26 @@ document.getElementById('btnLoad').onclick=()=>newTeamFlow();
    ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
    メニュー「お知らせ」で過去分も全件閲覧できる。空配列ならポップアップ無し。body は \n で改行可。 */
 const ANNOUNCEMENTS = [
-  { id:'2026-07-01-1', date:'2026/7/1', title:'そうまくんとともろうくん見えていますか？', body:'' },
-  { id:'2026-06-28-1', date:'2026/6/28', title:'お知らせ機能を追加しました',
-    body:'アプリ起動時に最新のお知らせを表示するようにしました。\n\n「今後表示しない」を押すと、次のお知らせが来るまで表示されません。過去のお知らせはメニューの「お知らせ」からいつでも読み返せます。' }
+  { id:'2026-07-01-welcome', date:'2026/7/1', title:'Squad XI へようこそ ⚽',
+    body:'はじめての方は、下の「使い方を見る」から基本の流れ（フォーメーション → 選手を配置 → 画像でシェア）を確認できます。メニューの「使い方」からいつでも見られます。',
+    action:'help' }
 ];
 function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNOUNCEMENTS[0]:null; }
 // 新しいお知らせは自動ポップアップを「1回だけ」（表示した時点で既読扱い→再起動で再表示しない）。以後はメニューの未読ドットで気づける。
 function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_popped')===a.id) return; lsSet('xi_announce_popped', a.id); openAnnouncement(a); }catch(e){} }
 function announceUnread(){ try{ const a=latestAnnouncement(); return !!(a&&a.id&&lsGet('xi_announce_read')!==a.id); }catch(e){ return false; } }
 
-/* ---------- 初回ガイド（コーチマーク・ツアー）：初めて開いた人だけに1回。使い方からいつでも再表示 ---------- */
-const TOUR_STEPS=[
-  { sel:null,            title:'Squad XI へようこそ ⚽', body:'サッカーのスタメン11人を作って、画像にしてシェアできるアプリです。かんたんに使い方を案内します。', cta:'はじめる' },
-  { sel:'#btnFormation', title:'① フォーメーションを選ぶ', body:'まずここで 4-3-3 などの並びを選びます。' },
-  { sel:'.pitch',        title:'② 選手を配置する', body:'空いている丸（駒）をタップ → 選手を検索して置きます。名前・国籍・クラブで絞り込めます。' },
-  { sel:'#btnLoad',      title:'③ まとめて自動配置', body:'クラブや代表を選ぶと11人を自動でセット。「レアル」「日本代表」なども一発です。' },
-  { sel:'#btnMarket',    title:'④ 選手を検索', body:'全選手を一覧から探せます。眺めたり、そのまま起用も。' },
-  { sel:'#btnShare',     title:'⑤ 画像でシェア', body:'完成したら画像にして X・Instagram に投稿・保存できます。' },
-  { sel:'#btnMenu',      title:'メニュー（保存など）', body:'作ったチームの保存・切り替えや各ページはここから。準備OK、自由に作ってみてください！', cta:'はじめる！' }
-];
-function _tourInjectCSS(){ if(document.getElementById('tourcss')) return; const s=document.createElement('style'); s.id='tourcss';
-  s.textContent='#tourwrap{position:fixed;inset:0;z-index:99999;opacity:0;transition:opacity .18s}#tourwrap.on{opacity:1}'
-   +'#tourwrap .tourcatch{position:absolute;inset:0}'
-   +'#tourwrap.dimfull .tourcatch{background:rgba(6,9,7,.8)}'
-   +'#tourwrap .tourhole{position:absolute;border-radius:12px;border:2px solid var(--lime,#c8ff4f);box-shadow:0 0 0 9999px rgba(6,9,7,.76),0 0 18px rgba(200,255,79,.75);pointer-events:none;transition:all .2s ease;animation:tourpulse 1.5s ease-in-out infinite}'
-   +'@keyframes tourpulse{0%,100%{box-shadow:0 0 0 9999px rgba(6,9,7,.76),0 0 6px rgba(200,255,79,.5)}50%{box-shadow:0 0 0 9999px rgba(6,9,7,.76),0 0 20px rgba(200,255,79,.9)}}'
-   +'#tourwrap .tourbub{position:absolute;width:min(300px,calc(100vw - 26px));background:#12160f;border:1px solid #2c3a1c;border-radius:14px;padding:15px 16px 13px;box-shadow:0 14px 40px rgba(0,0,0,.55);color:#eafff0}'
-   +'#tourwrap .tourbub.center{left:50%;top:50%;transform:translate(-50%,-50%)}'
-   +'#tourwrap .tstep{font-size:10.5px;letter-spacing:1px;color:#9fb27e;font-weight:800;margin-bottom:5px}'
-   +'#tourwrap .ttitle{font-size:15.5px;font-weight:800;margin-bottom:6px;color:#fff}'
-   +'#tourwrap .tbody{font-size:12.8px;line-height:1.75;color:#cfe0be}'
-   +'#tourwrap .tbtns{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}'
-   +'#tourwrap .tskip{font-size:12px;color:#8aa06a;cursor:pointer;padding:6px 4px}'
-   +'#tourwrap .tnext{background:var(--lime,#c8ff4f);color:#0a0e0c;font-weight:800;font-size:13.5px;border:0;border-radius:9px;padding:9px 18px;cursor:pointer}';
-  document.head.appendChild(s);
-}
-let _tourIdx=0;
-function startTour(){ _tourInjectCSS(); _tourIdx=0; window.addEventListener('resize',_tourReflow); renderTourStep(); }
-function _tourReflow(){ if(document.getElementById('tourwrap')) renderTourStep(); }
-function endTour(done){ const w=document.getElementById('tourwrap'); if(w){ w.classList.remove('on'); setTimeout(()=>{ try{w.remove();}catch(e){} },200); } window.removeEventListener('resize',_tourReflow); if(done) lsSet('xi_guide_done','1'); }
-function renderTourStep(){
-  const step=TOUR_STEPS[_tourIdx]; if(!step){ endTour(true); return; }
-  let wrap=document.getElementById('tourwrap');
-  if(!wrap){ wrap=document.createElement('div'); wrap.id='tourwrap'; wrap.innerHTML='<div class="tourcatch"></div>'; document.body.appendChild(wrap); requestAnimationFrame(()=>wrap.classList.add('on')); }
-  const last=_tourIdx===TOUR_STEPS.length-1;
-  let rect=null; if(step.sel){ const el=document.querySelector(step.sel); if(el){ const r=el.getBoundingClientRect(); if(r.width&&r.height) rect=r; } }
-  wrap.classList.toggle('dimfull', !rect);
-  wrap.querySelectorAll('.tourhole,.tourbub').forEach(n=>n.remove());
-  const pad=7, vw=innerWidth, vh=innerHeight;
-  if(rect){ const hole=document.createElement('div'); hole.className='tourhole';
-    hole.style.cssText=`left:${Math.max(4,rect.left-pad)}px;top:${Math.max(4,rect.top-pad)}px;width:${rect.width+pad*2}px;height:${rect.height+pad*2}px`;
-    wrap.appendChild(hole); }
-  const bw=Math.min(300, vw-26);
-  const bub=document.createElement('div'); bub.className='tourbub'+(rect?'':' center');
-  if(rect){ const cx=rect.left+rect.width/2; const left=Math.min(Math.max(12, cx-bw/2), vw-bw-12);
-    if(rect.top < vh*0.5) bub.style.cssText=`left:${left}px;top:${Math.round(rect.bottom+14)}px`;
-    else bub.style.cssText=`left:${left}px;bottom:${Math.round(vh-rect.top+14)}px`; }
-  const stepLabel = step.sel ? `STEP ${_tourIdx} / ${TOUR_STEPS.length-1}` : 'ようこそ';
-  bub.innerHTML=`<div class="tstep">${stepLabel}</div><div class="ttitle">${escAttr(step.title)}</div><div class="tbody">${escAttr(step.body)}</div>`
-    +`<div class="tbtns"><span class="tskip">${last?'':'スキップ'}</span><button class="tnext">${escAttr(step.cta||(last?'完了':'次へ'))}</button></div>`;
-  wrap.appendChild(bub);
-  bub.querySelector('.tnext').onclick=()=>{ if(last){ endTour(true); } else { _tourIdx++; renderTourStep(); } };
-  const sk=bub.querySelector('.tskip'); if(sk) sk.onclick=()=>endTour(true);
-}
 function openAnnouncement(a){
   a=a||latestAnnouncement(); if(!a) return;
   const w=document.getElementById('annwrap'); if(!w) return;
   w.innerHTML=`<div class="anncard">
     <div class="annhead"><div class="anndate">${escAttr(a.date||'お知らせ')}</div><div class="anntitle">${escAttr(a.title||'')}</div></div>
     <div class="annbody">${escAttr(a.body||'')}</div>
-    <div class="annbtns"><button class="bigbtn" id="annLater">閉じる</button></div>
+    <div class="annbtns">${a.action==='help'?'<button class="bigbtn" id="annHelp">使い方を見る</button>':''}<button class="bigbtn ${a.action==='help'?'ghost':''}" id="annLater">閉じる</button></div>
   </div>`;
   w.classList.add('show'); requestAnimationFrame(()=>w.classList.add('on'));
-  document.getElementById('annLater').onclick=closeAnnouncement; // 自動表示は1回だけ（maybeShowAnnouncementで既読管理）→単一の閉じるボタンで十分
+  document.getElementById('annLater').onclick=closeAnnouncement; // 自動表示は1回だけ（maybeShowAnnouncementで既読管理）
+  const _ah=document.getElementById('annHelp'); if(_ah) _ah.onclick=()=>{ closeAnnouncement(); setTimeout(()=>{ try{ openInfoPage('help'); }catch(e){} },180); }; // 「使い方を見る」→使い方ページへ
 }
 function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
 // メニュー「お知らせ」：過去のお知らせを新しい順に一覧表示
@@ -28183,9 +28127,7 @@ function openHelp(){
       ${leg('2nd','第2候補','控え候補の表示を ON/OFF')}
       <div style="margin:16px 16px 0;padding:13px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--mut);font-size:12px;line-height:1.85">
         <b style="color:var(--lime)">ヒント</b>　未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。</div>
-      <div style="padding:18px 16px calc(env(safe-area-inset-bottom) + 8px)"><button class="bigbtn" id="helpReplayTour">▶ このガイドを最初から見る</button></div>
     </div>`);
-  const rt=document.getElementById('helpReplayTour'); if(rt) rt.onclick=()=>{ closeSheet(); setTimeout(startTour, 160); };
 }
 // 未保存の変更があれば確認してから proceed() を実行（新規作成・他チーム読込の前に呼ぶ）
 function guardUnsaved(proceed){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed); }
