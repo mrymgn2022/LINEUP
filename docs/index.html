@@ -25322,6 +25322,17 @@ function recordSquadSave(){
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys}),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
+// 検索トレンド収集：「選手を検索」一覧から選手を開いた＝“検索された1回”。トレンドは 検索回数＋保存回数(placements) で集計する想定。
+// バックエンド未接続(POP_ENDPOINT='')の間は何もしない。1セッション内での同一選手の連打は1回に丸める（連打スパム防止）。
+const _searchSent=new Set();
+function recordSearch(pid){
+  try{
+    if(!POP_ENDPOINT||pid==null||!P[pid]||isCustomPid(pid)) return;
+    const k=pidToKey(pid); if(!k||_searchSent.has(k)) return;
+    _searchSent.add(k);
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k],kind:'search'}),keepalive:true}).catch(()=>{});
+  }catch(e){}
+}
 // 現在のスカッドを保存形式(v3, キー化)に変換。自動保存・複数チーム保存の両方で使う。
 function serializeTeam(){
   return { v:3, formation:state.formation,
@@ -27692,7 +27703,7 @@ function drawMkt(){
       if(ns){const rem=mktCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
     }
   };
-  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;openDetail(+row.dataset.pid,null);};
+  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;recordSearch(pid);openDetail(pid,null);};
 }
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
