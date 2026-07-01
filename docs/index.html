@@ -28003,6 +28003,7 @@ function exportBackup(){
   try{
     const out={app:'SquadXI',v:1,ts:Date.now(),data:{}};
     BACKUP_KEYS.forEach(k=>{ const v=lsGet(k); if(v!=null) out.data[k]=v; });
+    if(!Object.keys(out.data).length){ toast('保存データがありません。先にチームを保存してください'); return; } // 空ファイルを作らせない
     const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='squadxi-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
@@ -28017,7 +28018,7 @@ function importBackup(file){
     const j=JSON.parse(r.result);
     if(!j||j.app!=='SquadXI'||typeof j.data!=='object'){ toast('Squad XI のバックアップではありません'); return; }
     const keys=Object.keys(j.data).filter(k=>BACKUP_KEYS.includes(k));
-    if(!keys.length){ toast('復元できるデータがありません'); return; }
+    if(!keys.length){ toast('このファイルにはデータが入っていません（空のバックアップかもしれません）'); return; }
     keys.forEach(k=>lsSet(k, j.data[k]));
     toast('復元しました。再読み込みします…'); setTimeout(()=>location.reload(),700);
   }catch(e){ toast('ファイルを読み込めませんでした'); } };
@@ -28027,15 +28028,15 @@ function openBackup(){
   const teams=getTeams().length;
   openSheet(`<h2>バックアップ</h2>
     <div class="detail" style="padding:4px 16px calc(env(safe-area-inset-bottom) + 18px)">
-      <div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.8;margin:6px 0 14px">
-        ⚠ 保存データは<b>この端末内のみ</b>です。機種変更やブラウザのデータ消去で<b>消えることがあります</b>。<br>
-        大事なチームは時々<b>書き出して保管</b>してください（保存チーム ${teams}件＋現在のスカッド・写真をまとめて1ファイルに）。
+      <div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.8;margin:6px 0 16px">
+        ⚠ 作ったチーム・スカッド・写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。
       </div>
       <button class="bigbtn" id="bkExport">⤓ バックアップを書き出す</button>
-      <button class="bigbtn ghost" id="bkImport" style="margin-top:10px">⤒ バックアップを読み込む</button>
+      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 15px;line-height:1.7">今のデータを1ファイルに保存します（保存チーム ${teams}件＋現在のスカッド・写真）。できたファイルは、自分宛メールやGoogleドライブ等に置いて保管を。<br><b style="color:var(--ink)">※先にチームを保存 or 選手を配置していないと、中身が空になり書き出せません。</b></div>
+      <button class="bigbtn ghost" id="bkImport">⤒ バックアップを読み込む</button>
+      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 4px;line-height:1.7">前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。</div>
       <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
-      <div style="font-size:11px;color:var(--mut);margin-top:10px;line-height:1.7">※読み込むと現在のデータは復元したものに置き換わります。書き出したファイルは別の端末でも読み込めます。</div>
-      <button class="bigbtn ghost" id="bkClose" style="margin-top:16px">閉じる</button>
+      <button class="bigbtn ghost" id="bkClose" style="margin-top:18px">閉じる</button>
     </div>`);
   document.getElementById('bkExport').onclick=exportBackup;
   const fi=document.getElementById('bkFile');
