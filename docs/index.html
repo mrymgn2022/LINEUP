@@ -25304,8 +25304,9 @@ function keyToPid(key){
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
 // ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
-// 手動保存されたスカッドの「スタメン＋ベンチ」に入っている選手を、保存のたびに各1回ずつ匿名カウント。
-// 自動配置(MV順)や、閉じる時の下書き自動保存は数えない＝「実際に採用して保存した」独立シグナル（MVの写しにならない）。
+// 手動保存されたスカッドに入っている選手＝スタメン＋第2候補＋ベンチを、保存のたびに各1回ずつ匿名カウント。
+// 自動配置(MV順)で入った選手も、第2候補(自動サジェスト含む)も数える → 集まる人気度はMV順に近づき、MV→独自データへの移行がなめらか。
+// 数えないのは「閉じる時の下書き自動保存」だけ（手動保存のみ計上）。ベンチ外プール(clubOtherIds/reserveAdds)は対象外。
 // 数え方は「保存のたびに+1」（端末をまたいだ重複排除はしない。1回の保存内で同じ選手を二重には数えない）。
 // バックエンド未接続（POP_ENDPOINT=''）の間は完全に何もしない。ローンチ前にエンドポイントURLを入れるだけで収集開始。
 let POP_ENDPOINT=''; // ← Cloudflare Worker 等のURL（未設定＝収集オフ）
@@ -25315,8 +25316,8 @@ function recordSquadSave(){
     if(!POP_ENDPOINT) return;
     const keys=[], seen=new Set();
     const add=pid=>{ if(pid==null||!P[pid]||isCustomPid(pid)) return; const k=pidToKey(pid); if(!k||seen.has(k)) return; seen.add(k); keys.push(k); };
-    state.slots.forEach(s=>{ if(s) add(s.pid); });   // スタメン11
-    (state.bench||[]).forEach(add);                  // ベンチ
+    state.slots.forEach(s=>{ if(s){ add(s.pid); add(s.sub); } });   // スタメン11＋第2候補（自動サジェスト含む）
+    (state.bench||[]).forEach(add);                                 // ベンチ
     if(!keys.length) return;
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys}),keepalive:true}).catch(()=>{});
   }catch(e){}
