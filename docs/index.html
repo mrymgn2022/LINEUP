@@ -27999,12 +27999,28 @@ function openFeatured(kind){
 // バックアップ：保存チーム・現在のスカッド・写真をJSON1ファイルに書き出し／読み込み。
 // Web版は端末保存(localStorage)が消える可能性があるため、機種変更・データ消去前の退避用。
 const BACKUP_KEYS=['xi_teams_v1','xi_state_v2','xi_photos_v2'];
+// バックアップ本文（JSON文字列）を作る。保存データが無ければ空文字。
+function backupText(){
+  const out={app:'SquadXI',v:1,ts:Date.now(),data:{}};
+  BACKUP_KEYS.forEach(k=>{ const v=lsGet(k); if(v!=null) out.data[k]=v; });
+  return Object.keys(out.data).length ? JSON.stringify(out) : '';
+}
+// テキスト（ファイル or 貼り付け）から復元。ファイル選択を使わないのでiOSホーム画面アプリでも動く。
+function restoreFromBackupText(text){
+  try{
+    const j=JSON.parse(text);
+    if(!j||j.app!=='SquadXI'||typeof j.data!=='object'){ toast('Squad XI のバックアップではありません'); return; }
+    const keys=Object.keys(j.data).filter(k=>BACKUP_KEYS.includes(k));
+    if(!keys.length){ toast('このバックアップにはデータが入っていません（空かもしれません）'); return; }
+    keys.forEach(k=>lsSet(k, j.data[k]));
+    toast('復元しました。再読み込みします…'); setTimeout(()=>location.reload(),700);
+  }catch(e){ toast('テキストを読み込めませんでした（内容が壊れている可能性）'); }
+}
 function exportBackup(){
   try{
-    const out={app:'SquadXI',v:1,ts:Date.now(),data:{}};
-    BACKUP_KEYS.forEach(k=>{ const v=lsGet(k); if(v!=null) out.data[k]=v; });
-    if(!Object.keys(out.data).length){ toast('保存データがありません。先にチームを保存してください'); return; } // 空ファイルを作らせない
-    const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
+    const t=backupText();
+    if(!t){ toast('保存データがありません。先にチームを保存してください'); return; } // 空ファイルを作らせない
+    const blob=new Blob([t],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='squadxi-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
     setTimeout(()=>{ try{URL.revokeObjectURL(a.href);}catch(e){} },1500);
@@ -28014,14 +28030,8 @@ function exportBackup(){
 function importBackup(file){
   if(!file)return;
   const r=new FileReader();
-  r.onload=()=>{ try{
-    const j=JSON.parse(r.result);
-    if(!j||j.app!=='SquadXI'||typeof j.data!=='object'){ toast('Squad XI のバックアップではありません'); return; }
-    const keys=Object.keys(j.data).filter(k=>BACKUP_KEYS.includes(k));
-    if(!keys.length){ toast('このファイルにはデータが入っていません（空のバックアップかもしれません）'); return; }
-    keys.forEach(k=>lsSet(k, j.data[k]));
-    toast('復元しました。再読み込みします…'); setTimeout(()=>location.reload(),700);
-  }catch(e){ toast('ファイルを読み込めませんでした'); } };
+  r.onload=()=>restoreFromBackupText(r.result);
+  r.onerror=()=>toast('ファイルを読み込めませんでした');
   r.readAsText(file);
 }
 function openBackup(){
@@ -28036,12 +28046,23 @@ function openBackup(){
       <button class="bigbtn ghost" id="bkImport">⤒ バックアップを読み込む</button>
       <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 4px;line-height:1.7">前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。</div>
       <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
+      <div style="height:1px;background:var(--line);margin:17px 0 12px"></div>
+      <div style="font-size:12.5px;color:var(--ink);font-weight:800;margin:0 2px 5px">iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式</div>
+      <div style="font-size:11.5px;color:var(--mut);margin:0 2px 9px;line-height:1.7">ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。</div>
+      <textarea id="bkText" placeholder="ここにバックアップのテキストを貼り付けて「テキストから復元」を押す" style="width:100%;box-sizing:border-box;height:76px;font-size:11px;line-height:1.5;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);padding:9px 11px;resize:vertical"></textarea>
+      <button class="bigbtn ghost" id="bkCopyOut" style="margin-top:9px">⧉ 現在のデータをテキストで出す（コピー）</button>
+      <button class="bigbtn ghost" id="bkTextRestore" style="margin-top:9px">↺ 上のテキストから復元</button>
+      <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.7">「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。</div>
       <button class="bigbtn ghost" id="bkClose" style="margin-top:18px">閉じる</button>
     </div>`);
   document.getElementById('bkExport').onclick=exportBackup;
   const fi=document.getElementById('bkFile');
   document.getElementById('bkImport').onclick=()=>fi.click();
   fi.onchange=()=>{ if(fi.files&&fi.files[0]) importBackup(fi.files[0]); };
+  const bco=document.getElementById('bkCopyOut');
+  if(bco) bco.onclick=async()=>{ const t=backupText(); if(!t){ toast('保存データがありません。先にチームを保存してください'); return; } const ta=document.getElementById('bkText'); if(ta) ta.value=t; try{ await navigator.clipboard.writeText(t); toast('コピーしました。メモ等に貼り付けて保管を'); }catch(e){ if(ta){ ta.focus(); ta.select(); } toast('上の枠のテキストを全選択してコピーしてください'); } };
+  const btr=document.getElementById('bkTextRestore');
+  if(btr) btr.onclick=()=>{ const ta=document.getElementById('bkText'); const t=ta?ta.value.trim():''; if(!t){ toast('テキストが空です。バックアップを貼り付けてください'); return; } restoreFromBackupText(t); };
   const cl=document.getElementById('bkClose'); if(cl)cl.onclick=closeSheet;
 }
 function openInfoPage(kind){
