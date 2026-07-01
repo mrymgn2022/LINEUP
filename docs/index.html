@@ -25303,6 +25303,21 @@ function keyToPid(key){
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
+// ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
+// ユーザーが「手動で配置した選手」を、1端末×1選手で1回だけ匿名カウント（連打・自動配置は数えない＝MVの写しにならない独立指標）。
+// バックエンド未接続（POP_ENDPOINT=''）の間は完全に何もしない。ローンチ前にエンドポイントURLを入れるだけで収集開始。
+let POP_ENDPOINT=''; // ← Firebase Cloud Function / Supabase / Cloudflare Worker 等のURL（未設定＝収集オフ）
+function _deviceId(){ let d=lsGet('xi_did'); if(!d){ d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)); lsSet('xi_did',d); } return d; }
+function recordPopularity(pid){
+  try{
+    if(!POP_ENDPOINT||pid==null||!P[pid]||isCustomPid(pid)) return;
+    const k=pidToKey(pid); if(!k) return;
+    const sent=new Set(JSON.parse(lsGet('xi_pop_sent')||'[]'));
+    if(sent.has(k)) return;                              // この端末で既に計上済みなら送らない
+    sent.add(k); lsSet('xi_pop_sent', JSON.stringify([...sent]));
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k]}),keepalive:true}).catch(()=>{});
+  }catch(e){}
+}
 // 現在のスカッドを保存形式(v3, キー化)に変換。自動保存・複数チーム保存の両方で使う。
 function serializeTeam(){
   return { v:3, formation:state.formation,
@@ -27102,6 +27117,7 @@ function assign(slotIdx,pid){
     benchReturn(outgoing); // 元の選手を控えへ戻す（クラブ編成時のみ。国籍/リーグ等はベンチ外扱い）
   }
   closeSheet();render();save();
+  recordPopularity(pid); // 手動で選んで配置＝人気度に1回だけ計上（収集オフ時は何もしない）
   toast(P[pid][0].trim()+' を '+state.slots[slotIdx].role+' に配置');
 }
 
