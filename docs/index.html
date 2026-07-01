@@ -25304,18 +25304,21 @@ function keyToPid(key){
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
 // ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
-// ユーザーが「手動で配置した選手」を、1端末×1選手で1回だけ匿名カウント（連打・自動配置は数えない＝MVの写しにならない独立指標）。
+// 手動保存されたスカッドの「スタメン＋ベンチ」に入っている選手を、保存のたびに各1回ずつ匿名カウント。
+// 自動配置(MV順)や、閉じる時の下書き自動保存は数えない＝「実際に採用して保存した」独立シグナル（MVの写しにならない）。
+// 数え方は「保存のたびに+1」（端末をまたいだ重複排除はしない。1回の保存内で同じ選手を二重には数えない）。
 // バックエンド未接続（POP_ENDPOINT=''）の間は完全に何もしない。ローンチ前にエンドポイントURLを入れるだけで収集開始。
-let POP_ENDPOINT=''; // ← Firebase Cloud Function / Supabase / Cloudflare Worker 等のURL（未設定＝収集オフ）
+let POP_ENDPOINT=''; // ← Cloudflare Worker 等のURL（未設定＝収集オフ）
 function _deviceId(){ let d=lsGet('xi_did'); if(!d){ d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)); lsSet('xi_did',d); } return d; }
-function recordPopularity(pid){
+function recordSquadSave(){
   try{
-    if(!POP_ENDPOINT||pid==null||!P[pid]||isCustomPid(pid)) return;
-    const k=pidToKey(pid); if(!k) return;
-    const sent=new Set(JSON.parse(lsGet('xi_pop_sent')||'[]'));
-    if(sent.has(k)) return;                              // この端末で既に計上済みなら送らない
-    sent.add(k); lsSet('xi_pop_sent', JSON.stringify([...sent]));
-    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k]}),keepalive:true}).catch(()=>{});
+    if(!POP_ENDPOINT) return;
+    const keys=[], seen=new Set();
+    const add=pid=>{ if(pid==null||!P[pid]||isCustomPid(pid)) return; const k=pidToKey(pid); if(!k||seen.has(k)) return; seen.add(k); keys.push(k); };
+    state.slots.forEach(s=>{ if(s) add(s.pid); });   // スタメン11
+    (state.bench||[]).forEach(add);                  // ベンチ
+    if(!keys.length) return;
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys}),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
 // 現在のスカッドを保存形式(v3, キー化)に変換。自動保存・複数チーム保存の両方で使う。
@@ -25424,12 +25427,13 @@ function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDispl
 // 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
 function saveCurrentTeam(){
   const teams=getTeams(); const data=serializeTeam();
-  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); cleanJson=JSON.stringify(serializeTeam()); return 'updated'; } }
+  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); cleanJson=JSON.stringify(serializeTeam()); recordSquadSave(); return 'updated'; } }
   if(teams.length>=teamCap()) return 'limit';
   const id='t'+Date.now()+Math.floor(Math.random()*1000);
   state.teamId=id; data.teamId=id;
   teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
   setTeams(teams); save(); cleanJson=JSON.stringify(serializeTeam());
+  recordSquadSave();
   return 'added';
 }
 async function loadTeamFromList(id){
@@ -27117,7 +27121,6 @@ function assign(slotIdx,pid){
     benchReturn(outgoing); // 元の選手を控えへ戻す（クラブ編成時のみ。国籍/リーグ等はベンチ外扱い）
   }
   closeSheet();render();save();
-  recordPopularity(pid); // 手動で選んで配置＝人気度に1回だけ計上（収集オフ時は何もしない）
   toast(P[pid][0].trim()+' を '+state.slots[slotIdx].role+' に配置');
 }
 
