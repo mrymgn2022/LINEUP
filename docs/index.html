@@ -27790,6 +27790,38 @@ function fmtTeamDate(ts){ try{ const d=new Date(ts); return (d.getMonth()+1)+'/'
 function renderDrawer(){ const d=document.getElementById('drawer'); d.innerHTML=drawerHTML(); wireDrawer(); }
 function openDrawer(){ renderDrawer(); document.getElementById('dscrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); }
 function closeDrawer(){ document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); }
+// Web版（通常のブラウザ）判定。インストール済みPWA / ネイティブ(Capacitor)では false → ストア誘導を出さない
+function isWebVersion(){
+  try{
+    if(window.Capacitor && typeof window.Capacitor.isNativePlatform==='function' && window.Capacitor.isNativePlatform()) return false;
+    const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true;
+    return !standalone;
+  }catch(e){ return true; }
+}
+// App Store / Google Play バッジ（Web版のみ表示。URL未設定なら「近日公開」＝クリックでトースト）
+function storeBadgesHTML(){
+  if(!isWebVersion()) return '';
+  const soon = !APPSTORE_URL && !PLAYSTORE_URL;
+  const badge=(kind,url)=>{
+    const ios = kind==='ios';
+    const icon = ios
+      ? '<svg width="19" height="19" viewBox="0 0 24 24" fill="#fff"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M4 3v18l12-9z"/></svg>';
+    const l1 = ios ? 'Download on the' : 'GET IT ON';
+    const l2 = ios ? 'App Store' : 'Google Play';
+    const inner = `<span style="display:flex;align-items:center;gap:9px;padding:8px 13px;background:#000;border:1px solid rgba(255,255,255,.22);border-radius:9px;min-width:148px">`
+      + icon
+      + `<span style="display:flex;flex-direction:column;line-height:1.12;color:#fff;text-align:left">`
+      + `<span style="font-size:8.5px;letter-spacing:.3px;opacity:.85">${l1}</span>`
+      + `<span style="font-size:15px;font-weight:600;margin-top:1px">${l2}</span></span></span>`;
+    if(url) return `<a href="${url}" target="_blank" rel="noopener" style="text-decoration:none">${inner}</a>`;
+    return `<div data-storesoon="1" style="cursor:pointer;position:relative">${inner}`
+      + `<span style="position:absolute;inset:0;background:rgba(15,17,15,.4);border-radius:9px"></span></div>`;
+  };
+  return `<div class="dwdiv"></div>`
+    + `<div class="dwsec">アプリ版${soon?'（近日公開）':'をダウンロード'}</div>`
+    + `<div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 16px 10px">${badge('ios',APPSTORE_URL)}${badge('android',PLAYSTORE_URL)}</div>`;
+}
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(t=>`
@@ -27814,6 +27846,7 @@ function drawerHTML(){
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
     <div class="dwitem" data-page="backup"><span class="di">⤓</span>バックアップ（書き出し / 読み込み）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="feedback"><span class="di">✉</span>選手追加依頼・不具合報告<span class="dchev">›</span></div>
+    ${storeBadgesHTML()}
     <div class="dwdiv"></div>
     <div class="dwitem" data-page="privacy"><span class="di">🔒</span>プライバシーポリシー<span class="dchev">›</span></div>
     <div class="dwitem" data-page="terms"><span class="di">§</span>利用規約<span class="dchev">›</span></div>
@@ -27829,6 +27862,7 @@ function wireDrawer(){
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast('削除しました'); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
+  d.querySelectorAll('[data-storesoon]').forEach(el=>el.onclick=()=>toast('アプリ版は近日公開予定です'));
 }
 // 注目移籍カード用：クラブ名 → 国コード(FI)。to が 'フリー'(無所属)のときは旗の代わりに赤丸斜線マーク。
 const TR_CLUB_NAT={
@@ -28525,6 +28559,9 @@ function openSquadAnalysis(scope){
    SNS共有：スタメン画像を生成して共有（画像＋アプリリンク）
    ========================================================= */
 const APP_URL='https://squadxi.co';
+// ネイティブアプリのストアURL（公開後にここへ貼る＝バッジが自動でリンク有効化。空の間は「近日公開」表示）
+const APPSTORE_URL='';   // 例: https://apps.apple.com/app/id0000000000
+const PLAYSTORE_URL='';  // 例: https://play.google.com/store/apps/details?id=co.squadxi.app
 function roleCol(role){const g=grp(role);return {gk:'#ffd166',df:'#4fc3f7',mf:'#caff3a',fw:'#ff8a65'}[g]||'#caff3a';}
 // キャンバス用：幅に収まるよう末尾を省略
 function fitCanvasText(x,str,maxW){ if(x.measureText(str).width<=maxW)return str; let s=str; while(s.length>1&&x.measureText(s+'…').width>maxW)s=s.slice(0,-1); return s+'…'; }
