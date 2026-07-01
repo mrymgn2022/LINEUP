@@ -28016,13 +28016,24 @@ function restoreFromBackupText(text){
     toast('復元しました。再読み込みします…'); setTimeout(()=>location.reload(),700);
   }catch(e){ toast('テキストを読み込めませんでした（内容が壊れている可能性）'); }
 }
-function exportBackup(){
+async function exportBackup(){
   try{
     const t=backupText();
     if(!t){ toast('保存データがありません。先にチームを保存してください'); return; } // 空ファイルを作らせない
+    const fname='squadxi-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    // スマホ/ホーム画面アプリ：共有シート経由（ファイルに保存・自分宛メール等）が簡単で確実
+    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+    const mobileish=standalone||(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);
+    if(mobileish && navigator.canShare && typeof File!=='undefined'){
+      try{
+        const file=new File([t],fname,{type:'application/json'});
+        if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Squad XI バックアップ'}); return; }
+      }catch(e){ if(e&&e.name==='AbortError') return; } // キャンセルは何もしない／非対応はダウンロードへ
+    }
+    // PC等：通常のファイルダウンロード
     const blob=new Blob([t],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='squadxi-backup-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+    a.download=fname; a.click();
     setTimeout(()=>{ try{URL.revokeObjectURL(a.href);}catch(e){} },1500);
     toast('バックアップを書き出しました');
   }catch(e){ toast('書き出しに失敗しました'); }
