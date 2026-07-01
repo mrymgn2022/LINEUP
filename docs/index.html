@@ -27698,22 +27698,24 @@ const ANNOUNCEMENTS = [
     body:'アプリ起動時に最新のお知らせを表示するようにしました。\n\n「今後表示しない」を押すと、次のお知らせが来るまで表示されません。過去のお知らせはメニューの「お知らせ」からいつでも読み返せます。' }
 ];
 function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNOUNCEMENTS[0]:null; }
-function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_seen')===a.id) return; openAnnouncement(a); }catch(e){} }
+// 新しいお知らせは自動ポップアップを「1回だけ」（表示した時点で既読扱い→再起動で再表示しない）。以後はメニューの未読ドットで気づける。
+function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_popped')===a.id) return; lsSet('xi_announce_popped', a.id); openAnnouncement(a); }catch(e){} }
+function announceUnread(){ try{ const a=latestAnnouncement(); return !!(a&&a.id&&lsGet('xi_announce_read')!==a.id); }catch(e){ return false; } }
 function openAnnouncement(a){
   a=a||latestAnnouncement(); if(!a) return;
   const w=document.getElementById('annwrap'); if(!w) return;
   w.innerHTML=`<div class="anncard">
     <div class="annhead"><div class="anndate">${escAttr(a.date||'お知らせ')}</div><div class="anntitle">${escAttr(a.title||'')}</div></div>
     <div class="annbody">${escAttr(a.body||'')}</div>
-    <div class="annbtns"><button class="bigbtn" id="annDismiss">今後表示しない</button><button class="bigbtn ghost" id="annLater">閉じる</button></div>
+    <div class="annbtns"><button class="bigbtn" id="annLater">閉じる</button></div>
   </div>`;
   w.classList.add('show'); requestAnimationFrame(()=>w.classList.add('on'));
-  document.getElementById('annDismiss').onclick=()=>{ lsSet('xi_announce_seen', a.id); closeAnnouncement(); }; // 次の更新まで非表示
-  document.getElementById('annLater').onclick=closeAnnouncement;                                              // 今回だけ閉じる（次回起動でまた表示）
+  document.getElementById('annLater').onclick=closeAnnouncement; // 自動表示は1回だけ（maybeShowAnnouncementで既読管理）→単一の閉じるボタンで十分
 }
 function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
 // メニュー「お知らせ」：過去のお知らせを新しい順に一覧表示
 function openAnnouncementList(){
+  const _la=latestAnnouncement(); if(_la&&_la.id) lsSet('xi_announce_read', _la.id); // 一覧を開いた＝既読（未読ドットを消す）
   const list=ANNOUNCEMENTS||[];
   const body = list.length ? list.map(a=>`
     <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
@@ -27842,7 +27844,7 @@ function drawerHTML(){
     <div class="dwitem" data-feat="squad"><span class="di">${ICN.sub}</span>注目スカッド<span class="dchev">›</span></div>
     <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>注目移籍<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
-    <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>お知らせ<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>お知らせ${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
     <div class="dwitem" data-page="backup"><span class="di">⤓</span>バックアップ（書き出し / 読み込み）<span class="dchev">›</span></div>
