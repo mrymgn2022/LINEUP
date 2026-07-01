@@ -25309,7 +25309,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 // 数えないのは「閉じる時の下書き自動保存」だけ（手動保存のみ計上）。ベンチ外プール(clubOtherIds/reserveAdds)は対象外。
 // 数え方は「保存のたびに+1」（端末をまたいだ重複排除はしない。1回の保存内で同じ選手を二重には数えない）。
 // バックエンド未接続（POP_ENDPOINT=''）の間は完全に何もしない。ローンチ前にエンドポイントURLを入れるだけで収集開始。
-let POP_ENDPOINT=''; // ← Cloudflare Worker 等のURL（未設定＝収集オフ）
+let POP_ENDPOINT='https://squadxi-pop.mrymgn2018.workers.dev'; // ← Cloudflare Worker（設定済み＝収集オン）
 function _deviceId(){ let d=lsGet('xi_did'); if(!d){ d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)); lsSet('xi_did',d); } return d; }
 function recordSquadSave(){
   try{
