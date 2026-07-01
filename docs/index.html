@@ -27814,6 +27814,9 @@ function drawerHTML(){
     <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
     <div class="dwitem" data-page="backup"><span class="di">⤓</span>バックアップ（書き出し / 読み込み）<span class="dchev">›</span></div>
     <div class="dwitem" data-page="feedback"><span class="di">✉</span>選手追加依頼・不具合報告<span class="dchev">›</span></div>
+    <div class="dwdiv"></div>
+    <div class="dwitem" data-page="privacy"><span class="di">🔒</span>プライバシーポリシー<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="terms"><span class="di">§</span>利用規約<span class="dchev">›</span></div>
     <div class="dwfoot">Squad XI — build your XI<br>v0.9（プレビュー）</div>`;
 }
 function wireDrawer(){
@@ -28010,6 +28013,8 @@ function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
   if(kind==='announcements'){ openAnnouncementList(); return; }
   if(kind==='backup'){ openBackup(); return; }
+  if(kind==='privacy'){ window.open('privacy.html','_blank','noopener'); return; }
+  if(kind==='terms'){ window.open('terms.html','_blank','noopener'); return; }
   const M={ premium:['プレミアム（近日公開）','負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。'],
             feedback:['選手追加依頼・不具合報告','未掲載の選手の追加依頼や、不具合・改善要望があれば教えてください。連絡先は準備中です。'] };
   const m=M[kind]||['',''];
