@@ -27155,14 +27155,14 @@ function clubChips(f=pickFilter){
   const mem=lgMembers(f.lg);
   const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
   return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">${t('allClubs')}</div>`+
-    clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${c}">${c}</div>`).join('');
+    clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${escAttr(c)}">${escAttr(dispClub(c))}</div>`).join('');
 }
 // クラブ選択プルダウン（チーム作成以外のピッカー用。横並びチップ→<select>）。リーグ選択後に絞り込みやすく。
 function clubSelectHTML(f=pickFilter){
   const mem=lgMembers(f.lg);
   const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
   const o=(v,label,sel)=>`<option value="${escAttr(v)}"${sel?' selected':''}>${escAttr(label)}</option>`;
-  return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL',t('allClubs'),(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,c,f.club===c)).join('')+`</select>`;
+  return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL',t('allClubs'),(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,dispClub(c),f.club===c)).join('')+`</select>`;
 }
 // クラブ欄の表示制御（新規作成画面と同じ：リーグ未指定なら隠す／リーグ選択時のみ表示し、そのリーグのクラブを出す）
 function syncClubField(id, f){
@@ -27218,7 +27218,7 @@ function playerMatches(p){
   else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
   if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
   if(pickFilter.nat&&pickFilter.nat!=='ALL'&&natCode(p)!==pickFilter.nat)return false;
-  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）
+  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIのJリーグは日本語クラブ名でもヒット
   return true;
 }
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
@@ -27423,7 +27423,7 @@ function prowHTML(i,hideBench){
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
       <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
-      <div class="sub">${flagHTML(p[3])}${p[4]?' · '+p[4]:''}${p[2]>0?' · '+p[2]+(LANG==='en'?'':'歳'):''}</div>
+      <div class="sub">${flagHTML(p[3])}${p[4]?' · '+escAttr(dispClub(p[4])):''}${p[2]>0?' · '+p[2]+(LANG==='en'?'':'歳'):''}</div>
     </div>
   </div>`;
 }
@@ -27871,7 +27871,7 @@ function openDetail(pid,slotIdx){
         <div class="davatar${ph?' photo':''}"${ph?` style="background-image:url('${ph}')"`:''}>${SIL}</div>
         <div>
           <div class="dname renameTrigger" id="dRename">${nameOf(pid,false)}<span class="penIcon">${_PEN}</span></div>
-          <div class="dclub">${flagHTML(p[3])} · ${p[4]}</div>
+          <div class="dclub">${flagHTML(p[3])} · ${escAttr(dispClub(p[4]))}</div>
         </div>
       </div>
       <div class="dgrid">
@@ -27979,7 +27979,7 @@ function drawMkt(){
     if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
     if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
     if(f.nat&&f.nat!=='ALL'&&natCode(p)!==f.nat)return false;
-    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)))return false; // 発音記号を畳んで一致
+    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)))return false; // 発音記号を畳んで一致。日本語UIのJリーグは日本語クラブ名でもヒット
     return true;
   });
   const so=f.sort||'mv';
@@ -28665,8 +28665,20 @@ const CLUB_SHORT={
   'FC Tokyo':'FC Tokyo','Yokohama FC':'Yokohama FC','FC Gifu':'FC Gifu','FC Osaka':'FC Osaka',
   'FC Imabari':'FC Imabari','Iwaki FC':'Iwaki FC','Ehime FC':'Ehime FC','Tochigi SC':'Tochigi SC','SC Sagamihara':'SC Sagamihara'
 };
+// Jリーグ(J1/J2/J3)クラブ名の日本語表記。日本語UIのときだけ dispClub / shortClub がこれを使う（英語UIはローマ字のまま）。
+const CLUB_JA={
+  // J1
+  'Avispa Fukuoka':'アビスパ福岡','Cerezo Osaka':'セレッソ大阪','FC Tokyo':'FC東京','Fagiano Okayama':'ファジアーノ岡山','Gamba Osaka':'ガンバ大阪','JEF United Chiba':'ジェフユナイテッド千葉','Kashima Antlers':'鹿島アントラーズ','Kashiwa Reysol':'柏レイソル','Kawasaki Frontale':'川崎フロンターレ','Kyoto Sanga':'京都サンガ','Machida Zelvia':'FC町田ゼルビア','Mito HollyHock':'水戸ホーリーホック','Nagoya Grampus':'名古屋グランパス','Sanfrecce Hiroshima':'サンフレッチェ広島','Shimizu S-Pulse':'清水エスパルス','Tokyo Verdy':'東京ヴェルディ','Urawa Red Diamonds':'浦和レッズ','V-Varen Nagasaki':'V・ファーレン長崎','Vissel Kobe':'ヴィッセル神戸','Yokohama F. Marinos':'横浜F・マリノス',
+  // J2
+  'Albirex Niigata':'アルビレックス新潟','Blaublitz Akita':'ブラウブリッツ秋田','FC Imabari':'FC今治','Fujieda MYFC':'藤枝MYFC','Hokkaido Consadole Sapporo':'北海道コンサドーレ札幌','Iwaki FC':'いわきFC','Júbilo Iwata':'ジュビロ磐田','Kataller Toyama':'カターレ富山','Montedio Yamagata':'モンテディオ山形','Oita Trinita':'大分トリニータ','RB Omiya Ardija':'RB大宮アルディージャ','Sagan Tosu':'サガン鳥栖','Shonan Bellmare':'湘南ベルマーレ','Tegevajaro Miyazaki':'テゲバジャーロ宮崎','Tochigi City':'栃木シティ','Tokushima Vortis':'徳島ヴォルティス','Vanraure Hachinohe':'ヴァンラーレ八戸','Vegalta Sendai':'ベガルタ仙台','Ventforet Kofu':'ヴァンフォーレ甲府','Yokohama FC':'横浜FC',
+  // J3
+  'Ehime FC':'愛媛FC','FC Gifu':'FC岐阜','FC Osaka':'FC大阪','Fukushima United':'福島ユナイテッドFC','Gainare Tottori':'ガイナーレ鳥取','Giravanz Kitakyushu':'ギラヴァンツ北九州','Kagoshima United':'鹿児島ユナイテッドFC','Kamatamare Sanuki':'カマタマーレ讃岐','Kochi United':'高知ユナイテッドSC','Matsumoto Yamaga':'松本山雅FC','Nagano Parceiro':'AC長野パルセイロ','Nara Club':'奈良クラブ','Reilac Shiga':'レイラック滋賀','Renofa Yamaguchi':'レノファ山口FC','Roasso Kumamoto':'ロアッソ熊本','Ryukyu Okinawa':'FC琉球','SC Sagamihara':'SC相模原','Thespa Gunma':'ザスパ群馬','Tochigi SC':'栃木SC','Zweigen Kanazawa':'ツエーゲン金沢'
+};
+// クラブ名の表示（日本語UIかつJリーグのクラブなら日本語表記、それ以外はデータ通りのローマ字）
+function dispClub(club){ const c=(club||'').trim(); return (LANG==='ja'&&CLUB_JA[c])?CLUB_JA[c]:club; }
 function shortClub(name){
   const n=(name||'').trim(); if(!n) return n;
+  if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n]; // 日本語UIのJリーグ＝日本語クラブ名（ローマ字短縮はしない）
   if(CLUB_SHORT[n]) return CLUB_SHORT[n];
   let s=n;
   s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AFC|AC|AS|SSC|SS|SL|SC|SV|SG|SpVgg|SSV|FSV|TSV|VfB|VfL|TSG|BSC|RB|RC|RCD|CD|CA|CF|UD|SD|US|UC|OGC|LOSC|KAA|KRC|GNK|NK|FK)\s+/,''); // 接頭の種別語
@@ -28726,10 +28738,10 @@ function startOriginal(){
   // クラブ選択肢。特定リーグ＝そのリーグのクラブ／人気クラブ(POP)＝上位100。先頭はプレースホルダ（未選択＝リーグのみで作成）
   const otClubOptions=(lg)=>{
     const head='<option value="">'+t('chooseClub')+'</option>';
-    if(lg==='POP') return head+POP_CLUBS.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
+    if(lg==='POP') return head+POP_CLUBS.map(c=>`<option value="${escAttr(c)}">${escAttr(dispClub(c))}</option>`).join('');
     const mem=lgMembers(lg);
     const clubs=[...new Set(P.filter(p=>(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
-    return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
+    return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(dispClub(c))}</option>`).join('');
   };
   // 「人気クラブ」チップ（全リーグの隣）。タップでクラブ欄に上位100を出す
   const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">${_SM_STAR} ${t('popClubs')}</div>`;
@@ -28781,8 +28793,8 @@ function startOriginal(){
   if(otSearchEl) otSearchEl.oninput=()=>{
     const q=deaccent(otSearchEl.value.trim()).toLowerCase();
     if(!q){ otSug.innerHTML=''; return; }
-    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)).slice(0,12);
-    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(c)}</div>`).join(''):'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
+    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)).slice(0,12);
+    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(dispClub(c))}</div>`).join(''):'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
   };
   if(otSug) otSug.onclick=e=>{
     const d=e.target.closest('[data-club]'); if(!d)return;
@@ -28815,7 +28827,7 @@ function startOriginal(){
     // チーム名は任意。未入力なら、クラブ単独→クラブ名／国籍単独→国名 で自動命名（組み合わせ時は自動命名しない）
     let name=typed;
     if(!name){
-      if(useClub&&!useNat&&!useLg) name=chosenClub;
+      if(useClub&&!useNat&&!useLg) name=dispClub(chosenClub); // Jリーグは日本語UIで日本語クラブ名（英語UIはローマ字）
       else if(useNat&&!useClub&&!useLg) name=natDisp(acf.nat);
     }
     otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name:typed}; // 入力値のみ保持（自動命名は保存しない）
@@ -28825,7 +28837,7 @@ function startOriginal(){
       placeClubSquad(chosenClub,name);
       setFormLabel(); closeSheet(); render(); save();
       const filled=state.slots.filter(s=>s.pid!=null).length;
-      const clabel=(name&&name!==chosenClub)?(name+(LANG==='en'?' ('+chosenClub+')':'（'+chosenClub+'）')):chosenClub;
+      const clabel=typed?(typed+(LANG==='en'?' ('+dispClub(chosenClub)+')':'（'+dispClub(chosenClub)+'）')):dispClub(chosenClub);
       toast(tPlacedCount(clabel,filled)); return;
     }
     // 条件なし＝空のフォーメーション
@@ -28890,7 +28902,7 @@ function placeClubSquad(club,name){
   autoAssignSubs(); // 第二候補を初期割当（以後は手動・自動では変わらない）
 }
 function loadClub(club){
-  placeClubSquad(club,club);
+  placeClubSquad(club,dispClub(club));
   closeSheet();render();save();toast(tClubPlaced(club));
 }
 
