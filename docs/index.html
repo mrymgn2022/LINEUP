@@ -25773,13 +25773,13 @@ function render(){
       tok.appendChild(disc);
       if(!state.hideRoles){ const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role); }
       const nm=document.createElement('div');nm.className='pname';
-      if(state.showFlags){ nm.innerHTML=flagHTMLForPid(s.pid)+' '+escAttr(squadShortName(s.pid)); } else { nm.textContent=squadShortName(s.pid); }
+      if(state.showFlags && !state.flagByLeague){ nm.innerHTML=flagHTMLForPid(s.pid)+' '+escAttr(squadShortName(s.pid)); } else { nm.textContent=squadShortName(s.pid); } // 代表(flagByLeague)は名前の横に旗を出さない→メモのクラブ名の前へ移動
       tok.appendChild(nm);
       // 駒下：メモ→第2候補の順。存在するものだけ表示し、絶対配置(.tokfoot)で駒の高さに影響させない。
       // → メモの無い選手は空白を作らず、かつディスク高さは常に一定なので段差も出ない。
       let foot=null;
       const addFoot=el=>{ if(!foot){ foot=document.createElement('div'); foot.className='tokfoot'; tok.appendChild(foot); } foot.appendChild(el); };
-      if(state.showMemo){ const mt=memoOf(s.pid); if(mt){ const m=document.createElement('div');m.className='pmemo';m.textContent=mt; addFoot(m); } }
+      if(state.showMemo){ const mt=memoOf(s.pid); if(mt){ const m=document.createElement('div');m.className='pmemo'; if(state.flagByLeague && state.showFlags){ m.innerHTML=flagHTMLForPid(s.pid)+' '+escAttr(mt); } else { m.textContent=mt; } addFoot(m); } } // 代表：所属リーグの国旗をクラブ名(メモ)の前に。旗はメモの文字サイズ基準(em)で自然な大きさ
       if(state.showSub && s.sub!=null && P[s.sub]){ const sub=document.createElement('div');sub.className='psub';sub.textContent=squadShortName(s.sub); addFoot(sub); }
     }
     pitch.appendChild(tok);
@@ -29077,7 +29077,7 @@ async function buildShareCanvas(){
   state.slots.forEach(s=>{
     if(s.pid==null)return;
     const code=dispNatCode(s.pid);
-    const fImg=(state.showFlags&&FI[code])?flagImgs[FI[code]]:null;
+    const fImg=(state.showFlags&&!state.flagByLeague&&FI[code])?flagImgs[FI[code]]:null; // 代表(flagByLeague)は名前の横に旗を出さない→メモへ
     info.push({s,fx:tokX(s),fy:tokY(s),fImg,full:squadShortName(s.pid)});
   });
   // 名前/メモ/第2候補は全員同じフォントサイズに統一（盤面のようにバラつかせない）。
@@ -29089,7 +29089,11 @@ async function buildShareCanvas(){
   // 名前サイズは全員一律（盤面のように統一）。「全員を同じサイズUで描いたとき、同一行の隣同士が被らない最大のU」を採用。
   const uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
   const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=memoOf(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
-  const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ const t=subText(it); if(!t)return 0; x.font='700 '+U+'px Manrope,sans-serif'; return x.measureText(t).width; },m(10),m(6)):m(10);
+  const memoFlagOn=state.flagByLeague&&state.showFlags; // 代表：メモ(クラブ名)の前にリーグ国旗を描く
+  const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; let w=0;
+      if(state.showMemo){const mm=memoOf(it.s.pid); if(mm){ let mw=x.measureText(mm).width; if(memoFlagOn) mw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(mw>w)w=mw; }}
+      if(state.showSub&&it.s.sub!=null&&P[it.s.sub]){const sw=x.measureText(squadShortName(it.s.sub)).width; if(sw>w)w=sw;}
+      return w; },m(10),m(6)):m(10);
   info.forEach(it=>{
     const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
@@ -29139,7 +29143,13 @@ async function buildShareCanvas(){
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
     let infoY=fy+R+(state.hideRoles?m(33):m(53));
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(mt,fx,infoY);infoY+=m(15);}}
+    if(state.showMemo){const mt=memoOf(s.pid); if(mt){ x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';
+      const mImg=memoFlagOn?flagImgs[FI[dispNatCode(s.pid)]]:null;
+      if(mImg){ const fh=Math.round(uniSub*0.82),fw=Math.round(fh*4/3),gp=m(3),tw=x.measureText(mt).width,tot=fw+gp+tw,sx0=fx-tot/2,fyy=(infoY-uniSub*0.34)-fh/2;
+        const _sc=x.shadowColor; x.shadowColor='transparent'; x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); x.shadowColor=_sc;
+        x.textAlign='left'; x.fillText(mt,sx0+fw+gp,infoY); x.textAlign='center';
+      } else { x.fillText(mt,fx,infoY); }
+      infoY+=m(15); }}
     if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
     x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
