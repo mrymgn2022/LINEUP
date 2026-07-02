@@ -306,6 +306,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .dwteam .tn small{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-top:2px}
 .dwtrash{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--mut);flex-shrink:0}
 .dwtrash:active{color:var(--red);background:var(--bg)}
+.dwedit{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--mut);flex-shrink:0}
+.dwedit:active{color:var(--lime);background:var(--bg)}
 .dwempty{padding:6px 16px 2px;color:var(--mut);font-size:12px;line-height:1.7}
 .dwsave{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 12px 2px;border:1px dashed var(--line);border-radius:11px;color:var(--mut);padding:11px;font-size:13px;font-weight:700;cursor:pointer}
 .dwsave:active{background:var(--panel2);color:var(--ink)}
@@ -25392,7 +25394,7 @@ const I18N = {
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
-    editDisplayName:'表示名を編集', origName:'元の名前：', renameHelp:'長い名前の短縮や愛称に変更できます。<br>空のまま保存すると元の名前に戻ります。', save:'保存', resetToOrig:'元の名前に戻す',
+    editDisplayName:'表示名を編集', origName:'元の名前：', renameHelp:'長い名前の短縮や愛称に変更できます。<br>空のまま保存すると元の名前に戻ります。', save:'保存', resetToOrig:'元の名前に戻す', renameTeamTitle:'スカッド名を編集',
     memoPh:'例）怪我明け / 売却候補 / 新加入', deleteNote:'メモを削除',
     helpSub:'はじめての方へ', helpIntro:'サッカーの<b>スタメン11人</b>を自由に作って、<b>画像にしてシェア</b>できるアプリです。まずは3ステップ。',
     helpSec1:'かんたん3ステップ', helpS1T:'フォーメーションを選ぶ', helpS1D:'画面上の「フォーメーション」ボタンから 4-3-3 などを選びます。',
@@ -25470,7 +25472,7 @@ const I18N = {
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
-    editDisplayName:'Edit display name', origName:'Original name: ', renameHelp:'Shorten a long name or use a nickname.<br>Save empty to revert to the original.', save:'Save', resetToOrig:'Reset to original',
+    editDisplayName:'Edit display name', origName:'Original name: ', renameHelp:'Shorten a long name or use a nickname.<br>Save empty to revert to the original.', save:'Save', resetToOrig:'Reset to original', renameTeamTitle:'Edit squad name',
     memoPh:'e.g. Back from injury / Up for sale / New signing', deleteNote:'Delete note',
     helpSub:'Getting started', helpIntro:'Build your own <b>starting XI</b> and <b>share it as an image</b>. Just three steps to begin.',
     helpSec1:'3 easy steps', helpS1T:'Pick a formation', helpS1D:'Tap the “Formation” button at the top and choose 4-3-3, and so on.',
@@ -25678,6 +25680,20 @@ async function loadTeamFromList(id){
 function isDirty(){ if(!state.slots||state.slots.filter(s=>s.pid!=null).length===0) return false; return JSON.stringify(serializeTeam())!==cleanJson; }
 function deleteTeam(id){ setTeams(getTeams().filter(t=>t.id!==id)); if(state.teamId===id){ state.teamId=null; save(); } }
 function renameTeamInList(id,name){ const teams=getTeams(),i=teams.findIndex(t=>t.id===id); if(i<0)return; teams[i].name=name; if(teams[i].data)teams[i].data.teamName=name; setTeams(teams); if(state.teamId===id){ state.teamName=name; save(); } }
+// 保存済みスカッドの名前を編集（ドロワーのえんぴつマークから）
+function openRenameTeam(id){
+  const tm=getTeams().find(x=>x.id===id); if(!tm) return;
+  openSheet(`
+    <h2>${t('renameTeamTitle')}</h2>
+    <div class="controls">
+      <input class="search" id="rtIn" maxlength="24" autocomplete="off" placeholder="${escAttr(t('myTeam'))}" value="${escAttr(tm.name||'')}">
+    </div>
+    <button class="bigbtn" id="rtSave">${t('save')}</button>`);
+  const inp=document.getElementById('rtIn'); setTimeout(()=>{ try{inp.focus();}catch(e){} },120);
+  const doSave=()=>{ renameTeamInList(id,(inp.value||'').trim()); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstNameUpdated')); };
+  document.getElementById('rtSave').onclick=doSave;
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doSave(); } });
+}
 // アプリ/画面を閉じる時に「作業中の下書き」だけ同期保存（一覧には足さない）。
 // → 再起動時は最後のスカッドが復元される。保存一覧は手動保存したものだけにしておく（散らからない）。
 function autoSaveDraft(){ try{ if(typeof state!=='undefined'&&state.slots){ lsSet('xi_state_v2', JSON.stringify(serializeTeam())); } }catch(e){} }
@@ -27291,6 +27307,8 @@ const ICN={
   doc:_svg('<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/><path d="M8.5 13h7"/><path d="M8.5 16.5h7"/>'),
   globe:_svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/>'),
   plus:_svg('<path d="M12 5v14"/><path d="M5 12h14"/>'),
+  trash:_svg('<path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/>'),
+  pencil:_svg('<path d="M5 19h4L19 9l-4-4L5 15z"/><path d="M14 6l4 4"/>'),
   download:_svg('<path d="M12 3v12"/><path d="M7.5 10.5l4.5 4.5 4.5-4.5"/><path d="M4 20h16"/>'),
   upload:_svg('<path d="M12 15V3"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M4 20h16"/>'),
   copyicon:_svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/>'),
@@ -28142,7 +28160,8 @@ function drawerHTML(){
   const teamRows = teams.length ? teams.map(tm=>`
     <div class="dwteam ${tm.id===state.teamId?'cur':''}" data-team="${tm.id}">
       <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${tm.id===state.teamId?t('editing'):''}${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
-      <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.remove}</div>
+      <div class="dwedit" data-rename="${tm.id}" aria-label="${t('renameTeamTitle')}">${ICN.pencil}</div>
+      <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.trash}</div>
     </div>`).join('') : `<div class="dwempty">${t('noSaved')}</div>`;
   const curInList = state.teamId && teams.some(tm=>tm.id===state.teamId);
   const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?t('overwrite'):t('saveCurrent')}</div>`;
@@ -28176,8 +28195,9 @@ function wireDrawer(){
   d.querySelector('#dwClose').onclick=closeDrawer;
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
-  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded')))); });
+  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded')))); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast(t('tstDeleted')); });
+  d.querySelectorAll('[data-rename]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); openRenameTeam(el.dataset.rename); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
   d.querySelectorAll('[data-lang]').forEach(el=>el.onclick=()=>setLang(el.dataset.lang));
@@ -29029,20 +29049,24 @@ async function buildShareCanvas(){
   // 背景
   const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#16221c');bg.addColorStop(.45,'#0a0e0c');bg.addColorStop(1,'#0a0e0c');
   x.fillStyle=bg;x.fillRect(0,0,W,H);
-  // ヘッダー：アプリ名（常に表示）
+  // ヘッダー：アプリ名（左上・小さめ）＋フォーメーション（右上）
   x.textBaseline='alphabetic';x.textAlign='left';
-  x.font='800 58px Manrope,sans-serif';x.fillStyle='#eafff0';x.fillText('Squad',56,104);
+  x.font='800 44px Manrope,sans-serif';x.fillStyle='#eafff0';x.fillText('Squad',56,84);
   const w1=x.measureText('Squad ').width;
-  x.fillStyle=accent;x.fillText(' XI',56+w1,104);
+  x.fillStyle=accent;x.fillText(' XI',56+w1,84);
   // フォーメーション右上
-  x.textAlign='right';x.font='800 46px "Bebas Neue",Manrope,sans-serif';x.fillStyle='#7d9389';
-  x.fillText(state.formation,W-56,100);x.textAlign='left';
-  // チーム名（ピル）
+  x.textAlign='right';x.font='800 42px "Bebas Neue",Manrope,sans-serif';x.fillStyle='#7d9389';
+  x.fillText(state.formation,W-56,82);x.textAlign='left';
+  // チーム名：中央に大きく（ヒーロー表示）
   if(tn){
-    x.font='800 34px Manrope,sans-serif';const tpw=Math.min(x.measureText(tn).width,W-180);
-    x.fillStyle=accent;roundRect(x,56,128,tpw+52,60,30);x.fill();
-    x.fillStyle='#0a0e0c';x.fillText(tn,84,170);
-    if(state.teamInfo&&state.teamInfo.slogan){x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,58,244);}
+    x.textAlign='center';
+    const maxTW=W-110; let ts=66; x.font='800 '+ts+'px Manrope,sans-serif';
+    while(ts>34 && x.measureText(tn).width>maxTW){ ts-=2; x.font='800 '+ts+'px Manrope,sans-serif'; }
+    const hasSlogan=!!(state.teamInfo&&state.teamInfo.slogan);
+    const nameY=hasSlogan?172:190;
+    x.fillStyle=accent; x.fillText(fitCanvasText(x,tn,maxTW),W/2,nameY);
+    if(hasSlogan){ x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,W/2,nameY+42); }
+    x.textAlign='left';
   }
   // 芝のストライプ
   const stripes=11;for(let i=0;i<stripes;i++){x.fillStyle=(i%2===0)?'#15493a':'#12402f';x.fillRect(px,py+ph/stripes*i,pw,ph/stripes+1);}
@@ -29234,6 +29258,7 @@ function openShareFallback(imgUrl,shareText,file){
         <div class="fmtcard" data-fmt="sq" title="${t('fmtSqTitle')}"><div class="fmtsh" style="width:24px;height:24px"></div><div class="fmtr">1:1</div><div class="fmtu">${t('fmtSqU')}</div></div>
         <div class="fmtcard" data-fmt="story" title="${t('fmtStoryTitle')}"><div class="fmtsh" style="width:14px;height:24px"></div><div class="fmtr">9:16</div><div class="fmtu">${t('fmtStoryU')}</div></div>
       </div>
+      <div class="formfield" style="margin:0 16px 8px"><input class="search" id="shName" maxlength="24" placeholder="${escAttr(t('teamName'))}" value="${escAttr(teamDisplayName()||'')}" autocomplete="off"></div>
       <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="lineup"></div>
       <div class="sharecap">${escAttr(shareText)}</div>
       ${canNative?`<button class="bigbtn" id="shShare">${t('shareBtn')}</button>`:''}
@@ -29248,6 +29273,11 @@ function openShareFallback(imgUrl,shareText,file){
   const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags,bench:state.showBench!==false,marks:state.showMarks!==false}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
   syncTg();
   const regen=()=>{ buildShareCanvas().then(cv=>cv.toBlob(blob=>{ if(!blob)return; if(curUrl)try{URL.revokeObjectURL(curUrl);}catch(e){} curUrl=URL.createObjectURL(blob); curFile=new File([blob],'squad-xi.png',{type:'image/png'}); const img=document.getElementById('sharePrevImg'); if(img)img.src=curUrl; },'image/png')).catch(()=>{}); };
+  // 共有画面でチーム名を直接編集→キャプションと画像を更新
+  const shNameEl=document.getElementById('shName');
+  if(shNameEl){ let _rn; shNameEl.oninput=()=>{ state.teamName=(shNameEl.value||'').trim()||null; save();
+    shareText=tShareCaption(teamDisplayName()); const cap=document.querySelector('.sharecap'); if(cap)cap.textContent=shareText;
+    clearTimeout(_rn); _rn=setTimeout(regen,250); }; }
   document.getElementById('shToggles').onclick=e=>{ const b=e.target.closest('[data-tg]'); if(!b)return;
     if(b.dataset.tg==='bench'){ state.showBench=(state.showBench===false); save(); } // 共有専用：ベンチを画像に載せるか
     else if(b.dataset.tg==='marks'){ state.showMarks=(state.showMarks===false); save(); } // 共有画像に負傷・カードを載せるか
