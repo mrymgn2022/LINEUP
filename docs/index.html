@@ -25356,7 +25356,7 @@ const I18N = {
     addChangePhoto:'写真を追加 / 変更', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
-    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：',
+    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'チームから外す', tstRemovedFromTeam:'チームから外しました',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍',
     tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を保存して「写真を追加」で取り込めます',
@@ -25433,7 +25433,7 @@ const I18N = {
     addChangePhoto:'Add / change photo', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
-    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ',
+    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from team', tstRemovedFromTeam:'Removed from the team',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality',
     tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Save an image, then import it with “Add photo”.',
@@ -27271,6 +27271,11 @@ const ICN={
   star:_svg('<path d="M12 3.5l2.5 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.9 19.5l1-5.8L3.7 9.6l5.8-.8z"/>'),
   remove:_svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
   stats:_svg('<path d="M3 20h18"/><path d="M6.5 20v-5"/><path d="M12 20v-9.5"/><path d="M17.5 20v-3"/>'),
+  help:_svg('<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.4 2.4 0 0 1 4.7.7c0 1.6-2.3 1.9-2.3 3.4"/><path d="M12 17h.01"/>'),
+  backup:_svg('<path d="M12 3v10"/><path d="M8 9.5l4 4 4-4"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/>'),
+  mail:_svg('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.6 6.6l8.4 6 8.4-6"/>'),
+  lock:_svg('<rect x="4.5" y="10.5" width="15" height="9.5" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>'),
+  doc:_svg('<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/><path d="M8.5 13h7"/><path d="M8.5 16.5h7"/>'),
 };
 /* ---- ベンチ外選手メニュー（タップで表示） ---- */
 function openReserveMenu(pid){
@@ -27283,6 +27288,7 @@ function openReserveMenu(pid){
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
+      <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromTeam')}</div>
     </div>`);
   const _r=document.getElementById('omRename'); if(_r)_r.onclick=()=>openRename(pid);
   body.querySelector('.menu').onclick=e=>{
@@ -27293,7 +27299,14 @@ function openReserveMenu(pid){
     if(a==='memo') openMemo(pid);
     if(a==='detail') openDetail(pid,null);
     if(a==='photo') pickPhoto(pid);
+    if(a==='remove') removeReserve(pid);
   };
+}
+// ベンチ外の選手をチームから外す（クラブ控えは excluded に、手動追加は reserveAdds から除去）。以後 reserveIds() に出てこない。
+function removeReserve(pid){
+  if(state.reserveAdds && state.reserveAdds.includes(pid)){ state.reserveAdds=state.reserveAdds.filter(x=>x!==pid); }
+  else { if(!state.excluded) state.excluded=[]; if(!state.excluded.includes(pid)) state.excluded.push(pid); }
+  closeSheet(); render(); save(); toast(t('tstRemovedFromTeam'));
 }
 // 3文字コード → flag-icons のコード（全端末で旗を画像表示。コソボxk・英4地域も対応）
 const FI={PRK:'kp',ENG:'gb-eng',SCO:'gb-sct',WAL:'gb-wls',NIR:'gb-nir',IRL:'ie',FRA:'fr',ESP:'es',GER:'de',ITA:'it',NED:'nl',POR:'pt',BEL:'be',BRA:'br',ARG:'ar',URU:'uy',COL:'co',ECU:'ec',PAR:'py',VEN:'ve',CHI:'cl',PER:'pe',BOL:'bo',MEX:'mx',USA:'us',CAN:'ca',CRC:'cr',HON:'hn',PAN:'pa',JAM:'jm',TRI:'tt',HAI:'ht',CUW:'cw',SUR:'sr',CPV:'cv',COD:'cd',CIV:'ci',GHA:'gh',NGA:'ng',SEN:'sn',MLI:'ml',CMR:'cm',MAR:'ma',ALG:'dz',EGY:'eg',TUN:'tn',RSA:'za',GAM:'gm',GUI:'gn',GNB:'gw',BFA:'bf',MOZ:'mz',ZIM:'zw',ZAM:'zm',ANG:'ao',GAB:'ga',CGO:'cg',BEN:'bj',TOG:'tg',EQG:'gq',MTN:'mr',COM:'km',MAD:'mg',KEN:'ke',BDI:'bi',CTA:'cf',DOM:'do',FRO:'fo',GUF:'gf',GLP:'gp',IDN:'id',JOR:'jo',LBY:'ly',MAS:'my',MDA:'md',NIG:'ne',TAN:'tz',THA:'th',SWE:'se',NOR:'no',DEN:'dk',FIN:'fi',ISL:'is',SUI:'ch',AUT:'at',POL:'pl',CZE:'cz',SVK:'sk',SVN:'si',CRO:'hr',SRB:'rs',BIH:'ba',MNE:'me',ALB:'al',KVX:'xk',MKD:'mk',GRE:'gr',TUR:'tr',HUN:'hu',ROU:'ro',BUL:'bg',UKR:'ua',RUS:'ru',GEO:'ge',ARM:'am',LVA:'lv',LTU:'lt',EST:'ee',BLR:'by',LUX:'lu',CYP:'cy',MLT:'mt',UZB:'uz',JPN:'jp',KOR:'kr',CHN:'cn',AUS:'au',NZL:'nz',IRN:'ir',ISR:'il',KSA:'sa',QAT:'qa',PUR:'pr',SYR:'sy',RWA:'rw',SSD:'ss',MYA:'mm',PHI:'ph',GUA:'gt',SLV:'sv',SUD:'sd',LBR:'lr',IRQ:'iq',GUY:'gy',YEM:'ye',VIN:'vc',IND:'in',ETH:'et',UGA:'ug',LCA:'lc',SOM:'so',SLE:'sl',SAM:'ws',PLE:'ps',NCA:'ni',NCL:'nc',MTQ:'mq',GRN:'gd',ERI:'er',CHA:'td',CAM:'kh',AZE:'az',KAZ:'kz',ATG:'ag',BAN:'bd',NAM:'na',AND:'ad',ARU:'aw',CUB:'cu',LIB:'lb',MWI:'mw',SRI:'lk',BHR:'bh',MRI:'mu',VIE:'vn',UAE:'ae',HKG:'hk',SGP:'sg',TJK:'tj',LES:'ls',OMA:'om',LAO:'la',KGZ:'kg',SWZ:'sz',TLS:'tl',ZAN:'tz',BOT:'bw',BRU:'bn',AFG:'af',TPE:'tw'};
@@ -28117,13 +28130,13 @@ function drawerHTML(){
     <div class="dwdiv"></div>
     <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>${t('announcements')}${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>${t('premium')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="help"><span class="di">?</span>${t('help')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="backup"><span class="di">⤓</span>${t('backup')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="feedback"><span class="di">✉</span>${t('feedback')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="help"><span class="di">${ICN.help}</span>${t('help')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="backup"><span class="di">${ICN.backup}</span>${t('backup')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="feedback"><span class="di">${ICN.mail}</span>${t('feedback')}<span class="dchev">›</span></div>
     ${storeBadgesHTML()}
     <div class="dwdiv"></div>
-    <div class="dwitem" data-page="privacy"><span class="di">🔒</span>${t('privacy')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="terms"><span class="di">§</span>${t('terms')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="privacy"><span class="di">${ICN.lock}</span>${t('privacy')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px">🌐 ${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
     <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')}</div>`;
