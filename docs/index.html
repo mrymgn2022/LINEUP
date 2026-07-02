@@ -571,14 +571,14 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
     </div>
     <div class="hbtn">
       <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
-      <div class="icon" id="btnLoad" title="新規作成">＋</div>
+      <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
-      <div class="icon" id="btnReset" title="整列リセット">⟲</div>
+      <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div>
     </div>
   </header>
 
   <div class="topbar">
-    <button class="formbtn" id="btnFormation"><span class="fhex">⬢</span><span class="flabel">フォーメーション</span><b id="curForm">4-3-3</b><span class="caret">▾</span></button>
+    <button class="formbtn" id="btnFormation"><span class="fhex"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M7 3.5h10l5 8.5-5 8.5H7l-5-8.5z"/></svg></span><span class="flabel">フォーメーション</span><b id="curForm">4-3-3</b><span class="caret">▾</span></button>
     <div class="dispgroup">
       <div class="icon postog" id="btnLabels" title="ポジション名 表示/非表示">POS</div>
       <div class="icon subtog" id="btnSubs" title="第2候補 表示/非表示">2nd</div>
@@ -25348,15 +25348,15 @@ const I18N = {
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
     total:'合計', starters:'スタメン', subsWord:'控え', benchEmpty:'控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。',
     place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
-    posAll:'全部', allLeagues:'全リーグ', popClubs:'⭐ 人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
+    posAll:'全部', allLeagues:'全リーグ', popClubs:'人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
     sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
-    changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'✈ 全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
+    changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
     addChangePhoto:'写真を追加 / 変更', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
-    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'チームから外す', tstRemovedFromTeam:'チームから外しました',
+    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'チームから外す', tstRemovedFromTeam:'チームから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍',
     tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を保存して「写真を追加」で取り込めます',
@@ -25398,9 +25398,9 @@ const I18N = {
     previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー',
     fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok',
     backupTitle:'バックアップ', bkWarn:'⚠ 作ったチーム・スカッド・写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
-    bkExport:'⤓ バックアップを書き出す', bkImport:'⤒ バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
+    bkExport:'バックアップを書き出す', bkImport:'バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
     bkIosTitle:'iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式', bkIosHelp:'ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。',
-    bkTextPh:'ここにバックアップのテキストを貼り付けて「テキストから復元」を押す', bkCopyOut:'⧉ 現在のデータをテキストで出す（コピー）', bkTextRestore:'↺ 上のテキストから復元', bkTextHelp:'「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。',
+    bkTextPh:'ここにバックアップのテキストを貼り付けて「テキストから復元」を押す', bkCopyOut:'現在のデータをテキストで出す（コピー）', bkTextRestore:'上のテキストから復元', bkTextHelp:'「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。',
     fbBody:'未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。', fbMailBtn:'support@squadxi.futbol にメール', fbFallback:'ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。',
     premTitle:'プレミアム（近日公開）', premBody:'負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。',
     limitTitle:'保存できる上限です', goUnlimited:'無制限プランにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいチームを保存できます', noSavedTeams:'保存済みのチームはありません',
@@ -25425,15 +25425,15 @@ const I18N = {
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
     total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-building by club fills the bench too.',
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
-    posAll:'All', allLeagues:'All leagues', popClubs:'⭐ Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
+    posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
     sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
     createPlayer:'＋ Create a player', noMatch:'No matching players',
-    changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'✈ From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
+    changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
     addChangePhoto:'Add / change photo', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
-    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from team', tstRemovedFromTeam:'Removed from the team',
+    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from team', tstRemovedFromTeam:'Removed from the team', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality',
     tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Save an image, then import it with “Add photo”.',
@@ -25475,9 +25475,9 @@ const I18N = {
     previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link',
     fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
     backupTitle:'Backup', bkWarn:'⚠ Your teams, squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
-    bkExport:'⤓ Export backup', bkImport:'⤒ Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
+    bkExport:'Export backup', bkImport:'Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
     bkIosTitle:'If it doesn’t work in the iPhone home-screen app<br>= copy & paste method', bkIosHelp:'Home-screen apps sometimes can’t use file pickers (an iOS limitation). Use this instead — no file needed, so it always works.',
-    bkTextPh:'Paste your backup text here, then press “Restore from text”', bkCopyOut:'⧉ Export data as text (copy)', bkTextRestore:'↺ Restore from the text above', bkTextHelp:'Press “Copy”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from text”.',
+    bkTextPh:'Paste your backup text here, then press “Restore from text”', bkCopyOut:'Export data as text (copy)', bkTextRestore:'Restore from the text above', bkTextHelp:'Press “Copy”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from text”.',
     fbBody:'For requests to add a player who isn’t listed, or to report a bug or suggest an improvement, feel free to email us below.', fbMailBtn:'Email support@squadxi.futbol', fbFallback:'If the button doesn’t open, email <b style="color:var(--ink)">support@squadxi.futbol</b> directly.',
     premTitle:'Premium (coming soon)', premBody:'Injury / card markers, unlimited saved teams, ad-free and more are planned.\nComing soon as a Premium plan.',
     limitTitle:'Save limit reached', goUnlimited:'Go unlimited', deleteToFree:'Delete a saved team to free space', deleteSaved:'Delete saved teams', deleteSavedHint:'Delete some to save a new team', noSavedTeams:'No saved teams',
@@ -25869,7 +25869,7 @@ function renderBench(){
       <div class="bv">${flagHTMLForPid(pid)}</div>
     </div>`;
   }).join('');
-  const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus">＋</div><div class="addlbl">追加</div></div>`; // 控え15人で＋を隠す
+  const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
   // スタメン＋ベンチの合計人数（平均年齢は詳細分析へ集約）
   const xiCnt=state.slots.filter(s=>s.pid!=null).length;
   const totalCnt=xiCnt+list.length;
@@ -27060,7 +27060,7 @@ function lgMembers(v){ if(!v||v==='ALL'||v==='POP')return null; if(v[0]==='@'){ 
 function inLgFilter(p,v){ const m=lgMembers(v); return !m||m.includes(p[5]); }
 // 後方互換：全呼び出し元（ピッカー/市場/新規作成）は検索付きプルダウンになる
 function lgChips(f=pickFilter, extra=''){ return lgSelectHTML(f, extra); }
-function lgSelLabel(f){ if(f.lg==='ALL')return t('allLeagues'); if(f.lg==='POP')return t('popClubs'); if(f.lg&&f.lg[0]==='@')return lgCountryLabel(f.lg.slice(1)); return lgName(f.lg); }
+function lgSelLabel(f){ if(f.lg==='ALL')return t('allLeagues'); if(f.lg==='POP')return _SM_STAR+' '+t('popClubs'); if(f.lg&&f.lg[0]==='@')return lgCountryLabel(f.lg.slice(1)); return lgName(f.lg); }
 // リーグ選択プルダウン本体（ボタン＋開いている時は検索窓＋国リスト）
 function lgSelectHTML(f=pickFilter, extra=''){
   const open=!!f.lgopen;
@@ -27278,12 +27278,22 @@ const ICN={
   doc:_svg('<path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/><path d="M8.5 13h7"/><path d="M8.5 16.5h7"/>'),
   globe:_svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.5 4 5.6 4 9s-1.4 6.5-4 9c-2.6-2.5-4-5.6-4-9s1.4-6.5 4-9Z"/>'),
   plus:_svg('<path d="M12 5v14"/><path d="M5 12h14"/>'),
+  download:_svg('<path d="M12 3v12"/><path d="M7.5 10.5l4.5 4.5 4.5-4.5"/><path d="M4 20h16"/>'),
+  upload:_svg('<path d="M12 15V3"/><path d="M7.5 7.5L12 3l4.5 4.5"/><path d="M4 20h16"/>'),
+  copyicon:_svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/>'),
+  restore:_svg('<path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4h4"/>'),
 };
+// 小サイズのインラインアイコン（ピル/ペン等の狭い場所用。.miconの18pxだと大きいため）
+const _svgsm=(inner)=>`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px">${inner}</svg>`;
+const _SM_STAR=`<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px"><path d="M12 3.5l2.5 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.9 19.5l1-5.8L3.7 9.6l5.8-.8z"/></svg>`;
+const _SM_PLANE=_svgsm('<path d="M21 3L3 10.5l6 2.5 2.5 6L21 3Z"/><path d="M9 13l4-4"/>');
+const _SM_FLAG=_svgsm('<path d="M5.5 21V4"/><path d="M5.5 4.2h11l-2 3.1 2 3.1h-11"/>');
+const _PEN=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18 8l-4-4L4 16z"/><path d="M13 5l4 4"/></svg>`;
 /* ---- ベンチ外選手メニュー（タップで表示） ---- */
 function openReserveMenu(pid){
   if(!P[pid])return;
   openSheet(`
-    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>${t('reserves')}</span></h2>
+    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('reserves')}</span></h2>
     <div class="menu">
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
@@ -27353,7 +27363,7 @@ function natOptionsHTML(q){
   if(!top.length&&!rest.length) h+=`<div class="empty-msg" style="padding:14px">${t('noneFound')}</div>`;
   return h;
 }
-function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>🏳 ${on?natDisp(f.nat):t('natLabel')} ▾</div>`; }
+function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>${_SM_FLAG} ${on?natDisp(f.nat):t('natLabel')} ▾</div>`; }
 function natFilterHTML(f){ return `<div class="natwrap" data-natscope><div class="filters">${natChipHTML(f)}</div><div class="natpanel" data-natpanel style="display:none"></div></div>`; }
 function attachNatFilter(scope,f,redraw){
   if(!scope)return;
@@ -27407,7 +27417,7 @@ function openSlotMenu(i){
   const isCapt=state.captain===s.pid;
   const subLabel=s.sub!=null&&P[s.sub] ? t('subLabelPrefix')+nameOf(s.sub,true) : t('secondChoice');
   openSheet(`
-    <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">✎</span></span> <span>${s.role}</span></h2>
+    <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${s.role}</span></h2>
     <div class="menu">
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
       <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
@@ -27476,7 +27486,7 @@ function openMarkMenu(pid){
 function openBenchMenu(pid){
   if(!P[pid])return;
   openSheet(`
-    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>${t('subsWord')}</span></h2>
+    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('subsWord')}</span></h2>
     <div class="menu">
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
@@ -27512,7 +27522,7 @@ function openSubPicker(slotIdx){
     <div class="controls">
       ${hasBench?`<div class="filters" id="benchModeF">
         <div class="fchip on" data-bm="bench">${LANG==='en'?t('bench')+' ('+state.bench.length+')':t('bench')+'（'+state.bench.length+'人）'}</div>
-        <div class="fchip" data-bm="transfer">${t('fromAll')}</div>
+        <div class="fchip" data-bm="transfer">${_SM_PLANE} ${t('fromAll')}</div>
       </div>`:''}
       <div id="transferExtra" style="${hasBench?'display:none;':''}padding-top:6px">
         <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
@@ -27601,7 +27611,7 @@ function openBenchPicker(slotIdx){
     <div class="controls">
       <div class="filters" id="benchModeF">
         <div class="fchip on" data-bm="bench">${LANG==='en'?t('bench')+' ('+blen+')':t('bench')+'（'+blen+'人）'}</div>
-        <div class="fchip" data-bm="transfer">${t('fromAll')}</div>
+        <div class="fchip" data-bm="transfer">${_SM_PLANE} ${t('fromAll')}</div>
       </div>
       <div id="transferExtra" style="display:none;padding-top:6px">
         <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
@@ -27825,7 +27835,7 @@ function openDetail(pid,slotIdx){
       <div class="dhead">
         <div class="davatar${ph?' photo':''}"${ph?` style="background-image:url('${ph}')"`:''}>${SIL}</div>
         <div>
-          <div class="dname renameTrigger" id="dRename">${nameOf(pid,false)}<span class="penIcon">✎</span></div>
+          <div class="dname renameTrigger" id="dRename">${nameOf(pid,false)}<span class="penIcon">${_PEN}</span></div>
           <div class="dclub">${flagHTML(p[3])} · ${p[4]}</div>
         </div>
       </div>
@@ -28121,7 +28131,7 @@ function drawerHTML(){
   const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?t('overwrite'):t('saveCurrent')}</div>`;
   const langBtn=(l,label)=>`<button data-lang="${l}" style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;${LANG===l?'background:var(--lime);color:#0a0e0c;border:1px solid var(--lime)':'background:transparent;color:var(--ink);border:1px solid var(--line)'}">${label}</button>`;
   return `
-    <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="${t('close')}">✕</div></div>
+    <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="${t('close')}">${ICN.remove}</div></div>
     <div class="dwnew" id="dwNew"><span class="di">${ICN.plus}</span> ${t('newTeam')}</div>
     <div class="dwsec">${t('savedTeams')} <span class="dwcount">${teams.length}/${capLabel}</span></div>
     ${teamRows}
@@ -28350,17 +28360,17 @@ function openBackup(){
       <div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.8;margin:6px 0 16px">
         ${t('bkWarn')}
       </div>
-      <button class="bigbtn" id="bkExport">${t('bkExport')}</button>
+      <button class="bigbtn" id="bkExport">${ICN.download}${t('bkExport')}</button>
       <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 15px;line-height:1.7">${LANG==='en'?'Saves your current data to one file ('+teams+' saved teams + the current squad and photos). Keep the file by emailing it to yourself, on Google Drive, etc.<br><b style="color:var(--ink)">※ If you haven’t saved a team or placed players yet, there’s nothing to export.</b>':'今のデータを1ファイルに保存します（保存チーム '+teams+'件＋現在のスカッド・写真）。できたファイルは、自分宛メールやGoogleドライブ等に置いて保管を。<br><b style="color:var(--ink)">※先にチームを保存 or 選手を配置していないと、中身が空になり書き出せません。</b>'}</div>
-      <button class="bigbtn ghost" id="bkImport">${t('bkImport')}</button>
+      <button class="bigbtn ghost" id="bkImport">${ICN.upload}${t('bkImport')}</button>
       <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 4px;line-height:1.7">${t('bkImportHelp')}</div>
       <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
       <div style="height:1px;background:var(--line);margin:17px 0 12px"></div>
       <div style="font-size:12.5px;color:var(--ink);font-weight:800;margin:0 2px 5px">${t('bkIosTitle')}</div>
       <div style="font-size:11.5px;color:var(--mut);margin:0 2px 9px;line-height:1.7">${t('bkIosHelp')}</div>
       <textarea id="bkText" placeholder="${escAttr(t('bkTextPh'))}" style="width:100%;box-sizing:border-box;height:76px;font-size:11px;line-height:1.5;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);padding:9px 11px;resize:vertical"></textarea>
-      <button class="bigbtn ghost" id="bkCopyOut" style="margin-top:9px">${t('bkCopyOut')}</button>
-      <button class="bigbtn ghost" id="bkTextRestore" style="margin-top:9px">${t('bkTextRestore')}</button>
+      <button class="bigbtn ghost" id="bkCopyOut" style="margin-top:9px">${ICN.copyicon}${t('bkCopyOut')}</button>
+      <button class="bigbtn ghost" id="bkTextRestore" style="margin-top:9px">${ICN.restore}${t('bkTextRestore')}</button>
       <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.7">${t('bkTextHelp')}</div>
       <button class="bigbtn ghost" id="bkClose" style="margin-top:18px">${t('close')}</button>
     </div>`);
@@ -28663,7 +28673,7 @@ function startOriginal(){
   let chosenForm=otLast.form||state.formation||'4-3-3';
   let chosenLg=otLast.lg||'ALL';
   let otExpand=lgExpandFor(chosenLg);
-  const POP_ROW='<div class="lgrow2" data-lg="POP">'+t('popClubs')+'</div>';
+  const POP_ROW='<div class="lgrow2" data-lg="POP">'+_SM_STAR+' '+t('popClubs')+'</div>';
   const otF={lg:chosenLg, expand:otExpand, lgopen:false, lgq:''}; // リーグ選択プルダウン用
   const acf={nat:otLast.nat||'ALL'};
   const formOpts=FORMS.map(f=>`<option value="${f}"${f===chosenForm?' selected':''}>${f}</option>`).join('');
@@ -28679,7 +28689,7 @@ function startOriginal(){
     return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
   };
   // 「人気クラブ」チップ（全リーグの隣）。タップでクラブ欄に上位100を出す
-  const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">${t('popClubs')}</div>`;
+  const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">${_SM_STAR} ${t('popClubs')}</div>`;
   // クラブ欄はリーグ/人気クラブを選んで初めて表示。ALL（全リーグ）では非表示
   const updateClubField=()=>{ const f=document.getElementById('otClubField'); if(!f)return; const show=(chosenLg!=='ALL'); f.style.display=show?'':'none'; if(show){ const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg); } };
   openSheet(`
