@@ -229,6 +229,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
 .bcard .bv{font-size:10px;color:var(--mut);font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;min-height:15px}
 .bcard .bv .fi{font-size:15px;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35)}
+.bcard .bclub{font-size:9px;font-weight:700;color:var(--mut);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;line-height:1.1;margin-top:-1px}
 .bcard[data-pid]{touch-action:none}
 .bcard.dragging{opacity:.35}
 .bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:96px}
@@ -301,7 +302,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .dwnew .di{font-size:20px;line-height:1}
 .dwteam{display:flex;align-items:center;gap:10px;padding:11px 10px 11px 14px;margin:3px 8px;border-radius:11px;cursor:pointer;border:1px solid transparent}
 .dwteam:active{background:var(--panel2)}
-.dwteam.cur{border-color:var(--line);background:var(--panel2)}
+.dwteam.cur{border-color:var(--lime);background:rgba(202,255,58,.07)}
+.curbadge{flex-shrink:0;padding:2px 8px;border-radius:999px;background:var(--lime);color:#0a0e0c;font-size:9px;font-weight:800;letter-spacing:.3px;white-space:nowrap}
 .dwteam .tn{flex:1;min-width:0;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dwteam .tn small{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-top:2px}
 .dwtrash{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--mut);flex-shrink:0}
@@ -25346,7 +25348,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    newTeam:'チームを新規作成', savedTeams:'保存したチーム', myTeam:'マイチーム', editing:'編集中・', saved:'保存',
+    newTeam:'チームを新規作成', savedTeams:'保存したチーム', myTeam:'マイチーム', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。',
     saveCurrent:'現在のチームを保存', overwrite:'このチームを上書き保存',
     featSquad:'注目スカッド', featTransfer:'注目移籍', announcements:'お知らせ', premium:'プレミアム（無制限保存）',
@@ -25424,7 +25426,7 @@ const I18N = {
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
-    newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
+    newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved teams yet.<br>Add one with “Save current team” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
     featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (unlimited saves)',
@@ -25896,6 +25898,7 @@ function renderBench(){
       <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
       <div class="bv">${flagHTMLForPid(pid)}</div>
+      ${state.flagByLeague&&(p[4]||'').trim()?`<div class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</div>`:''}
     </div>`;
   }).join('');
   const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
@@ -28159,7 +28162,8 @@ function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
     <div class="dwteam ${tm.id===state.teamId?'cur':''}" data-team="${tm.id}">
-      <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${tm.id===state.teamId?t('editing'):''}${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
+      <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
+      ${tm.id===state.teamId?`<span class="curbadge">${t('editingBadge')}</span>`:''}
       <div class="dwedit" data-rename="${tm.id}" aria-label="${t('renameTeamTitle')}">${ICN.pencil}</div>
       <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.trash}</div>
     </div>`).join('') : `<div class="dwempty">${t('noSaved')}</div>`;
