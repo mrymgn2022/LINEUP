@@ -25317,7 +25317,13 @@ const I18N = {
     help:'使い方', backup:'バックアップ（書き出し / 読み込み）', feedback:'選手追加依頼・不具合報告',
     privacy:'プライバシーポリシー', terms:'利用規約', close:'閉じる', tagline:'build your XI', preview:'（プレビュー）', language:'言語',
     tstLoaded:'チームを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'チームを保存しました', appSoon:'アプリ版は近日公開予定です',
-    getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）'
+    getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
+    tipMenu:'メニュー', tipShare:'SNSに共有', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'整列リセット',
+    formation:'フォーメーション', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示',
+    hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
+    squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
+    bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
+    total:'合計', starters:'スタメン', subsWord:'控え', benchEmpty:'控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25326,8 +25332,14 @@ const I18N = {
     featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (unlimited saves)',
     help:'How to use', backup:'Backup (export / import)', feedback:'Request a player / Report a bug',
     privacy:'Privacy Policy', terms:'Terms of Use', close:'Close', tagline:'build your XI', preview:' (preview)', language:'Language',
-    tstLoaded:'Team loaded', tstDeleted:'Deleted', tstOverwritten:'Overwritten', tstSaved:'Team saved', appSoon:'The app version is coming soon',
-    getApp:'Get the app', getAppSoon:'App version (coming soon)'
+    tstLoaded:'Team loaded', tstDeleted:'Deleted', tstOverwritten:'Team updated', tstSaved:'Team saved', appSoon:'The app version is coming soon',
+    getApp:'Get the app', getAppSoon:'App version (coming soon)',
+    tipMenu:'Menu', tipShare:'Share', tipNew:'New team', tipSearch:'Search players', tipReset:'Reset layout',
+    formation:'Formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags',
+    hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
+    squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
+    bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
+    total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-building by club fills the bench too.'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -25600,6 +25612,19 @@ function render(){
   document.getElementById('hint').style.display=filled?'none':'block';
   renderBench();
   updateTeamTag();
+  applyStaticLang();
+}
+// 静的ヘッダー/盤面ラベル（render で作り直されない固定DOM）の多言語適用。boot時+言語切替時にrenderから呼ぶ。
+function applyStaticLang(){
+  const tset=(id,tip)=>{ const el=document.getElementById(id); if(el) el.title=tip; };
+  const bm=document.getElementById('btnMenu'); if(bm){ bm.title=t('tipMenu'); bm.setAttribute('aria-label',t('tipMenu')); }
+  tset('btnShare',t('tipShare')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
+  tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags'));
+  const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
+  const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
+  const sb=document.getElementById('statbar'); if(sb){ sb.title=t('tipAnalysis'); const sp=sb.querySelectorAll('span'); if(sp.length) sp[sp.length-1].textContent=t('squadAnalysis'); }
+  const sc=document.getElementById('scrollcue'); if(sc) sc.textContent=t('scrollBench');
+  const sk=document.querySelector('.sp-skip'); if(sk) sk.textContent=t('skip');
 }
 // 名前が長いとき、サイドの駒（LB/RB/LW/RW/LM/RM/WB）を外側へ広げて隣と被らないようにする。
 // 手動で動かした駒（既定位置から外れた駒）は対象外。中央の駒は動かさない。
@@ -25679,8 +25704,10 @@ function renderBench(){
   // スタメン＋ベンチの合計人数（平均年齢は詳細分析へ集約）
   const xiCnt=state.slots.filter(s=>s.pid!=null).length;
   const totalCnt=xiCnt+list.length;
-  const foot=`<div class="benchfoot">合計 <b>${totalCnt}</b>人 <span>(スタメン${xiCnt} ＋ 控え${list.length})</span></div>`;
-  const analyzeBtn=`<div class="statbar" id="statbarBench" title="タップでスカッド詳細分析"><span class="saicon">${ICN.stats}</span><span>スカッド詳細分析</span></div>`;
+  const foot=LANG==='en'
+    ? `<div class="benchfoot">${t('total')} <b>${totalCnt}</b> <span>(${t('starters')} ${xiCnt} + ${t('subsWord')} ${list.length})</span></div>`
+    : `<div class="benchfoot">合計 <b>${totalCnt}</b>人 <span>(スタメン${xiCnt} ＋ 控え${list.length})</span></div>`;
+  const analyzeBtn=`<div class="statbar" id="statbarBench" title="${t('tipAnalysis')}"><span class="saicon">${ICN.stats}</span><span>${t('squadAnalysis')}</span></div>`;
   // ベンチ外（読込クラブで、スタメンにも控えにもいない選手。並びは内部基準で固定）
   const others=reserveIds();
   const ocards=others.map(pid=>{
@@ -25692,9 +25719,9 @@ function renderBench(){
       <div class="bv">${flagHTMLForPid(pid)}</div>
     </div>`;
   }).join('');
-  const reserveSec = others.length ? `<div class="bh reservehead"><b>ベンチ外</b><span>${others.length}人</span><i>長押しでベンチへドラッグ</i></div><div class="rgrid">${ocards}</div>` : '';
-  const empty=list.length?'':'<div class="benchEmpty">控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。</div>';
-  wrap.innerHTML=`<div class="bh"><b>ベンチ</b><span>控え ${list.length}人</span><i>タップでメニュー・長押しでドラッグ</i></div>`+
+  const reserveSec = others.length ? `<div class="bh reservehead"><b>${t('reserves')}</b><span>${LANG==='en'?others.length+' players':others.length+'人'}</span><i>${t('dragToBench')}</i></div><div class="rgrid">${ocards}</div>` : '';
+  const empty=list.length?'':'<div class="benchEmpty">'+t('benchEmpty')+'</div>';
+  wrap.innerHTML=`<div class="bh"><b>${t('bench')}</b><span>${LANG==='en'?list.length+' subs':'控え '+list.length+'人'}</span><i>${t('tapMenuDrag')}</i></div>`+
     empty+`<div class="bgrid">${cards}${addCard}</div>`+foot+reserveSec+analyzeBtn;
   wrap.querySelectorAll('.bgrid .bcard[data-pid]').forEach(card=>attachCardDrag(card,+card.dataset.pid,'bench'));
   wrap.querySelectorAll('.rgrid .ocard[data-pid]').forEach(card=>attachCardDrag(card,+card.dataset.pid,'reserve'));
@@ -27888,7 +27915,7 @@ function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
     <div class="dwteam ${tm.id===state.teamId?'cur':''}" data-team="${tm.id}">
-      <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${tm.id===state.teamId?t('editing'):''}${fmtTeamDate(tm.ts)} ${t('saved')}</small></div>
+      <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${tm.id===state.teamId?t('editing'):''}${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
       <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.remove}</div>
     </div>`).join('') : `<div class="dwempty">${t('noSaved')}</div>`;
   const curInList = state.teamId && teams.some(tm=>tm.id===state.teamId);
