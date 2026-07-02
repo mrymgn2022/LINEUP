@@ -28146,8 +28146,8 @@ function openInfoPage(kind){
   if(kind==='help'){ openHelp(); return; }
   if(kind==='announcements'){ openAnnouncementList(); return; }
   if(kind==='backup'){ openBackup(); return; }
-  if(kind==='privacy'){ window.open('privacy.html','_blank','noopener'); return; }
-  if(kind==='terms'){ window.open('terms.html','_blank','noopener'); return; }
+  if(kind==='privacy'){ window.open(LANG==='en'?'privacy.en.html':'privacy.html','_blank','noopener'); return; }
+  if(kind==='terms'){ window.open(LANG==='en'?'terms.en.html':'terms.html','_blank','noopener'); return; }
   if(kind==='feedback'){
     openSheet(`<h2>選手追加依頼・不具合報告</h2>
       <div style="margin:6px 16px 12px;color:var(--ink);font-size:14px;line-height:1.9">未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。</div>
