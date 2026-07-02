@@ -25407,7 +25407,8 @@ const I18N = {
     seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。',
     featPredicted:'予想', featSquadDesc:'注目試合の予想スタメンを随時更新。', featSquadNote:'※キックオフ24時間前から表示します', featSquadEmpty:'本日の注目試合はありません。<br>キックオフ24時間前から表示されます。',
     featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※この移籍がデータベースに更新されるまで時間を要する場合があります', featComingSoon:'近日公開予定です。',
-    featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ', freeWord:'フリー'
+    featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ', freeWord:'フリー',
+    saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25484,7 +25485,8 @@ const I18N = {
     seeHowTo:'See how to use', noAnnounce:'No announcements yet.',
     featPredicted:'Predicted', featSquadDesc:'Predicted line-ups for featured matches, updated regularly.', featSquadNote:'Shown from 24 hours before kickoff.', featSquadEmpty:'No featured matches today.<br>They appear from 24 hours before kickoff.',
     featTransferDesc:'Big-money moves and big-name transfers, updated regularly.', featTransferNote:'It may take some time for these transfers to appear in the player database.', featComingSoon:'Coming soon.',
-    featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff', freeWord:'Free'
+    featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff', freeWord:'Free',
+    saTabXI:'Starting XI', saTabAll:'XI + bench', saNoXI:'No players in the XI', saSquadSize:'Squad size', saAvgAge:'Avg. age', saAvgHeight:'Avg. height', saCaptain:'Captain', saNone:'None', saYoungest:'Youngest', saOldest:'Oldest', saNat:'Nationalities', saOriginal:'Original'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -28861,12 +28863,12 @@ function openSquadAnalysis(scope){
   if(!all.length){ toast(t('tstPlaceFirst')); return; }
   const list = scope==='xi' ? xi : all;
   const tabs=`<div class="satabs">
-      <button class="satab${scope==='xi'?' on':''}" data-sc="xi">スタメン</button>
-      <button class="satab${scope==='all'?' on':''}" data-sc="all">スタメン＋ベンチ</button>
+      <button class="satab${scope==='xi'?' on':''}" data-sc="xi">${t('saTabXI')}</button>
+      <button class="satab${scope==='all'?' on':''}" data-sc="all">${t('saTabAll')}</button>
     </div>`;
   let body;
   if(!list.length){
-    body=`${tabs}<div class="dcell full" style="text-align:center;padding:22px 10px;color:var(--mut)">スタメンに選手がいません</div>`;
+    body=`${tabs}<div class="dcell full" style="text-align:center;padding:22px 10px;color:var(--mut)">${t('saNoXI')}</div>`;
   }else{
     const sum=a=>a.reduce((x,y)=>x+y,0);
     const ages=list.map(p=>p[2]).filter(a=>a>0); // 年齢未入力（カスタム選手の0）は平均から除外
@@ -28881,27 +28883,28 @@ function openSquadAnalysis(scope){
     const natTop=Object.entries(nat).sort((a,b)=>b[1]-a[1]).map(e=>flagHTML(e[0])+(e[1]>1?' ×'+e[1]:'')).join('　');
     const natCount=Object.keys(nat).length;
     const captIn=state.captain!=null&&list.indexOf(P[state.captain])>=0;
-    const captP=(captIn&&P[state.captain])?shortName(P[state.captain][0]):'未設定';
+    const captP=(captIn&&P[state.captain])?shortName(P[state.captain][0]):t('saNone');
+    const ageU=LANG==='en'?'':'歳';
     // スタメンは「11人で当たり前」なので人数セルなし。全体は総数のみ表示。
     const countCell = scope==='xi'
       ? ``
-      : `<div class="dcell"><div class="dk">登録人数</div><div class="dv">${all.length}<small style="font-size:13px"> 人</small></div></div>`;
+      : `<div class="dcell"><div class="dk">${t('saSquadSize')}</div><div class="dv">${all.length}${LANG==='en'?'':'<small style="font-size:13px"> 人</small>'}</div></div>`;
     body=`${tabs}
       <div class="dgrid">
-        <div class="dcell"><div class="dk">平均年齢</div><div class="dv lime">${avgAge}<small style="font-size:13px"> 歳</small></div></div>
-        <div class="dcell"><div class="dk">平均身長</div><div class="dv lime">${avgHt?avgHt:'–'}<small style="font-size:13px"> cm</small></div></div>
+        <div class="dcell"><div class="dk">${t('saAvgAge')}</div><div class="dv lime">${avgAge}${LANG==='en'?'':'<small style="font-size:13px"> 歳</small>'}</div></div>
+        <div class="dcell"><div class="dk">${t('saAvgHeight')}</div><div class="dv lime">${avgHt?avgHt:'–'}<small style="font-size:13px"> cm</small></div></div>
         ${countCell}
-        <div class="dcell"><div class="dk">キャプテン</div><div class="dv" style="font-size:18px">${captP}</div></div>
-        <div class="dcell"><div class="dk">最年少</div><div class="dv" style="font-size:18px">${youngest?shortName(youngest[0]):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${youngest?youngest[2]+'歳':''}</div></div>
-        <div class="dcell"><div class="dk">最年長</div><div class="dv" style="font-size:18px">${oldest?shortName(oldest[0]):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${oldest?oldest[2]+'歳':''}</div></div>
-        <div class="dcell full"><div class="dk">国籍 (${natCount}カ国)</div><div class="dv" style="font-size:16px">${natTop}</div></div>
+        <div class="dcell"><div class="dk">${t('saCaptain')}</div><div class="dv" style="font-size:18px">${captP}</div></div>
+        <div class="dcell"><div class="dk">${t('saYoungest')}</div><div class="dv" style="font-size:18px">${youngest?shortName(youngest[0]):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${youngest?youngest[2]+ageU:''}</div></div>
+        <div class="dcell"><div class="dk">${t('saOldest')}</div><div class="dv" style="font-size:18px">${oldest?shortName(oldest[0]):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${oldest?oldest[2]+ageU:''}</div></div>
+        <div class="dcell full"><div class="dk">${t('saNat')} (${natCount}${LANG==='en'?'':'カ国'})</div><div class="dv" style="font-size:16px">${natTop}</div></div>
       </div>`;
   }
   openSheet(`
-    <h2>スカッド分析 <span>${teamDisplayName()||'オリジナル'}</span></h2>
+    <h2>${t('squadAnalysis')} <span>${teamDisplayName()||t('saOriginal')}</span></h2>
     <div class="detail">
       ${body}
-      <button class="bigbtn ghost" id="saClose">閉じる</button>
+      <button class="bigbtn ghost" id="saClose">${t('close')}</button>
     </div>`);
   document.querySelectorAll('.satab').forEach(b=>b.onclick=()=>openSquadAnalysis(b.dataset.sc));
   const c=document.getElementById('saClose');if(c)c.onclick=closeSheet;

@@ -31,9 +31,13 @@
   a{ color:#4d7c0f; }
   .contact{ margin-top:8px; }
   footer{ margin-top:48px; padding-top:16px; border-top:1px solid var(--line); color:var(--sub); font-size:13px; }
+  .closebtn{ position:fixed; top:12px; right:12px; width:40px; height:40px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 12px rgba(0,0,0,.14); z-index:100; }
+  .closebtn:active{ transform:scale(.92); }
+  .closebtn svg{ width:20px; height:20px; }
 </style>
 </head>
 <body>
+<button class="closebtn" aria-label="閉じる" onclick="closeLegal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg></button>
 <div class="wrap">
 
 <header class="top">
@@ -122,5 +126,6 @@ Squad XI 運営<br>
 </footer>
 
 </div>
+<script>function closeLegal(){try{window.close();}catch(e){}setTimeout(function(){if(window.closed)return;if(history.length>1){history.back();}else{location.href='./';}},120);}</script>
 </body>
 </html>
