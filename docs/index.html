@@ -25383,7 +25383,10 @@ const I18N = {
     fbBody:'未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。', fbMailBtn:'✉ support@squadxi.futbol にメール', fbFallback:'ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。',
     premTitle:'プレミアム（近日公開）', premBody:'負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。',
     limitTitle:'保存できる上限です', goUnlimited:'無制限プランにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいチームを保存できます', noSavedTeams:'保存済みのチームはありません',
-    seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。'
+    seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。',
+    featPredicted:'予想', featSquadDesc:'注目試合の予想スタメンを随時更新。', featSquadNote:'※キックオフ24時間前から表示します', featSquadEmpty:'本日の注目試合はありません。<br>キックオフ24時間前から表示されます。',
+    featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※この移籍がデータベースに更新されるまで時間を要する場合があります', featComingSoon:'近日公開予定です。',
+    featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ', freeWord:'フリー'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25457,7 +25460,10 @@ const I18N = {
     fbBody:'For requests to add a player who isn’t listed, or to report a bug or suggest an improvement, feel free to email us below.', fbMailBtn:'✉ Email support@squadxi.futbol', fbFallback:'If the button doesn’t open, email <b style="color:var(--ink)">support@squadxi.futbol</b> directly.',
     premTitle:'Premium (coming soon)', premBody:'Injury / card markers, unlimited saved teams, ad-free and more are planned.\nComing soon as a Premium plan.',
     limitTitle:'Save limit reached', goUnlimited:'Go unlimited', deleteToFree:'Delete a saved team to free space', deleteSaved:'Delete saved teams', deleteSavedHint:'Delete some to save a new team', noSavedTeams:'No saved teams',
-    seeHowTo:'See how to use', noAnnounce:'No announcements yet.'
+    seeHowTo:'See how to use', noAnnounce:'No announcements yet.',
+    featPredicted:'Predicted', featSquadDesc:'Predicted line-ups for featured matches, updated regularly.', featSquadNote:'Shown from 24 hours before kickoff.', featSquadEmpty:'No featured matches today.<br>They appear from 24 hours before kickoff.',
+    featTransferDesc:'Big-money moves and big-name transfers, updated regularly.', featTransferNote:'It may take some time for these transfers to appear in the player database.', featComingSoon:'Coming soon.',
+    featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff', freeWord:'Free'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -27974,7 +27980,8 @@ function openAnnouncementList(){
 //     preview:'試合の見どころ(任意・\nで改行)' }  ※記事は必ず日本のサイトで選手名表記をダブルチェック
 //   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
 const FEATURED_SQUADS=[
-  { comp:'FIFAワールドカップ2026 ラウンド32', kickoff:'2026-06-30T02:00',
+  { comp:'FIFAワールドカップ2026 ラウンド32', compEn:'FIFA World Cup 2026 Round of 32', kickoff:'2026-06-30T02:00',
+    previewEn:'In the October 2025 friendly, Japan came back from 0-2 down at the break to win 3-2 — their first-ever victory over Brazil. Around eight months later, the rematch comes in a single-elimination Round of 32.\n\n■ Japan (3-4-2-1)\nHigh pressing to limit Brazil’s build-up, with Ueda as the focal point and Kamada and Maeda linking up as the two shadow strikers. The space beside the back three and the wing-backs’ up-and-down running are key.\n\n■ Brazil (4-3-3)\nBuilt around the drive of Vinícius and Cunha and a midfield of Casemiro and Bruno Guimarães. With Alisson behind them, Marquinhos and Gabriel marshal the defensive line.\n\n■ Things to watch\n• Japan’s high press vs Brazil’s build-up\n• Vinícius vs Japan’s right side (Doan, Tomiyasu)\n• Ueda’s aerial duels from set pieces and counters',
     home:{ team:'日本', nat:'JPN', form:'3-4-2-1', xi:[
       {name:'Z. Suzuki',club:'Parma'},{name:'H. Ito',club:'Bayern München'},{name:'Taniguchi',club:'Sint-Truidense VV'},
       {name:'Tomiyasu',club:'Ajax'},{name:'Nakamura',club:'Stade Reims'},{name:'Tanaka',club:'Leeds'},
@@ -28121,7 +28128,13 @@ const TR_CLUB_NAT={
 };
 // フリー（移籍金なし／無所属）＝赤丸に斜線のマーク＋「フリー」
 const _ICN_FREE='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#e5484d" stroke-width="2.2" style="flex:0 0 auto;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
-function trFreeCell(){ return `${_ICN_FREE}<span style="color:#e5484d;font-weight:800">フリー</span>`; }
+function trFreeCell(){ return `${_ICN_FREE}<span style="color:#e5484d;font-weight:800">${t('freeWord')}</span>`; }
+// 移籍金の表示（英語UIでは「€4000万」→「€40M」に換算。万=1e4なので N/100 で百万単位）
+function trFeeText(fee){ if(!fee) return '—'; if(LANG!=='en') return fee; const m=/^€(\d+(?:\.\d+)?)万$/.exec(fee); if(m){ const mm=parseFloat(m[1])/100; return '€'+(Number.isInteger(mm)?mm:mm.toFixed(1).replace(/\.0$/,''))+'M'; } return fee; }
+// 注目スカッドのチーム名（英語UIなら teamEn か、代表は NATNAME、無ければ日本語名）
+function squadTeamName(side){ if(!side) return ''; return (LANG==='en') ? (side.teamEn || NATNAME[side.nat] || side.team || '') : (side.team||''); }
+function featComp(m){ return (LANG==='en' && m && m.compEn) ? m.compEn : ((m&&m.comp)||''); }
+function featPreview(m){ return (LANG==='en' && m && m.previewEn) ? m.previewEn : ((m&&m.preview)||''); }
 // 注目移籍カード：日付＋NEW!＋移籍金、選手名(国旗)、移籍元 → 移籍先（各クラブに国旗、フリーは赤丸斜線）。
 function transferCardHTML(it){
   const arrow=`<span style="color:var(--lime);font-weight:900;font-size:15px;flex:0 0 auto">→</span>`;
@@ -28131,7 +28144,7 @@ function transferCardHTML(it){
       : `${flagHTML(TR_CLUB_NAT[club]||'')}<span style="overflow-wrap:anywhere">${escAttr(club)}</span>`;
     return `<span style="${base}">${inner}</span>`;
   };
-  const feeHTML = it.fee==='フリー' ? trFreeCell() : escAttr(it.fee||'—');
+  const feeHTML = it.fee==='フリー' ? trFreeCell() : escAttr(trFeeText(it.fee));
   return `<div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:0 16px 10px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
       <span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--mut)">${escAttr(it.date||'')}</span>
@@ -28156,7 +28169,7 @@ function squadInWindow(m){
   const now=Date.now();
   return now >= ko-24*3600e3 && now <= ko+3*3600e3;
 }
-function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w='日月火水木金土'[d.getDay()];
+function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w=(LANG==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['日','月','火','水','木','金','土'])[d.getDay()];
   return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; }
 // ミニピッチ：FORMの座標(GK下→FW上)を再利用。xi[i] を FORM[form][i] の位置に配置。
 function squadPitchHTML(side){
@@ -28194,28 +28207,28 @@ function squadTeamBlockHTML(side){
   const ready = side && side.xi && side.xi.length;
   return `<div style="margin:16px 0 0">
     <div style="display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);font-size:14px;padding:0 16px">
-      ${flagHTML(side.nat||'')}<span>${escAttr(side.team||'')}</span>
+      ${flagHTML(side.nat||'')}<span>${escAttr(squadTeamName(side))}</span>
       ${side.form?`<span style="margin-left:auto;font-size:11px;color:var(--mut);font-weight:700">${escAttr(side.form)}</span>`:''}
     </div>
     ${ready ? squadPitchHTML(side)
-      : `<div style="margin:8px 0 0;padding:18px;text-align:center;color:var(--mut);font-size:12px;border:1px dashed var(--line);border-radius:10px">予想スタメン準備中</div>`}
+      : `<div style="margin:8px 0 0;padding:18px;text-align:center;color:var(--mut);font-size:12px;border:1px dashed var(--line);border-radius:10px">${t('featXIPending')}</div>`}
   </div>`;
 }
 function squadMatchHTML(m){
   const ko = m.kickoff ? fmtKickoff(m.kickoff) : '';
   return `<div style="margin:0 0 22px;border-bottom:1px solid var(--line);padding-bottom:16px">
-    <div style="margin:0 16px 3px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--lime)">${escAttr(m.comp||'')}</div>
+    <div style="margin:0 16px 3px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--lime)">${escAttr(featComp(m))}</div>
     <div style="margin:0 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:800;color:var(--ink);font-size:15px">
-      ${flagHTML(m.home.nat||'')}<span>${escAttr(m.home.team||'')}</span>
+      ${flagHTML(m.home.nat||'')}<span>${escAttr(squadTeamName(m.home))}</span>
       <span style="color:var(--mut);font-weight:700;font-size:12px">vs</span>
-      <span>${escAttr(m.away.team||'')}</span>${flagHTML(m.away.nat||'')}
+      <span>${escAttr(squadTeamName(m.away))}</span>${flagHTML(m.away.nat||'')}
     </div>
-    ${ko?`<div style="margin:3px 16px 0;font-size:11px;color:var(--mut)">${ko} キックオフ</div>`:''}
+    ${ko?`<div style="margin:3px 16px 0;font-size:11px;color:var(--mut)">${ko} ${t('kickoffLabel')}</div>`:''}
     ${squadTeamBlockHTML(m.home)}
     ${squadTeamBlockHTML(m.away)}
-    ${m.preview?`<div style="margin:18px 16px 0">
-      <div style="font-size:12px;font-weight:800;color:var(--lime);letter-spacing:.4px;margin-bottom:7px">試合の見どころ</div>
-      <div style="font-size:12.5px;color:var(--ink);line-height:1.9;white-space:pre-wrap">${escAttr(m.preview)}</div>
+    ${featPreview(m)?`<div style="margin:18px 16px 0">
+      <div style="font-size:12px;font-weight:800;color:var(--lime);letter-spacing:.4px;margin-bottom:7px">${t('featPreviewLabel')}</div>
+      <div style="font-size:12.5px;color:var(--ink);line-height:1.9;white-space:pre-wrap">${escAttr(featPreview(m))}</div>
     </div>`:''}
   </div>`;
 }
@@ -28223,21 +28236,21 @@ function openFeatured(kind){
   if(kind==='squad'){
     const matches=FEATURED_SQUADS.filter(squadInWindow).sort((a,b)=> new Date(a.kickoff||0)-new Date(b.kickoff||0));
     const body = matches.length ? matches.map(squadMatchHTML).join('')
-      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">本日の注目試合はありません。<br>キックオフ24時間前から表示されます。</div>`;
-    openSheet(`<h2>注目スカッド <span>予想</span></h2>
-      <div style="font-size:11.5px;color:var(--mut);margin:0 16px 5px;line-height:1.7">注目試合の予想スタメンを随時更新。</div>
-      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 14px;line-height:1.6">※キックオフ24時間前から表示します</div>
+      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">${t('featSquadEmpty')}</div>`;
+    openSheet(`<h2>${t('featSquad')} <span>${t('featPredicted')}</span></h2>
+      <div style="font-size:11.5px;color:var(--mut);margin:0 16px 5px;line-height:1.7">${t('featSquadDesc')}</div>
+      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 14px;line-height:1.6">${t('featSquadNote')}</div>
       <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
     return;
   }
   if(kind==='transfer'){
     const list=FEATURED_TRANSFERS;
-    const desc='高額移籍金、ビッグネームの移籍を随時更新。';
+    const desc=t('featTransferDesc');
     const body = list.length ? list.map(transferCardHTML).join('')
-      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">近日公開予定です。<br>${desc}</div>`;
-    openSheet(`<h2>注目移籍 <span>NEWS</span></h2>
+      : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">${t('featComingSoon')}<br>${desc}</div>`;
+    openSheet(`<h2>${t('featTransfer')} <span>NEWS</span></h2>
       <div style="font-size:11.5px;color:var(--mut);margin:0 16px 5px;line-height:1.7">${desc}</div>
-      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 12px;line-height:1.6">※この移籍がデータベースに更新されるまで時間を要する場合があります</div>
+      <div style="font-size:10px;color:var(--mut);opacity:.85;margin:0 16px 12px;line-height:1.6">${t('featTransferNote')}</div>
       <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
     return;
   }
@@ -28273,7 +28286,7 @@ async function exportBackup(){
     if(mobileish && navigator.canShare && typeof File!=='undefined'){
       try{
         const file=new File([bt],fname,{type:'application/json'});
-        if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:'Squad XI バックアップ'}); return; }
+        if(navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:(LANG==='en'?'Squad XI backup':'Squad XI バックアップ')}); return; }
       }catch(e){ if(e&&e.name==='AbortError') return; } // キャンセルは何もしない／非対応はダウンロードへ
     }
     // PC等：通常のファイルダウンロード
