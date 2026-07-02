@@ -618,6 +618,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
    プレミアリーグは公開ロスター情報を参照（2025/26）。
    ========================================================= */
 const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン",ED:"エールディヴィジ",PT:"プリメイラ・リーガ",TR:"スュペル・リグ",BE:"ベルギー・プロ・リーグ",SC:"スコティッシュ・プレミアシップ",DK:"デンマーク・スーペルリーガ",CH:"スイス・スーパーリーグ",L2:"リーグ・アン2部",EC:"チャンピオンシップ",S2:"ラ・リーガ2部",SB:"セリエB",D2:"2.ブンデスリーガ",AT:"オーストリア・ブンデスリーガ",GR:"ギリシャ・スーパーリーグ",CZ:"チェコ・ファーストリーグ",PO:"エクストラクラサ",RS:"セルビア・スーパーリーガ",NO:"エリテセリエン",CY:"キプロス1部",UA:"ウクライナ・プレミアリーグ",HU:"ハンガリーNB I",HR:"クロアチア1部",AZ:"アゼルバイジャン・プレミアリーグ",SK:"スロバキア1部",IL:"イスラエル・プレミアリーグ",SE:"アルスヴェンスカン",BG:"ブルガリア1部",RO:"ルーマニア・スーペルリーガ",SI:"スロベニア1部",MD:"モルドバ・ナツィオナラ",J1:"J1リーグ",ML:"MLS",SP:"サウジ・プロリーグ",RU:"ロシア・プレミアリーグ",KR:"K League 1",AR:"アルゼンチン・プリメーラ",BR:"ブラジル・セリエA",CO:"コロンビア・プリメーラA",MX:"リーガMX",ID:"リーガ1(インドネシア)",TH:"タイ・リーグ1",IN:"インド・スーパーリーグ",MA:"ボトラ・プロ",ZA:"南アフリカ・プレミアリーグ",EG:"エジプト・プレミアリーグ",TN:"チュニジア・リーグ1",QA:"カタール・スターズリーグ",AE:"UAEプロリーグ",CN:"中国スーパーリーグ",VN:"Vリーグ1",FN:"フィンランド・ヴェイッカウスリーガ",KZ:"カザフスタン・プレミアリーグ",TZ:"タンザニア・プレミアリーグ",J2:"J2リーグ",J3:"J3リーグ"};
+// 英語リーグ名（LANG==='en' の表示・検索用。無ければ L(日本語) にフォールバック）
+const LEN={PL:"Premier League",LL:"La Liga",SA:"Serie A",BL:"Bundesliga",L1:"Ligue 1",ED:"Eredivisie",PT:"Primeira Liga",TR:"Süper Lig",BE:"Belgian Pro League",SC:"Scottish Premiership",DK:"Danish Superliga",CH:"Swiss Super League",L2:"Ligue 2",EC:"Championship",S2:"LaLiga 2",SB:"Serie B",D2:"2. Bundesliga",AT:"Austrian Bundesliga",GR:"Greek Super League",CZ:"Czech First League",PO:"Ekstraklasa",RS:"Serbian SuperLiga",NO:"Eliteserien",CY:"Cypriot First Division",UA:"Ukrainian Premier League",HU:"Hungarian NB I",HR:"Croatian First League",AZ:"Azerbaijan Premier League",SK:"Slovak First League",IL:"Israeli Premier League",SE:"Allsvenskan",BG:"Bulgarian First League",RO:"Romanian SuperLiga",SI:"Slovenian PrvaLiga",MD:"Moldovan Super Liga",J1:"J1 League",ML:"MLS",SP:"Saudi Pro League",RU:"Russian Premier League",KR:"K League 1",AR:"Argentine Primera División",BR:"Brazilian Série A",CO:"Colombian Primera A",MX:"Liga MX",ID:"Liga 1 (Indonesia)",TH:"Thai League 1",IN:"Indian Super League",MA:"Botola Pro",ZA:"South African Premiership",EG:"Egyptian Premier League",TN:"Tunisian Ligue 1",QA:"Qatar Stars League",AE:"UAE Pro League",CN:"Chinese Super League",VN:"V.League 1",FN:"Veikkausliiga",KZ:"Kazakhstan Premier League",TZ:"Tanzanian Premier League",J2:"J2 League",J3:"J3 League"};
 const P=[
 // ---- Manchester City (PL) ----
 ["Gianluigi Donnarumma","GK",27,"🇮🇹 ITA","Manchester City","PL"],
@@ -25323,7 +25325,13 @@ const I18N = {
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
-    total:'合計', starters:'スタメン', subsWord:'控え', benchEmpty:'控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。'
+    total:'合計', starters:'スタメン', subsWord:'控え', benchEmpty:'控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。',
+    place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
+    posAll:'全部', allLeagues:'全リーグ', popClubs:'⭐ 人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
+    sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
+    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
+    changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'✈ 全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
+    badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25339,12 +25347,20 @@ const I18N = {
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
-    total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-building by club fills the bench too.'
+    total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-building by club fills the bench too.',
+    place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
+    posAll:'All', allLeagues:'All leagues', popClubs:'⭐ Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
+    sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
+    createPlayer:'＋ Create a player', noMatch:'No matching players',
+    changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'✈ From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
+    badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
 function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)?I18N.ja[k]:k); }
 function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
+// 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
+function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
 // ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
 // 手動保存されたスカッドに入っている選手＝スタメン＋第2候補＋ベンチを、保存のたびに各1回ずつ匿名カウント。
 // 自動配置(MV順)で入った選手も、第2候補(自動サジェスト含む)も数える → 集まる人気度はMV順に近づき、MV→独自データへの移行がなめらか。
@@ -26856,10 +26872,10 @@ function openPicker(slotIdx){
 }
 function pickerHTML(slotIdx,role,title){
   return `
-  <h2>${title||'選手を配置'} <span>${role}</span></h2>
+  <h2>${title||t('place')} <span>${role}</span></h2>
   <div class="controls">
-    <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
-    <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
+    <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
+    <div class="filters"><div class="fchip" id="pickClear">${t('clearFilters')}</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
     <div class="filters" id="clubF" style="display:none"></div>
@@ -26867,7 +26883,7 @@ function pickerHTML(slotIdx,role,title){
   <div class="list" id="plist"></div>`;
 }
 function posChips(f=pickFilter){
-  const opts=[["ALL","全部"],["GK","GK"],["DF","DF"],["MF","MF"],["FW","FW"]];
+  const opts=[["ALL",t('posAll')],["GK","GK"],["DF","DF"],["MF","MF"],["FW","FW"]];
   let html=opts.map(o=>`<div class="fchip ${f.pos===o[0]?'on':''}" data-pos="${o[0]}">${o[1]}</div>`).join('');
   if(subFilterOn){ // 大枠を選ぶと右側に細かいポジションのサブフィルタを出す（配置/変更/移籍市場/ベンチ追加）
     const subs=SUBPOS[f.pos];
@@ -26879,45 +26895,49 @@ function posChips(f=pickFilter){
 // UEFA5年（国別係数）順。5大リーグ→J1→以降。複数部門の国は[1部,2部…]。末尾は単クラブ国＋非UEFA(米/サウジ)
 const LGGROUP=[["イングランド",["PL","EC"]],["イタリア",["SA","SB"]],["スペイン",["LL","S2"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["日本",["J1","J2","J3"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["ベルギー",["BE"]],["トルコ",["TR"]],["チェコ",["CZ"]],["ギリシャ",["GR"]],["ノルウェー",["NO"]],["オーストリア",["AT"]],["デンマーク",["DK"]],["スイス",["CH"]],["ポーランド",["PO"]],["スコットランド",["SC"]],["イスラエル",["IL"]],["セルビア",["RS"]],["キプロス",["CY"]],["スウェーデン",["SE"]],["クロアチア",["HR"]],["ハンガリー",["HU"]],["ルーマニア",["RO"]],["ウクライナ",["UA"]],["ブルガリア",["BG"]],["アゼルバイジャン",["AZ"]],["スロバキア",["SK"]],["スロベニア",["SI"]],["モルドバ",["MD"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]],["ブラジル",["BR"]],["アルゼンチン",["AR"]],["メキシコ",["MX"]],["コロンビア",["CO"]],["韓国",["KR"]],["中国",["CN"]],["ロシア",["RU"]],["タイ",["TH"]],["インドネシア",["ID"]],["ベトナム",["VN"]],["インド",["IN"]],["カタール",["QA"]],["UAE",["AE"]],["エジプト",["EG"]],["モロッコ",["MA"]],["チュニジア",["TN"]],["南アフリカ",["ZA"]],["フィンランド",["FN"]],["カザフスタン",["KZ"]],["タンザニア",["TZ"]]];
 function lgFlag(code){ if(code&&code[0]==='@'){ const g=LGGROUP.find(x=>x[0]===code.slice(1)); code=g?g[1][0]:''; } const n=LGNAT[code]; const fi=n&&FI[n]; return fi?`<span class="fi fi-${fi}"></span> `:''; }
+// リーグ名（英語UIなら LEN、無ければ L の日本語）／国名（LGGROUPの日本語表示ラベル → 英語UIなら NATNAME）
+function lgName(c){ return (LANG==='en' && LEN[c]) ? LEN[c] : (L[c]||c); }
+function lgCountryLabel(jp){ if(LANG!=='en') return jp; const g=LGGROUP.find(x=>x[0]===jp); const nc=g?LGNAT[g[1][0]]:null; return (nc&&NATNAME[nc])||jp; }
 // リーグ絞り込み値 → 対象となる実リーグコードの配列（ALL/POPはnull=制限なし、"@国名"はその国の全部門、通常コードはそれ単体）
 function lgMembers(v){ if(!v||v==='ALL'||v==='POP')return null; if(v[0]==='@'){ const g=LGGROUP.find(x=>x[0]===v.slice(1)); return g?g[1]:[]; } return [v]; }
 // 選手pが現在のリーグ絞り込み値に含まれるか（"@日本"ならJ1/J2/J3いずれかでtrue）
 function inLgFilter(p,v){ const m=lgMembers(v); return !m||m.includes(p[5]); }
 // 後方互換：全呼び出し元（ピッカー/市場/新規作成）は検索付きプルダウンになる
 function lgChips(f=pickFilter, extra=''){ return lgSelectHTML(f, extra); }
-function lgSelLabel(f){ if(f.lg==='ALL')return '全リーグ'; if(f.lg==='POP')return '⭐ 人気クラブ'; if(f.lg&&f.lg[0]==='@')return f.lg.slice(1); return L[f.lg]||f.lg; }
+function lgSelLabel(f){ if(f.lg==='ALL')return t('allLeagues'); if(f.lg==='POP')return t('popClubs'); if(f.lg&&f.lg[0]==='@')return lgCountryLabel(f.lg.slice(1)); return lgName(f.lg); }
 // リーグ選択プルダウン本体（ボタン＋開いている時は検索窓＋国リスト）
 function lgSelectHTML(f=pickFilter, extra=''){
   const open=!!f.lgopen;
   const flag=(f.lg!=='ALL'&&f.lg!=='POP')?lgFlag(f.lg):'';
   return `<div class="lgsel ${open?'open':''}">`+
     `<div class="lgsel-btn" data-lgtoggle>${flag}<span>${lgSelLabel(f)}</span><b class="lgcar">${open?'▴':'▾'}</b></div>`+
-    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="国名・リーグ名で検索（日本語・英語可）" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
+    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="${t('lgSearchPh')}" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
   `</div>`;
 }
 // 国でまとめた縦リスト。検索q一致でフィルタ、複数部門は▾で展開（検索中は自動展開）
 function lgSelRows(f, extra=''){
   const q=(f.lgq||'').trim().toLowerCase(); const qk=natNorm(q);
-  let h=`<div class="lgrow2 ${f.lg==='ALL'?'on':''}" data-lg="ALL">全リーグ</div>`;
+  let h=`<div class="lgrow2 ${f.lg==='ALL'?'on':''}" data-lg="ALL">${t('allLeagues')}</div>`;
   if(extra) h+=extra;
   for(const [jp,codes] of LGGROUP){
-    // 日本語国名/リーグ名（かな正規化）・英語国名・国コード・リーグコードのいずれでもヒット（例: "England"でも"いんぐらんど"でも"PL"でもOK）
+    // 日本語国名/リーグ名（かな正規化）・英語国名・英語リーグ名・国コード・リーグコードのいずれでもヒット（例: "England"でも"いんぐらんど"でも"PL"でもOK）
     const ncode=LGNAT[codes[0]]||'';
     const hit = !q
       || natNorm(jp).includes(qk)
       || codes.some(c=>natNorm(L[c]||'').includes(qk))
+      || codes.some(c=>(LEN[c]||'').toLowerCase().includes(q))
       || (NATNAME[ncode]||'').toLowerCase().includes(q)
       || ncode.toLowerCase().includes(q)
       || codes.some(c=>c.toLowerCase().includes(q));
     if(!hit) continue;
     if(codes.length===1){
-      h+=`<div class="lgrow2 ${f.lg===codes[0]?'on':''}" data-lg="${codes[0]}">${lgFlag(codes[0])}${jp}</div>`;
+      h+=`<div class="lgrow2 ${f.lg===codes[0]?'on':''}" data-lg="${codes[0]}">${lgFlag(codes[0])}${lgCountryLabel(jp)}</div>`;
     } else {
       const whole='@'+jp;
       const expanded = !!q || f.expand===jp || f.lg===whole || (f.expand==null && codes.includes(f.lg));
       // 国名タップ＝その国全体(全部門まとめ)を選択。シェブロン(▾)タップは選択せず開閉だけ。
-      h+=`<div class="lgrow2 country ${expanded?'open':''} ${f.lg===whole?'on':''}" data-lg="${whole}">${lgFlag(codes[0])}${jp}<span class="lgall">全${codes.length}部門</span><b class="lgcar" data-country="${jp}">${expanded?'▴':'▾'}</b></div>`;
-      if(expanded) for(const c of codes) h+=`<div class="lgrow2 sub ${f.lg===c?'on':''}" data-lg="${c}">${L[c]}</div>`;
+      h+=`<div class="lgrow2 country ${expanded?'open':''} ${f.lg===whole?'on':''}" data-lg="${whole}">${lgFlag(codes[0])}${lgCountryLabel(jp)}<span class="lgall">${LANG==='en'?codes.length+' divisions':'全'+codes.length+'部門'}</span><b class="lgcar" data-country="${jp}">${expanded?'▴':'▾'}</b></div>`;
+      if(expanded) for(const c of codes) h+=`<div class="lgrow2 sub ${f.lg===c?'on':''}" data-lg="${c}">${lgName(c)}</div>`;
     }
   }
   return h;
@@ -26945,7 +26965,7 @@ function lgExpandFor(code){ for(const [jp,codes] of LGGROUP){ if(codes.length>1 
 function clubChips(f=pickFilter){
   const mem=lgMembers(f.lg);
   const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
-  return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">全クラブ</div>`+
+  return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">${t('allClubs')}</div>`+
     clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${c}">${c}</div>`).join('');
 }
 // クラブ選択プルダウン（チーム作成以外のピッカー用。横並びチップ→<select>）。リーグ選択後に絞り込みやすく。
@@ -26953,7 +26973,7 @@ function clubSelectHTML(f=pickFilter){
   const mem=lgMembers(f.lg);
   const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
   const o=(v,label,sel)=>`<option value="${escAttr(v)}"${sel?' selected':''}>${escAttr(label)}</option>`;
-  return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL','全クラブ',(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,c,f.club===c)).join('')+`</select>`;
+  return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL',t('allClubs'),(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,c,f.club===c)).join('')+`</select>`;
 }
 // クラブ欄の表示制御（新規作成画面と同じ：リーグ未指定なら隠す／リーグ選択時のみ表示し、そのリーグのクラブを出す）
 function syncClubField(id, f){
@@ -26964,9 +26984,9 @@ function syncClubField(id, f){
 }
 // ソート切替チップ（おすすめ順/年齢↓↑）。drawPickList系ピッカーで使用
 function sortChips(f=pickFilter){
-  const opts=[['suggest','おすすめ順'],['pop','人気順'],['age_desc','年齢 高い順'],['age_asc','年齢 低い順']];
+  const opts=[['suggest',t('sortSuggest')],['pop',t('sortPop')],['age_desc',t('sortAgeDesc')],['age_asc',t('sortAgeAsc')]];
   return opts.map(o=>`<div class="fchip ${(f.sort||'suggest')===o[0]?'on':''}" data-sort="${o[0]}">${o[1]}</div>`).join('')
-    +`<div class="fchip" data-create style="margin-left:auto;border-color:var(--lime);color:var(--lime)">＋ 選手を新規作成</div>`;
+    +`<div class="fchip" data-create style="margin-left:auto;border-color:var(--lime);color:var(--lime)">${t('createPlayer')}</div>`;
 }
 function wirePicker(slotIdx){
   subFilterOn=true; // このピッカー系ではサブポジションフィルタを有効化
@@ -27025,9 +27045,9 @@ function drawPickList(slotIdx){
   else if(pickRole) pickCurIdx.sort(suggestSort); // スロット押下時：そのポジションを優先表示→市場価値順
   else pickCurIdx.sort((a,b)=>{const ma=mvScore(P[a]),mb=mvScore(P[b]); if(ma!==mb)return mb-ma; return P[b][2]-P[a][2];}); // ポジション指定なし(ベンチ/ベンチ外追加等)：市場価値の高い順
   _iconFloorActive=true;
-  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
-  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">▾ さらに ${pickCurIdx.length-PAGE}人</div>`);
+  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
     if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
@@ -27037,7 +27057,7 @@ function drawPickList(slotIdx){
       if(s)s.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
       list._loaded=start+more.length;
       const ns=document.getElementById('pickMore');
-      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
   list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;if(pickOnPick){pickOnPick(pid);}else if(benchAddMode)addPlayerToBench(pid);else assign(slotIdx,pid);};
@@ -27048,10 +27068,10 @@ function openBenchAdd(){
   pickRole=null; pickOnPick=null;
   pickReopen=()=>openBenchAdd();
   openSheet(`
-  <h2>ベンチに追加</h2>
+  <h2>${t('benchAddTitle')}</h2>
   <div class="controls">
-    <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
-    <div class="filters"><div class="fchip" id="pickClear">× 検索条件をクリア</div></div>
+    <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
+    <div class="filters"><div class="fchip" id="pickClear">${t('clearFilters')}</div></div>
     <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
     <div class="filters" id="clubF" style="display:none"></div>
@@ -27184,8 +27204,8 @@ function prowHTML(i,hideBench){
   return `<div class="prow ${already?'inxi':''}${lock?' locked':''}" ${lock?'':`data-pid="${i}"`}${lock?' style="opacity:.5;pointer-events:none"':''}>
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
-      <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">●起用中</span>':''}${onBench?'<span class="badge benchbadge">●ベンチ</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">自作</span>':''}</div>
-      <div class="sub">${flagHTML(p[3])}${p[4]?' · '+p[4]:''}${p[2]>0?' · '+p[2]+'歳':''}</div>
+      <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
+      <div class="sub">${flagHTML(p[3])}${p[4]?' · '+p[4]:''}${p[2]>0?' · '+p[2]+(LANG==='en'?'':'歳'):''}</div>
     </div>
   </div>`;
 }
@@ -27315,19 +27335,19 @@ function openSubPicker(slotIdx){
   const hasBench=state.loadedClub&&state.bench.length>0;
   const cur=state.slots[slotIdx].sub;
   openSheet(`
-    <h2>第二候補を選ぶ <span>${role}</span></h2>
+    <h2>${t('secondChoice')} <span>${role}</span></h2>
     <div class="controls">
       ${hasBench?`<div class="filters" id="benchModeF">
-        <div class="fchip on" data-bm="bench">ベンチ（${state.bench.length}人）</div>
-        <div class="fchip" data-bm="transfer">✈ 全選手から</div>
+        <div class="fchip on" data-bm="bench">${LANG==='en'?t('bench')+' ('+state.bench.length+')':t('bench')+'（'+state.bench.length+'人）'}</div>
+        <div class="fchip" data-bm="transfer">${t('fromAll')}</div>
       </div>`:''}
       <div id="transferExtra" style="${hasBench?'display:none;':''}padding-top:6px">
-        <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+        <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
         <div class="filters" id="clubF" style="display:none"></div>
       </div>
-      ${cur!=null?`<div class="bench-badge">現在の第二候補：<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">解除</span></div>`:''}
+      ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
     </div>
     <div class="list" id="plist"></div>`);
   const drawSub=()=>{
@@ -27335,7 +27355,7 @@ function openSubPicker(slotIdx){
     const usebench=!document.getElementById('transferExtra')||document.getElementById('transferExtra').style.display==='none';
     if(hasBench&&usebench){
       const pids=state.bench;
-      list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join(''):'<div class="empty-msg">ベンチに選手がいません</div>';
+      list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join(''):'<div class="empty-msg">'+t('benchEmptyList')+'</div>';
       list.onscroll=null;
       list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
     }else{
@@ -27373,9 +27393,9 @@ function drawSubFull(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   pickCurIdx.sort(suggestSort);
-  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
-  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">▾ さらに ${pickCurIdx.length-PAGE}人</div>`);
+  if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
     if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
@@ -27385,7 +27405,7 @@ function drawSubFull(slotIdx){
       if(sm)sm.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
       list._loaded=start+more.length;
       const ns=document.getElementById('pickMore');
-      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+      if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
   list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
@@ -27404,14 +27424,14 @@ function openBenchPicker(slotIdx){
   pickRole=role; pickOnPick=null;
   const blen=state.bench.length;
   openSheet(`
-    <h2>選手を変更 <span>${role}</span></h2>
+    <h2>${t('changePlayer')} <span>${role}</span></h2>
     <div class="controls">
       <div class="filters" id="benchModeF">
-        <div class="fchip on" data-bm="bench">ベンチ（${blen}人）</div>
-        <div class="fchip" data-bm="transfer">✈ 全選手から</div>
+        <div class="fchip on" data-bm="bench">${LANG==='en'?t('bench')+' ('+blen+')':t('bench')+'（'+blen+'人）'}</div>
+        <div class="fchip" data-bm="transfer">${t('fromAll')}</div>
       </div>
       <div id="transferExtra" style="display:none;padding-top:6px">
-        <input class="search" id="pq" placeholder="選手名を検索…" autocomplete="off">
+        <input class="search" id="pq" placeholder="${t('searchName')}" autocomplete="off">
         <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
         <div class="filters" id="clubF" style="display:none"></div>
@@ -27439,7 +27459,7 @@ function openBenchPicker(slotIdx){
 function drawBenchList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   const pids=state.bench;
-  if(!pids.length){list.innerHTML='<div class="empty-msg">ベンチに選手がいません</div>';return;}
+  if(!pids.length){list.innerHTML='<div class="empty-msg">'+t('benchEmptyList')+'</div>';return;}
   list.innerHTML=pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join('');
   list.onscroll=null;
   list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assign(slotIdx,+row.dataset.pid);};
@@ -27451,7 +27471,7 @@ function openSlotAddSearch(slotIdx){
   const role=state.slots[slotIdx].role;
   pickRole=role; benchAddMode=false; pickOnPick=null;
   pickReopen=()=>openSlotAddSearch(slotIdx);
-  openSheet(pickerHTML(slotIdx,role,'チーム外の選手と交代'));
+  openSheet(pickerHTML(slotIdx,role,t('outsideSwap')));
   wirePicker(slotIdx);
 }
 // チーム外の選手と交代（汎用）：onPick(pid)で選んだ選手の反映先を指定。ベンチ／ベンチ外から呼ぶ
@@ -27472,9 +27492,9 @@ function replaceBenchPlayer(oldPid,newPid){
   state.slots.forEach(s=>{ if(s.sub===oldPid)s.sub=null; }); // 外れた選手の第2候補参照を解消
   closeSheet();render();save();toast(shortName(P[oldPid][0])+' → '+shortName(P[newPid][0])+' に交代');
 }
-function openBenchSwap(oldPid){ openOutsideSwap('チーム外の選手と交代',newPid=>replaceBenchPlayer(oldPid,newPid)); }
+function openBenchSwap(oldPid){ openOutsideSwap(t('outsideSwap'),newPid=>replaceBenchPlayer(oldPid,newPid)); }
 // ベンチ外は読込クラブの控え（自動算出）。本当の置き換え＝元の選手を除外リストへ（一覧から消す）＋選んだ選手をベンチへ
-function openReserveSwap(oldPid){ openOutsideSwap('チーム外の選手と交代',newPid=>replaceReservePlayer(oldPid,newPid)); }
+function openReserveSwap(oldPid){ openOutsideSwap(t('outsideSwap'),newPid=>replaceReservePlayer(oldPid,newPid)); }
 function replaceReservePlayer(oldPid,newPid){
   if(oldPid===newPid){ closeSheet(); return; }
   if(!state.excluded) state.excluded=[];
@@ -27701,14 +27721,14 @@ let mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
 function openMarket(){
   mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
   openSheet(`
-    <h2>選手を検索 <span>全${P.length}選手</span></h2>
+    <h2>${t('tipSearch')} <span>${LANG==='en'?P.length+' players':'全'+P.length+'選手'}</span></h2>
     <div class="controls">
-      <input class="search" id="mq" placeholder="選手名・クラブで検索…" autocomplete="off">
-      <div class="filters"><div class="fchip" id="mClear">× 検索条件をクリア</div></div>
+      <input class="search" id="mq" placeholder="${t('searchNameClub')}" autocomplete="off">
+      <div class="filters"><div class="fchip" id="mClear">${t('clearFilters')}</div></div>
       <div class="filters" id="msortF">
-        <div class="fchip on" data-sort="mv">注目順</div>
-        <div class="fchip" data-sort="age_desc">年齢 高い順</div>
-        <div class="fchip" data-sort="age_asc">年齢 低い順</div>
+        <div class="fchip on" data-sort="mv">${t('sortFeatured')}</div>
+        <div class="fchip" data-sort="age_desc">${t('sortAgeDesc')}</div>
+        <div class="fchip" data-sort="age_asc">${t('sortAgeAsc')}</div>
       </div>
       <div class="filters" id="mposF">${posChips(mktFilter)}</div>
       <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
@@ -27752,9 +27772,9 @@ function drawMkt(){
     const ma=mvScore(P[a]), mb=mvScore(P[b]); if(ma!==mb) return mb-ma; return P[b][2]-P[a][2]; // 注目順=市場価値の高い順
   });
   _iconFloorActive=true;
-  if(!mktCurIdx.length){list.innerHTML='<div class="empty-msg">該当する選手がいません</div>';return;}
+  if(!mktCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
-  if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">▾ さらに ${mktCurIdx.length-PAGE}人</div>`);
+  if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,mktCurIdx.length);
   list.onscroll=()=>{
     if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
@@ -27764,7 +27784,7 @@ function drawMkt(){
       if(s)s.insertAdjacentHTML('beforebegin',more.map(i=>prowHTML(i)).join(''));
       list._loaded=start+more.length;
       const ns=document.getElementById('mktMore');
-      if(ns){const rem=mktCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent='▾ さらに '+rem+'人';}
+      if(ns){const rem=mktCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
   list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;recordSearch(pid);openDetail(pid,null);};
