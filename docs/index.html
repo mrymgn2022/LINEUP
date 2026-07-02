@@ -25358,7 +25358,7 @@ const I18N = {
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'チームから外す', tstRemovedFromTeam:'チームから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
-    allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍',
+    allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
     tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を保存して「写真を追加」で取り込めます',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした', swapPrompt:'入れ替える相手をタップ（スタメン / ベンチ / ベンチ外）。同じ選手で取消',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
@@ -25436,7 +25436,7 @@ const I18N = {
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from team', tstRemovedFromTeam:'Removed from the team', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
-    allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality',
+    allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
     tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Save an image, then import it with “Add photo”.',
     tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image', swapPrompt:'Tap who to swap with (XI / bench / reserves). Tap the same player to cancel.',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
@@ -27373,7 +27373,7 @@ function attachNatFilter(scope,f,redraw){
   if(!chip||!panel)return;
   chip.onclick=()=>{
     if(panel.style.display!=='none'){ panel.style.display='none'; return; }
-    panel.innerHTML=`<input class="search natq" placeholder="国名で検索（日本語・英語可）…" autocomplete="off"><div class="natlist">${natOptionsHTML('')}</div>`;
+    panel.innerHTML=`<input class="search natq" placeholder="${t('natSearchPh')}" autocomplete="off"><div class="natlist">${natOptionsHTML('')}</div>`;
     panel.style.display='block';
     const inp=panel.querySelector('.natq'), lst=panel.querySelector('.natlist');
     inp.oninput=()=>{ lst.innerHTML=natOptionsHTML(inp.value); };
