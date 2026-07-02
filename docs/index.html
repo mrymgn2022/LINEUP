@@ -25893,7 +25893,7 @@ function renderBench(){
   const reserveSec = others.length ? `<div class="bh reservehead"><b>${t('reserves')}</b><span>${LANG==='en'?others.length+' players':others.length+'人'}</span><i>${t('dragToBench')}</i></div><div class="rgrid">${ocards}</div>` : '';
   const empty=list.length?'':'<div class="benchEmpty">'+t('benchEmpty')+'</div>';
   wrap.innerHTML=`<div class="bh"><b>${t('bench')}</b><span>${LANG==='en'?list.length+' subs':'控え '+list.length+'人'}</span><i>${t('tapMenuDrag')}</i></div>`+
-    empty+`<div class="bgrid">${cards}${addCard}</div>`+foot+reserveSec+analyzeBtn;
+    empty+`<div class="bgrid">${cards}${addCard}</div>`+foot+analyzeBtn+reserveSec; // 分析バーは必ずベンチ(合計)の直下。ベンチ外はその下に。
   wrap.querySelectorAll('.bgrid .bcard[data-pid]').forEach(card=>attachCardDrag(card,+card.dataset.pid,'bench'));
   wrap.querySelectorAll('.rgrid .ocard[data-pid]').forEach(card=>attachCardDrag(card,+card.dataset.pid,'reserve'));
   const add=document.getElementById('benchAdd'); if(add) add.onclick=openBenchAdd;
@@ -28854,7 +28854,7 @@ function loadClub(club){
 }
 
 /* ---- スカッド分析（スタッツバーをタップ） ---- */
-document.getElementById('statbar').onclick=openSquadAnalysis;
+document.getElementById('statbar').onclick=()=>openSquadAnalysis('xi'); // 盤面下＝スタメン分析
 function openSquadAnalysis(scope){
   scope = scope==='xi' ? 'xi' : 'all'; // 既定はスタメン＋ベンチ
   const xi=state.slots.filter(s=>s.pid!=null).map(s=>P[s.pid]);
