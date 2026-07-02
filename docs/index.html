@@ -25307,6 +25307,32 @@ function keyToPid(key){
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
+/* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
+const I18N = {
+  ja: {
+    newTeam:'チームを新規作成', savedTeams:'保存したチーム', myTeam:'マイチーム', editing:'編集中・', saved:'保存',
+    noSaved:'まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。',
+    saveCurrent:'現在のチームを保存', overwrite:'このチームを上書き保存',
+    featSquad:'注目スカッド', featTransfer:'注目移籍', announcements:'お知らせ', premium:'プレミアム（無制限保存）',
+    help:'使い方', backup:'バックアップ（書き出し / 読み込み）', feedback:'選手追加依頼・不具合報告',
+    privacy:'プライバシーポリシー', terms:'利用規約', close:'閉じる', tagline:'build your XI', preview:'（プレビュー）', language:'言語',
+    tstLoaded:'チームを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'チームを保存しました', appSoon:'アプリ版は近日公開予定です',
+    getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）'
+  },
+  en: {
+    newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
+    noSaved:'No saved teams yet.<br>Add one with “Save current team” below.',
+    saveCurrent:'Save current team', overwrite:'Overwrite this team',
+    featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (unlimited saves)',
+    help:'How to use', backup:'Backup (export / import)', feedback:'Request a player / Report a bug',
+    privacy:'Privacy Policy', terms:'Terms of Use', close:'Close', tagline:'build your XI', preview:' (preview)', language:'Language',
+    tstLoaded:'Team loaded', tstDeleted:'Deleted', tstOverwritten:'Overwritten', tstSaved:'Team saved', appSoon:'The app version is coming soon',
+    getApp:'Get the app', getAppSoon:'App version (coming soon)'
+  }
+};
+let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
+function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)?I18N.ja[k]:k); }
+function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
 // ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
 // 手動保存されたスカッドに入っている選手＝スタメン＋第2候補＋ベンチを、保存のたびに各1回ずつ匿名カウント。
 // 自動配置(MV順)で入った選手も、第2候補(自動サジェスト含む)も数える → 集まる人気度はMV順に近づき、MV→独自データへの移行がなめらか。
@@ -27855,50 +27881,54 @@ function storeBadgesHTML(){
       + `<span style="position:absolute;inset:0;background:rgba(15,17,15,.4);border-radius:9px"></span></div>`;
   };
   return `<div class="dwdiv"></div>`
-    + `<div class="dwsec">アプリ版${soon?'（近日公開）':'をダウンロード'}</div>`
+    + `<div class="dwsec">${soon?t('getAppSoon'):t('getApp')}</div>`
     + `<div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 16px 10px">${badge('ios',APPSTORE_URL)}${badge('android',PLAYSTORE_URL)}</div>`;
 }
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
-  const teamRows = teams.length ? teams.map(t=>`
-    <div class="dwteam ${t.id===state.teamId?'cur':''}" data-team="${t.id}">
-      <div class="tn">${escAttr(t.name||'マイチーム')}<small>${t.id===state.teamId?'編集中・':''}${fmtTeamDate(t.ts)} 保存</small></div>
-      <div class="dwtrash" data-del="${t.id}" aria-label="削除">${ICN.remove}</div>
-    </div>`).join('') : `<div class="dwempty">まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。</div>`;
-  const curInList = state.teamId && teams.some(t=>t.id===state.teamId);
-  const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?'このチームを上書き保存':'現在のチームを保存'}</div>`;
+  const teamRows = teams.length ? teams.map(tm=>`
+    <div class="dwteam ${tm.id===state.teamId?'cur':''}" data-team="${tm.id}">
+      <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${tm.id===state.teamId?t('editing'):''}${fmtTeamDate(tm.ts)} ${t('saved')}</small></div>
+      <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.remove}</div>
+    </div>`).join('') : `<div class="dwempty">${t('noSaved')}</div>`;
+  const curInList = state.teamId && teams.some(tm=>tm.id===state.teamId);
+  const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?t('overwrite'):t('saveCurrent')}</div>`;
+  const langBtn=(l,label)=>`<button data-lang="${l}" style="font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer;${LANG===l?'background:var(--lime);color:#0a0e0c;border:1px solid var(--lime)':'background:transparent;color:var(--ink);border:1px solid var(--line)'}">${label}</button>`;
   return `
-    <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="閉じる">✕</div></div>
-    <div class="dwnew" id="dwNew"><span class="di">＋</span> チームを新規作成</div>
-    <div class="dwsec">保存したチーム <span class="dwcount">${teams.length}/${capLabel}</span></div>
+    <div class="dwhead"><div class="dwlogo">Squad <b>XI</b></div><div class="dwx" id="dwClose" aria-label="${t('close')}">✕</div></div>
+    <div class="dwnew" id="dwNew"><span class="di">＋</span> ${t('newTeam')}</div>
+    <div class="dwsec">${t('savedTeams')} <span class="dwcount">${teams.length}/${capLabel}</span></div>
     ${teamRows}
     ${saveRow}
     <div class="dwdiv"></div>
-    <div class="dwitem" data-feat="squad"><span class="di">${ICN.squad}</span>注目スカッド<span class="dchev">›</span></div>
-    <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>注目移籍<span class="dchev">›</span></div>
+    <div class="dwitem" data-feat="squad"><span class="di">${ICN.squad}</span>${t('featSquad')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>${t('featTransfer')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
-    <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>お知らせ${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>プレミアム（無制限保存）<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="help"><span class="di">?</span>使い方<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="backup"><span class="di">⤓</span>バックアップ（書き出し / 読み込み）<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="feedback"><span class="di">✉</span>選手追加依頼・不具合報告<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>${t('announcements')}${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>${t('premium')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="help"><span class="di">?</span>${t('help')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="backup"><span class="di">⤓</span>${t('backup')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="feedback"><span class="di">✉</span>${t('feedback')}<span class="dchev">›</span></div>
     ${storeBadgesHTML()}
     <div class="dwdiv"></div>
-    <div class="dwitem" data-page="privacy"><span class="di">🔒</span>プライバシーポリシー<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="terms"><span class="di">§</span>利用規約<span class="dchev">›</span></div>
-    <div class="dwfoot">Squad XI — build your XI<br>v0.9（プレビュー）</div>`;
+    <div class="dwitem" data-page="privacy"><span class="di">🔒</span>${t('privacy')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-page="terms"><span class="di">§</span>${t('terms')}<span class="dchev">›</span></div>
+    <div class="dwdiv"></div>
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px">🌐 ${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
+    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')}</div>`;
 }
 function wireDrawer(){
   const d=document.getElementById('drawer');
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
-  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?'上書き保存しました':'チームを保存しました'); openDrawer(); } };
-  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast('チームを読み込みました'))); });
-  d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast('削除しました'); });
+  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
+  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded')))); });
+  d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast(t('tstDeleted')); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
-  d.querySelectorAll('[data-storesoon]').forEach(el=>el.onclick=()=>toast('アプリ版は近日公開予定です'));
+  d.querySelectorAll('[data-lang]').forEach(el=>el.onclick=()=>setLang(el.dataset.lang));
+  d.querySelectorAll('[data-storesoon]').forEach(el=>el.onclick=()=>toast(t('appSoon')));
 }
 // 注目移籍カード用：クラブ名 → 国コード(FI)。to が 'フリー'(無所属)のときは旗の代わりに赤丸斜線マーク。
 const TR_CLUB_NAT={
