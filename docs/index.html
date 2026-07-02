@@ -25331,7 +25331,13 @@ const I18N = {
     sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'✈ 全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
-    badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代'
+    badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
+    addChangePhoto:'写真を追加 / 変更', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
+    cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
+    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：',
+    injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
+    allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25353,7 +25359,13 @@ const I18N = {
     sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
     createPlayer:'＋ Create a player', noMatch:'No matching players',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'✈ From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
-    badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player'
+    badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
+    addChangePhoto:'Add / change photo', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
+    cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
+    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ',
+    injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
+    allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -26226,6 +26238,8 @@ Object.assign(BIRTH,{"Abbosbek Fayzullaev|UZB":"2003-10-03","Abdou Aziz Fall|SEN
 function pkey(p){ return keyForPlayer(p); } // 同名・同国籍の別人を一意化したキー（MV/身長/利き足/生年月日マップ用）
 function heightOf(p){ return metaGet(HEIGHT,p)||0; }
 function footOf(p){ return metaGet(FOOT,p)||''; }
+// 利き足の表示ラベル（値は「右/左/両」。日本語は「◯足」、英語は Right/Left/Both foot）
+function footLabel(p){ const f=footOf(p); if(!f)return ''; if(LANG==='en'){ return ({'右':'Right','左':'Left','両':'Both'}[f]||f)+' foot'; } return f+'足'; }
 function birthOf(p){ return metaGet(BIRTH,p)||''; }
 // 同名・同国籍の別人で混入していた個別データ（年齢・身長・利き足・市場価値・生年月日）の補正。
 // 出典: Transfermarkt 各選手プロフィール（所属クラブで本人を特定）。年齢は2026-06-25基準。
@@ -26724,6 +26738,7 @@ function ageFromDOB(dob){
 // 生年月日 → "1999年2月25日"
 function birthLabel(dob){
   const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(dob||''); if(!m)return '';
+  if(LANG==='en'){ const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]; return mo+' '+(+m[3])+', '+(+m[1]); }
   return `${+m[1]}年${+m[2]}月${+m[3]}日`;
 }
 // 全選手の年齢を生年月日から再計算してP[2]へ反映（DOB未取得はスクレイプ時の固定値を維持）
@@ -27120,13 +27135,13 @@ const ICN={
 function openReserveMenu(pid){
   if(!P[pid])return;
   openSheet(`
-    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>ベンチ外</span></h2>
+    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>${t('reserves')}</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
-      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
-      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
     </div>`);
   const _r=document.getElementById('omRename'); if(_r)_r.onclick=()=>openRename(pid);
   body.querySelector('.menu').onclick=e=>{
@@ -27149,6 +27164,8 @@ const NATNAME={ENG:'England',SCO:'Scotland',WAL:'Wales',NIR:'Northern Ireland',I
 const NATJA={ENG:'イングランド',SCO:'スコットランド',WAL:'ウェールズ',NIR:'北アイルランド',IRL:'アイルランド',FRA:'フランス',ESP:'スペイン',GER:'ドイツ',ITA:'イタリア',NED:'オランダ',POR:'ポルトガル',BEL:'ベルギー',BRA:'ブラジル',ARG:'アルゼンチン',URU:'ウルグアイ',COL:'コロンビア',ECU:'エクアドル',PAR:'パラグアイ',VEN:'ベネズエラ',CHI:'チリ',PER:'ペルー',BOL:'ボリビア',MEX:'メキシコ',USA:'アメリカ合衆国',CAN:'カナダ',CRC:'コスタリカ',HON:'ホンジュラス',PAN:'パナマ',JAM:'ジャマイカ',TRI:'トリニダード・トバゴ',HAI:'ハイチ',CUW:'キュラソー',SUR:'スリナム',CPV:'カーボベルデ',COD:'コンゴ民主共和国',CIV:'コートジボワール',GHA:'ガーナ',NGA:'ナイジェリア',SEN:'セネガル',MLI:'マリ',CMR:'カメルーン',MAR:'モロッコ',ALG:'アルジェリア',EGY:'エジプト',TUN:'チュニジア',RSA:'南アフリカ',GAM:'ガンビア',GUI:'ギニア',GNB:'ギニアビサウ',BFA:'ブルキナファソ',MOZ:'モザンビーク',ZIM:'ジンバブエ',ZAM:'ザンビア',ANG:'アンゴラ',GAB:'ガボン',CGO:'コンゴ共和国',BEN:'ベナン',TOG:'トーゴ',EQG:'赤道ギニア',MTN:'モーリタニア',COM:'コモロ',MAD:'マダガスカル',KEN:'ケニア',BDI:'ブルンジ',CTA:'中央アフリカ共和国',DOM:'ドミニカ共和国',FRO:'フェロー諸島',GUF:'フランス領ギアナ',GLP:'グアドループ',IDN:'インドネシア',JOR:'ヨルダン',LBY:'リビア',MAS:'マレーシア',MDA:'モルドバ',NIG:'ニジェール',TAN:'タンザニア',THA:'タイ',SWE:'スウェーデン',NOR:'ノルウェー',DEN:'デンマーク',FIN:'フィンランド',ISL:'アイスランド',SUI:'スイス',AUT:'オーストリア',POL:'ポーランド',CZE:'チェコ',SVK:'スロバキア',SVN:'スロベニア',CRO:'クロアチア',SRB:'セルビア',BIH:'ボスニア・ヘルツェゴビナ',MNE:'モンテネグロ',ALB:'アルバニア',KVX:'コソボ',MKD:'北マケドニア',GRE:'ギリシャ',TUR:'トルコ',HUN:'ハンガリー',ROU:'ルーマニア',BUL:'ブルガリア',UKR:'ウクライナ',RUS:'ロシア',GEO:'ジョージア',ARM:'アルメニア',LVA:'ラトビア',LTU:'リトアニア',EST:'エストニア',BLR:'ベラルーシ',LUX:'ルクセンブルク',CYP:'キプロス',MLT:'マルタ',UZB:'ウズベキスタン',JPN:'日本',KOR:'韓国',CHN:'中国',AUS:'オーストラリア',NZL:'ニュージーランド',IRN:'イラン',ISR:'イスラエル',KSA:'サウジアラビア',QAT:'カタール',PUR:'プエルトリコ',SYR:'シリア',RWA:'ルワンダ',SSD:'南スーダン',MYA:'ミャンマー',PHI:'フィリピン',GUA:'グアテマラ',SLV:'エルサルバドル',SUD:'スーダン',LBR:'リベリア',IRQ:'イラク',GUY:'ガイアナ',YEM:'イエメン',VIN:'セントビンセント・グレナディーン',IND:'インド',ETH:'エチオピア',UGA:'ウガンダ',LCA:'セントルシア',SOM:'ソマリア',SLE:'シエラレオネ',SAM:'サモア',PLE:'パレスチナ',NCA:'ニカラグア',NCL:'ニューカレドニア',MTQ:'マルティニーク',GRN:'グレナダ',ERI:'エリトリア',CHA:'チャド',CAM:'カンボジア',AZE:'アゼルバイジャン',BAN:'バングラデシュ',NAM:'ナミビア',AND:'アンドラ',ARU:'アルバ',CUB:'キューバ',LIB:'レバノン',MWI:'マラウイ',SRI:'スリランカ',BHR:'バーレーン',MRI:'モーリシャス',VIE:'ベトナム',UAE:'アラブ首長国連邦',KAZ:'カザフスタン',HKG:'香港',SGP:'シンガポール',TJK:'タジキスタン',LES:'レソト',OMA:'オマーン',LAO:'ラオス',KGZ:'キルギス',SWZ:'エスワティニ',TLS:'東ティモール',ZAN:'ザンジバル',BOT:'ボツワナ',BRU:'ブルネイ',AFG:'アフガニスタン',TPE:'チャイニーズタイペイ'};
 // 国籍コード→日本語名（無ければ英語名→コードの順でフォールバック）。検索フィルタの表示はこちらを使う。
 function natJa(c){ return NATJA[c]||NATNAME[c]||c; }
+// 国籍名の表示（英語UIなら NATNAME、それ以外は natJa の日本語）
+function natDisp(c){ return (LANG==='en' && NATNAME[c]) ? NATNAME[c] : natJa(c); }
 // 検索クエリ/対象の正規化：小文字化＋ひらがな→カタカナ（「ぶらじる」でも「ブラジル」にヒット）
 function natNorm(s){ return (s||'').toLowerCase().replace(/[ぁ-ゖ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60)); }
 // 発音記号を畳む（João→joao, São→sao, Atlético→atletico 等）。検索をローマ字でもヒットさせる。
@@ -27172,15 +27189,15 @@ function natOptionsHTML(q){
   // 日本語名（かな正規化）・英語名・コードのいずれかにヒットすれば一致（例: "Japan"でも"日本"でも"JPN"でもOK）
   const m=c=>!q||natNorm(NATJA[c]||'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase().includes(q);
   const top=NAT_TOP.filter(c=>present.has(c)&&m(c));
-  const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=>natJa(a).localeCompare(natJa(b),'ja'));
-  const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${natJa(c)}</span></div>`;
-  let h=`<div class="natrow allrow" data-nat="ALL">すべての国</div>`;
-  if(top.length) h+=`<div class="natsec">FIFAランキング上位20</div>`+top.map(row).join('');
-  if(rest.length) h+=`<div class="natsec">その他（五十音）</div>`+rest.map(row).join('');
-  if(!top.length&&!rest.length) h+=`<div class="empty-msg" style="padding:14px">該当なし</div>`;
+  const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=> LANG==='en' ? (NATNAME[a]||a).localeCompare(NATNAME[b]||b) : natJa(a).localeCompare(natJa(b),'ja'));
+  const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${natDisp(c)}</span></div>`;
+  let h=`<div class="natrow allrow" data-nat="ALL">${t('allCountries')}</div>`;
+  if(top.length) h+=`<div class="natsec">${t('fifaTop20')}</div>`+top.map(row).join('');
+  if(rest.length) h+=`<div class="natsec">${t('natOthers')}</div>`+rest.map(row).join('');
+  if(!top.length&&!rest.length) h+=`<div class="empty-msg" style="padding:14px">${t('noneFound')}</div>`;
   return h;
 }
-function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>🏳 ${on?natJa(f.nat):'国籍'} ▾</div>`; }
+function natChipHTML(f){ const on=f.nat&&f.nat!=='ALL'; return `<div class="fchip natchip${on?' on':''}" data-natchip>🏳 ${on?natDisp(f.nat):t('natLabel')} ▾</div>`; }
 function natFilterHTML(f){ return `<div class="natwrap" data-natscope><div class="filters">${natChipHTML(f)}</div><div class="natpanel" data-natpanel style="display:none"></div></div>`; }
 function attachNatFilter(scope,f,redraw){
   if(!scope)return;
@@ -27232,20 +27249,20 @@ function openSlotMenu(i){
   const s=state.slots[i];
   const p=P[s.pid];
   const isCapt=state.captain===s.pid;
-  const subLabel=s.sub!=null&&P[s.sub] ? '第二候補：'+nameOf(s.sub,true) : '第二候補を選ぶ';
+  const subLabel=s.sub!=null&&P[s.sub] ? t('subLabelPrefix')+nameOf(s.sub,true) : t('secondChoice');
   openSheet(`
     <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">✎</span></span> <span>${s.role}</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
-      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>この選手の画像をネット検索</div>
-      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
-      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
+      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
       <div class="mitem" data-act="sub"><div class="mi">${ICN.sub}</div>${subLabel}</div>
-      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(s.pid):_ICN_GOLDLOCK}</div>
-      <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?'キャプテンを解除':'キャプテンに指定'}</div>
-      <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>スタメンから外す</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(s.pid):_ICN_GOLDLOCK}</div>
+      <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?t('captainOff'):t('captainOn')}</div>
+      <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromXI')}</div>
     </div>`);
   const _smr=document.getElementById('smRename'); if(_smr)_smr.onclick=()=>openRename(s.pid);
   body.querySelector('.menu').onclick=e=>{
@@ -27271,20 +27288,20 @@ function openMarkMenu(pid){
     const m=markOf(pid);
     const cardChip=(v,label)=>{ const on=(v==='Y')?m.yc>0:(v==='R')?!!m.red:(!m.yc&&!m.red); return `<div class="fchip${on?' on':''}" data-card="${v}">${label}</div>`; };
     openSheet(`
-      <h2>負傷・カード <span>${nameOf(pid,true)}</span></h2>
+      <h2>${t('injCard')} <span>${nameOf(pid,true)}</span></h2>
       <div class="detail" style="padding:4px 16px calc(env(safe-area-inset-bottom) + 18px)">
-        <div style="font-weight:800;color:var(--ink);margin:8px 0 6px">負傷</div>
+        <div style="font-weight:800;color:var(--ink);margin:8px 0 6px">${t('injury')}</div>
         <div class="filters" style="overflow:visible"><div class="fchip${m.inj?' on':''}" data-inj="1"><span style="display:inline-block;width:13px;height:13px;border-radius:50%;background:#fff;border:1.5px solid #e5384d;position:relative;vertical-align:-2px;margin-right:6px"><span style="position:absolute;left:50%;top:50%;width:7px;height:2px;background:#e5384d;transform:translate(-50%,-50%)"></span><span style="position:absolute;left:50%;top:50%;width:2px;height:7px;background:#e5384d;transform:translate(-50%,-50%)"></span></span>${m.inj?'ON':'OFF'}</div></div>
-        <div style="font-weight:800;color:var(--ink);margin:16px 0 6px">カード <span style="font-size:11px;color:var(--mut);font-weight:600">（イエロー／レッドは同時不可）</span></div>
-        <div class="filters" style="overflow:visible">${cardChip('','なし')}${cardChip('Y','イエロー')}${cardChip('R','レッド')}</div>
-        ${m.yc>0?`<div style="font-weight:800;color:var(--ink);margin:16px 0 8px">イエロー枚数（最大15）</div>
+        <div style="font-weight:800;color:var(--ink);margin:16px 0 6px">${t('cards')} <span style="font-size:11px;color:var(--mut);font-weight:600">${t('cardsNote')}</span></div>
+        <div class="filters" style="overflow:visible">${cardChip('',t('cNone'))}${cardChip('Y',t('cYellow'))}${cardChip('R',t('cRed'))}</div>
+        ${m.yc>0?`<div style="font-weight:800;color:var(--ink);margin:16px 0 8px">${t('ycCount')}</div>
           <div style="display:flex;align-items:center;justify-content:center;gap:20px">
             <button class="bigbtn ghost" data-yc="-1" style="width:56px;font-size:22px">−</button>
             <div style="font-size:30px;font-weight:800;min-width:44px;text-align:center;color:#f4c81f">${m.yc}</div>
             <button class="bigbtn ghost" data-yc="1" style="width:56px;font-size:22px">＋</button>
           </div>
-          <div style="font-size:11px;color:var(--mut);text-align:center;margin-top:8px">2枚以上で四角の右上に ×枚数 を表示</div>`:''}
-        <button class="bigbtn ghost" id="mkClose" style="margin-top:20px">閉じる</button>
+          <div style="font-size:11px;color:var(--mut);text-align:center;margin-top:8px">${t('ycHint')}</div>`:''}
+        <button class="bigbtn ghost" id="mkClose" style="margin-top:20px">${t('close')}</button>
       </div>`);
     body.querySelector('.detail').onclick=e=>{
       const inj=e.target.closest('[data-inj]'); if(inj){ setMark(pid,{inj:markOf(pid).inj?0:1}); render(); draw(); return; }
@@ -27303,15 +27320,15 @@ function openMarkMenu(pid){
 function openBenchMenu(pid){
   if(!P[pid])return;
   openSheet(`
-    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>控え</span></h2>
+    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">✎</span></span> <span>${t('subsWord')}</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>選手を入れ替える</div>
-      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>チーム外の選手と交代</div>
-      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>メモを編集${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>負傷・カード${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
-      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>選手の詳細を見る</div>
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>写真を追加 / 変更</div>
-      <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>ベンチから外す</div>
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
+      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
+      <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>${t('removeFromBench')}</div>
     </div>`);
   const _r=document.getElementById('bmRename'); if(_r)_r.onclick=()=>openRename(pid);
   body.querySelector('.menu').onclick=e=>{
@@ -27633,21 +27650,21 @@ function openDetail(pid,slotIdx){
   const inBench=state.bench.includes(pid);
   let actions;
   if(slotIdx!=null){
-    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
-      <button class="bigbtn ghost" id="dChange">この選手を変更 / 移籍</button>
-      <button class="bigbtn ghost" id="dRemove">スタメンから外す</button>`;
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} ${t('addChangePhoto')}</button>
+      <button class="bigbtn ghost" id="dChange">${t('changeTransfer')}</button>
+      <button class="bigbtn ghost" id="dRemove">${t('removeFromXI')}</button>`;
   }else if(inSquad){
-    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
-      <button class="bigbtn ghost" disabled style="opacity:.5">すでにスタメン起用中</button>`;
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} ${t('addChangePhoto')}</button>
+      <button class="bigbtn ghost" disabled style="opacity:.5">${t('alreadyInXI')}</button>`;
   }else{
-    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} 写真を追加 / 変更</button>
-      <button class="bigbtn" id="dAdd">スタメンに入れる</button>`+
+    actions=`<button class="bigbtn" id="dPhoto">${ICN.photo} ${t('addChangePhoto')}</button>
+      <button class="bigbtn" id="dAdd">${t('addToXIBtn')}</button>`+
       (inBench
-        ? `<button class="bigbtn ghost" id="dUnbench">ベンチから外す</button>`
-        : `<button class="bigbtn ghost" id="dBench">ベンチ（控え）に加える</button>`);
+        ? `<button class="bigbtn ghost" id="dUnbench">${t('removeFromBench')}</button>`
+        : `<button class="bigbtn ghost" id="dBench">${t('addToBenchBtn')}</button>`);
   }
   openSheet(`
-    <h2>選手プロフィール</h2>
+    <h2>${t('playerProfile')}</h2>
     <div class="detail">
       <div class="dhead">
         <div class="davatar${ph?' photo':''}"${ph?` style="background-image:url('${ph}')"`:''}>${SIL}</div>
@@ -27657,15 +27674,15 @@ function openDetail(pid,slotIdx){
         </div>
       </div>
       <div class="dgrid">
-        <div class="dcell"><div class="dk">ポジション</div><div class="dv">${p[1]}</div></div>
-        <div class="dcell"><div class="dk">年齢</div><div class="dv">${p[2]}<small style="font-size:13px"> 歳</small></div>${birthOf(p)?`<div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${birthLabel(birthOf(p))}</div>`:''}</div>
-        <div class="dcell"><div class="dk">身長</div><div class="dv">${heightOf(p)?heightOf(p)+'<small style="font-size:13px"> cm</small>':'<span style="font-size:17px;color:var(--mut)">–</span>'}</div></div>
-        <div class="dcell"><div class="dk">利き足</div><div class="dv" style="font-size:18px">${footOf(p)?footOf(p)+'足':'<span style="font-size:17px;color:var(--mut)">–</span>'}</div></div>
-        <div class="dcell"><div class="dk">リーグ</div><div class="dv" style="font-size:17px">${L[p[5]]}</div></div>
-        <div class="dcell"><div class="dk">国籍</div><div class="dv" style="font-size:17px">${flagHTML(p[3])}</div></div>
+        <div class="dcell"><div class="dk">${t('dkPos')}</div><div class="dv">${p[1]}</div></div>
+        <div class="dcell"><div class="dk">${t('dkAge')}</div><div class="dv">${p[2]}${LANG==='en'?'':'<small style="font-size:13px"> 歳</small>'}</div>${birthOf(p)?`<div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${birthLabel(birthOf(p))}</div>`:''}</div>
+        <div class="dcell"><div class="dk">${t('dkHeight')}</div><div class="dv">${heightOf(p)?heightOf(p)+'<small style="font-size:13px"> cm</small>':'<span style="font-size:17px;color:var(--mut)">–</span>'}</div></div>
+        <div class="dcell"><div class="dk">${t('dkFoot')}</div><div class="dv" style="font-size:18px">${footOf(p)?footLabel(p):'<span style="font-size:17px;color:var(--mut)">–</span>'}</div></div>
+        <div class="dcell"><div class="dk">${t('dkLeague')}</div><div class="dv" style="font-size:17px">${lgName(p[5])}</div></div>
+        <div class="dcell"><div class="dk">${t('dkNat')}</div><div class="dv" style="font-size:17px">${flagHTML(p[3])}</div></div>
       </div>
       ${actions}
-      <button class="bigbtn ghost" id="dSearch">${ICN.search} この選手の画像をネット検索</button>
+      <button class="bigbtn ghost" id="dSearch">${ICN.search} ${t('webSearchPhoto')}</button>
     </div>`);
   const $=id=>document.getElementById(id);
   if($('dRename'))$('dRename').onclick=()=>openRename(pid);
@@ -27689,7 +27706,7 @@ function addToXI(pid){
 function showModeBar(text){
   let b=document.getElementById('modebar');
   if(!b){ b=document.createElement('div'); b.id='modebar'; b.className='modebar'; document.body.appendChild(b); }
-  b.innerHTML='<span></span><button type="button">キャンセル</button>';
+  b.innerHTML='<span></span><button type="button">'+t('cancel')+'</button>';
   b.querySelector('span').textContent=text;
   b.querySelector('button').onclick=cancelMarketMode;
   b.style.display='flex';
@@ -27697,12 +27714,12 @@ function showModeBar(text){
 function hideModeBar(){ const b=document.getElementById('modebar'); if(b)b.style.display='none'; }
 function cancelMarketMode(){ const was=(mktPlace!=null||mktBenchSwap!=null); mktPlace=null; mktBenchSwap=null; hideModeBar(); if(was){ render(); toast('キャンセルしました'); } }
 // スタメンに入れる：11枠を点滅→タップした枠に配置
-function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); mktPlace=pid; closeSheet(); render(); showModeBar('入れたいポジションをタップ（11枠が点滅中）'); }
+function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); mktPlace=pid; closeSheet(); render(); showModeBar(t('modePlaceXI')); }
 function placeMarketIntoSlot(i){ const pid=mktPlace; mktPlace=null; hideModeBar(); state.bench=state.bench.filter(x=>x!==pid); assign(i,pid); }
 // ベンチに加える：空きがあれば自動配置、満杯なら控え全員を点滅→タップした控えと交代
 function startMarketBench(pid){ swapSel=null; mktPlace=null; mktBenchSwap=null; hideModeBar();
   if(state.bench.filter(b=>!inXI(b)).length<15){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(squadShortName(pid)+' をベンチに加えました'); return; }
-  mktBenchSwap=pid; closeSheet(); render(); showModeBar('交代する控えをタップ（控えが点滅中）');
+  mktBenchSwap=pid; closeSheet(); render(); showModeBar(t('modeSwapSub'));
 }
 function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; hideModeBar();
   if(pid===targetPid){ render(); return; }
