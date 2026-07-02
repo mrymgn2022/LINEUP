@@ -28676,9 +28676,11 @@ const CLUB_JA={
 };
 // クラブ名の表示（日本語UIかつJリーグのクラブなら日本語表記、それ以外はデータ通りのローマ字）
 function dispClub(club){ const c=(club||'').trim(); return (LANG==='ja'&&CLUB_JA[c])?CLUB_JA[c]:club; }
-function shortClub(name){
+// クラブ名の短縮表示。日本語UIのJリーグは日本語クラブ名、それ以外はローマ字短縮。
+function shortClub(name){ const n=(name||'').trim(); if(!n) return n; if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n]; return shortClubRomaji(n); }
+// ローマ字クラブ名の短縮（言語非依存。自動クラブメモの判定比較にも使う）
+function shortClubRomaji(name){
   const n=(name||'').trim(); if(!n) return n;
-  if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n]; // 日本語UIのJリーグ＝日本語クラブ名（ローマ字短縮はしない）
   if(CLUB_SHORT[n]) return CLUB_SHORT[n];
   let s=n;
   s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AFC|AC|AS|SSC|SS|SL|SC|SV|SG|SpVgg|SSV|FSV|TSV|VfB|VfL|TSG|BSC|RB|RC|RCD|CD|CA|CF|UD|SD|US|UC|OGC|LOSC|KAA|KRC|GNK|NK|FK)\s+/,''); // 接頭の種別語
@@ -28700,7 +28702,7 @@ function autoFillClubMemosForNat(){
   if(!state.flagByLeague) return;
   if(!state.memos) state.memos={};
   const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); const club=(P[pid][4]||'').trim(); if(!club)return;
-    const cur=state.memos[k]; if(cur===undefined||cur===club) state.memos[k]=shortClub(club); }; // 未設定 or 旧フル表記(自動)のみ短縮版へ。手入力メモは保持
+    const cur=state.memos[k]; if(cur===undefined||cur===club||cur===CLUB_JA[club]||cur===shortClubRomaji(club)) state.memos[k]=shortClub(club); }; // 未設定 or 自動クラブメモ(生/日本語/ローマ字短縮)のみ現在言語の表記へ。手入力メモは保持
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
@@ -28708,7 +28710,7 @@ function autoFillClubMemosForNat(){
 // 国籍縛りチームで付いたクラブ名メモが、別チーム（クラブ編成など）に持ち越されて誤表示されるのを防ぐ。
 function clearAutoClubMemos(){
   if(!state.memos) return;
-  for(const k in state.memos){ const pid=keyToPid(k); if(pid==null||!P[pid])continue; const club=(P[pid][4]||'').trim(); if(state.memos[k]===club||state.memos[k]===shortClub(club)) delete state.memos[k]; } // フル表記/短縮どちらの自動メモも掃除
+  for(const k in state.memos){ const pid=keyToPid(k); if(pid==null||!P[pid])continue; const club=(P[pid][4]||'').trim(); if(state.memos[k]===club||state.memos[k]===shortClub(club)||state.memos[k]===CLUB_JA[club]||state.memos[k]===shortClubRomaji(club)) delete state.memos[k]; } // 生/日本語/ローマ字短縮どの自動メモも掃除
 }
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
 function autoFillNationality(code,form,name){
