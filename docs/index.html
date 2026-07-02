@@ -25375,7 +25375,15 @@ const I18N = {
     legPos:'ポジション名', legPosD:'駒の下の役職表示を ON/OFF', legSub:'第2候補', legSubD:'控え候補の表示を ON/OFF',
     helpTipLabel:'ヒント', helpTipBody:'未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。',
     previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー',
-    fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok'
+    fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok',
+    backupTitle:'バックアップ', bkWarn:'⚠ 作ったチーム・スカッド・写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
+    bkExport:'⤓ バックアップを書き出す', bkImport:'⤒ バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
+    bkIosTitle:'iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式', bkIosHelp:'ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。',
+    bkTextPh:'ここにバックアップのテキストを貼り付けて「テキストから復元」を押す', bkCopyOut:'⧉ 現在のデータをテキストで出す（コピー）', bkTextRestore:'↺ 上のテキストから復元', bkTextHelp:'「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。',
+    fbBody:'未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。', fbMailBtn:'✉ support@squadxi.futbol にメール', fbFallback:'ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。',
+    premTitle:'プレミアム（近日公開）', premBody:'負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。',
+    limitTitle:'保存できる上限です', goUnlimited:'無制限プランにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいチームを保存できます', noSavedTeams:'保存済みのチームはありません',
+    seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25441,7 +25449,15 @@ const I18N = {
     legPos:'Position labels', legPosD:'Toggle the role labels under tokens', legSub:'Second choice', legSubD:'Toggle the backup-player display',
     helpTipLabel:'Tip', helpTipBody:'If you try to create a new team with unsaved changes, you’ll be asked to confirm. Even if you forget to save, closing the app lets you pick up where you left off next time.',
     previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link',
-    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok'
+    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
+    backupTitle:'Backup', bkWarn:'⚠ Your teams, squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
+    bkExport:'⤓ Export backup', bkImport:'⤒ Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
+    bkIosTitle:'If it doesn’t work in the iPhone home-screen app<br>= copy & paste method', bkIosHelp:'Home-screen apps sometimes can’t use file pickers (an iOS limitation). Use this instead — no file needed, so it always works.',
+    bkTextPh:'Paste your backup text here, then press “Restore from text”', bkCopyOut:'⧉ Export data as text (copy)', bkTextRestore:'↺ Restore from the text above', bkTextHelp:'Press “Copy”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from text”.',
+    fbBody:'For requests to add a player who isn’t listed, or to report a bug or suggest an improvement, feel free to email us below.', fbMailBtn:'✉ Email support@squadxi.futbol', fbFallback:'If the button doesn’t open, email <b style="color:var(--ink)">support@squadxi.futbol</b> directly.',
+    premTitle:'Premium (coming soon)', premBody:'Injury / card markers, unlimited saved teams, ad-free and more are planned.\nComing soon as a Premium plan.',
+    limitTitle:'Save limit reached', goUnlimited:'Go unlimited', deleteToFree:'Delete a saved team to free space', deleteSaved:'Delete saved teams', deleteSavedHint:'Delete some to save a new team', noSavedTeams:'No saved teams',
+    seeHowTo:'See how to use', noAnnounce:'No announcements yet.'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -27909,10 +27925,15 @@ document.getElementById('btnLoad').onclick=()=>newTeamFlow();
    ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
    メニュー「お知らせ」で過去分も全件閲覧できる。空配列ならポップアップ無し。body は \n で改行可。 */
 const ANNOUNCEMENTS = [
-  { id:'2026-07-01-welcome', date:'2026/7/1', title:'Squad XI へようこそ ⚽',
+  { id:'2026-07-01-welcome', date:'2026/7/1',
+    title:'Squad XI へようこそ ⚽', titleEn:'Welcome to Squad XI ⚽',
     body:'はじめての方は、下の「使い方を見る」から基本の流れ（フォーメーション → 選手を配置 → 画像でシェア）を確認できます。メニューの「使い方」からいつでも見られます。',
+    bodyEn:'New here? Tap “See how to use” below to learn the basics: formation → place players → share as an image. You can open it anytime from “How to use” in the menu.',
     action:'help' }
 ];
+// お知らせの表示用タイトル/本文（英語UIなら titleEn/bodyEn があればそれを使う）
+function annTitle(a){ return (LANG==='en'&&a&&a.titleEn)?a.titleEn:((a&&a.title)||''); }
+function annBody(a){ return (LANG==='en'&&a&&a.bodyEn)?a.bodyEn:((a&&a.body)||''); }
 function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNOUNCEMENTS[0]:null; }
 // 新しいお知らせは自動ポップアップを「1回だけ」（表示した時点で既読扱い→再起動で再表示しない）。以後はメニューの未読ドットで気づける。
 function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_popped')===a.id) return; lsSet('xi_announce_popped', a.id); openAnnouncement(a); }catch(e){} }
@@ -27922,9 +27943,9 @@ function openAnnouncement(a){
   a=a||latestAnnouncement(); if(!a) return;
   const w=document.getElementById('annwrap'); if(!w) return;
   w.innerHTML=`<div class="anncard">
-    <div class="annhead"><div class="anndate">${escAttr(a.date||'お知らせ')}</div><div class="anntitle">${escAttr(a.title||'')}</div></div>
-    <div class="annbody">${escAttr(a.body||'')}</div>
-    <div class="annbtns">${a.action==='help'?'<button class="bigbtn" id="annHelp">使い方を見る</button>':''}<button class="bigbtn ${a.action==='help'?'ghost':''}" id="annLater">閉じる</button></div>
+    <div class="annhead"><div class="anndate">${escAttr(a.date||t('announcements'))}</div><div class="anntitle">${escAttr(annTitle(a))}</div></div>
+    <div class="annbody">${escAttr(annBody(a))}</div>
+    <div class="annbtns">${a.action==='help'?'<button class="bigbtn" id="annHelp">'+t('seeHowTo')+'</button>':''}<button class="bigbtn ${a.action==='help'?'ghost':''}" id="annLater">${t('close')}</button></div>
   </div>`;
   w.classList.add('show'); requestAnimationFrame(()=>w.classList.add('on'));
   document.getElementById('annLater').onclick=closeAnnouncement; // 自動表示は1回だけ（maybeShowAnnouncementで既読管理）
@@ -27938,11 +27959,11 @@ function openAnnouncementList(){
   const body = list.length ? list.map(a=>`
     <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
       <div style="font-size:11px;letter-spacing:1px;color:var(--lime);font-weight:800">${escAttr(a.date||'')}</div>
-      <div style="font-weight:800;color:var(--ink);font-size:15px;margin-top:4px">${escAttr(a.title||'')}</div>
-      ${a.body?`<div style="font-size:13px;color:var(--ink);margin-top:8px;line-height:1.8;white-space:pre-wrap">${escAttr(a.body)}</div>`:''}
+      <div style="font-weight:800;color:var(--ink);font-size:15px;margin-top:4px">${escAttr(annTitle(a))}</div>
+      ${annBody(a)?`<div style="font-size:13px;color:var(--ink);margin-top:8px;line-height:1.8;white-space:pre-wrap">${escAttr(annBody(a))}</div>`:''}
     </div>`).join('')
-    : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;border:1px dashed var(--line);border-radius:13px">お知らせはまだありません。</div>`;
-  openSheet(`<h2>お知らせ</h2><div style="padding:4px 0 calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
+    : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;border:1px dashed var(--line);border-radius:13px">${t('noAnnounce')}</div>`;
+  openSheet(`<h2>${t('announcements')}</h2><div style="padding:4px 0 calc(env(safe-area-inset-bottom) + 20px)">${body}</div>`);
 }
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
@@ -28272,24 +28293,24 @@ function importBackup(file){
 }
 function openBackup(){
   const teams=getTeams().length;
-  openSheet(`<h2>バックアップ</h2>
+  openSheet(`<h2>${t('backupTitle')}</h2>
     <div class="detail" style="padding:4px 16px calc(env(safe-area-inset-bottom) + 18px)">
       <div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.8;margin:6px 0 16px">
-        ⚠ 作ったチーム・スカッド・写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。
+        ${t('bkWarn')}
       </div>
-      <button class="bigbtn" id="bkExport">⤓ バックアップを書き出す</button>
-      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 15px;line-height:1.7">今のデータを1ファイルに保存します（保存チーム ${teams}件＋現在のスカッド・写真）。できたファイルは、自分宛メールやGoogleドライブ等に置いて保管を。<br><b style="color:var(--ink)">※先にチームを保存 or 選手を配置していないと、中身が空になり書き出せません。</b></div>
-      <button class="bigbtn ghost" id="bkImport">⤒ バックアップを読み込む</button>
-      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 4px;line-height:1.7">前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。</div>
+      <button class="bigbtn" id="bkExport">${t('bkExport')}</button>
+      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 15px;line-height:1.7">${LANG==='en'?'Saves your current data to one file ('+teams+' saved teams + the current squad and photos). Keep the file by emailing it to yourself, on Google Drive, etc.<br><b style="color:var(--ink)">※ If you haven’t saved a team or placed players yet, there’s nothing to export.</b>':'今のデータを1ファイルに保存します（保存チーム '+teams+'件＋現在のスカッド・写真）。できたファイルは、自分宛メールやGoogleドライブ等に置いて保管を。<br><b style="color:var(--ink)">※先にチームを保存 or 選手を配置していないと、中身が空になり書き出せません。</b>'}</div>
+      <button class="bigbtn ghost" id="bkImport">${t('bkImport')}</button>
+      <div style="font-size:11.5px;color:var(--mut);margin:7px 2px 4px;line-height:1.7">${t('bkImportHelp')}</div>
       <input type="file" id="bkFile" accept="application/json,.json" style="display:none">
       <div style="height:1px;background:var(--line);margin:17px 0 12px"></div>
-      <div style="font-size:12.5px;color:var(--ink);font-weight:800;margin:0 2px 5px">iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式</div>
-      <div style="font-size:11.5px;color:var(--mut);margin:0 2px 9px;line-height:1.7">ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。</div>
-      <textarea id="bkText" placeholder="ここにバックアップのテキストを貼り付けて「テキストから復元」を押す" style="width:100%;box-sizing:border-box;height:76px;font-size:11px;line-height:1.5;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);padding:9px 11px;resize:vertical"></textarea>
-      <button class="bigbtn ghost" id="bkCopyOut" style="margin-top:9px">⧉ 現在のデータをテキストで出す（コピー）</button>
-      <button class="bigbtn ghost" id="bkTextRestore" style="margin-top:9px">↺ 上のテキストから復元</button>
-      <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.7">「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。</div>
-      <button class="bigbtn ghost" id="bkClose" style="margin-top:18px">閉じる</button>
+      <div style="font-size:12.5px;color:var(--ink);font-weight:800;margin:0 2px 5px">${t('bkIosTitle')}</div>
+      <div style="font-size:11.5px;color:var(--mut);margin:0 2px 9px;line-height:1.7">${t('bkIosHelp')}</div>
+      <textarea id="bkText" placeholder="${escAttr(t('bkTextPh'))}" style="width:100%;box-sizing:border-box;height:76px;font-size:11px;line-height:1.5;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);padding:9px 11px;resize:vertical"></textarea>
+      <button class="bigbtn ghost" id="bkCopyOut" style="margin-top:9px">${t('bkCopyOut')}</button>
+      <button class="bigbtn ghost" id="bkTextRestore" style="margin-top:9px">${t('bkTextRestore')}</button>
+      <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.7">${t('bkTextHelp')}</div>
+      <button class="bigbtn ghost" id="bkClose" style="margin-top:18px">${t('close')}</button>
     </div>`);
   document.getElementById('bkExport').onclick=exportBackup;
   const fi=document.getElementById('bkFile');
@@ -28308,15 +28329,15 @@ function openInfoPage(kind){
   if(kind==='privacy'){ window.open(LANG==='en'?'privacy.en.html':'privacy.html','_blank','noopener'); return; }
   if(kind==='terms'){ window.open(LANG==='en'?'terms.en.html':'terms.html','_blank','noopener'); return; }
   if(kind==='feedback'){
-    openSheet(`<h2>選手追加依頼・不具合報告</h2>
-      <div style="margin:6px 16px 12px;color:var(--ink);font-size:14px;line-height:1.9">未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。</div>
+    openSheet(`<h2>${t('feedback')}</h2>
+      <div style="margin:6px 16px 12px;color:var(--ink);font-size:14px;line-height:1.9">${t('fbBody')}</div>
       <div style="padding:2px 16px calc(env(safe-area-inset-bottom) + 22px)">
-        <a href="mailto:support@squadxi.futbol" class="bigbtn" style="text-decoration:none;display:block;text-align:center">✉ support@squadxi.futbol にメール</a>
-        <div style="font-size:11.5px;color:var(--mut);margin-top:10px;line-height:1.6">ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。</div>
+        <a href="mailto:support@squadxi.futbol" class="bigbtn" style="text-decoration:none;display:block;text-align:center">${t('fbMailBtn')}</a>
+        <div style="font-size:11.5px;color:var(--mut);margin-top:10px;line-height:1.6">${t('fbFallback')}</div>
       </div>`);
     return;
   }
-  const M={ premium:['プレミアム（近日公開）','負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。'] };
+  const M={ premium:[t('premTitle'),t('premBody')] };
   const m=M[kind]||['',''];
   openSheet(`<h2>${m[0]}</h2><div style="margin:6px 16px 24px;color:var(--ink);font-size:14px;line-height:1.9;white-space:pre-wrap">${escAttr(m[1])}</div>`);
 }
@@ -28375,12 +28396,12 @@ function openConfirmSave(proceed){
 // 保存上限ダイアログ：無制限プラン誘導 ／ 保存済みを削除して空ける
 function openLimitDialog(opts){ opts=opts||{};
   openSheet(`
-    <h2>保存できる上限です</h2>
-    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">無料プランで保存できるのは <b>${FREE_TEAM_LIMIT}チーム</b> までです。<br>無制限にするか、保存済みを削除して空けてください。</div>
+    <h2>${t('limitTitle')}</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${LANG==='en'?'The free plan lets you save up to <b>'+FREE_TEAM_LIMIT+' teams</b>.<br>Go unlimited, or delete a saved team to free up space.':'無料プランで保存できるのは <b>'+FREE_TEAM_LIMIT+'チーム</b> までです。<br>無制限にするか、保存済みを削除して空けてください。'}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
-      <button class="bigbtn" id="ldPremium">無制限プランにする</button>
-      <button class="bigbtn ghost" id="ldDelete">保存済みを削除して空ける</button>
-      <button class="bigbtn ghost" id="ldCancel">キャンセル</button>
+      <button class="bigbtn" id="ldPremium">${t('goUnlimited')}</button>
+      <button class="bigbtn ghost" id="ldDelete">${t('deleteToFree')}</button>
+      <button class="bigbtn ghost" id="ldCancel">${t('cancel')}</button>
     </div>`);
   document.getElementById('ldPremium').onclick=()=>{ openInfoPage('premium'); };
   document.getElementById('ldDelete').onclick=()=>{ openDeleteList(opts); };
@@ -28390,8 +28411,8 @@ function openLimitDialog(opts){ opts=opts||{};
 function openDeleteList(opts){ opts=opts||{};
   const render=()=>{
     const teams=getTeams();
-    const rows = teams.length ? teams.map(t=>`<div class="dwteam" style="margin:4px 16px" data-del2="${t.id}"><div class="tn">${escAttr(t.name||'マイチーム')}<small>${fmtTeamDate(t.ts)} 保存</small></div><div class="dwtrash">${ICN.remove}</div></div>`).join('') : '<div class="dwempty" style="padding:18px">保存済みのチームはありません</div>';
-    openSheet(`<h2>保存済みを削除 <span>${teams.length}/${FREE_TEAM_LIMIT}</span></h2><div style="font-size:12px;color:var(--mut);margin:0 16px 12px">削除すると新しいチームを保存できます</div><div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${rows}</div>`);
+    const rows = teams.length ? teams.map(tm=>`<div class="dwteam" style="margin:4px 16px" data-del2="${tm.id}"><div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div><div class="dwtrash">${ICN.remove}</div></div>`).join('') : '<div class="dwempty" style="padding:18px">'+t('noSavedTeams')+'</div>';
+    openSheet(`<h2>${t('deleteSaved')} <span>${teams.length}/${FREE_TEAM_LIMIT}</span></h2><div style="font-size:12px;color:var(--mut);margin:0 16px 12px">${t('deleteSavedHint')}</div><div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${rows}</div>`);
     document.querySelectorAll('[data-del2]').forEach(el=>el.onclick=()=>{ deleteTeam(el.dataset.del2); toast(t('tstDeleted'));
       if(opts.pending && getTeams().length<teamCap()){ opts.pending(); } else render(); });
   };
