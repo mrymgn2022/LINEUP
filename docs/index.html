@@ -316,6 +316,27 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .dwfoot{margin-top:auto;padding:14px 16px calc(env(safe-area-inset-bottom) + 16px);color:var(--mut);font-size:10px;border-top:1px solid var(--line);line-height:1.6}
 .dwdiv{height:1px;background:var(--line);margin:8px 0}
 
+/* PC・タブレット（iPad含む：横幅768px以上かつ高さ600px以上）＝ハンバーガーメニューを左端に常時表示のサイドバーとしてドッキング。
+   本体とモーダルはサイドバー分だけ右へ寄せて中央配置。スマホ（縦長・狭い画面）は従来どおりスライド式のまま。 */
+@media (min-width:768px) and (min-height:600px){
+  #btnMenu{display:none!important;}                 /* トグル不要 */
+  .dscrim{display:none!important;}                  /* 常時表示なので暗幕なし */
+  .drawer{ left:0!important; width:300px!important; transform:none!important;
+    box-shadow:2px 0 22px rgba(0,0,0,.28); border-right:1px solid var(--line); z-index:40; }
+  .drawer .dwx{display:none!important;}             /* ×不要 */
+  .app{ margin-left:max(300px, calc(50vw - 280px)); margin-right:auto; } /* 残り幅で中央寄せ（狭い時はサイドバー右に接して配置） */
+  .sheet{ left:300px; }                             /* シートもサイドバーを避けて本体と同じ位置で中央寄せ */
+  .toast{ left:calc(50% + 150px); }
+  .modebar{ left:calc(50% + 150px); }
+  /* 常時表示時はできるだけ全項目が1画面に収まるよう余白を少し詰める（収まらない高さではスクロール） */
+  .drawer .dwitem{padding:10px 16px;}
+  .drawer .dwnew{padding:10px 15px;margin:10px 12px 2px;}
+  .drawer .dwsec{padding:10px 16px 4px;}
+  .drawer .dwsave{padding:9px;}
+  .drawer .dwdiv{margin:5px 0;}
+  .drawer .dwfoot{padding:9px 16px calc(env(safe-area-inset-bottom) + 9px);}
+}
+
 /* search + filters */
 .controls{padding:0 16px 8px}
 .search{
@@ -25758,7 +25779,10 @@ function render(){
   renderBench();
   updateTeamTag();
   applyStaticLang();
+  if(isWideDock()){ const dw=document.getElementById('drawer'); if(dw){ dw.innerHTML=drawerHTML(); wireDrawer(); } } // 常時表示サイドバーを状態に同期
 }
+// PC・タブレット判定：この幅/高さではハンバーガーメニューを左端に常時表示（CSSの @media と一致させる）
+function isWideDock(){ try{ return window.matchMedia('(min-width:768px) and (min-height:600px)').matches; }catch(e){ return false; } }
 // 静的ヘッダー/盤面ラベル（render で作り直されない固定DOM）の多言語適用。boot時+言語切替時にrenderから呼ぶ。
 function applyStaticLang(){
   const tset=(id,tip)=>{ const el=document.getElementById(id); if(el) el.title=tip; };
@@ -28465,9 +28489,9 @@ window.addEventListener('pagehide',autoSaveDraft);
     d.style.transform=''; sc.style.opacity='';               // inline解除→現在位置からCSSの開/閉へ滑らかにアニメ
   }
   // 開く：画面左端(<30px)から、本体スクロール領域上で右スワイプ
-  document.addEventListener('pointerdown',e=>{ if(active||d.classList.contains('on'))return; if(e.clientX>30)return; if(!e.target.closest('#scroll'))return; start(true,e); });
+  document.addEventListener('pointerdown',e=>{ if(isWideDock())return; if(active||d.classList.contains('on'))return; if(e.clientX>30)return; if(!e.target.closest('#scroll'))return; start(true,e); });
   // 閉じる：開いているドロワー上で左スワイプ
-  d.addEventListener('pointerdown',e=>{ if(active||!d.classList.contains('on'))return; start(false,e); });
+  d.addEventListener('pointerdown',e=>{ if(isWideDock())return; if(active||!d.classList.contains('on'))return; start(false,e); });
   // 閉じスワイプ直後の誤クリック（チーム読込/新規作成など）を1回だけ無効化
   d.addEventListener('click',e=>{ if(suppress){ e.stopPropagation(); e.preventDefault(); suppress=false; } },true);
 })();
