@@ -25349,7 +25349,14 @@ const I18N = {
     tstSaved2:'保存しました', tstGenerating:'画像を生成中…', tstGenFail:'画像の生成に失敗しました', tstImgSaved:'画像を保存しました', tstImgSavedX:'画像を保存しました。Xの投稿画面に貼り付けてください', tstImgSavedIG:'画像を保存しました。Instagramアプリで投稿してください',
     tstCopied:'コピーしました', tstCopyFail:'コピーできませんでした', tstPlaceFirst:'まず選手を配置してください',
     tstRolesOff:'ポジション名を非表示（名前を大きく表示）', tstRolesOn:'ポジション名を表示', tstFlagsOn:'国旗を表示', tstFlagsOff:'国旗を非表示', tstSubOn:'第2候補を表示', tstSubOff:'第2候補を非表示', tstMemoOn:'メモを表示', tstMemoOff:'メモを非表示',
-    tstAlreadyDefault:'既に既定の配置です', tstResetLayout:'既定の配置に戻しました'
+    tstAlreadyDefault:'既に既定の配置です', tstResetLayout:'既定の配置に戻しました',
+    create:'新規作成', chooseClub:'クラブを選択…', teamName:'チーム名', optional:'任意', egTeamName:'例：レッドドラゴンズ',
+    nameHelp:'未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、日本）が自動で入ります。',
+    autoConds:'自動配置の条件（任意・組み合わせ可）', teamSearch:'チーム検索', teamSearchPh:'チーム名で検索（例：Barcelona、Schalke）', clubLabel:'クラブ',
+    clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
+    clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
+    noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25389,7 +25396,14 @@ const I18N = {
     tstSaved2:'Saved', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved', tstImgSavedX:'Image saved. Paste it into your X post.', tstImgSavedIG:'Image saved. Post it from the Instagram app.',
     tstCopied:'Copied', tstCopyFail:'Could not copy', tstPlaceFirst:'Place some players first',
     tstRolesOff:'Position labels hidden (bigger names)', tstRolesOn:'Position labels shown', tstFlagsOn:'Flags shown', tstFlagsOff:'Flags hidden', tstSubOn:'Second choice shown', tstSubOff:'Second choice hidden', tstMemoOn:'Notes shown', tstMemoOff:'Notes hidden',
-    tstAlreadyDefault:'Already the default layout', tstResetLayout:'Reset to the default layout'
+    tstAlreadyDefault:'Already the default layout', tstResetLayout:'Reset to the default layout',
+    create:'Create a team', chooseClub:'Choose a club…', teamName:'Team name', optional:'optional', egTeamName:'e.g. Red Dragons',
+    nameHelp:'Optional. If you pick only a club or only a nationality, that name (e.g. Arsenal, Japan) is filled in automatically.',
+    autoConds:'Auto-build conditions (optional, combinable)', teamSearch:'Team search', teamSearchPh:'Search by team (e.g. Barcelona, Schalke)', clubLabel:'Club',
+    clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
+    clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
+    noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -25409,6 +25423,11 @@ function tSubSet(n){ return LANG==='en'? n+' set as second choice' : n+' を第�
 function tCreated(n){ return LANG==='en'? n+' created' : n+' を作成しました'; }
 function tFormChanged(f){ return LANG==='en'? 'Formation changed to '+f : 'フォーメーションを '+f+' に変更'; }
 function tRoleChanged(r){ return LANG==='en'? 'Position changed to '+r : 'ポジションを '+r+' に変更'; }
+// 新規作成/自動編成の結果トースト
+function tPlacedCount(label,n){ return LANG==='en'? label+': '+n+' placed' : label+'：'+n+'人を配置'; }
+function tAutoPlaced(label,n,few){ few=few||''; return LANG==='en'? ((label?label+': ':'')+n+' auto-placed'+few) : ((label?label+'：':'')+n+'人を自動配置'+few); }
+function tCreatedEmpty(name){ return LANG==='en'? (name||'Team')+' created (empty formation)' : (name||'チーム')+' を作成（空のフォーメーション）'; }
+function tClubPlaced(club){ return LANG==='en'? club+' — XI, subs & second choices placed' : club+' のスタメン・控え・第二候補を配置しました'; }
 // ── 人気度データ収集（将来この独自指標でTMの市場価値を置き換えるための土台）──
 // 手動保存されたスカッドに入っている選手＝スタメン＋第2候補＋ベンチを、保存のたびに各1回ずつ匿名カウント。
 // 自動配置(MV順)で入った選手も、第2候補(自動サジェスト含む)も数える → 集まる人気度はMV順に近づき、MV→独自データへの移行がなめらか。
@@ -28302,12 +28321,12 @@ function openHelp(){
 function guardUnsaved(proceed){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed); }
 function openConfirmSave(proceed){
   openSheet(`
-    <h2>未保存のスカッド</h2>
-    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">いま編集中のスカッドはまだ保存されていません。保存しますか？</div>
+    <h2>${t('unsavedTitle')}</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('unsavedBody')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
-      <button class="bigbtn" id="csSave">保存して新規作成</button>
-      <button class="bigbtn ghost" id="csSkip">保存せず新規作成</button>
-      <button class="bigbtn ghost" id="csCancel">キャンセル</button>
+      <button class="bigbtn" id="csSave">${t('saveAndNew')}</button>
+      <button class="bigbtn ghost" id="csSkip">${t('skipAndNew')}</button>
+      <button class="bigbtn ghost" id="csCancel">${t('cancel')}</button>
     </div>`);
   document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
   document.getElementById('csSkip').onclick=()=>{ closeSheet(); proceed(); };
@@ -28518,10 +28537,11 @@ function autoFillNationality(code,form,name){
   buildSlots(form,false);
   const ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&natCode(P[i])===code);
   autoFillFrom(ids);
-  state.loadedClub=null; state.teamName=name||natJa(code); state.captain=null; state.teamInfo=null; state.teamCond={nat:code,lg:null}; state.teamId=null;
+  state.loadedClub=null; state.teamName=name||natDisp(code); state.captain=null; state.teamInfo=null; state.teamCond={nat:code,lg:null}; state.teamId=null;
   setFormLabel(); closeSheet(); render(); save();
   const filled=state.slots.filter(s=>s.pid!=null).length;
-  toast((name||natJa(code))+'：'+filled+'人を自動配置'+(filled<11?'（その国の選手が11人未満）':''));
+  const few=filled<11?(LANG==='en'?' (that country has fewer than 11 players)':'（その国の選手が11人未満）'):'';
+  toast(tAutoPlaced(name||natDisp(code),filled,few));
 }
 // 前回の新規作成で選んだソート条件を保持（再度開いたときにリセットしない）
 let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
@@ -28530,7 +28550,7 @@ function startOriginal(){
   let chosenForm=otLast.form||state.formation||'4-3-3';
   let chosenLg=otLast.lg||'ALL';
   let otExpand=lgExpandFor(chosenLg);
-  const POP_ROW='<div class="lgrow2" data-lg="POP">⭐ 人気クラブ</div>';
+  const POP_ROW='<div class="lgrow2" data-lg="POP">'+t('popClubs')+'</div>';
   const otF={lg:chosenLg, expand:otExpand, lgopen:false, lgq:''}; // リーグ選択プルダウン用
   const acf={nat:otLast.nat||'ALL'};
   const formOpts=FORMS.map(f=>`<option value="${f}"${f===chosenForm?' selected':''}>${f}</option>`).join('');
@@ -28539,50 +28559,50 @@ function startOriginal(){
   const POP_CLUBS=["Bayern München","Real Madrid","Paris Saint-Germain","Liverpool","Inter","Manchester City","Arsenal","Barcelona","Bayer Leverkusen","Atlético Madrid","Borussia Dortmund","Chelsea","AS Roma","SL Benfica","Atalanta","Sporting CP","Eintracht Frankfurt","Tottenham","Aston Villa","FC Porto","Manchester United","Fiorentina","Club Brugge KV","Real Betis","Juventus","PSV Eindhoven","Feyenoord Rotterdam","West Ham United","Lille","AC Milan","Olympique Lyon","FK Bodø/Glimt","SC Braga","Napoli","AZ Alkmaar","Olympiacos Piraeus","RB Leipzig","Rangers","Lazio","Villarreal","Ajax Amsterdam","Fenerbahce","Real Sociedad","Freiburg","Shakhtar Donetsk","AS Monaco","FC Copenhagen","Marseille","Galatasaray","FC Viktoria Plzen","Ferencvárosi TC","PAOK Thessaloniki","FC Midtjylland","Union Saint-Gilloise","GNK Dinamo Zagreb","Red Star Belgrade","Red Bull Salzburg","SK Slavia Prague","Celtic","Qarabağ FK","KAA Gent","Sevilla","Athletic Club","AC Sparta Prague","Slovan Bratislava","Stade Rennais","FC Basel","Legia Warszawa","Maccabi Tel Aviv","Djurgårdens IF","Bologna","RSC Anderlecht","Newcastle United","Rapid Vienna","BSC Young Boys","Panathinaikos","KRC Genk","Ludogorets Razgrad","VfB Stuttgart","Lech Poznan","SK Sturm Graz","FCSB","Pafos FC","AEK Athens","Nottingham Forest","Union Berlin","Raków Częstochowa","Rayo Vallecano","Jagiellonia Bialystok","FK Partizan Belgrade","NK Celje","Molde FK","Omonia Nicosia","FC Lugano","LASK","AEK Larnaca","FC Sheriff Tiraspol","OGC Nice","Crystal Palace","Basaksehir FK"];
   // クラブ選択肢。特定リーグ＝そのリーグのクラブ／人気クラブ(POP)＝上位100。先頭はプレースホルダ（未選択＝リーグのみで作成）
   const otClubOptions=(lg)=>{
-    const head='<option value="">クラブを選択…</option>';
+    const head='<option value="">'+t('chooseClub')+'</option>';
     if(lg==='POP') return head+POP_CLUBS.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
     const mem=lgMembers(lg);
     const clubs=[...new Set(P.filter(p=>(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
     return head+clubs.map(c=>`<option value="${escAttr(c)}">${escAttr(c)}</option>`).join('');
   };
   // 「人気クラブ」チップ（全リーグの隣）。タップでクラブ欄に上位100を出す
-  const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">⭐ 人気クラブ</div>`;
+  const popChip=()=>`<div class="fchip ${chosenLg==='POP'?'on':''}" data-pop="1">${t('popClubs')}</div>`;
   // クラブ欄はリーグ/人気クラブを選んで初めて表示。ALL（全リーグ）では非表示
   const updateClubField=()=>{ const f=document.getElementById('otClubField'); if(!f)return; const show=(chosenLg!=='ALL'); f.style.display=show?'':'none'; if(show){ const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg); } };
   openSheet(`
-    <h2>新規作成</h2>
+    <h2>${t('create')}</h2>
     <div class="detail">
       <div class="formfield">
-        <label>チーム名 <i>任意</i></label>
-        <input class="search" id="otName" maxlength="24" placeholder="例：レッドドラゴンズ" value="" autocomplete="off">
-        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、日本）が自動で入ります。</div>
+        <label>${t('teamName')} <i>${t('optional')}</i></label>
+        <input class="search" id="otName" maxlength="24" placeholder="${t('egTeamName')}" value="" autocomplete="off">
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">${t('nameHelp')}</div>
       </div>
       <div class="formfield">
-        <label>フォーメーション</label>
+        <label>${t('formation')}</label>
         <select class="search" id="otForm" style="width:100%">${formOpts}</select>
       </div>
-      <div class="otsep">自動配置の条件（任意・組み合わせ可）</div>
+      <div class="otsep">${t('autoConds')}</div>
       <div class="formfield">
-        <label>チーム検索</label>
-        <input class="search" id="otSearch" placeholder="チーム名で検索（例：Barcelona、Schalke）" autocomplete="off">
+        <label>${t('teamSearch')}</label>
+        <input class="search" id="otSearch" placeholder="${t('teamSearchPh')}" autocomplete="off">
         <div id="otSuggest" class="otsuggest"></div>
       </div>
       <div class="formfield">
-        <label>国籍</label>
+        <label>${t('natLabel')}</label>
         ${natFilterHTML(acf)}
       </div>
       <div class="formfield">
-        <label>リーグ</label>
+        <label>${t('dkLeague')}</label>
         <div id="otLg">${lgSelectHTML(otF, POP_ROW)}</div>
       </div>
       <div class="formfield" id="otClubField" style="display:none">
-        <label>クラブ</label>
+        <label>${t('clubLabel')}</label>
         <select class="search" id="otClub" style="width:100%">${otClubOptions(chosenLg)}</select>
-        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。</div>
+        <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">${t('clubHelp')}</div>
       </div>
-      <div class="filters" style="margin:2px 0 4px"><div class="fchip" id="otClear">× 条件をクリア</div></div>
-      <button class="bigbtn" id="otStart">自動配置 →</button>
-      <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.6">条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。</div>
+      <div class="filters" style="margin:2px 0 4px"><div class="fchip" id="otClear">${t('clearConds')}</div></div>
+      <button class="bigbtn" id="otStart">${t('autoBuild')}</button>
+      <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.6">${t('autoBuildHelp')}</div>
     </div>`);
   document.getElementById('otForm').onchange=e=>{ chosenForm=e.target.value; };
   const _otLgEl=document.getElementById('otLg');
@@ -28596,7 +28616,7 @@ function startOriginal(){
     const q=deaccent(otSearchEl.value.trim()).toLowerCase();
     if(!q){ otSug.innerHTML=''; return; }
     const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)).slice(0,12);
-    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(c)}</div>`).join(''):'<div class="otsug-empty">該当するチームがありません</div>';
+    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(c)}</div>`).join(''):'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
   };
   if(otSug) otSug.onclick=e=>{
     const d=e.target.closest('[data-club]'); if(!d)return;
@@ -28630,7 +28650,7 @@ function startOriginal(){
     let name=typed;
     if(!name){
       if(useClub&&!useNat&&!useLg) name=chosenClub;
-      else if(useNat&&!useClub&&!useLg) name=natJa(acf.nat);
+      else if(useNat&&!useClub&&!useLg) name=natDisp(acf.nat);
     }
     otLast={form:chosenForm,lg:chosenLg,nat:acf.nat,club:chosenClub,name:typed}; // 入力値のみ保持（自動命名は保存しない）
     // クラブ単独指定：最初の画面のクラブ選択と同じ実在編成（控え・ベンチ外・第二候補つき）
@@ -28639,14 +28659,15 @@ function startOriginal(){
       placeClubSquad(chosenClub,name);
       setFormLabel(); closeSheet(); render(); save();
       const filled=state.slots.filter(s=>s.pid!=null).length;
-      toast((name&&name!==chosenClub?name+'（'+chosenClub+'）':chosenClub)+'：'+filled+'人を配置'); return;
+      const clabel=(name&&name!==chosenClub)?(name+(LANG==='en'?' ('+chosenClub+')':'（'+chosenClub+'）')):chosenClub;
+      toast(tPlacedCount(clabel,filled)); return;
     }
     // 条件なし＝空のフォーメーション
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
       state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.teamId=null; state.bench=[];
       setFormLabel(); closeSheet(); render(); save();
-      toast((name||'チーム')+' を作成（空のフォーメーション）'); return;
+      toast(tCreatedEmpty(name)); return;
     }
     // 複数条件は AND（すべて満たす選手だけ）。クラブ＋国籍など組み合わせ可
     const ids=P.map((p,i)=>i).filter(i=>{
@@ -28657,7 +28678,7 @@ function startOriginal(){
       return true;
     });
     if(ids.length===0){ // 該当選手なし：配置せず通知（シートは開いたまま条件を見直せる）
-      toast('条件に合う選手がいません。条件を見直してください'); return;
+      toast(t('tstNoMatchConds')); return;
     }
     buildSlots(chosenForm,false);
     state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null;
@@ -28667,7 +28688,8 @@ function startOriginal(){
     if(useNat&&!useClub&&!useLg){ fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true; } // 国籍のみ：所属クラブ名をメモに自動入力＆表示、旗は所属リーグの国に
     setFormLabel(); closeSheet(); render(); save();
     const filled=state.slots.filter(s=>s.pid!=null).length;
-    toast((name?name+'：':'')+filled+'人を自動配置'+(filled<11?'（条件に合う選手が11人未満）':''));
+    const few=filled<11?(LANG==='en'?' (fewer than 11 match)':'（条件に合う選手が11人未満）'):'';
+    toast(tAutoPlaced(name,filled,few));
   };
 }
 function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -28703,7 +28725,7 @@ function placeClubSquad(club,name){
 }
 function loadClub(club){
   placeClubSquad(club,club);
-  closeSheet();render();save();toast(club+' のスタメン・控え・第二候補を配置しました');
+  closeSheet();render();save();toast(tClubPlaced(club));
 }
 
 /* ---- スカッド分析（スタッツバーをタップ） ---- */
