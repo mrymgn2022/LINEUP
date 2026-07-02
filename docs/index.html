@@ -561,6 +561,17 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   <div class="sp-tag">スタメン11人を組んで、画像でシェアしよう</div>
   <div class="sp-skip">タップしてスキップ</div>
 </div>
+<script>
+/* スプラッシュ（起動アニメ）の言語をパース時に確定。本体JS(I18N/LANG)より前に走るので、英語判定時は日本語が一瞬出ずに英語で表示される。判定ロジックは本体のLANG算出と一致させる。 */
+(function(){try{
+  var s=localStorage.getItem('xi_lang');
+  var en=(s==='en')||(s!=='ja'&&String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')!==0);
+  if(en){
+    var tg=document.querySelector('#splash .sp-tag'); if(tg) tg.textContent='Build your XI and share it as an image';
+    var sk=document.querySelector('#splash .sp-skip'); if(sk) sk.textContent='Tap to skip';
+  }
+}catch(e){}})();
+</script>
 
 <div class="app">
   <header>
