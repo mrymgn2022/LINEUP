@@ -229,7 +229,9 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
 .bcard .bv{font-size:10px;color:var(--mut);font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;min-height:15px}
 .bcard .bv .fi{font-size:15px;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35)}
-.bcard .bclub{font-size:9px;font-weight:700;color:var(--mut);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;line-height:1.1;margin-top:-1px}
+.bcard .bclub{font-size:11px;font-weight:800;color:#7fd3ff;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.bcard .bclub + .bv{min-height:11px}
+.bcard .bclub + .bv .fi{font-size:11px}
 .bcard[data-pid]{touch-action:none}
 .bcard.dragging{opacity:.35}
 .bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:96px}
@@ -25897,8 +25899,8 @@ function renderBench(){
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
       <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
-      <div class="bv">${flagHTMLForPid(pid)}</div>
       ${state.flagByLeague&&(p[4]||'').trim()?`<div class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</div>`:''}
+      <div class="bv">${flagHTMLForPid(pid)}</div>
     </div>`;
   }).join('');
   const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
