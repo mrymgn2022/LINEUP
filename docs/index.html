@@ -25356,7 +25356,12 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成'
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成',
+    createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
+    fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
+    heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
+    editDisplayName:'表示名を編集', origName:'元の名前：', renameHelp:'長い名前の短縮や愛称に変更できます。<br>空のまま保存すると元の名前に戻ります。', save:'保存', resetToOrig:'元の名前に戻す',
+    memoPh:'例）怪我明け / 売却候補 / 新加入', deleteNote:'メモを削除'
   },
   en: {
     newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', saved:'saved',
@@ -25403,7 +25408,12 @@ const I18N = {
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
     clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving'
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving',
+    createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
+    fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
+    heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
+    editDisplayName:'Edit display name', origName:'Original name: ', renameHelp:'Shorten a long name or use a nickname.<br>Save empty to revert to the original.', save:'Save', resetToOrig:'Reset to original',
+    memoPh:'e.g. Back from injury / Up for sale / New signing', deleteNote:'Delete note'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -27615,18 +27625,18 @@ function openCreatePlayer(slotIdx){
   const cf={nat:null}; let selPos=null, selFoot='';
   const posBtns=CP_POS.map(p=>`<div class="fchip2" data-cpos="${p}">${p}</div>`).join('');
   openSheet(`
-    <h2>選手を新規作成</h2>
+    <h2>${t('createPlayerTitle')}</h2>
     <div class="detail">
-      <div style="font-size:11px;color:var(--mut);margin:0 2px 10px;line-height:1.6">未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。</div>
-      <div class="formfield"><label>名前 <i>必須</i></label><input class="search" id="cpName" maxlength="32" placeholder="例：山田 太郎" autocomplete="off"></div>
-      <div class="formfield"><label>ポジション <i>必須</i></label><div class="fchipgrid" id="cpPos">${posBtns}</div></div>
-      <div class="formfield"><label>国籍 <i>必須</i></label>${natFilterHTML(cf)}</div>
-      <div class="formfield"><label>クラブ <i>任意</i></label><input class="search" id="cpClub" maxlength="32" placeholder="所属クラブ（任意）" autocomplete="off"></div>
-      <div class="formfield"><label>年齢 <i>任意</i></label><input class="search" id="cpAge" type="number" inputmode="numeric" min="15" max="50" placeholder="例：24" autocomplete="off"></div>
-      <div class="formfield"><label>身長(cm) <i>任意</i></label><input class="search" id="cpHt" type="number" inputmode="numeric" min="140" max="220" placeholder="例：180" autocomplete="off"><div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">未入力なら、スカッド分析の平均身長の計算から除外されます。</div></div>
-      <div class="formfield"><label>利き足 <i>任意</i></label><div class="fchipgrid" id="cpFoot"><div class="fchip2" data-foot="右">右</div><div class="fchip2" data-foot="左">左</div><div class="fchip2" data-foot="両">両</div></div></div>
-      <button class="bigbtn" id="cpSave">この選手を作成</button>
-      <button class="bigbtn ghost" id="cpCancel">キャンセル</button>
+      <div style="font-size:11px;color:var(--mut);margin:0 2px 10px;line-height:1.6">${t('cpHelp')}</div>
+      <div class="formfield"><label>${t('fieldName')} <i>${t('required')}</i></label><input class="search" id="cpName" maxlength="32" placeholder="${t('egName')}" autocomplete="off"></div>
+      <div class="formfield"><label>${t('dkPos')} <i>${t('required')}</i></label><div class="fchipgrid" id="cpPos">${posBtns}</div></div>
+      <div class="formfield"><label>${t('natLabel')} <i>${t('required')}</i></label>${natFilterHTML(cf)}</div>
+      <div class="formfield"><label>${t('clubLabel')} <i>${t('optional')}</i></label><input class="search" id="cpClub" maxlength="32" placeholder="${t('clubPh')}" autocomplete="off"></div>
+      <div class="formfield"><label>${t('dkAge')} <i>${t('optional')}</i></label><input class="search" id="cpAge" type="number" inputmode="numeric" min="15" max="50" placeholder="${t('egAge')}" autocomplete="off"></div>
+      <div class="formfield"><label>${t('fieldHeightCm')} <i>${t('optional')}</i></label><input class="search" id="cpHt" type="number" inputmode="numeric" min="140" max="220" placeholder="${t('egHeight')}" autocomplete="off"><div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">${t('heightHelp')}</div></div>
+      <div class="formfield"><label>${t('dkFoot')} <i>${t('optional')}</i></label><div class="fchipgrid" id="cpFoot"><div class="fchip2" data-foot="右">${LANG==='en'?'Right':'右'}</div><div class="fchip2" data-foot="左">${LANG==='en'?'Left':'左'}</div><div class="fchip2" data-foot="両">${LANG==='en'?'Both':'両'}</div></div></div>
+      <button class="bigbtn" id="cpSave">${t('createThisPlayer')}</button>
+      <button class="bigbtn ghost" id="cpCancel">${t('cancel')}</button>
     </div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),cf,()=>{});
   document.getElementById('cpPos').onclick=e=>{const c=e.target.closest('[data-cpos]');if(!c)return;selPos=c.dataset.cpos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');};
@@ -27655,14 +27665,14 @@ function openRename(pid){
   const orig=P[pid][0].trim();
   const cur=(state.names&&state.names[pidToKey(pid)])||'';
   openSheet(`
-    <h2>表示名を編集</h2>
+    <h2>${t('editDisplayName')}</h2>
     <div class="controls">
-      <div style="font-size:12px;color:var(--mut);margin:2px 2px 8px">元の名前：${orig}</div>
+      <div style="font-size:12px;color:var(--mut);margin:2px 2px 8px">${t('origName')}${orig}</div>
       <input class="search" id="renameIn" maxlength="24" autocomplete="off" placeholder="${escAttr(orig)}" value="${escAttr(cur)}">
-      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">長い名前の短縮や愛称に変更できます。<br>空のまま保存すると元の名前に戻ります。</div>
+      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">${t('renameHelp')}</div>
     </div>
-    <button class="bigbtn" id="renameSave">保存</button>
-    <button class="bigbtn ghost" id="renameReset">元の名前に戻す</button>`);
+    <button class="bigbtn" id="renameSave">${t('save')}</button>
+    <button class="bigbtn ghost" id="renameReset">${t('resetToOrig')}</button>`);
   const inp=document.getElementById('renameIn');
   setTimeout(()=>{try{inp.focus();}catch(_){}} ,120); // キーボードを出す
   document.getElementById('renameSave').onclick=()=>applyRename(pid,inp.value);
@@ -27679,13 +27689,13 @@ function applyRename(pid,val){
 function openMemo(pid){
   const cur=memoOf(pid);
   openSheet(`
-    <h2>メモを編集 <span>${escAttr(nameOf(pid,true))}</span></h2>
+    <h2>${t('editNote')} <span>${escAttr(nameOf(pid,true))}</span></h2>
     <div class="controls">
-      <input class="search" id="memoIn" maxlength="16" autocomplete="off" placeholder="例）怪我明け / 売却候補 / 新加入" value="${escAttr(cur)}">
-      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">駒の下に表示される短いメモ（最大16文字）。<br>ヘッダーのメモ${ICN.memo}ボタンが点灯しているときに表示されます。</div>
+      <input class="search" id="memoIn" maxlength="16" autocomplete="off" placeholder="${t('memoPh')}" value="${escAttr(cur)}">
+      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">${LANG==='en'?'A short note shown under the token (max 16 chars).<br>Visible when the notes '+ICN.memo+' button in the header is on.':'駒の下に表示される短いメモ（最大16文字）。<br>ヘッダーのメモ'+ICN.memo+'ボタンが点灯しているときに表示されます。'}</div>
     </div>
-    <button class="bigbtn" id="memoSave">保存</button>
-    <button class="bigbtn ghost" id="memoClear">メモを削除</button>`);
+    <button class="bigbtn" id="memoSave">${t('save')}</button>
+    <button class="bigbtn ghost" id="memoClear">${t('deleteNote')}</button>`);
   const inp=document.getElementById('memoIn');
   setTimeout(()=>{try{inp.focus();}catch(_){}} ,120);
   document.getElementById('memoSave').onclick=()=>applyMemo(pid,inp.value);
