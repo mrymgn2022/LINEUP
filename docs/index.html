@@ -25409,7 +25409,7 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', clearTitle:'盤面をリセット', clearBody:'現在表示されているスカッドを削除します。<br>※保存されていないスカッドは復元できません。', clearConfirm:'削除する', saveAndDelete:'保存して削除', tstCleared:'盤面をリセットしました', tstSavedCleared:'保存して削除しました',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', clearTitle:'盤面をリセット', clearBody:'現在表示されているスカッドを削除します。<br>※保存されていないスカッドは復元できません。', clearConfirm:'削除する', saveAndDelete:'保存して削除', tstCleared:'盤面をリセットしました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
@@ -25487,7 +25487,7 @@ const I18N = {
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
     clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', clearTitle:'Clear the board', clearBody:'This deletes the squad currently on the board.<br>Note: an unsaved squad can’t be restored.', clearConfirm:'Delete', saveAndDelete:'Save and delete', tstCleared:'Board cleared', tstSavedCleared:'Saved and cleared',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', clearTitle:'Clear the board', clearBody:'This deletes the squad currently on the board.<br>Note: an unsaved squad can’t be restored.', clearConfirm:'Delete', saveAndDelete:'Save and delete', tstCleared:'Board cleared', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
@@ -25712,6 +25712,18 @@ function openRenameTeam(id){
   const doSave=()=>{ renameTeamInList(id,(inp.value||'').trim()); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstNameUpdated')); };
   document.getElementById('rtSave').onclick=doSave;
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doSave(); } });
+}
+// ハンガーメニューの保存済みスカッド削除：確認してから削除する（誤操作防止）。保存/削除の作法は clearSquad と共通（保存して削除は無し）
+function confirmDeleteTeam(id){
+  openSheet(`
+    <h2>${t('deleteTeamTitle')}</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('clearBody')}</div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="dtOk">${t('clearConfirm')}</button>
+      <button class="bigbtn ghost" id="dtCancel">${t('cancel')}</button>
+    </div>`);
+  document.getElementById('dtOk').onclick=()=>{ deleteTeam(id); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstDeleted')); };
+  document.getElementById('dtCancel').onclick=()=>{ closeSheet(); openDrawer(); };
 }
 // アプリ/画面を閉じる時に「作業中の下書き」だけ同期保存（一覧には足さない）。
 // → 再起動時は最後のスカッドが復元される。保存一覧は手動保存したものだけにしておく（散らからない）。
@@ -28216,7 +28228,7 @@ function wireDrawer(){
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
-  d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast(t('tstDeleted')); });
+  d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDeleteTeam(el.dataset.del); });
   d.querySelectorAll('[data-rename]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); openRenameTeam(el.dataset.rename); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
   d.querySelectorAll('[data-page]').forEach(el=>el.onclick=()=>{ const k=el.dataset.page; closeDrawer(); openInfoPage(k); });
