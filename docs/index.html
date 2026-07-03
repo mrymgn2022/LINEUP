@@ -29056,7 +29056,7 @@ async function buildShareCanvas(){
   const order=rowsV.slice().reverse();                     // 画面 上(FW)→下(GK) の順
   // 盤面と同じ縦密度で配置（盤面アスペクト≒盤面高さ600/ピッチ幅REF405≒1.48を忠実再現）。
   // ハイブリッド：基本は盤面比率のまま。上の行のラベルが下の駒に被る場合だけ、その行間を必要分だけ広げる。
-  const VDENS=kk*6;                                        // y1単位あたりの縦px（盤面高さ≒600px/100 × 倍率kk）
+  const VDENS=kk*5.3;                                      // y1単位あたりの縦px（盤面の縦密度に合わせる。以前のkk*6は行間が広すぎて不格好だった）
   const ryOf=r=>r.slots.reduce((a,s)=>a+s.y,0)/r.slots.length; // 行の代表y（平均）
   const cyOf=[]; { let cy=py+topPad; for(let k=0;k<order.length;k++){ cyOf[k]=cy;
       if(k<order.length-1){ const prop=(ryOf(order[k])-ryOf(order[k+1]))*VDENS, need=rowDrop(order[k])+R+GAPMARGIN; cy+=Math.max(prop,need); } } } // 盤面比率(prop)を基本に、被る所(need)だけ広げる
@@ -29064,8 +29064,9 @@ async function buildShareCanvas(){
   const lastCy=cyOf.length?cyOf[cyOf.length-1]:(py+topPad);
   let ph=Math.max(m(280),Math.round(lastCy-py+botPad)); // ピッチ高さは内容に合わせて可変
   if(!showBench && cyOf.length>1){
-    // ベンチ非表示：縦長ポートレートになるよう行間を均等に引き伸ばし、スタメンで画像全体を埋める
-    const phFill=Math.max(ph, Math.round(W*1.7)-py-92);
+    // ベンチ非表示でも盤面と同じ縦密度を維持する。以前はW*1.7まで引き伸ばして行間がスカスカになり不格好だった。
+    // 盤面ピッチ比率(≒1.42)相当までだけ軽く整える（伸ばしすぎない）。
+    const phFill=Math.max(ph, Math.round(pw*1.2));
     if(phFill>ph){ const top0=py+topPad, span0=lastCy-top0, span1=(py+phFill-botPad)-top0, f=span0>0?span1/span0:1;
       for(let k=0;k<cyOf.length;k++) cyOf[k]=top0+(cyOf[k]-top0)*f; ph=phFill; }
   }
