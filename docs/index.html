@@ -29047,7 +29047,7 @@ async function buildShareCanvas(){
   const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
   // 駒中心から下方向のラベル伸び（盤面実測のベースライン：役職+22 / 名前+36 / メモ+53 / 第2候補は+15刻み。disc縁基準）
-  const dropOf=s=>{ let d=state.hideRoles?(R+m(23)):(R+m(36)); let info=R+(state.hideRoles?m(33):m(53)),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*m(15)); return d; };
+  const dropOf=s=>{ let d=state.hideRoles?(R+m(23)):(R+m(36)); let info=R+(state.hideRoles?m(37):m(57)),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*m(15)); return d; };
   // y が近い駒（差≤11。SB/CB・WB の段差を吸収）は同じ列へ統合。GK(y<16)は必ず単独行に。配列は最小y側=GK(最後尾)→最大y側=FW(最前線)
   const rowsV=[]; filledSlots.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ const last=rowsV[rowsV.length-1]; const sGK=s.y<16, lastGK=last&&last.maxy<16; if(last && !sGK && !lastGK && s.y-last.maxy<=11){ last.slots.push(s); last.maxy=s.y; } else rowsV.push({slots:[s],maxy:s.y}); });
   const NV=rowsV.length;
@@ -29202,7 +29202,7 @@ async function buildShareCanvas(){
     x.fillText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY);
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
-    let infoY=fy+R+(state.hideRoles?m(33):m(53));
+    let infoY=fy+R+(state.hideRoles?m(37):m(57));
     if(state.showMemo){const mt=memoOf(s.pid); if(mt){ x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';
       const mImg=memoFlagOn?flagImgs[FI[dispNatCode(s.pid)]]:null;
       if(mImg){ const fh=Math.round(uniSub*0.82),fw=Math.round(fh*4/3),gp=m(3),tw=x.measureText(mt).width,tot=fw+gp+tw,sx0=fx-tot/2,fyy=(infoY-uniSub*0.34)-fh/2;
