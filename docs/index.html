@@ -25408,7 +25408,7 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
@@ -25486,7 +25486,7 @@ const I18N = {
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
     clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
@@ -28214,7 +28214,7 @@ function wireDrawer(){
   d.querySelector('#dwClose').onclick=closeDrawer;
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
-  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded')))); });
+  d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); deleteTeam(el.dataset.del); openDrawer(); toast(t('tstDeleted')); });
   d.querySelectorAll('[data-rename]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); openRenameTeam(el.dataset.rename); });
   d.querySelectorAll('[data-feat]').forEach(el=>el.onclick=()=>{ const k=el.dataset.feat; closeDrawer(); openFeatured(k); });
@@ -28497,14 +28497,14 @@ function openHelp(){
     </div>`);
 }
 // 未保存の変更があれば確認してから proceed() を実行（新規作成・他チーム読込の前に呼ぶ）
-function guardUnsaved(proceed){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed); }
-function openConfirmSave(proceed){
+function guardUnsaved(proceed,mode){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed,mode); }
+function openConfirmSave(proceed,mode){
   openSheet(`
     <h2>${t('unsavedTitle')}</h2>
     <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('unsavedBody')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
-      <button class="bigbtn" id="csSave">${t('saveAndNew')}</button>
-      <button class="bigbtn ghost" id="csSkip">${t('skipAndNew')}</button>
+      <button class="bigbtn" id="csSave">${t(mode==='load'?'saveAndLoad':'saveAndNew')}</button>
+      <button class="bigbtn ghost" id="csSkip">${t(mode==='load'?'skipAndLoad':'skipAndNew')}</button>
       <button class="bigbtn ghost" id="csCancel">${t('cancel')}</button>
     </div>`);
   document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
