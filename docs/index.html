@@ -87,6 +87,12 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .icon.postog{font-size:11px;font-weight:800;letter-spacing:.5px;font-family:'Bebas Neue',sans-serif}
 .icon.subtog{font-size:12px;font-weight:800;letter-spacing:.2px}
 .icon svg{width:19px;height:19px;display:block}
+/* 幅の狭い端末ではアイコン側を詰めて、ロゴ「Squad XI」をフル表示する（ロゴは省略しない） */
+@media (max-width:430px){
+  header{gap:8px;padding-left:12px;padding-right:12px}
+  header .icon{width:38px}
+  .hbtn{gap:3px}
+}
 
 /* ---------- Formation bar (集約版) ---------- */
 .topbar{display:flex;gap:8px;align-items:stretch;padding:4px 14px 10px;flex-shrink:0}
@@ -331,7 +337,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .drawer{ left:0!important; width:300px!important; transform:none!important;
     box-shadow:2px 0 22px rgba(0,0,0,.28); border-right:1px solid var(--line); z-index:40; }
   .drawer .dwx{display:none!important;}             /* ×不要 */
-  .app{ margin-left:max(300px, calc(50vw - 280px)); margin-right:auto; } /* 残り幅で中央寄せ（狭い時はサイドバー右に接して配置） */
+  .app{ margin-left:max(300px, calc(50vw - 130px)); margin-right:auto; } /* サイドバーを除いた残り領域の中央へ（50vw+150が残り領域の中心、アプリ幅560の半分280を引く。狭い時はサイドバー右に接して配置） */
   .sheet{ left:300px; }                             /* シートもサイドバーを避けて本体と同じ位置で中央寄せ */
   .toast{ left:calc(50% + 150px); }
   .modebar{ left:calc(50% + 150px); }
@@ -25293,6 +25299,8 @@ const NAMEJA={
   'Kaishu Sano':'佐野海舟','Yuito Suzuki':'鈴木唯人','Kaoru Mitoma':'三笘薫','Takefusa Kubo':'久保建英','Zion Suzuki':'鈴木彩艶','Hiroki Ito':'伊藤洋輝','Ritsu Doan':'堂安律','Ayase Ueda':'上田綺世','Ao Tanaka':'田中碧','Daizen Maeda':'前田大然','Kodai Sano':'佐野航大','Daichi Kamada':'鎌田大地','Joel Chima Fujita':'藤田譲瑠チマ','Takumi Minamino':'南野拓実','Tsuyoshi Watanabe':'渡辺剛','Reo Hatate':'旗手怜央','Keisuke Goto':'後藤啓介','Keito Nakamura':'中村敬斗','Ko Itakura':'板倉滉','Hidemasa Morita':'守田英正','Rihito Yamamoto':'山本理仁','Koki Machida':'町田浩樹','Ryotaro Ito':'伊藤涼太郎','Sota Kitano':'北野颯太','Yukinari Sugawara':'菅原由勢','Keita Kosugi':'小杉啓太','Ayumu Seko':'瀬古歩夢','Taichi Fukui':'福井太智','Kota Takai':'高井幸大','Takehiro Tomiyasu':'冨安健洋','Tatsuhiro Sakamoto':'坂本達裕','Wataru Endo':'遠藤航','Shuto Machino':'町野修斗','Taishi Brandon Nozawa':'野澤大志ブランドン','Yohei Takaoka':'高丘陽平','Koki Saito':'斉藤光毅','Junya Ito':'伊東純也','Kuryu Matsuki':'松木玖生','Atsuki Ito':'伊藤敦樹','Yuma Suzuki':'鈴木優磨','Keigo Tsunemoto':'常本佳吾','Taisei Miyashiro':'宮代大聖','Seiya Maikuma':'毎熊晟矢','Koki Ogawa':'小川航基','Shunsuke Mito':'三戸舜介','Tomoki Hayakawa':'早川友基','Ryunosuke Sato':'佐藤龍之介','Yuki Soma':'相馬勇紀','Keisuke Osako':'大迫敬介','Hayao Kawabe':'川辺駿','Sota Kawasaki':'川崎颯太','Ryoya Morishita':'森下龍矢','Tomoki Iwata':'岩田智輝','Kanya Fujimoto':'藤本寛也','Kyogo Furuhashi':'古橋亨梧','Satoshi Tanaka':'田中聡','Anrie Chase':'チェイス・アンリ','Kosei Tani':'谷晃生','Haruya Fujii':'藤井陽也','Yuki Ohashi':'大橋祐紀','Shunki Higashi':'東俊希','Rion Ichihara':'市原吏音','Ayumu Yokoyama':'横山歩夢','Seiji Kimura':'木村誠二','Mao Hosoya':'細谷真大','Yuta Nakayama':'中山雄太','Yasuto Wakizaka':'脇坂泰斗','Hayato Araki':'荒木隼人','Daiki Hashioka':'橋岡大樹','Takuma Asano':'浅野拓磨','Ryoma Watanabe':'渡邊凌磨','Taiyo Koga':'古賀太陽','Sota Miura':'三浦颯太','Kimito Nono':'濃野公人','Takuro Kaneko':'金子拓郎','Ryosuke Kojima':'小島亨介','Kento Tachibanada':'橘田健人','Shinnosuke Nakatani':'中谷進之介','Riku Handa':'半田陸','Shunta Tanaka':'田中駿汰','Tetsushi Yamakawa':'山川哲史','Keisuke Kurokawa':'黒川圭介','Sho Fukuda':'福田師王',
   'Kento Shiogai':'塩貝健人','Leo Kokubo':'小久保玲央ブライアン','Isa Sakamoto':'坂本一彩','Junnosuke Suzuki':'鈴木淳之介','Tomoya Ando':'安藤智哉','Hiroki Akiyama':'秋山裕紀','Taiga Hata':'畑大雅','Taisei Abe':'安部大晴','Hayate Matsuda':'松田隼風','Kazunari Kita':'喜多壱也','Daisuke Yokota':'横田大祐','Yuto Tsunashima':'綱島悠斗','Takahiro Akimoto':'明本考浩','Shunsuke Saito':'齋藤俊輔'
 };
+// 7文字以上の漢字名の盤面用短縮形（無い長名は先頭5文字+…にフォールバック）。フル表記は詳細画面で表示
+const NAMEJA_SHORT={ 'Taishi Brandon Nozawa':'野澤','Leo Kokubo':'小久保','Anrie Chase':'チェイス' };
 // 日本代表(国籍JPN編成)／Jリーグのクラブ編成／Jリーグ(J1・J2・J3)選抜 を作っている時だけ true。この時のみ日本人選手名を漢字表示する。
 function isJTeamContext(){ const tc=state.teamCond;
   if(state.flagByLeague && tc && tc.nat==='JPN') return true;                 // 日本代表
@@ -25335,7 +25343,7 @@ function computeSquadDups(){
 function squadShortName(pid){
   if(pid==null||!P[pid]) return '';
   const c=state.names&&state.names[pidToKey(pid)]; if(c) return c; // ユーザー設定名はそのまま
-  const kj=nameJa(pid); if(kj) return kj; // 日本代表/Jリーグ編成では日本人選手名を漢字
+  const kj=nameJa(pid); if(kj){ if(kj.length<=6) return kj; return NAMEJA_SHORT[P[pid][0].trim()]||(kj.slice(0,5)+'…'); } // 漢字も長い名前は短縮（盤面で隣と重なるため）。詳細画面はnameOf(full)で全文
   if(squadDispName[pid]) return squadDispName[pid];
   return shortName(P[pid][0]);
 }
@@ -25366,13 +25374,13 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    newTeam:'チームを新規作成', savedTeams:'保存したチーム', myTeam:'マイチーム', editing:'編集中・', editingBadge:'編集中', saved:'保存',
-    noSaved:'まだ保存したチームはありません。<br>下の「現在のチームを保存」で追加できます。',
-    saveCurrent:'現在のチームを保存', overwrite:'このチームを上書き保存',
-    featSquad:'注目スカッド', featTransfer:'注目移籍', announcements:'お知らせ', premium:'プレミアム（無制限保存）',
+    newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
+    noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
+    saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
+    featSquad:'注目スカッド', featTransfer:'注目移籍', announcements:'お知らせ', premium:'プレミアム（近日公開）',
     help:'使い方', backup:'バックアップ（書き出し / 読み込み）', feedback:'選手追加依頼・不具合報告',
     privacy:'プライバシーポリシー', terms:'利用規約', close:'閉じる', tagline:'build your XI', preview:'（プレビュー）', language:'言語',
-    tstLoaded:'チームを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'チームを保存しました', appSoon:'アプリ版は近日公開予定です',
+    tstLoaded:'スカッドを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'スカッドを保存しました', appSoon:'アプリ版は近日公開予定です',
     getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
     tipMenu:'メニュー', tipShare:'SNSに共有', tipClear:'盤面をリセット', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'整列リセット',
     formation:'フォーメーション', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示',
@@ -25389,22 +25397,22 @@ const I18N = {
     addChangePhoto:'写真を追加 / 変更', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
-    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'チームから外す', tstRemovedFromTeam:'チームから外しました', addWord:'追加',
+    viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
     tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を保存して「写真を追加」で取り込めます',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした', swapPrompt:'入れ替える相手をタップ（スタメン / ベンチ / ベンチ外）。同じ選手で取消',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
-    tstSubCleared:'第二候補を解除しました', tstCaptainOff:'キャプテンを解除', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
+    tstSubCleared:'第二候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
     tstNameUpdated:'表示名を更新しました', tstMemoSaved:'メモを保存しました', tstMemoDeleted:'メモを削除しました', tstXIFull:'スタメンが11人埋まっています。誰かを外してください', tstCanceled:'キャンセルしました',
     tstNotBackup:'Squad XI のバックアップではありません', tstBackupEmpty:'このバックアップにはデータが入っていません（空かもしれません）', tstRestored:'復元しました。再読み込みします…', tstReadFail:'テキストを読み込めませんでした（内容が壊れている可能性）',
-    tstNoSaveData:'保存データがありません。先にチームを保存してください', tstExported:'バックアップを書き出しました', tstExportFail:'書き出しに失敗しました', tstFileReadFail:'ファイルを読み込めませんでした',
+    tstNoSaveData:'保存データがありません。先にスカッドを保存してください', tstExported:'バックアップを書き出しました', tstExportFail:'書き出しに失敗しました', tstFileReadFail:'ファイルを読み込めませんでした',
     tstCopiedKeep:'コピーしました。メモ等に貼り付けて保管を', tstSelectCopy:'上の枠のテキストを全選択してコピーしてください', tstTextEmpty:'テキストが空です。バックアップを貼り付けてください',
     tstSaved2:'保存しました', tstGenerating:'画像を生成中…', tstGenFail:'画像の生成に失敗しました', tstImgSaved:'画像を保存しました', tstImgSavedX:'画像を保存しました。Xの投稿画面に貼り付けてください', tstImgSavedIG:'画像を保存しました。Instagramアプリで投稿してください',
     tstCopied:'コピーしました', tstCopyFail:'コピーできませんでした', tstPlaceFirst:'まず選手を配置してください',
     tstRolesOff:'ポジション名を非表示（名前を大きく表示）', tstRolesOn:'ポジション名を表示', tstFlagsOn:'国旗を表示', tstFlagsOff:'国旗を非表示', tstSubOn:'第2候補を表示', tstSubOff:'第2候補を非表示', tstMemoOn:'メモを表示', tstMemoOff:'メモを非表示',
     tstAlreadyDefault:'既に既定の配置です', tstResetLayout:'既定の配置に戻しました',
-    create:'新規作成', chooseClub:'クラブを選択…', teamName:'チーム名', optional:'任意', egTeamName:'例：レッドドラゴンズ',
+    create:'新規作成', chooseClub:'クラブを選択…', teamName:'スカッド名', optional:'任意', egTeamName:'例：レッドドラゴンズ',
     nameHelp:'未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、日本）が自動で入ります。',
     autoConds:'自動配置の条件（任意・組み合わせ可）', teamSearch:'チーム検索', teamSearchPh:'チーム名で検索（例：Barcelona、Schalke）', clubLabel:'クラブ',
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
@@ -25421,38 +25429,38 @@ const I18N = {
     helpS2T:'選手を配置する', helpS2D:'空いている駒をタップ → 選手を選びます。名前・ポジション・国籍・リーグ・クラブで絞り込み検索できます。',
     helpS3T:'画像でシェア', helpS3D:'右上の共有ボタンで画像を作成 → X・Instagram に投稿、保存もできます。',
     helpSec2:'もっと使いこなす', helpS4T:'まとめて自動配置', helpS4D:'右上の ＋ から、クラブ・国籍・リーグを選ぶと11人を自動配置。「レアル」「日本代表」なども一発。',
-    helpS5T:'チームを保存・切り替え', helpS5D:'左上メニューで保存（最大10チーム／無制限はプレミアム）。作ったチームの切り替えもここから。',
+    helpS5T:'スカッドを保存・切り替え', helpS5D:'メニューで保存（最大10スカッド／無制限はプレミアム）。作ったスカッドの切り替えもここから。',
     helpS6D:'全選手を市場価値順などで一覧。誰がいるか眺めたり、そのまま起用できます。',
     helpS7T:'選手をカスタム', helpS7D:'駒をタップ → 写真追加・キャプテン・第2候補・メモ・入れ替え。名前は長押しで短縮や愛称に変更。',
     helpS8T:'位置を微調整', helpS8D:'駒を長押ししてドラッグで移動。⟲（整列リセット）でいつでも既定の配置に戻せます。',
-    helpSec3:'画面のボタン', legMenu:'メニュー', legMenuD:'チームの保存・切り替え、各ページ', legNewD:'自動配置でチームを作る', legSearchD:'全選手を一覧から探す', legResetD:'動かした駒を既定の配置へ',
+    helpSec3:'画面のボタン', legMenu:'メニュー', legMenuD:'スカッドの保存・切り替え、各ページ', legNewD:'自動配置でスカッドを作る', legSearchD:'全選手を一覧から探す', legResetD:'動かした駒を既定の配置へ',
     legPos:'ポジション名', legPosD:'駒の下の役職表示を ON/OFF', legSub:'第2候補', legSubD:'控え候補の表示を ON/OFF',
     helpTipLabel:'ヒント', helpTipBody:'未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。',
     previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー',
     fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok',
-    backupTitle:'バックアップ', bkWarn:'⚠ 作ったチーム・スカッド・写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
+    backupTitle:'バックアップ', bkWarn:'⚠ 作ったスカッドや写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
     bkExport:'バックアップを書き出す', bkImport:'バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
     bkIosTitle:'iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式', bkIosHelp:'ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。',
     bkTextPh:'ここにバックアップのテキストを貼り付けて「テキストから復元」を押す', bkCopyOut:'現在のデータをテキストで出す（コピー）', bkTextRestore:'上のテキストから復元', bkTextHelp:'「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。',
     fbBody:'未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。', fbMailBtn:'support@squadxi.futbol にメール', fbFallback:'ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。',
-    premTitle:'プレミアム（近日公開）', premBody:'負傷・カードマーカー、保存チーム無制限、広告非表示などを予定しています。\n近日プレミアムプランで解放予定です。',
-    limitTitle:'保存できる上限です', goUnlimited:'無制限プランにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいチームを保存できます', noSavedTeams:'保存済みのチームはありません',
+    premTitle:'プレミアム（近日公開）', premBody:'プレミアムでは、負傷・カードマーカー、スカッドの無制限保存、広告非表示などを提供予定です。\n公開までもうしばらくお待ちください。',
+    limitTitle:'保存できる上限です', goUnlimited:'プレミアムにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいスカッドを保存できます', noSavedTeams:'保存済みのスカッドはありません',
     seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。',
     featPredicted:'予想', featSquadDesc:'注目試合の予想スタメンを随時更新。', featSquadNote:'※キックオフ24時間前から表示します', featSquadEmpty:'本日の注目試合はありません。<br>キックオフ24時間前から表示されます。',
-    featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※この移籍がデータベースに更新されるまで時間を要する場合があります', featComingSoon:'近日公開予定です。',
+    featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※データベースへの反映まで時間がかかる場合があります', featComingSoon:'近日公開予定です。',
     featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ', freeWord:'フリー',
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
-    newTeam:'Create a team', savedTeams:'Saved teams', myTeam:'My Team', editing:'editing · ', editingBadge:'Editing', saved:'saved',
-    noSaved:'No saved teams yet.<br>Add one with “Save current team” below.',
+    newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
+    noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
-    featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (unlimited saves)',
+    featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (coming soon)',
     help:'How to use', backup:'Backup (export / import)', feedback:'Request a player / Report a bug',
     privacy:'Privacy Policy', terms:'Terms of Use', close:'Close', tagline:'build your XI', preview:' (preview)', language:'Language',
-    tstLoaded:'Team loaded', tstDeleted:'Deleted', tstOverwritten:'Team updated', tstSaved:'Team saved', appSoon:'The app version is coming soon',
+    tstLoaded:'Squad loaded', tstDeleted:'Deleted', tstOverwritten:'Squad updated', tstSaved:'Squad saved', appSoon:'The app version is coming soon',
     getApp:'Get the app', getAppSoon:'App version (coming soon)',
-    tipMenu:'Menu', tipShare:'Share', tipClear:'Clear the board', tipNew:'New team', tipSearch:'Search players', tipReset:'Reset layout',
+    tipMenu:'Menu', tipShare:'Share', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
     formation:'Formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
@@ -25467,7 +25475,7 @@ const I18N = {
     addChangePhoto:'Add / change photo', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
-    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from team', tstRemovedFromTeam:'Removed from the team', addWord:'Add',
+    viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
     tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Save an image, then import it with “Add photo”.',
@@ -25476,13 +25484,13 @@ const I18N = {
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
     tstNameUpdated:'Display name updated', tstMemoSaved:'Note saved', tstMemoDeleted:'Note deleted', tstXIFull:'The XI already has 11. Remove someone first.', tstCanceled:'Canceled',
     tstNotBackup:'This isn’t a Squad XI backup.', tstBackupEmpty:'This backup contains no data (it may be empty).', tstRestored:'Restored. Reloading…', tstReadFail:'Could not read the text (it may be corrupted).',
-    tstNoSaveData:'No saved data. Save a team first.', tstExported:'Backup exported', tstExportFail:'Export failed', tstFileReadFail:'Could not read the file',
+    tstNoSaveData:'No saved data. Save a squad first.', tstExported:'Backup exported', tstExportFail:'Export failed', tstFileReadFail:'Could not read the file',
     tstCopiedKeep:'Copied. Paste it somewhere safe to keep it.', tstSelectCopy:'Select all the text above and copy it.', tstTextEmpty:'The text is empty. Paste your backup.',
     tstSaved2:'Saved', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved', tstImgSavedX:'Image saved. Paste it into your X post.', tstImgSavedIG:'Image saved. Post it from the Instagram app.',
     tstCopied:'Copied', tstCopyFail:'Could not copy', tstPlaceFirst:'Place some players first',
     tstRolesOff:'Position labels hidden (bigger names)', tstRolesOn:'Position labels shown', tstFlagsOn:'Flags shown', tstFlagsOff:'Flags hidden', tstSubOn:'Second choice shown', tstSubOff:'Second choice hidden', tstMemoOn:'Notes shown', tstMemoOff:'Notes hidden',
     tstAlreadyDefault:'Already the default layout', tstResetLayout:'Reset to the default layout',
-    create:'Create a team', chooseClub:'Choose a club…', teamName:'Team name', optional:'optional', egTeamName:'e.g. Red Dragons',
+    create:'Create a squad', chooseClub:'Choose a club…', teamName:'Squad name', optional:'optional', egTeamName:'e.g. Red Dragons',
     nameHelp:'Optional. If you pick only a club or only a nationality, that name (e.g. Arsenal, Japan) is filled in automatically.',
     autoConds:'Auto-build conditions (optional, combinable)', teamSearch:'Team search', teamSearchPh:'Search by team (e.g. Barcelona, Schalke)', clubLabel:'Club',
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
@@ -25499,22 +25507,22 @@ const I18N = {
     helpS2T:'Place players', helpS2D:'Tap an empty spot → pick a player. Filter by name, position, nationality, league or club.',
     helpS3T:'Share as an image', helpS3D:'Use the share button (top-right) to create an image → post to X or Instagram, or save it.',
     helpSec2:'Go further', helpS4T:'Auto-build in one tap', helpS4D:'From ＋ (top-right), pick a club, nationality or league to auto-place 11 players — “Real Madrid”, “Japan” and more in one tap.',
-    helpS5T:'Save & switch teams', helpS5D:'Save from the top-left menu (up to 10 teams; unlimited with Premium). Switch between your teams here too.',
+    helpS5T:'Save & switch squads', helpS5D:'Save from the menu (up to 10 squads; unlimited with Premium). Switch between your squads there too.',
     helpS6D:'Browse all players by market value and more. See who’s available and add them straight in.',
     helpS7T:'Customize players', helpS7D:'Tap a token → add a photo, set captain, second choice, notes, or swap. Long-press the name to shorten it or set a nickname.',
     helpS8T:'Fine-tune positions', helpS8D:'Long-press and drag a token to move it. ⟲ (reset layout) restores the default arrangement anytime.',
-    helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch teams, and all pages', legNewD:'Build a team via auto-place', legSearchD:'Find players from the full list', legResetD:'Return moved tokens to the default',
+    helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch squads, and all pages', legNewD:'Build a squad via auto-place', legSearchD:'Find players from the full list', legResetD:'Return moved tokens to the default',
     legPos:'Position labels', legPosD:'Toggle the role labels under tokens', legSub:'Second choice', legSubD:'Toggle the backup-player display',
     helpTipLabel:'Tip', helpTipBody:'If you try to create a new team with unsaved changes, you’ll be asked to confirm. Even if you forget to save, closing the app lets you pick up where you left off next time.',
     previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link',
     fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
-    backupTitle:'Backup', bkWarn:'⚠ Your teams, squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
+    backupTitle:'Backup', bkWarn:'⚠ Your squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
     bkExport:'Export backup', bkImport:'Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
     bkIosTitle:'If it doesn’t work in the iPhone home-screen app<br>= copy & paste method', bkIosHelp:'Home-screen apps sometimes can’t use file pickers (an iOS limitation). Use this instead — no file needed, so it always works.',
     bkTextPh:'Paste your backup text here, then press “Restore from text”', bkCopyOut:'Export data as text (copy)', bkTextRestore:'Restore from the text above', bkTextHelp:'Press “Copy”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from text”.',
     fbBody:'For requests to add a player who isn’t listed, or to report a bug or suggest an improvement, feel free to email us below.', fbMailBtn:'Email support@squadxi.futbol', fbFallback:'If the button doesn’t open, email <b style="color:var(--ink)">support@squadxi.futbol</b> directly.',
-    premTitle:'Premium (coming soon)', premBody:'Injury / card markers, unlimited saved teams, ad-free and more are planned.\nComing soon as a Premium plan.',
-    limitTitle:'Save limit reached', goUnlimited:'Go unlimited', deleteToFree:'Delete a saved team to free space', deleteSaved:'Delete saved teams', deleteSavedHint:'Delete some to save a new team', noSavedTeams:'No saved teams',
+    premTitle:'Premium (coming soon)', premBody:'Premium will include injury / card markers, unlimited saved squads, ad-free and more.\nComing soon.',
+    limitTitle:'Save limit reached', goUnlimited:'Go Premium', deleteToFree:'Delete a saved squad to free space', deleteSaved:'Delete saved squads', deleteSavedHint:'Delete some to save a new squad', noSavedTeams:'No saved squads',
     seeHowTo:'See how to use', noAnnounce:'No announcements yet.',
     featPredicted:'Predicted', featSquadDesc:'Predicted line-ups for featured matches, updated regularly.', featSquadNote:'Shown from 24 hours before kickoff.', featSquadEmpty:'No featured matches today.<br>They appear from 24 hours before kickoff.',
     featTransferDesc:'Big-money moves and big-name transfers, updated regularly.', featTransferNote:'It may take some time for these transfers to appear in the player database.', featComingSoon:'Coming soon.',
@@ -28530,7 +28538,7 @@ function openConfirmSave(proceed,mode){
 function openLimitDialog(opts){ opts=opts||{};
   openSheet(`
     <h2>${t('limitTitle')}</h2>
-    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${LANG==='en'?'The free plan lets you save up to <b>'+FREE_TEAM_LIMIT+' teams</b>.<br>Go unlimited, or delete a saved team to free up space.':'無料プランで保存できるのは <b>'+FREE_TEAM_LIMIT+'チーム</b> までです。<br>無制限にするか、保存済みを削除して空けてください。'}</div>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${LANG==='en'?'The free plan lets you save up to <b>'+FREE_TEAM_LIMIT+' squads</b>.<br>Go Premium, or delete a saved squad to free up space.':'無料プランで保存できるのは <b>'+FREE_TEAM_LIMIT+'スカッド</b> までです。<br>プレミアムにするか、保存済みを削除して空けてください。'}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
       <button class="bigbtn" id="ldPremium">${t('goUnlimited')}</button>
       <button class="bigbtn ghost" id="ldDelete">${t('deleteToFree')}</button>
