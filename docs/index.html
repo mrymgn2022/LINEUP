@@ -1,3 +1,4 @@
+<html lang="ja">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Squad XI</title>
@@ -25522,6 +25523,7 @@ const I18N = {
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
+try{ document.documentElement.lang=LANG; }catch(e){} // 起動時の言語を<html lang>へ反映（読み上げ・SEO対応）
 function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)?I18N.ja[k]:k); }
 function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
@@ -29633,5 +29635,9 @@ window.__selftest=function(){
   applyRaw(saved); // 表示フラグ・スタメン・ベンチ等をまとめて適用（初回起動）
   render();
 })();
+</script>
+<script>
+// Service Worker 登録（オフライン対応＆2回目以降の即時起動）。未対応環境や失敗時も本体動作には影響しない
+if('serviceWorker' in navigator){ addEventListener('load',function(){ try{ navigator.serviceWorker.register('./sw.js'); }catch(e){} }); }
 </script>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3779ba1a2d4c471094631eaf4a8135a8"}'></script><!-- End Cloudflare Web Analytics -->
