@@ -29371,6 +29371,8 @@ function clearSquad(){
     state.slots.forEach(s=>{ s.pid=null; s.sub=null; });
     state.bench=[]; if(state.reserveAdds)state.reserveAdds=[]; if(state.excluded)state.excluded=[];
     state.captain=null; state.marks={}; state.teamId=null; layoutMoved=false;
+    state.teamCond=null; state.loadedClub=null; state.flagByLeague=false; // 検索条件（国籍/リーグ/クラブ）と国籍旗モードもリセット
+    pickFilter=basePickFilter(); // 選手検索の既定フィルタをまっさらへ戻す
     save(); render();
   };
   document.getElementById('clrSave').onclick=()=>{ // 現在のスカッドを保存してから盤面を消す
