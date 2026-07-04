@@ -28751,10 +28751,11 @@ function autoFillNationality(code,form,name){
   const few=filled<11?(LANG==='en'?' (that country has fewer than 11 players)':'（その国の選手が11人未満）'):'';
   toast(tAutoPlaced(name||natDisp(code),filled,few));
 }
-// 前回の新規作成で選んだソート条件を保持（再度開いたときにリセットしない）
+// 新規作成ダイアログのソート条件（作成時に一時保持するだけ。開くたびにまっさらへ戻す）
 let otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''};
 // 新規作成：チーム名・フォーメーション・自動配置（国籍/クラブ）
 function startOriginal(){
+  otLast={form:'',lg:'ALL',nat:'ALL',club:'',name:''}; // 毎回まっさら：前回のソート条件（リーグ/国籍/クラブ/名前）を持ち越さない
   let chosenForm=otLast.form||state.formation||'4-3-3';
   let chosenLg=otLast.lg||'ALL';
   let otExpand=lgExpandFor(chosenLg);
