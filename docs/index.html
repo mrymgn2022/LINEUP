@@ -29105,9 +29105,11 @@ async function buildShareCanvas(){
   const accent=(state.teamInfo&&state.teamInfo.color)||'#caff3a';
   // レイアウト寸法を先に決めて、画像の高さをベンチ人数に応じて動的に確保
   const tn=teamDisplayName();
-  let headBottom=150;
+  let headBottom=120;
   if(tn){ headBottom=210; if(state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
-  const px=46,py=Math.max(270,headBottom+30),pw=W-92;
+  // 余白圧縮ポリシー：上部は「ヘッダー実体+24px」に追従（旧: 最低270px固定の予約领域）。左右は30px。
+  // ピッチ内の配置・駒間はすべて kk=pw/REF 比例なので、左右余白の縮小＝全要素の等倍拡大（レイアウト不変）。
+  const px=30,py=headBottom+24,pw=W-60;
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
   const REF=405;                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
@@ -29148,7 +29150,7 @@ async function buildShareCanvas(){
   const bRows=Math.ceil(benchPids.length/bCols);
   const benchH=benchPids.length?(bHeadH+bRows*bRowH):0;
   const benchTop=pitchBottom+(benchPids.length?bGap:0);
-  const footH=92;
+  const footH=28; // 下端の小さな余白のみ（"made with"のフッター行は廃止＝ピッチ内右下のSQUAD XIロゴに一本化）
   const H=Math.round(benchTop+benchH+footH);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const x=cv.getContext('2d');
@@ -29288,7 +29290,7 @@ async function buildShareCanvas(){
   if(benchPids.length){
     x.textAlign='left';x.textBaseline='alphabetic';
     x.fillStyle=accent;x.font='800 34px "Bebas Neue",Manrope,sans-serif';
-    x.fillText((LANG==='en'?'SUBSTITUTES (':'SUBSTITUTES  ベンチ (')+benchPids.length+')',56,benchTop+40);
+    x.fillText((LANG==='en'?'SUBSTITUTES (':'SUBSTITUTES  ベンチ (')+benchPids.length+')',px+10,benchTop+40);
     const gridTop=benchTop+bHeadH, cellW=pw/bCols;
     benchPids.forEach((pid,i)=>{
       const p=P[pid]; const col=i%bCols, row=Math.floor(i/bCols);
@@ -29307,11 +29309,7 @@ async function buildShareCanvas(){
       x.textBaseline='alphabetic';
     });
   }
-  // フッター（平均年齢は表示しない）。旧名由来の starting-xi.app 表記は削除（ブランド名 Squad XI と不一致のため）
-  const footY=H-40;
-  x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#5a6b62';x.font='700 26px Manrope,sans-serif';
-  x.fillText('⚽ made with Squad XI',56,footY);
-  x.textAlign='left';
+  // フッター行は廃止（ピッチ内右下のSQUAD XIロゴが常時入るため二重ブランディングだった）。footH=28は純粋な下端余白。
   // SNS向けフォーマット：選んだ比率(1:1/4:5/9:16)のキャンバスへ中央配置（はみ出し防止＝contain）。'auto'は内容なりの高さのまま。
   const fmt=state.shareFmt||'auto';
   const AR={sq:[1080,1080],feed:[1080,1350],story:[1080,1920]}[fmt];
