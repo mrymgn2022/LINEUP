@@ -25418,7 +25418,7 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', clearTitle:'盤面をリセット', clearBody:'現在表示されているスカッドを削除します。<br>※保存されていないスカッドは復元できません。', clearConfirm:'削除する', saveAndDelete:'保存して削除', tstCleared:'盤面をリセットしました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', clearTitle:'盤面をリセット', clearBody:'現在表示されているスカッドを削除します。<br>※保存されていないスカッドは復元できません。', clearConfirm:'削除する', saveAndDelete:'保存して削除', tstCleared:'盤面をリセットしました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'写真をドラッグして、円に入る位置を合わせてください。', cropSet:'この位置で設定',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
@@ -25496,7 +25496,7 @@ const I18N = {
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
     clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', clearTitle:'Clear the board', clearBody:'This deletes the squad currently on the board.<br>Note: an unsaved squad can’t be restored.', clearConfirm:'Delete', saveAndDelete:'Save and delete', tstCleared:'Board cleared', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', clearTitle:'Clear the board', clearBody:'This deletes the squad currently on the board.<br>Note: an unsaved squad can’t be restored.', clearConfirm:'Delete', saveAndDelete:'Save and delete', tstCleared:'Board cleared', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag the photo to position it inside the circle.', cropSet:'Use this position',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
@@ -26305,24 +26305,68 @@ photoInput.addEventListener('change',()=>{
   fr.onload=()=>{
     const img=new Image();
     img.onload=()=>{
-      // 正方形にトリミングしつつ240pxへ縮小（容量節約）
-      const S=240,c=document.createElement('canvas');c.width=S;c.height=S;
-      const ctx=c.getContext('2d');
       const side=Math.min(img.width,img.height);
-      // 縦長写真は「上寄せ」で切り出す（人物写真は顔が上部にあるため、中央基準だと頭が切れる）。
-      // 上に10%だけ余白を残すと頭ピッタリで切れず自然。横長写真は従来どおり左右中央（sy=0になる）。
-      const sx=(img.width-side)/2, sy=(img.height-side)*0.1;
-      ctx.drawImage(img,sx,sy,side,side,0,0,S,S);
-      const url=c.toDataURL('image/jpeg',0.82);
-      state.photos[photoTarget]=url;
-      const pid=photoTarget;photoTarget=null;
-      savePhotos();closeSheet();render();toast(t('tstPhotoSet'));
+      const maxOff=Math.max(img.width,img.height)-side;
+      if(maxOff<=side*0.02){ savePhotoCrop(img,(img.width-side)/2,(img.height-side)/2); } // ほぼ正方形＝調整の余地なし→即保存
+      else openPhotoCrop(img); // 縦長/横長は位置調整シートへ（頭が切れる問題のユーザー側解決手段）
     };
     img.onerror=()=>{photoTarget=null;toast(t('tstPhotoFail'));};
     img.src=fr.result;
   };
   fr.readAsDataURL(f);
+  photoInput.value=''; // 同じファイルを選び直しても change が発火するように
 });
+// 指定オフセットで正方形にトリミングしつつ240pxへ縮小（容量節約）して保存
+function savePhotoCrop(img,sx,sy){
+  const S=240,c=document.createElement('canvas');c.width=S;c.height=S;
+  const ctx=c.getContext('2d');
+  const side=Math.min(img.width,img.height);
+  ctx.drawImage(img,sx,sy,side,side,0,0,S,S);
+  state.photos[photoTarget]=c.toDataURL('image/jpeg',0.82);
+  photoTarget=null;
+  savePhotos();closeSheet();render();toast(t('tstPhotoSet'));
+}
+// 写真の切り抜き位置調整シート：丸枠プレビューをドラッグして「円に入る範囲」を自分で決める。
+// 初期位置は 縦長=上寄り10%（顔は上部にあることが多い）/ 横長=中央。ドラッグで全域に動かせる。
+function openPhotoCrop(img){
+  const pid=photoTarget;
+  const side=Math.min(img.width,img.height);
+  const portrait=img.height>img.width;
+  const maxOff=(portrait?img.height:img.width)-side;
+  let off=portrait?Math.round(maxOff*0.1):Math.round(maxOff/2);
+  openSheet(`
+    <h2>${t('cropTitle')}</h2>
+    <div style="margin:2px 16px 10px;color:var(--mut);font-size:13px;line-height:1.7">${t('cropHelp')}</div>
+    <div style="display:flex;justify-content:center;padding:4px 0 14px">
+      <canvas id="cropCv" width="280" height="280" style="width:280px;height:280px;max-width:80vw;max-height:80vw;border-radius:14px;touch-action:none;cursor:grab"></canvas>
+    </div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 20px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="cropOk">${t('cropSet')}</button>
+      <button class="bigbtn ghost" id="cropCancel">${t('cancel')}</button>
+    </div>`);
+  const cv=document.getElementById('cropCv'), cx2=cv.getContext('2d'), D=280;
+  const draw=()=>{
+    const sx=portrait?0:off, sy=portrait?off:0;
+    cx2.clearRect(0,0,D,D);
+    cx2.drawImage(img,sx,sy,side,side,0,0,D,D);
+    // 円の外側を暗く＝駒に乗った時に見える範囲のプレビュー
+    cx2.save();
+    cx2.fillStyle='rgba(10,14,12,.62)';
+    cx2.beginPath();cx2.rect(0,0,D,D);cx2.arc(D/2,D/2,D/2-6,0,Math.PI*2,true);cx2.fill('evenodd');
+    cx2.restore();
+    cx2.lineWidth=3;cx2.strokeStyle='#caff3a';cx2.beginPath();cx2.arc(D/2,D/2,D/2-6,0,Math.PI*2);cx2.stroke();
+  };
+  draw();
+  let drag=null;
+  cv.addEventListener('pointerdown',e=>{ drag={x:e.clientX,y:e.clientY,off}; try{cv.setPointerCapture(e.pointerId);}catch(err){} e.preventDefault(); });
+  cv.addEventListener('pointermove',e=>{ if(!drag)return;
+    const d=portrait?(e.clientY-drag.y):(e.clientX-drag.x);
+    off=Math.max(0,Math.min(maxOff,Math.round(drag.off-d*(side/D)))); draw(); });
+  const dragEnd=()=>{ drag=null; };
+  cv.addEventListener('pointerup',dragEnd); cv.addEventListener('pointercancel',dragEnd);
+  document.getElementById('cropOk').onclick=()=>{ savePhotoCrop(img, portrait?0:off, portrait?off:0); };
+  document.getElementById('cropCancel').onclick=()=>{ const p=pid; photoTarget=null; closeSheet(); if(p!=null&&P[p]) try{openDetail(p);}catch(e){} };
+}
 
 function onSlotTap(i){
   if(mktPlace!=null){ placeMarketIntoSlot(i); return; } // 移籍市場の配置モード：タップした枠に配置
