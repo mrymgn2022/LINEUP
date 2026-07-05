@@ -26309,7 +26309,9 @@ photoInput.addEventListener('change',()=>{
       const S=240,c=document.createElement('canvas');c.width=S;c.height=S;
       const ctx=c.getContext('2d');
       const side=Math.min(img.width,img.height);
-      const sx=(img.width-side)/2, sy=(img.height-side)/2;
+      // 縦長写真は「上寄せ」で切り出す（人物写真は顔が上部にあるため、中央基準だと頭が切れる）。
+      // 上に10%だけ余白を残すと頭ピッタリで切れず自然。横長写真は従来どおり左右中央（sy=0になる）。
+      const sx=(img.width-side)/2, sy=(img.height-side)*0.1;
       ctx.drawImage(img,sx,sy,side,side,0,0,S,S);
       const url=c.toDataURL('image/jpeg',0.82);
       state.photos[photoTarget]=url;
