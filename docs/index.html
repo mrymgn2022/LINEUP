@@ -221,12 +221,12 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:8px 10px}
 .stat .k{font-size:9px;letter-spacing:2px;color:var(--mut);text-transform:uppercase}
 .stat .v{font-family:'Bebas Neue';font-size:22px;letter-spacing:1px;color:var(--lime);line-height:1}
-.stat .v small{font-size:12px;color:var(--mut);font-family:'Manrope';font-weight:600}
+.stat .v small{font-size:12px;color:var(--mut);font-family:'Manrope',system-ui,sans-serif;font-weight:600}
 
 /* ---------- Bench ---------- */
 .bench{padding:2px 14px calc(env(safe-area-inset-bottom) + 30px)}
 .bench .bh{display:flex;align-items:baseline;gap:9px;margin:8px 2px 11px}
-.bench .bh b{font-family:'Bebas Neue';font-size:21px;letter-spacing:1.5px;color:var(--ink)}
+.bench .bh b{font-family:'Bebas Neue',system-ui,sans-serif;font-size:21px;letter-spacing:1.5px;color:var(--ink)}
 .bench .bh span{font-size:11px;color:var(--mut)}
 .bench .bh i{margin-left:auto;font-style:normal;font-size:11px;color:var(--lime-dim);letter-spacing:1px}
 .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px}
@@ -291,8 +291,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .grabzone:active{cursor:grabbing}
 .grab{width:44px;height:5px;border-radius:3px;background:var(--line);transition:width .15s,background .15s}
 .grabzone:active .grab,.sheet.expanded .grab{width:64px;background:var(--mut)}
-.sheet h2{font-family:'Bebas Neue';font-size:24px;letter-spacing:1.5px;margin:4px 16px 8px;display:flex;align-items:center;gap:8px}
-.sheet h2 span{font-size:11px;font-family:'Manrope';font-weight:700;color:var(--lime);background:rgba(202,255,58,.12);padding:3px 9px;border-radius:999px;margin-left:auto}
+.sheet h2{font-family:'Bebas Neue',system-ui,sans-serif;font-size:24px;letter-spacing:1.5px;margin:4px 16px 8px;display:flex;align-items:center;gap:8px}
+.sheet h2 span{font-size:11px;font-family:'Manrope',system-ui,sans-serif;font-weight:700;color:var(--lime);background:rgba(202,255,58,.12);padding:3px 9px;border-radius:999px;margin-left:auto}
 
 /* ---------- Drawer (左ハンバーガーメニュー) ---------- */
 .dscrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:72;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -358,7 +358,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .controls{padding:0 16px 8px}
 .search{
   width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
-  padding:11px 13px;color:var(--ink);font-size:15px;font-family:'Manrope';outline:none;
+  padding:11px 13px;color:var(--ink);font-size:15px;font-family:'Manrope',system-ui,sans-serif;outline:none;
 }
 .search::placeholder{color:var(--mut)}
 .filters{display:flex;gap:6px;overflow-x:auto;padding:9px 0 2px;scrollbar-width:none}
@@ -383,7 +383,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .lgsel-btn .lgcar{margin-left:auto;color:var(--mut);font-size:11px}
 .lgsel.open .lgsel-btn{border-color:var(--lime)}
 .lgsel-panel{margin-top:6px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:8px;display:flex;flex-direction:column;gap:7px}
-.lgsel-q{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:'Manrope';outline:none}
+.lgsel-q{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 11px;color:var(--ink);font-size:14px;font-family:'Manrope',system-ui,sans-serif;outline:none}
 .lgsel-q::placeholder{color:var(--mut)}
 .lgsel-list{max-height:46dvh;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .lgrow2{padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--mut)}
@@ -444,7 +444,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .dcell .dv.lime{color:var(--lime)}
 .bigbtn{
   width:100%;margin-top:14px;padding:15px;border-radius:14px;border:0;cursor:pointer;
-  font-family:'Bebas Neue';font-size:20px;letter-spacing:1.5px;background:var(--lime);color:#0a0e0c;
+  font-family:'Bebas Neue',system-ui,sans-serif;font-size:20px;letter-spacing:1.5px;background:var(--lime);color:#0a0e0c;
 }
 .bigbtn:active{transform:scale(.98)}
 .bigbtn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
