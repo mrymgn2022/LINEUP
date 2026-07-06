@@ -25353,6 +25353,12 @@ function squadShortName(pid){
 }
 // 選手メモ（安定IDキー。駒下に表示する自由テキスト）
 function memoOf(pid){ if(pid==null||!P[pid])return ''; return (state.memos&&state.memos[pidToKey(pid)])||''; }
+// まっさらビルド（クラブ読込も自動編成条件も無い自由編成）か。クラブ編成では所属＝自明なので出さない
+function freeBuildMode(){ return !state.loadedClub && !state.teamCond; }
+// 表示用メモ：ユーザーメモ優先。まっさらビルドではメモ未設定の選手に所属クラブ名を動的表示（state.memosには保存しない）
+function dispMemo(pid){ const m=memoOf(pid); if(m) return m; if(freeBuildMode()&&pid!=null&&P[pid]){ const c=(P[pid][4]||'').trim(); if(c) return shortClub(c); } return ''; }
+// メモ先頭の旗コード：代表ビルド=所属リーグの国（従来）／まっさらビルド=所属リーグの国／それ以外=旗なし
+function memoFlagCode(pid){ if(!state.showFlags||pid==null||!P[pid]) return null; if(state.flagByLeague) return dispNatCode(pid); if(freeBuildMode()) return LGNAT[P[pid][5]]||null; return null; }
 // 負傷/カードのマーカー（有料機能）。メモと同じく安定キーで保存＝起用先(スロット/チーム)が変わっても保持。
 // 形式: state.marks[key]={inj:0|1, yc:0..15(イエロー枚数), red:0|1}。イエローとレッドは排他。
 function markOf(pid){ if(pid==null||!P[pid])return {inj:0,yc:0,red:0}; const m=state.marks&&state.marks[pidToKey(pid)]; return {inj:(m&&m.inj)?1:0, yc:(m&&m.yc)||0, red:(m&&m.red)?1:0}; }
@@ -25840,7 +25846,7 @@ function render(){
       // → メモの無い選手は空白を作らず、かつディスク高さは常に一定なので段差も出ない。
       let foot=null;
       const addFoot=el=>{ if(!foot){ foot=document.createElement('div'); foot.className='tokfoot'; tok.appendChild(foot); } foot.appendChild(el); };
-      if(state.showMemo){ const mt=memoOf(s.pid); if(mt){ const m=document.createElement('div');m.className='pmemo'; if(state.flagByLeague && state.showFlags){ m.innerHTML=flagHTMLForPid(s.pid)+' '+escAttr(mt); } else { m.textContent=mt; } addFoot(m); } } // 代表：所属リーグの国旗をクラブ名(メモ)の前に。旗はメモの文字サイズ基準(em)で自然な大きさ
+      if(state.showMemo){ const mt=dispMemo(s.pid); if(mt){ const m=document.createElement('div');m.className='pmemo'; const fc=memoFlagCode(s.pid); if(fc){ m.innerHTML=flagHTML(fc)+' '+escAttr(mt); } else { m.textContent=mt; } addFoot(m); } } // 代表&自由編成：所属リーグの国旗をクラブ名(メモ)の前に。旗はメモの文字サイズ基準(em)で自然な大きさ
       if(state.showSub && s.sub!=null && P[s.sub]){ const sub=document.createElement('div');sub.className='psub';sub.textContent=squadShortName(s.sub); addFoot(sub); }
     }
     pitch.appendChild(tok);
@@ -25940,7 +25946,7 @@ function renderBench(){
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
       <div class="bn">${squadShortName(pid)}</div>
       <div class="bp">${p[1]}</div>
-      <div class="bv${state.flagByLeague&&(p[4]||'').trim()?' withclub':''}">${flagHTMLForPid(pid)}${state.flagByLeague&&(p[4]||'').trim()?`<span class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</span>`:''}</div>
+      <div class="bv${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?' withclub':''}">${flagHTMLForPid(pid)}${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?`<span class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</span>`:''}</div>
     </div>`;
   }).join('');
   const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
@@ -28996,6 +29002,7 @@ function startOriginal(){
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
       state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.teamId=null; state.bench=[];
+      state.showMemo=true; syncMemoBtn(); // 自由編成＝所属クラブ（リーグ国旗つき）をメモ位置に自動表示
       setFormLabel(); closeSheet(); render(); save();
       toast(tCreatedEmpty(name)); return;
     }
@@ -29144,7 +29151,7 @@ function preloadPhotos(){
 function preloadFlags(){
   if(!state.showFlags) return Promise.resolve({});
   const codes=new Set();
-  state.slots.forEach(s=>{ if(s.pid==null)return; const fi=FI[dispNatCode(s.pid)]; if(fi)codes.add(fi); });
+  state.slots.forEach(s=>{ if(s.pid==null)return; const fi=FI[dispNatCode(s.pid)]; if(fi)codes.add(fi); const mfc=memoFlagCode(s.pid); if(mfc&&FI[mfc])codes.add(FI[mfc]); }); // メモ用のリーグ国旗もプリロード
   return Promise.all([...codes].map(fi=>new Promise(res=>{
     const im=new Image(); im.crossOrigin='anonymous';
     im.onload=()=>res([fi,im]); im.onerror=()=>res(null);
@@ -29186,7 +29193,7 @@ async function buildShareCanvas(){
   const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
   // 駒中心から下方向のラベル伸び（盤面実測のベースライン：役職+22 / 名前+36 / メモ+53 / 第2候補は+15刻み。disc縁基準）
-  const dropOf=s=>{ let d=state.hideRoles?(R+m(23)):(R+m(36)); let info=R+(state.hideRoles?m(37):m(57)),lines=0; if(state.showMemo&&memoOf(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*m(15)); return d; };
+  const dropOf=s=>{ let d=state.hideRoles?(R+m(23)):(R+m(36)); let info=R+(state.hideRoles?m(37):m(57)),lines=0; if(state.showMemo&&dispMemo(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*m(15)); return d; };
   // y が近い駒（差≤11。SB/CB・WB の段差を吸収）は同じ列へ統合。GK(y<16)は必ず単独行に。配列は最小y側=GK(最後尾)→最大y側=FW(最前線)
   const rowsV=[]; filledSlots.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ const last=rowsV[rowsV.length-1]; const sGK=s.y<16, lastGK=last&&last.maxy<16; if(last && !sGK && !lastGK && s.y-last.maxy<=11){ last.slots.push(s); last.maxy=s.y; } else rowsV.push({slots:[s],maxy:s.y}); });
   const NV=rowsV.length;
@@ -29287,10 +29294,10 @@ async function buildShareCanvas(){
       if(ok) return U; } return lo; };
   // 名前サイズは全員一律（盤面のように統一）。「全員を同じサイズUで描いたとき、同一行の隣同士が被らない最大のU」を採用。
   const uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
-  const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=memoOf(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
-  const memoFlagOn=state.flagByLeague&&state.showFlags; // 代表：メモ(クラブ名)の前にリーグ国旗を描く
+  const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=dispMemo(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
+  // メモ前の旗は memoFlagCode(pid) で選手ごとに判定（代表=リーグ国／自由編成=リーグ国／他=なし）
   const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; let w=0;
-      if(state.showMemo){const mm=memoOf(it.s.pid); if(mm){ let mw=x.measureText(mm).width; if(memoFlagOn) mw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(mw>w)w=mw; }}
+      if(state.showMemo){const mm=dispMemo(it.s.pid); if(mm){ let mw=x.measureText(mm).width; if(memoFlagCode(it.s.pid)) mw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(mw>w)w=mw; }}
       if(state.showSub&&it.s.sub!=null&&P[it.s.sub]){const sw=x.measureText(squadShortName(it.s.sub)).width; if(sw>w)w=sw;}
       return w; },m(10),m(6)):m(10);
   // 盤面の二重text-shadow（0 1px 3px ＋ 0 0 4px）を2回描きで再現。1回描きだと文字が平板に見え盤面と差が出る
@@ -29343,8 +29350,8 @@ async function buildShareCanvas(){
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
     let infoY=fy+R+(state.hideRoles?m(37):m(57));
-    if(state.showMemo){const mt=memoOf(s.pid); if(mt){ x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';
-      const mImg=memoFlagOn?flagImgs[FI[dispNatCode(s.pid)]]:null;
+    if(state.showMemo){const mt=dispMemo(s.pid); if(mt){ x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';
+      const _mfc=memoFlagCode(s.pid); const mImg=_mfc?flagImgs[FI[_mfc]]:null;
       if(mImg){ const fh=Math.round(uniSub*0.82),fw=Math.round(fh*4/3),gp=m(3),tw=x.measureText(mt).width,tot=fw+gp+tw,sx0=fx-tot/2,fyy=(infoY-uniSub*0.34)-fh/2;
         const _sc=x.shadowColor; x.shadowColor='transparent'; x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); x.shadowColor=_sc;
         x.textAlign='left'; dsText(mt,sx0+fw+gp,infoY); x.textAlign='center';
@@ -29494,6 +29501,7 @@ function clearSquad(){
     state.bench=[]; if(state.reserveAdds)state.reserveAdds=[]; if(state.excluded)state.excluded=[];
     state.captain=null; state.marks={}; state.teamId=null; layoutMoved=false;
     state.teamCond=null; state.loadedClub=null; state.flagByLeague=false; // 検索条件（国籍/リーグ/クラブ）と国籍旗モードもリセット
+    state.showMemo=true; syncMemoBtn(); // リセット後は自由編成＝所属クラブをメモ位置に自動表示
     pickFilter=basePickFilter(); // 選手検索の既定フィルタをまっさらへ戻す
     save(); render();
   };
