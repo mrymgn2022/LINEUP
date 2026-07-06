@@ -26,7 +26,11 @@
 <meta name="twitter:description" content="サッカーの最強スタメンを作って共有。無料の布陣メーカー。">
 <meta name="twitter:image" content="https://squadxi.futbol/og.png">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap');
+/* Webフォント同梱（旧: Google Fonts CDNの@import）。同梱化＝オフラインでも崩れない・CDN障害/プライバシー送信なし・読込高速化。サイズ等の指定は一切不変 */
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url('fonts/manrope-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url('fonts/manrope-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/bebas-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/bebas-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @import url('https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css');
 .fi{vertical-align:-0.12em;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35);margin-right:2px}
 .renameTrigger{cursor:pointer;display:inline-flex;align-items:center;gap:5px}
@@ -29124,6 +29128,8 @@ function drawSilhouette(x,fx,fy,R){
   x.restore();
 }
 async function buildShareCanvas(){
+  // Webフォントのロード完了を待ってから焼く（待たないと、タイミング次第でシステムフォントの画像になり盤面と字形が変わる）
+  try{ await Promise.all([document.fonts.load('700 20px Manrope'),document.fonts.load('800 20px Manrope'),document.fonts.load('600 20px Manrope'),document.fonts.load('20px "Bebas Neue"')]); }catch(e){}
   computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   const photoImgs=await preloadPhotos();
   const flagImgs=await preloadFlags();
@@ -29252,6 +29258,8 @@ async function buildShareCanvas(){
       if(state.showMemo){const mm=memoOf(it.s.pid); if(mm){ let mw=x.measureText(mm).width; if(memoFlagOn) mw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(mw>w)w=mw; }}
       if(state.showSub&&it.s.sub!=null&&P[it.s.sub]){const sw=x.measureText(squadShortName(it.s.sub)).width; if(sw>w)w=sw;}
       return w; },m(10),m(6)):m(10);
+  // 盤面の二重text-shadow（0 1px 3px ＋ 0 0 4px）を2回描きで再現。1回描きだと文字が平板に見え盤面と差が出る
+  const dsText=(txt,tx,ty)=>{ x.shadowColor='rgba(0,0,0,.95)'; x.shadowBlur=m(4); x.shadowOffsetX=0; x.shadowOffsetY=0; x.fillText(txt,tx,ty); x.shadowBlur=m(3); x.shadowOffsetY=m(1); x.fillText(txt,tx,ty); x.shadowColor='transparent'; x.shadowBlur=0; x.shadowOffsetY=0; };
   info.forEach(it=>{
     const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
@@ -29296,8 +29304,7 @@ async function buildShareCanvas(){
       x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH);
     }
     x.fillStyle='#eafff0';
-    x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=m(3);x.shadowOffsetX=0;x.shadowOffsetY=m(1); // 盤面と同じ文字影（名前）
-    x.fillText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY);
+    dsText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY); // 盤面と同じ二重影で描画
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
     let infoY=fy+R+(state.hideRoles?m(37):m(57));
@@ -29305,10 +29312,10 @@ async function buildShareCanvas(){
       const mImg=memoFlagOn?flagImgs[FI[dispNatCode(s.pid)]]:null;
       if(mImg){ const fh=Math.round(uniSub*0.82),fw=Math.round(fh*4/3),gp=m(3),tw=x.measureText(mt).width,tot=fw+gp+tw,sx0=fx-tot/2,fyy=(infoY-uniSub*0.34)-fh/2;
         const _sc=x.shadowColor; x.shadowColor='transparent'; x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); x.shadowColor=_sc;
-        x.textAlign='left'; x.fillText(mt,sx0+fw+gp,infoY); x.textAlign='center';
-      } else { x.fillText(mt,fx,infoY); }
+        x.textAlign='left'; dsText(mt,sx0+fw+gp,infoY); x.textAlign='center';
+      } else { dsText(mt,fx,infoY); }
       infoY+=m(15); }}
-    if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';x.fillText(sn,fx,infoY);}
+    if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';dsText(sn,fx,infoY);}
     x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
   });
