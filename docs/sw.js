@@ -5,7 +5,8 @@
 // 注意: 外部オリジン（人気度APIのCloudflare Worker、Web Analyticsビーコン等）には一切触らない
 const CACHE='squadxi-v2'; // v2: Webフォント同梱（fonts/）を追加
 const CORE=['./index.html','./favicon.png','./privacy.html','./privacy.en.html','./terms.html','./terms.en.html',
-  './fonts/manrope-latin.woff2','./fonts/manrope-latin-ext.woff2','./fonts/bebas-latin.woff2','./fonts/bebas-latin-ext.woff2'];
+  './fonts/manrope-latin.woff2','./fonts/manrope-latin-ext.woff2','./fonts/bebas-latin.woff2','./fonts/bebas-latin-ext.woff2',
+  './vendor/flag-icons/css/flag-icons.min.css']; // 国旗SVG本体(270枚)は事前キャッシュせず、表示したものから実行時キャッシュ（SWRのput）で貯める
 const DEV=(self.location.hostname==='localhost'||self.location.hostname==='127.0.0.1');
 
 self.addEventListener('install',e=>{

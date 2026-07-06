@@ -26,12 +26,12 @@
 <meta name="twitter:description" content="サッカーの最強スタメンを作って共有。無料の布陣メーカー。">
 <meta name="twitter:image" content="https://squadxi.futbol/og.png">
 <style>
+@import url('vendor/flag-icons/css/flag-icons.min.css'); /* 国旗も同梱配信（旧: jsdelivr CDN）。※@importはCSS先頭でないと無効になるため必ずこの位置に置く */
 /* Webフォント同梱（旧: Google Fonts CDNの@import）。同梱化＝オフラインでも崩れない・CDN障害/プライバシー送信なし・読込高速化。サイズ等の指定は一切不変 */
 @font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url('fonts/manrope-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Manrope';font-style:normal;font-weight:200 800;font-display:swap;src:url('fonts/manrope-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/bebas-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('fonts/bebas-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@import url('https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css');
 .fi{vertical-align:-0.12em;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35);margin-right:2px}
 .renameTrigger{cursor:pointer;display:inline-flex;align-items:center;gap:5px}
 .penIcon{font-size:.62em;color:var(--lime);background:rgba(202,255,58,.14);border:1px solid rgba(202,255,58,.4);border-radius:6px;padding:3px 5px;line-height:1;flex:0 0 auto}
@@ -29113,7 +29113,7 @@ function preloadFlags(){
   return Promise.all([...codes].map(fi=>new Promise(res=>{
     const im=new Image(); im.crossOrigin='anonymous';
     im.onload=()=>res([fi,im]); im.onerror=()=>res(null);
-    im.src='https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/flags/4x3/'+fi+'.svg';
+    im.src='vendor/flag-icons/flags/4x3/'+fi+'.svg'; // 同梱SVG（同一オリジン＝キャンバス汚染なし・オフラインもSWキャッシュで表示可）
   }))).then(arr=>{ const m={}; arr.forEach(e=>{ if(e)m[e[0]]=e[1]; }); return m; });
 }
 function drawSilhouette(x,fx,fy,R){
