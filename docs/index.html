@@ -26313,16 +26313,20 @@ function importPhotoBlob(pid,blob){
   img.src=url;
 }
 // クリップボードの画像を貼り付けて追加（ネット検索→画像を長押しコピー→このボタン、の最短経路）。従来のファイル選択と併存。
-// まず clipboard.read() を試し、使えない/拒否される環境（iOSホーム画面PWA等）では貼り付けボックスへフォールバック。
+// iOS(iPhone/iPad)は Safari通常タブでも PWA でも clipboard.read() の画像取得が不安定なため、端末判定で一律に貼り付けボックスを使う。
+// iPadOS 13+ の Safari は UA が "Macintosh" になるので、タッチ対応(Mac風UA＋ontouchend)も iOS とみなす。
+function isIOSDevice(){ const ua=navigator.userAgent||''; return /iP(hone|od|ad)/.test(ua) || (/Macintosh|Mac OS X/.test(ua) && ('ontouchend' in document)); }
+// まず clipboard.read() を試し、使えない/拒否される環境（iOS全般）では貼り付けボックスへフォールバック。
 async function pastePhoto(pid){
-  if(!(navigator.clipboard&&navigator.clipboard.read)){ openPasteBox(pid); return; } // 非対応→ボックス
+  if(isIOSDevice()){ openPasteBox(pid); return; }                                     // iOSは read() をあてにせず最初からボックス（Safariタブ含む）
+  if(!(navigator.clipboard&&navigator.clipboard.read)){ openPasteBox(pid); return; }   // その他で read() 非対応→ボックス
   try{
     const items=await navigator.clipboard.read();
     let blob=null;
     for(const it of items){ const tp=(it.types||[]).find(tt=>tt&&tt.indexOf('image/')===0); if(tp){ blob=await it.getType(tp); break; } }
-    if(blob){ importPhotoBlob(pid,blob); return; } // read()が使える環境＝画像があれば即ワンタップ取り込み（PC/Android/iOS通常Safari）
+    if(blob){ importPhotoBlob(pid,blob); return; } // read()が使える環境＝画像があれば即ワンタップ取り込み（PC/Android）
     toast(t('tstPasteNoImage')); // read()は使えるが画像が無いだけ→従来どおりトースト（ボックスは出さない）
-  }catch(e){ openPasteBox(pid); } // read()が拒否される環境（＝iOSホーム画面PWA等）だけ、貼り付けボックスへフォールバック
+  }catch(e){ openPasteBox(pid); } // read()が拒否される環境→ボックスへ
 }
 // iOS PWA等で clipboard.read() が使えない/拒否される時の貼り付けフォールバック。
 // contenteditable枠に「ペースト」してもらい、pasteイベントのBlob か、挿入された<img>（iOSはこちら）から画像を取り込む。
