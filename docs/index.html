@@ -26320,9 +26320,9 @@ async function pastePhoto(pid){
     const items=await navigator.clipboard.read();
     let blob=null;
     for(const it of items){ const tp=(it.types||[]).find(tt=>tt&&tt.indexOf('image/')===0); if(tp){ blob=await it.getType(tp); break; } }
-    if(blob){ importPhotoBlob(pid,blob); return; }
-    openPasteBox(pid); // 画像タイプが無い（HTML参照のみ等）→ボックスで拾う
-  }catch(e){ openPasteBox(pid); } // NotAllowedError（PWAの権限制限等）→ボックスへ
+    if(blob){ importPhotoBlob(pid,blob); return; } // read()が使える環境＝画像があれば即ワンタップ取り込み（PC/Android/iOS通常Safari）
+    toast(t('tstPasteNoImage')); // read()は使えるが画像が無いだけ→従来どおりトースト（ボックスは出さない）
+  }catch(e){ openPasteBox(pid); } // read()が拒否される環境（＝iOSホーム画面PWA等）だけ、貼り付けボックスへフォールバック
 }
 // iOS PWA等で clipboard.read() が使えない/拒否される時の貼り付けフォールバック。
 // contenteditable枠に「ペースト」してもらい、pasteイベントのBlob か、挿入された<img>（iOSはこちら）から画像を取り込む。
