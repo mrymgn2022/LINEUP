@@ -28852,6 +28852,19 @@ function shortClubRomaji(name){
   s=s.trim();
   return s.length>=3 ? s : n; // 削り過ぎは元に戻す
 }
+// メモが「自動入力されたクラブ名」か。メモ＝現在の所属クラブ比較だと、移籍でP側のクラブが変わった瞬間に
+// 旧クラブ名メモが手入力扱いになって残り続ける（例: ゴードン移籍後もニューカッスル表示）。
+// そこで全クラブの全表記（生/日本語/ローマ字短縮/現行短縮）の集合と照合し、どれかに一致すれば自動メモとみなす。
+let _autoMemoForms=null;
+function isAutoClubMemo(v){
+  if(!v) return false;
+  if(!_autoMemoForms){
+    _autoMemoForms=new Set(); const seen=new Set();
+    for(const p of P){ const c=(p&&p[4]||'').trim(); if(!c||seen.has(c))continue; seen.add(c);
+      _autoMemoForms.add(c); if(CLUB_JA[c])_autoMemoForms.add(CLUB_JA[c]); _autoMemoForms.add(shortClubRomaji(c)); _autoMemoForms.add(shortClub(c)); }
+  }
+  return _autoMemoForms.has(v);
+}
 function fillClubMemos(){
   if(!state.memos)state.memos={};
   const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[pidToKey(pid)]=shortClub(club); };
@@ -28865,7 +28878,7 @@ function autoFillClubMemosForNat(){
   if(!state.flagByLeague && !jl) return;
   if(!state.memos) state.memos={};
   const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); const club=(P[pid][4]||'').trim(); if(!club)return;
-    const cur=state.memos[k]; if(cur===undefined||cur===club||cur===CLUB_JA[club]||cur===shortClubRomaji(club)) state.memos[k]=shortClub(club); }; // 未設定 or 自動クラブメモ(生/日本語/ローマ字短縮)のみ現在言語の表記へ。手入力メモは保持
+    const cur=state.memos[k]; if(cur===undefined||isAutoClubMemo(cur)) state.memos[k]=shortClub(club); }; // 未設定 or 自動クラブメモ（移籍前の旧クラブ名も含む）のみ現在の所属・言語の表記へ。手入力メモは保持
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
@@ -28873,7 +28886,7 @@ function autoFillClubMemosForNat(){
 // 国籍縛りチームで付いたクラブ名メモが、別チーム（クラブ編成など）に持ち越されて誤表示されるのを防ぐ。
 function clearAutoClubMemos(){
   if(!state.memos) return;
-  for(const k in state.memos){ const pid=keyToPid(k); if(pid==null||!P[pid])continue; const club=(P[pid][4]||'').trim(); if(state.memos[k]===club||state.memos[k]===shortClub(club)||state.memos[k]===CLUB_JA[club]||state.memos[k]===shortClubRomaji(club)) delete state.memos[k]; } // 生/日本語/ローマ字短縮どの自動メモも掃除
+  for(const k in state.memos){ if(isAutoClubMemo(state.memos[k])) delete state.memos[k]; } // どのクラブ名表記でも（移籍前の旧クラブ名も含めて）自動メモは掃除
 }
 // 国籍で自動配置（その国の選手のみ。市場価値が高く適性ポジションへ）
 function autoFillNationality(code,form,name){
