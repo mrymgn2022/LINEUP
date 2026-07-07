@@ -25460,7 +25460,7 @@ const I18N = {
     helpSec3:'画面のボタン', legMenu:'メニュー', legMenuD:'スカッドの保存・切り替え、各ページ', legNewD:'自動配置でスカッドを作る', legSearchD:'全選手を一覧から探す', legResetD:'動かした駒を既定の配置へ',
     legPos:'ポジション名', legPosD:'駒の下の役職表示を ON/OFF', legSub:'第2候補', legSubD:'控え候補の表示を ON/OFF',
     helpTipLabel:'ヒント', helpTipBody:'未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。',
-    previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー',
+    previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー', shareLinkBtn:'スカッドのリンクをコピー', tstLinkCopied:'リンクをコピーしました。開くと同じスカッドが表示されます', shOpenTitle:'共有されたスカッド', shOpenBody:'共有リンクからスカッドを受け取りました。盤面に表示しますか？<br>※現在の盤面は置き換わります（保存済みスカッドはそのまま）。', shOpenGo:'表示する',
     fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok',
     backupTitle:'バックアップ', bkWarn:'⚠ 作ったスカッドや写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
     bkExport:'バックアップを書き出す', bkImport:'バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
@@ -25538,7 +25538,7 @@ const I18N = {
     helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch squads, and all pages', legNewD:'Build a squad via auto-place', legSearchD:'Find players from the full list', legResetD:'Return moved tokens to the default',
     legPos:'Position labels', legPosD:'Toggle the role labels under tokens', legSub:'Second choice', legSubD:'Toggle the backup-player display',
     helpTipLabel:'Tip', helpTipBody:'If you try to create a new team with unsaved changes, you’ll be asked to confirm. Even if you forget to save, closing the app lets you pick up where you left off next time.',
-    previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link',
+    previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link', shareLinkBtn:'Copy squad link', tstLinkCopied:'Link copied — opening it shows this exact squad', shOpenTitle:'Shared squad', shOpenBody:'You received a squad via a shared link. Show it on the board?<br>Note: your current board will be replaced (saved squads are untouched).', shOpenGo:'Show squad',
     fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
     backupTitle:'Backup', bkWarn:'⚠ Your squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
     bkExport:'Export backup', bkImport:'Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
@@ -25619,6 +25619,33 @@ function serializeTeam(){
     excluded:(state.excluded||[]).map(pidToKey).filter(k=>k!=null),
     reserveAdds:(state.reserveAdds||[]).map(pidToKey).filter(k=>k!=null),
     custom:referencedCustomDefs() };
+}
+// ── スカッド共有リンク ──────────────────────────────────────
+// serializeTeam()のJSONを deflate-raw + base64url でURLハッシュ(#s=...)に埋め込む。バックエンド不要で
+// 「開くと同じスカッドが再現されるURL」を作る。ハッシュはサーバへ送られないためGitHub Pagesでも動く。
+// 形式: "1."=deflate圧縮あり / "0."=非圧縮（CompressionStream未対応環境のフォールバック）。
+function _b64uEnc(bytes){ let s=''; const CH=0x8000; for(let i=0;i<bytes.length;i+=CH){ s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH)); } return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function _b64uDec(str){ const b=atob(str.replace(/-/g,'+').replace(/_/g,'/')); const out=new Uint8Array(b.length); for(let i=0;i<b.length;i++)out[i]=b.charCodeAt(i); return out; }
+async function _deflateBytes(bytes){ const cs=new CompressionStream('deflate-raw'); const w=cs.writable.getWriter(); w.write(bytes); w.close(); return new Uint8Array(await new Response(cs.readable).arrayBuffer()); }
+async function _inflateBytes(bytes){ const ds=new DecompressionStream('deflate-raw'); const w=ds.writable.getWriter(); w.write(bytes); w.close(); return new Uint8Array(await new Response(ds.readable).arrayBuffer()); }
+async function buildSquadLink(){
+  const bytes=new TextEncoder().encode(JSON.stringify(serializeTeam()));
+  let payload;
+  try{ payload=(typeof CompressionStream==='function')?('1.'+_b64uEnc(await _deflateBytes(bytes))):('0.'+_b64uEnc(bytes)); }
+  catch(e){ payload='0.'+_b64uEnc(bytes); }
+  return APP_URL+'/#s='+payload;
+}
+async function decodeSquadHash(h){ // '#s=...' → 保存形式raw / 該当なし・壊れは null
+  try{
+    const m=/^#?s=(.+)$/.exec(h||''); if(!m) return null;
+    const p=m[1]; let bytes;
+    if(p.startsWith('1.')){ if(typeof DecompressionStream!=='function') return null; bytes=await _inflateBytes(_b64uDec(p.slice(2))); }
+    else if(p.startsWith('0.')){ bytes=_b64uDec(p.slice(2)); }
+    else return null;
+    const raw=JSON.parse(new TextDecoder().decode(bytes));
+    if(!raw||!(raw.v>=3)||!Array.isArray(raw.slots)||raw.slots.length!==11) return null;
+    return raw;
+  }catch(e){ return null; }
 }
 async function save(){
   const data=serializeTeam();
@@ -28653,6 +28680,18 @@ function openHelp(){
 }
 // 未保存の変更があれば確認してから proceed() を実行（新規作成・他チーム読込の前に呼ぶ）
 function guardUnsaved(proceed,mode){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed,mode); }
+// 共有リンク（#s=...）で開かれた場合の確認→展開。受け手の保存済みスカッドには一切触れない（盤面のみ置き換え）
+function openSharedSquadConfirm(raw){
+  openSheet(`
+    <h2>${t('shOpenTitle')}</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${raw.teamName?('<b>'+escAttr(raw.teamName)+'</b><br>'):''}${t('shOpenBody')}</div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="ssGo">${t('shOpenGo')}</button>
+      <button class="bigbtn ghost" id="ssCancel">${t('cancel')}</button>
+    </div>`);
+  document.getElementById('ssGo').onclick=()=>{ closeSheet(); const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); };
+  document.getElementById('ssCancel').onclick=()=>{ closeSheet(); };
+}
 function openConfirmSave(proceed,mode){
   openSheet(`
     <h2>${t('unsavedTitle')}</h2>
@@ -29474,6 +29513,7 @@ function openShareFallback(imgUrl,shareText,file){
         <button class="snsbtn ig" id="shIG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
       </div>
       <button class="bigbtn ${canNative?'ghost':''}" id="shDl">${t('saveImage')}</button>
+      <button class="bigbtn ghost" id="shLink">${t('shareLinkBtn')}</button>
       <button class="bigbtn ghost" id="shCopy">${t('copyCapLink')}</button>
     </div>`);
   // 盤面右上と同じ表示トグル。押すと盤面ボタンと同じ処理を実行→プレビューを再生成
@@ -29494,12 +29534,14 @@ function openShareFallback(imgUrl,shareText,file){
   const syncFmt=()=>{ document.querySelectorAll('#shFmt [data-fmt]').forEach(b=>b.classList.toggle('on',(state.shareFmt||'auto')===b.dataset.fmt)); };
   syncFmt();
   document.getElementById('shFmt').onclick=e=>{ const b=e.target.closest('[data-fmt]'); if(!b)return; state.shareFmt=b.dataset.fmt; save(); syncFmt(); regen(); };
-  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:APP_URL}).catch(()=>{}); }; }
+  // スカッド再現リンク（#s=...）を先に生成しておき、共有系ボタンのURLを「開くと同じスカッドが出るリンク」へ格上げ。生成失敗時はトップURLのまま
+  let squadLink=APP_URL; buildSquadLink().then(u=>{ if(u) squadLink=u; }).catch(()=>{});
+  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:squadLink}).catch(()=>{}); }; }
   const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='squad-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{dlImg();toast(t('tstImgSaved'));};
   document.getElementById('shX').onclick=()=>{
     dlImg();
-    const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(APP_URL);
+    const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink);
     window.open(url,'_blank','noopener');
     toast(t('tstImgSavedX'));
   };
@@ -29508,7 +29550,8 @@ function openShareFallback(imgUrl,shareText,file){
     window.open('https://www.instagram.com/','_blank','noopener');
     toast(t('tstImgSavedIG'));
   };
-  document.getElementById('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(shareText+' '+APP_URL);toast(t('tstCopied'));}catch(e){toast(t('tstCopyFail'));}};
+  document.getElementById('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(shareText+' '+squadLink);toast(t('tstCopied'));}catch(e){toast(t('tstCopyFail'));}};
+  document.getElementById('shLink').onclick=async()=>{try{const u=await buildSquadLink();await navigator.clipboard.writeText(u);toast(t('tstLinkCopied'));}catch(e){toast(t('tstCopyFail'));}};
 }
 document.getElementById('btnShare').onclick=shareLineup;
 
@@ -29762,6 +29805,9 @@ window.__selftest=function(){
     } else ok('reserve_replace',true,'skip: ベンチ外なし');
     // T9: 旗ヘルパ・共有関数の健全性
     ok('flag_helpers',flagHTML('ARG').indexOf('fi-ar')>=0&&typeof buildShareCanvas==='function','旗ヘルパ/共有関数の異常');
+    // T10: スカッド共有リンクの往復（0.非圧縮パス＝同期検証。serialize→base64url→decode→保存形式が保たれるか）
+    let _rt=null; try{ _rt=JSON.parse(new TextDecoder().decode(_b64uDec(('0.'+_b64uEnc(new TextEncoder().encode(JSON.stringify(serializeTeam())))).slice(2)))); }catch(e){}
+    ok('share_link_roundtrip',!!(_rt&&_rt.v>=3&&Array.isArray(_rt.slots)&&_rt.slots.length===11),'共有リンクの往復でスカッドが崩れる');
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -29790,6 +29836,11 @@ window.__selftest=function(){
   if(ph&&typeof ph==='object')state.photos=ph;
   applyRaw(saved); // 表示フラグ・スタメン・ベンチ等をまとめて適用（初回起動）
   render();
+  // スカッド共有リンク（#s=...）で開かれた場合：URLから復元して確認ダイアログ（拒否なら何も変えない）
+  try{
+    const sharedRaw=await decodeSquadHash(location.hash);
+    if(sharedRaw){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} openSharedSquadConfirm(sharedRaw); }
+  }catch(e){}
 })();
 </script>
 <script>
