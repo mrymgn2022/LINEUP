@@ -25295,7 +25295,9 @@ function dupBaseKeys(){ // 実データ内で「名前|国籍」が複数人い�
 }
 // 選手オブジェクトから一意キーを生成。同名・同国籍が複数いる選手だけクラブ＋ポジションで区別（年齢は補正で変わり得るのでキーには含めない）。
 // 例: ポルトガルVitinha2人（PSG/Genoa）、FC東京の同名Hashimoto2人（LB/CDM）。MV/身長/利き足/生年月日マップ(pkey)もこのキーを使う。
-function keyForPlayer(p){ if(!p) return null; const base=p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); return dupBaseKeys().has(base) ? base+'|'+(p[4]||'').trim()+'|'+(p[1]||'') : base; }
+function keyForPlayer(p){ if(!p) return null;
+  if(p.length>6&&p[6]) return 'CU|'+p[6]; // カスタム選手は固有ID基準（同名同国籍を10人作っても写真・メモ・配置が混ざらない）
+  const base=p[0].trim()+'|'+(p[3].trim().split(' ').pop()||''); return dupBaseKeys().has(base) ? base+'|'+(p[4]||'').trim()+'|'+(p[1]||'') : base; }
 function pidToKey(pid){ if(pid==null) return null; return keyForPlayer(P[pid]); }
 // 表示名：ユーザーが設定した愛称があればそれ、なければ元の名前（short=苗字のみ）
 // 日本人選手名の漢字表記（ローマ字→漢字）。確実に分かる有名選手（市場価値上位の日本人）中心。無い選手は自動でローマ字にフォールバック。
@@ -25371,7 +25373,10 @@ function marksHTML(pid){ const m=markOf(pid); let h=''; if(m.yc>0){ h+='<span cl
 // プレミアム未加入時の金の南京錠（メニューでテキスト「（プレミアム）」の代わりに表示。タップでプレミアム画面へ）
 const _ICN_GOLDLOCK=' <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;margin-left:6px" aria-label="プレミアム"><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="#e0a92e" stroke-width="2.2"/><rect x="5" y="10" width="14" height="10" rx="2.5" fill="#ffd470" stroke="#b8862a" stroke-width="1.2"/><circle cx="12" cy="14.3" r="1.7" fill="#6e5212"/><rect x="11.15" y="14.6" width="1.7" height="3.6" rx="0.85" fill="#6e5212"/></svg>';
 let _keyMap=null;
-function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; } }
+function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; }
+  // 互換: uid導入前に保存されたカスタム選手（キー=名前|国籍[|クラブ|POS]）も解決できるよう別名を張る（先勝ち）
+  for(let i=customBaseLen;i<P.length;i++){ const p=P[i]; if(!p)continue; const base=p[0].trim()+'|'+(natCode(p)||''); if(!(base in _keyMap)) _keyMap[base]=i; const ext=base+'|'+(p[4]||'').trim()+'|'+(p[1]||''); if(!(ext in _keyMap)) _keyMap[ext]=i; }
+}
 function keyToPid(key){
   if(key==null) return null;
   if(typeof key==='number') return (key>=0&&key<P.length)?key:null; // 旧形式(index)の後方互換
@@ -27887,6 +27892,7 @@ let customBaseLen=Infinity;  // これ以上のindexはカスタム選手（こ�
 function isCustomPid(i){ return i>=customBaseLen; }
 function injectCustomDef(c){ // Pの末尾へ追加（indexは不変＝既存の参照を壊さない）
   const p=[c.name,c.pos,c.age||0,'🏳 '+c.nat,c.club||'',c.league||''];
+  p[6]=c.uid||('c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)); // カスタム固有ID：同名・同国籍でも別人として保存/復元できる（TRUMP×10問題の恒久対策）
   P.push(p);
   const k=pkey(p);
   if(c.height) HEIGHT[k]=c.height;
@@ -27895,7 +27901,7 @@ function injectCustomDef(c){ // Pの末尾へ追加（indexは不変＝既存の
   return P.length-1;
 }
 function addCustomPlayer(c){ return injectCustomDef(c); } // 永続化はsave()がスカッド参照分だけ行う
-function customDefFromPid(i){ const p=P[i]; return {name:p[0],pos:p[1],age:p[2]||0,nat:natCode(p),club:p[4]||'',league:p[5]||'',height:heightOf(p),foot:footOf(p)}; }
+function customDefFromPid(i){ const p=P[i]; return {name:p[0],pos:p[1],age:p[2]||0,nat:natCode(p),club:p[4]||'',league:p[5]||'',height:heightOf(p),foot:footOf(p),uid:p[6]||undefined}; }
 // 現スカッド（スタメン+第二候補+ベンチ+ベンチ外）から参照されているカスタム選手だけ保存する＝外れた選手は消滅
 function referencedCustomDefs(){
   const ref=new Set();
