@@ -25636,13 +25636,14 @@ async function buildSquadLink(){
   let payload;
   try{ payload=(typeof CompressionStream==='function')?('1.'+_b64uEnc(await _deflateBytes(bytes))):('0.'+_b64uEnc(bytes)); }
   catch(e){ payload='0.'+_b64uEnc(bytes); }
-  let link=APP_URL+'/#s='+payload; // フォールバック：URL埋め込み（長いが確実に動く）
+  // 着地は軽量中継ページ /s/（本体4.6MBはXのカードクローラー上限超えでプレビューが出ないため。/s/がOGカードを出して即アプリへ転送）
+  let link=APP_URL+'/s/#s='+payload; // フォールバック：URL埋め込み（長いが確実に動く）
   if(POP_ENDPOINT){ // Workerで短縮ID化（例: #s=Ab3xYz12）。未対応・オフライン・タイムアウト時は長いリンクのまま
     try{
       const ac=new AbortController(); const tm=setTimeout(()=>ac.abort(),2500);
       const res=await fetch(POP_ENDPOINT+'/share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:payload}),signal:ac.signal});
       clearTimeout(tm);
-      if(res.ok){ const j=await res.json(); if(j&&j.ok&&typeof j.id==='string'&&/^[A-Za-z0-9]{4,20}$/.test(j.id)) link=APP_URL+'/#s='+j.id; }
+      if(res.ok){ const j=await res.json(); if(j&&j.ok&&typeof j.id==='string'&&/^[A-Za-z0-9]{4,20}$/.test(j.id)) link=APP_URL+'/s/#s='+j.id; }
     }catch(e){}
   }
   _sqLinkCache={json:jsonStr,url:link};

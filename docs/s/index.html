@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- スカッド共有リンクの中継ページ。
+     目的: アプリ本体(index.html)は約4.6MBあり、X(Twitter)等のカードクローラーの取得上限(約2MB)を超えて
+     プレビューカードが出ない。そこで共有リンクはこの数KBのページに着地させ、カードはここのOGメタで生成し、
+     人間は即座にアプリへリダイレクトする（#s=... のハッシュはそのまま引き継ぐ）。 -->
+<title>Squad XI — 共有されたスカッド / Shared squad</title>
+<meta name="description" content="共有されたスタメンを開く — Squad XI（無料のサッカーフォーメーション作成メーカー）。Open the shared starting XI on Squad XI, the free football lineup builder.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://squadxi.futbol/">
+<link rel="icon" type="image/png" href="https://squadxi.futbol/favicon.png" sizes="192x192">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Squad XI">
+<meta property="og:title" content="⚽ スタメンが共有されました — Squad XI">
+<meta property="og:description" content="タップして共有されたスタメンを表示。あなたの理想のイレブンも無料で作れます。Tap to open the shared XI — then build your own, free.">
+<meta property="og:url" content="https://squadxi.futbol/s/">
+<meta property="og:image" content="https://squadxi.futbol/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="⚽ スタメンが共有されました — Squad XI">
+<meta name="twitter:description" content="タップして共有されたスタメンを表示。Tap to open the shared XI — free lineup builder.">
+<meta name="twitter:image" content="https://squadxi.futbol/og.png">
+<script>location.replace('/'+ (location.hash||''));</script>
+<noscript><meta http-equiv="refresh" content="0;url=/"></noscript>
+<style>
+body{background:#0a0e0c;color:#eafff0;font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}
+a{color:#C8FF4F}
+</style>
+</head>
+<body>
+<p>Squad XI を開いています… / Opening Squad XI… <a href="/">開かない場合はこちら / tap here</a></p>
+</body>
+</html>
