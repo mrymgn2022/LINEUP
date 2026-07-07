@@ -29559,7 +29559,12 @@ function openShareFallback(imgUrl,shareText,file){
   let squadLink=APP_URL; buildSquadLink().then(u=>{ if(u) squadLink=u; }).catch(()=>{});
   if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:squadLink}).catch(()=>{}); }; }
   const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='squad-xi.png';a.click();};
-  document.getElementById('shDl').onclick=()=>{dlImg();toast(t('tstImgSaved'));};
+  document.getElementById('shDl').onclick=()=>{
+    // iOSでは a[download] が写真アプリに入らず「ファイル」/プレビュー行きになるため、
+    // 共有シートを開いて「画像を保存」→写真アプリ直行の2タップにする（PC/Androidは従来どおり直ダウンロード）
+    if(isIOSDevice()&&canNative&&curFile){ navigator.share({files:[curFile]}).catch(()=>{}); return; }
+    dlImg();toast(t('tstImgSaved'));
+  };
   document.getElementById('shX').onclick=()=>{
     dlImg();
     const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink);
