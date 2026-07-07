@@ -29581,7 +29581,28 @@ function openShareFallback(imgUrl,shareText,file){
     toast(t('tstImgSavedIG'));
   };
   document.getElementById('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(shareText+' '+squadLink);toast(t('tstCopied'));}catch(e){toast(t('tstCopyFail'));}};
-  document.getElementById('shLink').onclick=async()=>{try{const u=await buildSquadLink();await navigator.clipboard.writeText(u);toast(t('tstLinkCopied'));}catch(e){toast(t('tstCopyFail'));}};
+  document.getElementById('shLink').onclick=async()=>{
+    // iOS対策：タップ→非同期待ち(Worker発行)→writeText はユーザー操作の有効期限切れで失敗し、
+    // クリップボードに「前回コピーした別スカッドのリンク」が残る（＝古いスカッドに飛ぶ誤共有事故）。
+    // 対策: ①シート表示時に事前生成済みならその場で書き込み ②未生成なら ClipboardItem(Promise) で
+    // タップ権限を保持したまま非同期データを書き込む ③それでも失敗したら手動コピー用に必ずリンクを提示。
+    try{
+      let u=(squadLink&&squadLink!==APP_URL)?squadLink:null;
+      if(u){ await navigator.clipboard.writeText(u); }
+      else if(typeof ClipboardItem==='function'&&navigator.clipboard.write){
+        const p=buildSquadLink().then(x=>{squadLink=x;return new Blob([x],{type:'text/plain'});});
+        await navigator.clipboard.write([new ClipboardItem({'text/plain':p})]);
+      } else {
+        u=await buildSquadLink(); squadLink=u;
+        await navigator.clipboard.writeText(u);
+      }
+      toast(t('tstLinkCopied'));
+    }catch(e){
+      // 静かに失敗させない：古いリンクが残ったまま貼られる事故を防ぐため、リンクを見せて手動コピーさせる
+      try{ const u=await buildSquadLink(); squadLink=u; window.prompt(t('shareLinkBtn'), u); }
+      catch(_){ toast(t('tstCopyFail')); }
+    }
+  };
 }
 document.getElementById('btnShare').onclick=shareLineup;
 
