@@ -674,9 +674,9 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
    形式: [名前, ポジション, 年齢, "🏳 国籍", クラブ, リーグ]
    プレミアリーグは公開ロスター情報を参照（2025/26）。
    ========================================================= */
-const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン",ED:"エールディヴィジ",PT:"プリメイラ・リーガ",TR:"スュペル・リグ",BE:"ベルギー・プロ・リーグ",SC:"スコティッシュ・プレミアシップ",DK:"デンマーク・スーペルリーガ",CH:"スイス・スーパーリーグ",L2:"リーグ・アン2部",EC:"チャンピオンシップ",S2:"ラ・リーガ2部",SB:"セリエB",D2:"2.ブンデスリーガ",AT:"オーストリア・ブンデスリーガ",GR:"ギリシャ・スーパーリーグ",CZ:"チェコ・ファーストリーグ",PO:"エクストラクラサ",RS:"セルビア・スーパーリーガ",NO:"エリテセリエン",CY:"キプロス1部",UA:"ウクライナ・プレミアリーグ",HU:"ハンガリーNB I",HR:"クロアチア1部",AZ:"アゼルバイジャン・プレミアリーグ",SK:"スロバキア1部",IL:"イスラエル・プレミアリーグ",SE:"アルスヴェンスカン",BG:"ブルガリア1部",RO:"ルーマニア・スーペルリーガ",SI:"スロベニア1部",MD:"モルドバ・ナツィオナラ",J1:"J1リーグ",ML:"MLS",SP:"サウジ・プロリーグ",RU:"ロシア・プレミアリーグ",KR:"K League 1",AR:"アルゼンチン・プリメーラ",BR:"ブラジル・セリエA",CO:"コロンビア・プリメーラA",MX:"リーガMX",ID:"リーガ1(インドネシア)",TH:"タイ・リーグ1",IN:"インド・スーパーリーグ",MA:"ボトラ・プロ",ZA:"南アフリカ・プレミアリーグ",EG:"エジプト・プレミアリーグ",TN:"チュニジア・リーグ1",QA:"カタール・スターズリーグ",AE:"UAEプロリーグ",CN:"中国スーパーリーグ",VN:"Vリーグ1",FN:"フィンランド・ヴェイッカウスリーガ",KZ:"カザフスタン・プレミアリーグ",TZ:"タンザニア・プレミアリーグ",J2:"J2リーグ",J3:"J3リーグ"};
+const L={PL:"プレミアリーグ",LL:"ラ・リーガ",SA:"セリエA",BL:"ブンデスリーガ",L1:"リーグ・アン",ED:"エールディヴィジ",PT:"プリメイラ・リーガ",TR:"スュペル・リグ",BE:"ベルギー・プロ・リーグ",SC:"スコティッシュ・プレミアシップ",DK:"デンマーク・スーペルリーガ",CH:"スイス・スーパーリーグ",L2:"リーグ・アン2部",EC:"チャンピオンシップ",E3:"リーグ・ワン",S2:"ラ・リーガ2部",SB:"セリエB",D2:"2.ブンデスリーガ",AT:"オーストリア・ブンデスリーガ",GR:"ギリシャ・スーパーリーグ",CZ:"チェコ・ファーストリーグ",PO:"エクストラクラサ",RS:"セルビア・スーパーリーガ",NO:"エリテセリエン",CY:"キプロス1部",UA:"ウクライナ・プレミアリーグ",HU:"ハンガリーNB I",HR:"クロアチア1部",AZ:"アゼルバイジャン・プレミアリーグ",SK:"スロバキア1部",IL:"イスラエル・プレミアリーグ",SE:"アルスヴェンスカン",BG:"ブルガリア1部",RO:"ルーマニア・スーペルリーガ",SI:"スロベニア1部",MD:"モルドバ・ナツィオナラ",J1:"J1リーグ",ML:"MLS",SP:"サウジ・プロリーグ",RU:"ロシア・プレミアリーグ",KR:"K League 1",AR:"アルゼンチン・プリメーラ",BR:"ブラジル・セリエA",CO:"コロンビア・プリメーラA",MX:"リーガMX",ID:"リーガ1(インドネシア)",TH:"タイ・リーグ1",IN:"インド・スーパーリーグ",MA:"ボトラ・プロ",ZA:"南アフリカ・プレミアリーグ",EG:"エジプト・プレミアリーグ",TN:"チュニジア・リーグ1",QA:"カタール・スターズリーグ",AE:"UAEプロリーグ",CN:"中国スーパーリーグ",VN:"Vリーグ1",FN:"フィンランド・ヴェイッカウスリーガ",KZ:"カザフスタン・プレミアリーグ",TZ:"タンザニア・プレミアリーグ",J2:"J2リーグ",J3:"J3リーグ"};
 // 英語リーグ名（LANG==='en' の表示・検索用。無ければ L(日本語) にフォールバック）
-const LEN={PL:"Premier League",LL:"La Liga",SA:"Serie A",BL:"Bundesliga",L1:"Ligue 1",ED:"Eredivisie",PT:"Primeira Liga",TR:"Süper Lig",BE:"Belgian Pro League",SC:"Scottish Premiership",DK:"Danish Superliga",CH:"Swiss Super League",L2:"Ligue 2",EC:"Championship",S2:"LaLiga 2",SB:"Serie B",D2:"2. Bundesliga",AT:"Austrian Bundesliga",GR:"Greek Super League",CZ:"Czech First League",PO:"Ekstraklasa",RS:"Serbian SuperLiga",NO:"Eliteserien",CY:"Cypriot First Division",UA:"Ukrainian Premier League",HU:"Hungarian NB I",HR:"Croatian First League",AZ:"Azerbaijan Premier League",SK:"Slovak First League",IL:"Israeli Premier League",SE:"Allsvenskan",BG:"Bulgarian First League",RO:"Romanian SuperLiga",SI:"Slovenian PrvaLiga",MD:"Moldovan Super Liga",J1:"J1 League",ML:"MLS",SP:"Saudi Pro League",RU:"Russian Premier League",KR:"K League 1",AR:"Argentine Primera División",BR:"Brazilian Série A",CO:"Colombian Primera A",MX:"Liga MX",ID:"Liga 1 (Indonesia)",TH:"Thai League 1",IN:"Indian Super League",MA:"Botola Pro",ZA:"South African Premiership",EG:"Egyptian Premier League",TN:"Tunisian Ligue 1",QA:"Qatar Stars League",AE:"UAE Pro League",CN:"Chinese Super League",VN:"V.League 1",FN:"Veikkausliiga",KZ:"Kazakhstan Premier League",TZ:"Tanzanian Premier League",J2:"J2 League",J3:"J3 League"};
+const LEN={PL:"Premier League",LL:"La Liga",SA:"Serie A",BL:"Bundesliga",L1:"Ligue 1",ED:"Eredivisie",PT:"Primeira Liga",TR:"Süper Lig",BE:"Belgian Pro League",SC:"Scottish Premiership",DK:"Danish Superliga",CH:"Swiss Super League",L2:"Ligue 2",EC:"Championship",E3:"League One",S2:"LaLiga 2",SB:"Serie B",D2:"2. Bundesliga",AT:"Austrian Bundesliga",GR:"Greek Super League",CZ:"Czech First League",PO:"Ekstraklasa",RS:"Serbian SuperLiga",NO:"Eliteserien",CY:"Cypriot First Division",UA:"Ukrainian Premier League",HU:"Hungarian NB I",HR:"Croatian First League",AZ:"Azerbaijan Premier League",SK:"Slovak First League",IL:"Israeli Premier League",SE:"Allsvenskan",BG:"Bulgarian First League",RO:"Romanian SuperLiga",SI:"Slovenian PrvaLiga",MD:"Moldovan Super Liga",J1:"J1 League",ML:"MLS",SP:"Saudi Pro League",RU:"Russian Premier League",KR:"K League 1",AR:"Argentine Primera División",BR:"Brazilian Série A",CO:"Colombian Primera A",MX:"Liga MX",ID:"Liga 1 (Indonesia)",TH:"Thai League 1",IN:"Indian Super League",MA:"Botola Pro",ZA:"South African Premiership",EG:"Egyptian Premier League",TN:"Tunisian Ligue 1",QA:"Qatar Stars League",AE:"UAE Pro League",CN:"Chinese Super League",VN:"V.League 1",FN:"Veikkausliiga",KZ:"Kazakhstan Premier League",TZ:"Tanzanian Premier League",J2:"J2 League",J3:"J3 League"};
 const P=JSON.parse((`[
 // ---- Manchester City (PL) ----
 ["Gianluigi Donnarumma","GK",27,"🇮🇹 ITA","Manchester City","PL"],
@@ -1138,30 +1138,30 @@ const P=JSON.parse((`[
 ["Harry Wilson","RW",29,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Fulham","PL"],
 ["Rodrigo Muniz","ST",25,"🇧🇷 BRA","Fulham","PL"],
 // ---- Wolverhampton (PL) ----
-["José Sá","GK",33,"🇵🇹 POR","Wolverhampton","PL"],
-["Sam Johnstone","GK",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
-["Daniel Bentley","GK",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
-["Toti","CB",27,"🇵🇹 POR","Wolverhampton","PL"],
-["Yerson Mosquera","CB",25,"🇨🇴 COL","Wolverhampton","PL"],
-["Santiago Bueno","CB",27,"🇺🇾 URU","Wolverhampton","PL"],
-["Nasser Djiga","CB",23,"🇧🇫 BFA","Wolverhampton","PL"],
-["Hugo Bueno","LB",23,"🇪🇸 ESP","Wolverhampton","PL"],
-["David Møller Wolfe","LB",24,"🇳🇴 NOR","Wolverhampton","PL"],
-["Jackson Tchatchoua","RB",24,"🇨🇲 CMR","Wolverhampton","PL"],
-["Pedro Lima","RB",19,"🇧🇷 BRA","Wolverhampton","PL"],
-["Ki-Jana Hoever","RB",24,"🇳🇱 NED","Wolverhampton","PL"],
-["André","CDM",24,"🇧🇷 BRA","Wolverhampton","PL"],
-["João Gomes","CM",25,"🇧🇷 BRA","Wolverhampton","PL"],
-["Jean-Ricner Bellegarde","CM",27,"🇭🇹 HAI","Wolverhampton","PL"],
-["Tommy Doyle","CM",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
-["Rodrigo Gomes","LW",22,"🇵🇹 POR","Wolverhampton","PL"],
-["Mateus Mané","CAM",18,"🇵🇹 POR","Wolverhampton","PL"],
-["Tawanda Chirewa","CAM",22,"🇿🇼 ZIM","Wolverhampton","PL"],
-["Enso González","LW",21,"🇵🇾 PAR","Wolverhampton","PL"],
-["Tolu Arokodare","ST",25,"🇳🇬 NGA","Wolverhampton","PL"],
-["Adam Armstrong","ST",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
-["Hee-chan Hwang","ST",30,"🇰🇷 KOR","Wolverhampton","PL"],
-["Nathan Fraser","ST",21,"🇮🇪 IRL","Wolverhampton","PL"],
+["José Sá","GK",33,"🇵🇹 POR","Wolverhampton","EC"],
+["Sam Johnstone","GK",33,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","EC"],
+["Daniel Bentley","GK",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","EC"],
+["Toti","CB",27,"🇵🇹 POR","Wolverhampton","EC"],
+["Yerson Mosquera","CB",25,"🇨🇴 COL","Wolverhampton","EC"],
+["Santiago Bueno","CB",27,"🇺🇾 URU","Wolverhampton","EC"],
+["Nasser Djiga","CB",23,"🇧🇫 BFA","Wolverhampton","EC"],
+["Hugo Bueno","LB",23,"🇪🇸 ESP","Wolverhampton","EC"],
+["David Møller Wolfe","LB",24,"🇳🇴 NOR","Wolverhampton","EC"],
+["Jackson Tchatchoua","RB",24,"🇨🇲 CMR","Wolverhampton","EC"],
+["Pedro Lima","RB",19,"🇧🇷 BRA","Wolverhampton","EC"],
+["Ki-Jana Hoever","RB",24,"🇳🇱 NED","Wolverhampton","EC"],
+["André","CDM",24,"🇧🇷 BRA","Wolverhampton","EC"],
+["João Gomes","CM",25,"🇧🇷 BRA","Wolverhampton","EC"],
+["Jean-Ricner Bellegarde","CM",27,"🇭🇹 HAI","Wolverhampton","EC"],
+["Tommy Doyle","CM",24,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","EC"],
+["Rodrigo Gomes","LW",22,"🇵🇹 POR","Wolverhampton","EC"],
+["Mateus Mané","CAM",18,"🇵🇹 POR","Wolverhampton","EC"],
+["Tawanda Chirewa","CAM",22,"🇿🇼 ZIM","Wolverhampton","EC"],
+["Enso González","LW",21,"🇵🇾 PAR","Wolverhampton","EC"],
+["Tolu Arokodare","ST",25,"🇳🇬 NGA","Wolverhampton","EC"],
+["Adam Armstrong","ST",29,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","EC"],
+["Hee-chan Hwang","ST",30,"🇰🇷 KOR","Wolverhampton","EC"],
+["Nathan Fraser","ST",21,"🇮🇪 IRL","Wolverhampton","EC"],
 // ---- Burnley (PL) ----
 ["Max Weiß","GK",22,"🇩🇪 GER","Burnley","PL"],
 ["Maxime Estève","CB",24,"🇫🇷 FRA","Burnley","PL"],
@@ -7899,7 +7899,7 @@ const P=JSON.parse((`[
 ["Diego Coppola","CB",22,"🇮🇹 ITA","Brighton","PL"],
 ["Timothée Kolodziejczak","CB",34,"🇫🇷 FRA","Paris FC","L1"],
 ["Sofiane Alakouch","RB",27,"🇲🇦 MAR","Paris FC","L1"],
-["Marshall Munetsi","CM",30,"🇿🇼 ZIM","Wolverhampton","PL"],
+["Marshall Munetsi","CM",30,"🇿🇼 ZIM","Wolverhampton","EC"],
 ["Julien Lopez","LW",34,"🇩🇿 ALG","Paris FC","L1"],
 ["Luca Koleosho","RW",21,"🇮🇹 ITA","Paris FC","L1"],
 ["Lamine Gueye","RW",28,"🇸🇳 SEN","Paris FC","L1"],
@@ -7942,7 +7942,7 @@ const P=JSON.parse((`[
 ["Danny Namaso","LW",25,"🇨🇲 CMR","Auxerre","L1"],
 ["Sékou Mara","ST",23,"🇫🇷 FRA","Auxerre","L1"],
 ["Koffi Kouao","RB",28,"🇨🇮 CIV","Metz","L1"],
-["Boubacar Traoré","CDM",24,"🇲🇱 MLI","Wolverhampton","PL"],
+["Boubacar Traoré","CDM",24,"🇲🇱 MLI","Wolverhampton","EC"],
 ["Ismaël Guerti","CAM",21,"🇲🇦 MAR","Metz","L1"],
 ["Lucas Michal","LW",21,"🇫🇷 FRA","Metz","L1"],
 ["Giorgi Tsitaishvili","LW",25,"🇬🇪 GEO","Metz","L1"],
@@ -8102,7 +8102,7 @@ const P=JSON.parse((`[
 ["Joseph Aidoo","CB",30,"🇬🇭 GHA","Celta Vigo","LL"],
 ["Mihailo Ristic","LB",30,"🇷🇸 SRB","Celta Vigo","LL"],
 ["Óscar Mingueza","RB",27,"🇪🇸 ESP","Celta Vigo","LL"],
-["Fer López","CAM",22,"🇪🇸 ESP","Wolverhampton","PL"],
+["Fer López","CAM",22,"🇪🇸 ESP","Wolverhampton","EC"],
 ["Franco Cervi","LW",32,"🇦🇷 ARG","Celta Vigo","LL"],
 ["Connor Ronan","CM",28,"🇮🇪 IRL","Colorado Rapids","ML"],
 ["Aarón Herrera","RB",29,"🇬🇹 GUA","D.C. United","ML"],
@@ -8152,8 +8152,8 @@ const P=JSON.parse((`[
 ["Douglas Luiz","CM",28,"🇧🇷 BRA","Juventus","SA"],
 ["Harvey Elliott","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Liverpool","PL"],
 ["Jadon Sancho","LW",26,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Manchester United","PL"],
-["Ladislav Krejčí","CB",27,"🇨🇿 CZE","Wolverhampton","PL"],
-["Matt Doherty","RB",34,"🇮🇪 IRL","Wolverhampton","PL"],
+["Ladislav Krejčí","CB",27,"🇨🇿 CZE","Wolverhampton","EC"],
+["Matt Doherty","RB",34,"🇮🇪 IRL","Wolverhampton","EC"],
 ["Angel Gomes","CAM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Marseille","L1"],
 ["Marc Cucurella","LB",27,"🇪🇸 ESP","Real Madrid","LL"],
 ["Stefan Ortega","GK",33,"🇩🇪 GER","Nottingham Forest","PL"],
@@ -8163,13 +8163,13 @@ const P=JSON.parse((`[
 ["Aaron Ramsdale","GK",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Southampton FC","EC"],
 ["John Ruddy","GK",39,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
 ["Matt Targett","LB",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Newcastle United","PL"],
-["Kieran Trippier","RB",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","PL"],
+["Kieran Trippier","RB",35,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Wolverhampton","EC"],
 ["Emil Krafth","RB",31,"🇸🇪 SWE","Newcastle United","PL"],
 ["Anthony Gordon","LW",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Barcelona","LL"],
 ["Evann Guessand","RW",24,"🇨🇮 CIV","Aston Villa","PL"],
 ["Christantus Uche","ST",23,"🇳🇬 NGA","Getafe","LL"],
 ["Samuel Chukwueze","RW",27,"🇳🇬 NGA","AC Milan","SA"],
-["Raúl Jiménez","ST",35,"🇲🇽 MEX","Wolverhampton","PL"],
+["Raúl Jiménez","ST",35,"🇲🇽 MEX","Wolverhampton","EC"],
 ["Jonah Kusi-Asare","ST",18,"🇸🇪 SWE","Fulham","PL"],
 ["Tyrell Malacia","LB",26,"🇳🇱 NED","Manchester United","PL"],
 ["Casemiro","CDM",34,"🇧🇷 BRA","Manchester United","PL"],
@@ -8413,33 +8413,33 @@ const P=JSON.parse((`[
 ["Abdulrahman Al-Safari","CM",33,"🇸🇦 KSA","Al-Kholood Club","SP"],
 ["Myziane Maolida","LW",27,"🇰🇲 COM","Al-Kholood Club","SP"],
 ["Majed Khalifa","ST",22,"🇸🇦 KSA","Al-Kholood Club","SP"],
-["Jakub Stolarczyk","GK",25,"🇵🇱 POL","Leicester City","EC"],
-["Fran Vieites","GK",27,"🇪🇸 ESP","Leicester City","EC"],
-["Asmir Begovic","GK",39,"🇧🇦 BIH","Leicester City","EC"],
-["Caleb Okoli","CB",24,"🇮🇹 ITA","Leicester City","EC"],
-["Harry Souttar","CB",27,"🇦🇺 AUS","Leicester City","EC"],
-["Ben Nelson","CB",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Jannik Vestergaard","CB",33,"🇩🇰 DEN","Leicester City","EC"],
-["Jamaal Lascelles","CB",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Victor Kristiansen","LB",23,"🇩🇰 DEN","Leicester City","EC"],
-["Luke Thomas","LB",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Ricardo Pereira","RB",32,"🇵🇹 POR","Leicester City","EC"],
-["Olabade Aluko","RB",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Hamza Choudhury","CDM",28,"🇧🇩 BAN","Leicester City","EC"],
-["Oliver Skipp","CDM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Harry Winks","CDM",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Jordan James","CM",21,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leicester City","EC"],
-["Louis Page","CM",17,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Michael Golding","CM",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Bobby De Cordova-Reid","CAM",33,"🇯🇲 JAM","Leicester City","EC"],
-["Will Alves","CAM",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Jeremy Monga","LW",16,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Stephy Mavididi","LW",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Abdul Fatawu","RW",22,"🇬🇭 GHA","Leicester City","EC"],
-["Silko Thomas","RW",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","EC"],
-["Wanya Marçal","RW",23,"🇵🇹 POR","Leicester City","EC"],
-["Patson Daka","ST",27,"🇿🇲 ZAM","Leicester City","EC"],
-["Jordan Ayew","ST",34,"🇬🇭 GHA","Leicester City","EC"],
+["Jakub Stolarczyk","GK",25,"🇵🇱 POL","Leicester City","E3"],
+["Fran Vieites","GK",27,"🇪🇸 ESP","Leicester City","E3"],
+["Asmir Begovic","GK",39,"🇧🇦 BIH","Leicester City","E3"],
+["Caleb Okoli","CB",24,"🇮🇹 ITA","Leicester City","E3"],
+["Harry Souttar","CB",27,"🇦🇺 AUS","Leicester City","E3"],
+["Ben Nelson","CB",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Jannik Vestergaard","CB",33,"🇩🇰 DEN","Leicester City","E3"],
+["Jamaal Lascelles","CB",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Victor Kristiansen","LB",23,"🇩🇰 DEN","Leicester City","E3"],
+["Luke Thomas","LB",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Ricardo Pereira","RB",32,"🇵🇹 POR","Leicester City","E3"],
+["Olabade Aluko","RB",19,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Hamza Choudhury","CDM",28,"🇧🇩 BAN","Leicester City","E3"],
+["Oliver Skipp","CDM",25,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Harry Winks","CDM",30,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Jordan James","CM",21,"🏴󠁧󠁢󠁷󠁬󠁳󠁿 WAL","Leicester City","E3"],
+["Louis Page","CM",17,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Michael Golding","CM",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Bobby De Cordova-Reid","CAM",33,"🇯🇲 JAM","Leicester City","E3"],
+["Will Alves","CAM",21,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Jeremy Monga","LW",16,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Stephy Mavididi","LW",28,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Abdul Fatawu","RW",22,"🇬🇭 GHA","Leicester City","E3"],
+["Silko Thomas","RW",22,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Leicester City","E3"],
+["Wanya Marçal","RW",23,"🇵🇹 POR","Leicester City","E3"],
+["Patson Daka","ST",27,"🇿🇲 ZAM","Leicester City","E3"],
+["Jordan Ayew","ST",34,"🇬🇭 GHA","Leicester City","E3"],
 ["Egil Selvik","GK",28,"🇳🇴 NOR","Watford FC","EC"],
 ["Nathan Baxter","GK",27,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Watford FC","EC"],
 ["Gabriel Ortelli","GK",20,"🇨🇾 CYP","Watford FC","EC"],
@@ -11597,7 +11597,7 @@ const P=JSON.parse((`[
 ["Lukas Kacavenda","CAM",23,"🇭🇷 CRO","LASK","AT"],
 ["Armin Haider","CAM",20,"🇦🇹 AUT","LASK","AT"],
 ["Moses Usor","ST",24,"🇳🇬 NGA","LASK","AT"],
-["Sasa Kalajdzic","ST",28,"🇦🇹 AUT","Wolverhampton","PL"],
+["Sasa Kalajdzic","ST",28,"🇦🇹 AUT","Wolverhampton","EC"],
 ["Samuel Adeniran","ST",27,"🇺🇸 USA","LASK","AT"],
 ["Maximilian Entrup","ST",28,"🇦🇹 AUT","LASK","AT"],
 ["Nikolas Polster","GK",23,"🇦🇹 AUT","Wolfsberger AC","AT"],
@@ -27291,7 +27291,7 @@ function posChips(f=pickFilter){
 }
 // 検索フィルタのリーグ表示は「国でまとめ、複数部門の国(英・仏)はタップで展開」
 // UEFA5年（国別係数）順。5大リーグ→J1→以降。複数部門の国は[1部,2部…]。末尾は単クラブ国＋非UEFA(米/サウジ)
-const LGGROUP=[["イングランド",["PL","EC"]],["イタリア",["SA","SB"]],["スペイン",["LL","S2"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["日本",["J1","J2","J3"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["ベルギー",["BE"]],["トルコ",["TR"]],["チェコ",["CZ"]],["ギリシャ",["GR"]],["ノルウェー",["NO"]],["オーストリア",["AT"]],["デンマーク",["DK"]],["スイス",["CH"]],["ポーランド",["PO"]],["スコットランド",["SC"]],["イスラエル",["IL"]],["セルビア",["RS"]],["キプロス",["CY"]],["スウェーデン",["SE"]],["クロアチア",["HR"]],["ハンガリー",["HU"]],["ルーマニア",["RO"]],["ウクライナ",["UA"]],["ブルガリア",["BG"]],["アゼルバイジャン",["AZ"]],["スロバキア",["SK"]],["スロベニア",["SI"]],["モルドバ",["MD"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]],["ブラジル",["BR"]],["アルゼンチン",["AR"]],["メキシコ",["MX"]],["コロンビア",["CO"]],["韓国",["KR"]],["中国",["CN"]],["ロシア",["RU"]],["タイ",["TH"]],["インドネシア",["ID"]],["ベトナム",["VN"]],["インド",["IN"]],["カタール",["QA"]],["UAE",["AE"]],["エジプト",["EG"]],["モロッコ",["MA"]],["チュニジア",["TN"]],["南アフリカ",["ZA"]],["フィンランド",["FN"]],["カザフスタン",["KZ"]],["タンザニア",["TZ"]]];
+const LGGROUP=[["イングランド",["PL","EC","E3"]],["イタリア",["SA","SB"]],["スペイン",["LL","S2"]],["ドイツ",["BL","D2"]],["フランス",["L1","L2"]],["日本",["J1","J2","J3"]],["オランダ",["ED"]],["ポルトガル",["PT"]],["ベルギー",["BE"]],["トルコ",["TR"]],["チェコ",["CZ"]],["ギリシャ",["GR"]],["ノルウェー",["NO"]],["オーストリア",["AT"]],["デンマーク",["DK"]],["スイス",["CH"]],["ポーランド",["PO"]],["スコットランド",["SC"]],["イスラエル",["IL"]],["セルビア",["RS"]],["キプロス",["CY"]],["スウェーデン",["SE"]],["クロアチア",["HR"]],["ハンガリー",["HU"]],["ルーマニア",["RO"]],["ウクライナ",["UA"]],["ブルガリア",["BG"]],["アゼルバイジャン",["AZ"]],["スロバキア",["SK"]],["スロベニア",["SI"]],["モルドバ",["MD"]],["アメリカ",["ML"]],["サウジアラビア",["SP"]],["ブラジル",["BR"]],["アルゼンチン",["AR"]],["メキシコ",["MX"]],["コロンビア",["CO"]],["韓国",["KR"]],["中国",["CN"]],["ロシア",["RU"]],["タイ",["TH"]],["インドネシア",["ID"]],["ベトナム",["VN"]],["インド",["IN"]],["カタール",["QA"]],["UAE",["AE"]],["エジプト",["EG"]],["モロッコ",["MA"]],["チュニジア",["TN"]],["南アフリカ",["ZA"]],["フィンランド",["FN"]],["カザフスタン",["KZ"]],["タンザニア",["TZ"]]];
 function lgFlag(code){ if(code&&code[0]==='@'){ const g=LGGROUP.find(x=>x[0]===code.slice(1)); code=g?g[1][0]:''; } const n=LGNAT[code]; const fi=n&&FI[n]; return fi?`<span class="fi fi-${fi}"></span> `:''; }
 // リーグ名（英語UIなら LEN、無ければ L の日本語）／国名（LGGROUPの日本語表示ラベル → 英語UIなら NATNAME）
 function lgName(c){ return (LANG==='en' && LEN[c]) ? LEN[c] : (L[c]||c); }
@@ -27591,7 +27591,7 @@ function deaccLower(s){ let v=_deaccCache.get(s); if(v===undefined){ v=deaccent(
 const NAT_TOP=['ARG','FRA','ESP','ENG','BRA','POR','NED','BEL','ITA','GER','CRO','MAR','COL','URU','USA','MEX','SUI','SEN','DEN','JPN'];
 function natCode(p){ return p[3].trim().split(' ').pop(); }
 // リーグ→その国の国籍コード（国籍縛りチームで「所属リーグの国」の旗を出すため）
-const LGNAT={PL:'ENG',LL:'ESP',SA:'ITA',BL:'GER',L1:'FRA',ED:'NED',PT:'POR',TR:'TUR',BE:'BEL',SC:'SCO',DK:'DEN',CH:'SUI',L2:'FRA',EC:'ENG',S2:'ESP',SB:'ITA',D2:'GER',AT:'AUT',GR:'GRE',CZ:'CZE',PO:'POL',RS:'SRB',NO:'NOR',CY:'CYP',UA:'UKR',HU:'HUN',HR:'CRO',AZ:'AZE',SK:'SVK',IL:'ISR',SE:'SWE',BG:'BUL',RO:'ROU',SI:'SVN',MD:'MDA',J1:'JPN',ML:'USA',SP:'KSA',RU:'RUS',KR:'KOR',AR:'ARG',BR:'BRA',CO:'COL',MX:'MEX',ID:'IDN',TH:'THA',IN:'IND',MA:'MAR',ZA:'RSA',EG:'EGY',TN:'TUN',QA:'QAT',AE:'UAE',CN:'CHN',VN:'VIE',FN:'FIN',KZ:'KAZ',TZ:'TAN',J2:'JPN',J3:'JPN'};
+const LGNAT={PL:'ENG',LL:'ESP',SA:'ITA',BL:'GER',L1:'FRA',ED:'NED',PT:'POR',TR:'TUR',BE:'BEL',SC:'SCO',DK:'DEN',CH:'SUI',L2:'FRA',EC:'ENG',E3:'ENG',S2:'ESP',SB:'ITA',D2:'GER',AT:'AUT',GR:'GRE',CZ:'CZE',PO:'POL',RS:'SRB',NO:'NOR',CY:'CYP',UA:'UKR',HU:'HUN',HR:'CRO',AZ:'AZE',SK:'SVK',IL:'ISR',SE:'SWE',BG:'BUL',RO:'ROU',SI:'SVN',MD:'MDA',J1:'JPN',ML:'USA',SP:'KSA',RU:'RUS',KR:'KOR',AR:'ARG',BR:'BRA',CO:'COL',MX:'MEX',ID:'IDN',TH:'THA',IN:'IND',MA:'MAR',ZA:'RSA',EG:'EGY',TN:'TUN',QA:'QAT',AE:'UAE',CN:'CHN',VN:'VIE',FN:'FIN',KZ:'KAZ',TZ:'TAN',J2:'JPN',J3:'JPN'};
 // 駒/カード/共有画像で表示する国籍コード。flagByLeague時は所属リーグの国（不明なら本人の国籍）
 function dispNatCode(pid){ const p=P[pid]; if(!p)return ''; if(state.flagByLeague){ const c=LGNAT[p[5]]; if(c)return c; } return natCode(p); }
 function flagHTMLForPid(pid){ return flagHTML(dispNatCode(pid)); }
@@ -28980,7 +28980,7 @@ function startOriginal(){
   const otF={lg:chosenLg, expand:otExpand, lgopen:false, lgq:''}; // リーグ選択プルダウン用
   const acf={nat:otLast.nat||'ALL'};
   const formOpts=FORMS.map(f=>`<option value="${f}"${f===chosenForm?' selected':''}>${f}</option>`).join('');
-  const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["AT","オーストリア"],["GR","ギリシャ"],["CZ","チェコ"],["PO","ポーランド"],["RS","セルビア"],["NO","ノルウェー"],["CY","キプロス"],["J1","Jリーグ"],["J2","J2リーグ"],["J3","J3リーグ"],["ML","MLS"],["SP","サウジ"]];
+  const lgOpts=[["ALL","全リーグ"],["PL","プレミア"],["EC","チャンピオンシップ"],["E3","リーグ・ワン"],["LL","ラ・リーガ"],["S2","ラ・リーガ2部"],["SA","セリエA"],["SB","セリエB"],["BL","ブンデス"],["D2","2.ブンデス"],["L1","リーグ・アン"],["L2","リーグ・アン2部"],["ED","オランダ"],["PT","ポルトガル"],["TR","トルコ"],["BE","ベルギー"],["SC","スコットランド"],["DK","デンマーク"],["CH","スイス"],["AT","オーストリア"],["GR","ギリシャ"],["CZ","チェコ"],["PO","ポーランド"],["RS","セルビア"],["NO","ノルウェー"],["CY","キプロス"],["J1","Jリーグ"],["J2","J2リーグ"],["J3","J3リーグ"],["ML","MLS"],["SP","サウジ"]];
   // 人気クラブ（UEFAクラブランキング上位100）。順位リストは後日設定するため今は空
   const POP_CLUBS=["Bayern München","Real Madrid","Paris Saint-Germain","Liverpool","Inter","Manchester City","Arsenal","Barcelona","Bayer Leverkusen","Atlético Madrid","Borussia Dortmund","Chelsea","AS Roma","SL Benfica","Atalanta","Sporting CP","Eintracht Frankfurt","Tottenham","Aston Villa","FC Porto","Manchester United","Fiorentina","Club Brugge KV","Real Betis","Juventus","PSV Eindhoven","Feyenoord Rotterdam","West Ham United","Lille","AC Milan","Olympique Lyon","FK Bodø/Glimt","SC Braga","Napoli","AZ Alkmaar","Olympiacos Piraeus","RB Leipzig","Rangers","Lazio","Villarreal","Ajax Amsterdam","Fenerbahce","Real Sociedad","Freiburg","Shakhtar Donetsk","AS Monaco","FC Copenhagen","Marseille","Galatasaray","FC Viktoria Plzen","Ferencvárosi TC","PAOK Thessaloniki","FC Midtjylland","Union Saint-Gilloise","GNK Dinamo Zagreb","Red Star Belgrade","Red Bull Salzburg","SK Slavia Prague","Celtic","Qarabağ FK","KAA Gent","Sevilla","Athletic Club","AC Sparta Prague","Slovan Bratislava","Stade Rennais","FC Basel","Legia Warszawa","Maccabi Tel Aviv","Djurgårdens IF","Bologna","RSC Anderlecht","Newcastle United","Rapid Vienna","BSC Young Boys","Panathinaikos","KRC Genk","Ludogorets Razgrad","VfB Stuttgart","Lech Poznan","SK Sturm Graz","FCSB","Pafos FC","AEK Athens","Nottingham Forest","Union Berlin","Raków Częstochowa","Rayo Vallecano","Jagiellonia Bialystok","FK Partizan Belgrade","NK Celje","Molde FK","Omonia Nicosia","FC Lugano","LASK","AEK Larnaca","FC Sheriff Tiraspol","OGC Nice","Crystal Palace","Basaksehir FK"];
   // クラブ選択肢。特定リーグ＝そのリーグのクラブ／人気クラブ(POP)＝上位100。先頭はプレースホルダ（未選択＝リーグのみで作成）
