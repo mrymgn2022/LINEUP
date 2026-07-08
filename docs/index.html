@@ -25616,6 +25616,34 @@ function recordSearch(pid){
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k],kind:'search'}),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
+// 離脱時カウント：スカッドを組んだのに「保存」せず画面を閉じる初心者を取りこぼさないための集計。
+// 対象＝(1)未保存の変更あり(isDirty) かつ (2)スタメン11人が埋まった完成盤面。離脱の瞬間に“最終盤面”を1回だけ記録。
+// タブ切替の連発や同一盤面の多重送信は _lastExitSig（前回記録した盤面の署名）で抑止。保存経路(recordSquadSave)とは
+// 二重計上しない（保存直後はisDirty=falseになるため）。キーはpopKey＝同名選手も移籍で分裂しない。
+let _lastExitSig=null;
+function exitSquadKeys(){
+  if(typeof isDirty==='function' && !isDirty()) return null;                     // 未変更/保存済み＝対象外
+  if(!state.slots || state.slots.filter(s=>s&&s.pid!=null).length<11) return null; // 完成した11人のみ
+  const keys=[], seen=new Set();
+  const add=pid=>{ if(pid==null||!P[pid]||isCustomPid(pid)) return; const k=popKey(pid); if(!k||seen.has(k)) return; seen.add(k); keys.push(k); };
+  state.slots.forEach(s=>{ if(s){ add(s.pid); add(s.sub); } });   // スタメン11＋第2候補
+  (state.bench||[]).forEach(add);                                 // ベンチ
+  if(!keys.length) return null;
+  const sig=keys.slice().sort().join(',');
+  if(sig===_lastExitSig) return null;                            // 同一盤面の多重送信を抑止
+  return {keys,sig};
+}
+function recordExitSquad(){
+  try{
+    if(!POP_ENDPOINT) return;
+    const r=exitSquadKeys(); if(!r) return;
+    _lastExitSig=r.sig;
+    const body=JSON.stringify({did:_deviceId(),keys:r.keys});
+    // 離脱時は fetch より確実に届く sendBeacon を優先（非対応環境は keepalive fetch でフォールバック）
+    if(navigator.sendBeacon){ navigator.sendBeacon(POP_ENDPOINT, new Blob([body],{type:'application/json'})); }
+    else { fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{}); }
+  }catch(e){}
+}
 // 現在のスカッドを保存形式(v3, キー化)に変換。自動保存・複数チーム保存の両方で使う。
 function serializeTeam(){
   return { v:3, formation:state.formation,
@@ -28764,8 +28792,8 @@ function newTeamFlow(){ guardUnsaved(()=>startOriginal()); }
 
 document.getElementById('btnMenu').onclick=openDrawer;
 // 画面/アプリを閉じる時に作業中の下書きだけ同期保存（再起動時に最後のスカッドを復元。一覧へは手動保存のみ）
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') autoSaveDraft(); });
-window.addEventListener('pagehide',autoSaveDraft);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } });
+window.addEventListener('pagehide',()=>{ autoSaveDraft(); recordExitSquad(); });
 // ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
 // ドロワーのスワイプ操作：左端からの右スワイプで開く／開いている時は左スワイプで閉じる（×・スクリムタップに加えて）
 (function initDrawerGestures(){
@@ -29873,6 +29901,16 @@ window.__selftest=function(){
       _p[4]='__SELFTEST_TRANSFER__'; const _after=popKey(_dp); _p[4]=_oldClub; // クラブを一時変更→復元
       ok('popkey_transfer_stable', _before===_after && /\|#/.test(_before||'') && popKey(_dp)===_before,
          '同名人気度キーが移籍で変化: ['+_before+'] -> ['+_after+']'); }
+    // T12: 離脱時カウント（保存せず組んで離脱）— 完成11人&未保存のみ記録、同一盤面は多重送信しない
+    { const _cj=cleanJson, _les=_lastExitSig;
+      autoFillNationality('BRA','4-3-3','EXIT-test');
+      cleanJson='__force_dirty__'; _lastExitSig=null;                       // 未保存の完成盤面を再現
+      const e1=exitSquadKeys(); const _filled=state.slots.filter(s=>s&&s.pid!=null).length;
+      let _pass=!!(e1&&e1.keys&&e1.keys.length>=11);                        // 完成11人+未保存→記録対象
+      if(e1){ _lastExitSig=e1.sig; _pass=_pass&&(exitSquadKeys()===null); } // 同一盤面は2回目null（多重送信抑止）
+      cleanJson=JSON.stringify(serializeTeam()); _pass=_pass&&(exitSquadKeys()===null); // 未変更→対象外
+      cleanJson=_cj; _lastExitSig=_les;                                     // 復元
+      ok('exit_squad_capture',_pass,'離脱時カウントの判定不整合 (filled='+_filled+')'); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
