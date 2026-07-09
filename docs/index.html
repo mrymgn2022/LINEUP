@@ -25564,7 +25564,7 @@ const I18N = {
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
 try{ document.documentElement.lang=LANG; }catch(e){} // 起動時の言語を<html lang>へ反映（読み上げ・SEO対応）
 function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)?I18N.ja[k]:k); }
-function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
+function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
 // トースト用：選手名・ポジション等を差し込む言語別フレーズ
@@ -25794,7 +25794,7 @@ function getTeams(){
   memTeams=[]; return memTeams;
 }
 function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} }
-function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||'マイチーム'; }
+function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||defaultTeamName(); }
 // 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
 function saveCurrentTeam(){
   const teams=getTeams(); const data=serializeTeam();
@@ -27612,6 +27612,34 @@ const NATJA={ENG:'イングランド',SCO:'スコットランド',WAL:'ウェー
 function natJa(c){ return NATJA[c]||NATNAME[c]||c; }
 // 国籍名の表示（英語UIなら NATNAME、それ以外は natJa の日本語）
 function natDisp(c){ return (LANG==='en' && NATNAME[c]) ? NATNAME[c] : natJa(c); }
+function natDispL(c,l){ return (l==='en' && NATNAME[c]) ? NATNAME[c] : natJa(c); } // 明示言語版
+function defaultTeamName(){ return LANG==='en' ? 'My Team' : 'マイチーム'; }        // 言語別の既定チーム名
+// name が「自動生成名」か判定：'default'（既定名）／'nat'（代表名）／null（ユーザー命名 or クラブ名＝不変）
+function autoNameKind(name,cond){
+  if(name==='マイチーム'||name==='My Team') return 'default';
+  if(cond&&cond.nat&&(name===natDispL(cond.nat,'ja')||name===natDispL(cond.nat,'en'))) return 'nat';
+  return null;
+}
+// 言語切替時：自動生成のチーム名（既定名・代表名）だけ新言語 next へ。ユーザー命名・クラブ名は不変。
+function retranslateAutoNames(next){
+  const nm=k=> k==='nat'?null : (next==='en'?'My Team':'マイチーム');
+  // ライブ盤面
+  if(state.teamName!=null){
+    const k=autoNameKind(state.teamName,state.teamCond);
+    if(k==='nat') state.teamName=natDispL(state.teamCond.nat,next);
+    else if(k==='default') state.teamName=nm('default');
+  }
+  // 保存済み一覧
+  const teams=getTeams(); let changed=false;
+  for(const t of teams){
+    const cond=t.data&&t.data.teamCond; const k=autoNameKind(t.name,cond);
+    let nn=null;
+    if(k==='nat') nn=natDispL(cond.nat,next);
+    else if(k==='default') nn=nm('default');
+    if(nn&&nn!==t.name){ t.name=nn; if(t.data&&t.data.teamName!=null) t.data.teamName=nn; changed=true; }
+  }
+  if(changed) setTeams(teams);
+}
 // 検索クエリ/対象の正規化：小文字化＋ひらがな→カタカナ（「ぶらじる」でも「ブラジル」にヒット）
 function natNorm(s){ return (s||'').toLowerCase().replace(/[ぁ-ゖ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60)); }
 // 発音記号を畳む（João→joao, São→sao, Atlético→atletico 等）。検索をローマ字でもヒットさせる。
@@ -28942,7 +28970,28 @@ const CLUB_JA={
 // クラブ名の表示（日本語UIかつJリーグのクラブなら日本語表記、それ以外はデータ通りのローマ字）
 function dispClub(club){ const c=(club||'').trim(); return (LANG==='ja'&&CLUB_JA[c])?CLUB_JA[c]:club; }
 // クラブ名の短縮表示。日本語UIのJリーグは日本語クラブ名、それ以外はローマ字短縮。
-function shortClub(name){ const n=(name||'').trim(); if(!n) return n; if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n]; return shortClubRomaji(n); }
+// 英語UIのJリーグ盤面名＝都市名（例 Kashima Antlers→Kashima / Kawasaki Frontale→Kawasaki / Urawa Red Diamonds→Urawa）。
+// 同一都市に複数クラブがある東京(FC東京/東京V)・大阪(G/C/FC大阪)・横浜(FM/横浜FC)・栃木(栃木C/栃木SC)は曖昧なので除外＝従来のニックネーム表記のまま。
+const JCITY_EN={
+  'Albirex Niigata':'Niigata','Avispa Fukuoka':'Fukuoka','Blaublitz Akita':'Akita','Ehime FC':'Ehime',
+  'FC Gifu':'Gifu','FC Imabari':'Imabari','Fagiano Okayama':'Okayama','Fujieda MYFC':'Fujieda',
+  'Fukushima United':'Fukushima','Gainare Tottori':'Tottori','Giravanz Kitakyushu':'Kitakyushu',
+  'Hokkaido Consadole Sapporo':'Sapporo','Iwaki FC':'Iwaki','JEF United Chiba':'Chiba','Júbilo Iwata':'Iwata',
+  'Kagoshima United':'Kagoshima','Kamatamare Sanuki':'Sanuki','Kashima Antlers':'Kashima','Kashiwa Reysol':'Kashiwa',
+  'Kataller Toyama':'Toyama','Kawasaki Frontale':'Kawasaki','Kochi United':'Kochi','Kyoto Sanga':'Kyoto',
+  'Machida Zelvia':'Machida','Matsumoto Yamaga':'Matsumoto','Mito HollyHock':'Mito','Montedio Yamagata':'Yamagata',
+  'Nagano Parceiro':'Nagano','Nagoya Grampus':'Nagoya','Nara Club':'Nara','Oita Trinita':'Oita',
+  'RB Omiya Ardija':'Omiya','Reilac Shiga':'Shiga','Renofa Yamaguchi':'Yamaguchi','Roasso Kumamoto':'Kumamoto',
+  'Ryukyu Okinawa':'Okinawa','SC Sagamihara':'Sagamihara','Sagan Tosu':'Tosu','Sanfrecce Hiroshima':'Hiroshima',
+  'Shimizu S-Pulse':'Shimizu','Shonan Bellmare':'Shonan','Tegevajaro Miyazaki':'Miyazaki','Thespa Gunma':'Gunma',
+  'Tokushima Vortis':'Tokushima','Urawa Red Diamonds':'Urawa','V-Varen Nagasaki':'Nagasaki',
+  'Vanraure Hachinohe':'Hachinohe','Vegalta Sendai':'Sendai','Ventforet Kofu':'Kofu','Vissel Kobe':'Kobe',
+  'Zweigen Kanazawa':'Kanazawa'
+};
+function shortClub(name){ const n=(name||'').trim(); if(!n) return n;
+  if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n];
+  if(LANG==='en'&&JCITY_EN[n]) return JCITY_EN[n]; // 英語Jリーグ＝都市名（共有都市は除外＝従来通り）
+  return shortClubRomaji(n); }
 // ローマ字クラブ名の短縮（言語非依存。自動クラブメモの判定比較にも使う）
 function shortClubRomaji(name){
   const n=(name||'').trim(); if(!n) return n;
