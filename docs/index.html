@@ -25414,7 +25414,7 @@ const I18N = {
     tstLoaded:'スカッドを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'スカッドを保存しました', appSoon:'アプリ版は近日公開予定です',
     getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
     tipMenu:'メニュー', tipShare:'SNSに共有', tipClear:'盤面をリセット', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'整列リセット',
-    formation:'フォーメーション', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示',
+    formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示',
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
@@ -25492,7 +25492,7 @@ const I18N = {
     tstLoaded:'Squad loaded', tstDeleted:'Deleted', tstOverwritten:'Squad updated', tstSaved:'Squad saved', appSoon:'The app version is coming soon',
     getApp:'Get the app', getAppSoon:'App version (coming soon)',
     tipMenu:'Menu', tipShare:'Share', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
-    formation:'Formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags',
+    formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
@@ -26269,9 +26269,9 @@ function formationThumb(key){
 }
 function openFormationPicker(){
   const cards=FORMS.map(f=>`<div class="fcard${f===state.formation?' on':''}" data-f="${f}">${formationThumb(f)}<div class="fname">${f}</div></div>`).join('');
-  openSheet(`<h2>フォーメーション変更 <span>${state.formation}</span></h2>
+  openSheet(`<h2>${t('fmChange')} <span>${state.formation}</span></h2>
     <div class="detail"><div class="fgrid">${cards}</div>
-    <button class="bigbtn ghost" id="fClose">閉じる</button></div>`);
+    <button class="bigbtn ghost" id="fClose">${t('close')}</button></div>`);
   body.querySelector('.fgrid').onclick=e=>{
     const c=e.target.closest('[data-f]'); if(!c)return;
     const f=c.dataset.f;
