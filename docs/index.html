@@ -27471,12 +27471,21 @@ function drawPickList(slotIdx){
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   const so=pickFilter.sort||'suggest';
   _iconFloorActive=false; // 手動ピッカーはレジェンド下限を効かせず“素の実力順”で並べる（引退アイコンで一覧を汚さない）
+  // ★性能修正: ソートキー(市場価値・適性ランク)を候補ごとに1回だけ事前計算する（デコレート）。
+  // 以前は比較のたびに mvScore(=keyForPlayer文字列生成+マップ参照) を呼んでいたため、まっさら盤面(候補2.4万)で
+  // 並べ替えに約700msかかっていた。全件1回計算(約47ms)＋数値ソートに置き換え＝体感で即開くようになる。並び順は従来と同一。
+  const _suggest=(so==='suggest'||so===undefined), _useRank=_suggest&&!!pickRole, _needScore=(so==='pop'||_suggest);
+  const _club=state.loadedClub;
+  const _sc=_needScore?new Float64Array(P.length):null; // pid→mvScore
+  const _rk=_useRank?new Float64Array(P.length):null;   // pid→適性ランク
+  for(const i of pickCurIdx){ const p=P[i]; if(_needScore)_sc[i]=mvScore(p); if(_useRank)_rk[i]=suggestRank(p[1]); }
+  _iconFloorActive=true;
+  const _cm=i=> (_club && P[i][4].trim()===_club) ? 1 : 0; // 自チーム(読込クラブ)一致を優先
   if(so==='age_desc') pickCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
   else if(so==='age_asc') pickCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
-  else if(so==='pop') pickCurIdx.sort((a,b)=>{const ma=mvScore(P[a]),mb=mvScore(P[b]); if(ma!==mb)return mb-ma; return P[b][2]-P[a][2];}); // 人気順（注目度＝内部指標で降順）
-  else if(pickRole) pickCurIdx.sort(suggestSort); // スロット押下時：そのポジションを優先表示→市場価値順
-  else pickCurIdx.sort((a,b)=>{const ma=mvScore(P[a]),mb=mvScore(P[b]); if(ma!==mb)return mb-ma; return P[b][2]-P[a][2];}); // ポジション指定なし(ベンチ/ベンチ外追加等)：市場価値の高い順
-  _iconFloorActive=true;
+  else if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
+  else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
+  else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
   if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
