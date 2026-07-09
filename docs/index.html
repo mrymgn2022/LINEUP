@@ -27275,6 +27275,16 @@ function suggestSort(a,b){
   if(ma!==mb) return mb-ma;   // 市場価値の高い順（自チーム以外のサジェストに使用）
   return P[b][2]-P[a][2];
 }
+// suggestSort と“完全に同じ並び”を、mvScore/suggestRank を候補ごとに1回だけ計算して高速化した版（比較器内で再計算しない）。
+// pickRole / state.loadedClub / _iconFloorActive の現在値を suggestSort と同様に参照する＝ idx.sort(suggestSort) のドロップイン置換。
+// まっさら盤面(候補2.4万)の第2候補ピッカー等で、比較のたびの mvScore 再計算による数百msの遅延を解消する。
+function sortSuggestFast(idx){
+  const club=state.loadedClub;
+  const sc=new Float64Array(P.length), rk=new Float64Array(P.length);
+  for(const i of idx){ const p=P[i]; sc[i]=mvScore(p); rk[i]= pickRole ? suggestRank(p[1]) : (POSORDERFULL[p[1]]??99); }
+  const cm=i=> (club && P[i][4].trim()===club) ? 1 : 0;
+  return idx.sort((a,b)=> (rk[a]-rk[b]) || (cm(b)-cm(a)) || (sc[b]-sc[a]) || (P[b][2]-P[a][2]));
+}
 // 自動配置の適性ゲート：そのポジションの選手をそのスロット役割に置いてよいか
 // GKは相互に専用（フィールド選手をGKに入れない／GKをフィールドに入れない）。同じ大枠(DF/MF/FW)はOK。越境はSUGGESTに明記された役割のみ許可。
 function slotFit(pos,role){
@@ -27896,7 +27906,7 @@ function wireSubPickerFull(slotIdx){
 function drawSubFull(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
-  pickCurIdx.sort(suggestSort);
+  sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
   if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
@@ -28273,11 +28283,11 @@ function drawMkt(){
   });
   const so=f.sort||'mv';
   _iconFloorActive=false; // 検索一覧もレジェンド下限を効かせず“素の実力順”で並べる
-  mktCurIdx.sort((a,b)=>{
-    if(so==='age_desc') return P[b][2]-P[a][2];
-    if(so==='age_asc')  return P[a][2]-P[b][2];
-    const ma=mvScore(P[a]), mb=mvScore(P[b]); if(ma!==mb) return mb-ma; return P[b][2]-P[a][2]; // 注目順=市場価値の高い順
-  });
+  // ★性能修正: 市場価値順は mvScore を候補ごとに1回だけ事前計算（比較器内で再計算しない）。フィルタ無しの全2.4万件でも即並ぶ。順序は従来と同一。
+  if(so==='age_desc') mktCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
+  else if(so==='age_asc') mktCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
+  else { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
+    mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 注目順=市場価値の高い順
   _iconFloorActive=true;
   if(!mktCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
