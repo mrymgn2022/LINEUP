@@ -3,20 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>インテルの最新スカッド一覧とスタメン作成【2026-27】｜Squad XI</title>
-<meta name="description" content="インテルの2026-27最新スカッド（全24人：ポジション・年齢・国籍）。移籍を反映したインテルのスタメン・フォーメーションを無料で作成して画像で共有。">
+<title>インテル の予想スタメン・ベストイレブン・最新スカッド｜Squad XI</title>
+<meta name="description" content="インテル の最新スカッドと予想スターティングXI。市場価値上位の主力で布陣を組んで無料で画像共有できます。スカッドイレブン。">
 <link rel="canonical" href="https://squadxi.futbol/clubs/inter.html">
-<link rel="icon" type="image/png" href="https://squadxi.futbol/favicon.png" sizes="192x192">
+<link rel="alternate" hreflang="ja" href="https://squadxi.futbol/clubs/inter.html">
+<link rel="alternate" hreflang="en" href="https://squadxi.futbol/en/clubs/inter.html">
+<link rel="alternate" hreflang="x-default" href="https://squadxi.futbol/clubs/inter.html">
+<link rel="icon" type="image/png" href="/favicon.png" sizes="192x192">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Squad XI">
-<meta property="og:title" content="インテルの最新スカッドとスタメン作成">
-<meta property="og:description" content="インテルの2026-27最新スカッド（全24人：ポジション・年齢・国籍）。移籍を反映したインテルのスタメン・フォーメーションを無料で作成して画像で共有。">
+<meta property="og:title" content="インテル の予想スタメン・ベストイレブン・最新スカッド｜Squad XI">
+<meta property="og:description" content="インテル の最新スカッドと予想スターティングXI。市場価値上位の主力で布陣を組んで無料で画像共有できます。スカッドイレブン。">
 <meta property="og:url" content="https://squadxi.futbol/clubs/inter.html">
-<meta property="og:image" content="https://squadxi.futbol/og.png">
+<meta property="og:image" content="/og.png">
 <meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <style>
-@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/bebas-latin.woff2') format('woff2')}
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#0a0e0c;--panel:#10160f;--line:#1f2b1e;--ink:#eafff0;--sub:#7d9389;--lime:#C8FF4F}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;line-height:1.85}
@@ -25,14 +28,21 @@ a{color:var(--lime)}
 header.site{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line)}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1.5px;color:var(--ink);text-decoration:none}
 .logo b{color:var(--lime);font-weight:400}
+.nav a{color:var(--sub);text-decoration:none;font-size:13px;margin-left:14px}
 .open{background:var(--lime);color:#0a0e0c;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:10px;font-size:14px}
-h1{font-size:24px;line-height:1.4;margin:34px 0 10px}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(200,255,79,.12);border:1px solid var(--lime);color:var(--lime);font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:999px;margin:26px 0 0}
+h1{font-size:24px;line-height:1.4;margin:10px 0 10px;display:flex;align-items:center;gap:10px}
+h1 img{width:34px;height:26px;border-radius:3px}
 .lead{color:var(--sub);margin-bottom:8px}
-h2{font-size:19px;margin:36px 0 12px;padding-left:10px;border-left:4px solid var(--lime)}
+h2{font-size:19px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--lime)}
+h3{font-size:15px;margin:18px 0 6px;color:var(--lime)}
 p{margin:10px 0}
-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:14px}
 th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
 th{background:var(--panel);white-space:nowrap}
+.res td.r{font-weight:800;text-align:center;width:44px}
+.win{color:#7CFF9B}.draw{color:#ffd166}.loss{color:#ff7d7d}
+.pitchbox{margin:8px 0 6px}
 .cta{display:block;background:var(--lime);color:#0a0e0c;text-align:center;text-decoration:none;font-weight:800;font-size:16px;padding:14px;border-radius:12px;margin:26px 0}
 .note{font-size:12px;color:var(--sub)}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
@@ -43,52 +53,71 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <body>
 <div class="wrap">
 <header class="site">
-  <a class="logo" href="../">Squad <b>XI</b></a>
-  <a class="open" href="../">アプリを開く</a>
+  <a class="logo" href="/">Squad <b>XI</b></a>
+  <span class="nav"><a href="https://squadxi.futbol/en/clubs/inter.html">English</a> <a class="open" href="/">アプリを開く</a></span>
 </header>
+<h1>インテル 予想スタメン & ベストイレブン</h1>
+<p class="lead">イタリアの盟主インテル。 <a href="/">Squad XI</a>で並べ替えて画像共有できます。</p>
+<a class="cta" href="/">インテル のスタメンを組む（無料）→</a>
+<h2>予想スターティングXI（4-4-2）</h2>
+<div class="pitchbox"><svg viewBox="0 0 520 800" xmlns="http://www.w3.org/2000/svg" role="img" width="100%" style="max-width:460px;display:block;margin:0 auto" font-family="system-ui,-apple-system,sans-serif"><title>インテル 予想スターティングXI (4-4-2)</title>
+<defs><linearGradient id="dsc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2722"/><stop offset="1" stop-color="#10160f"/></linearGradient></defs>
+<rect x="0" y="0" width="520" height="800" rx="18" fill="#12402f"/><rect x="0" y="0.0" width="520" height="80" fill="#15493a" opacity="0.92"/><rect x="0" y="80.0" width="520" height="80" fill="#12402f" opacity="0.92"/><rect x="0" y="160.0" width="520" height="80" fill="#15493a" opacity="0.92"/><rect x="0" y="240.0" width="520" height="80" fill="#12402f" opacity="0.92"/><rect x="0" y="320.0" width="520" height="80" fill="#15493a" opacity="0.92"/><rect x="0" y="400.0" width="520" height="80" fill="#12402f" opacity="0.92"/><rect x="0" y="480.0" width="520" height="80" fill="#15493a" opacity="0.92"/><rect x="0" y="560.0" width="520" height="80" fill="#12402f" opacity="0.92"/><rect x="0" y="640.0" width="520" height="80" fill="#15493a" opacity="0.92"/><rect x="0" y="720.0" width="520" height="80" fill="#12402f" opacity="0.92"/>
+<rect x="8" y="8" width="504" height="784" rx="12" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<line x1="20" y1="400" x2="500" y2="400" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<circle cx="260" cy="400" r="62" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<circle cx="260" cy="400" r="3" fill="rgba(255,255,255,.4)"/>
+<rect x="135.2" y="8" width="249.6" height="80" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<rect x="197.6" y="8" width="124.8" height="36" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<rect x="135.2" y="712" width="249.6" height="80" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<rect x="197.6" y="756" width="124.8" height="36" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+<text x="260" y="409" text-anchor="middle" font-size="30" font-weight="700" letter-spacing="5" fill="rgba(234,255,240,.12)">SQUAD <tspan fill="rgba(200,255,79,.20)">XI</tspan></text>
+<text x="502" y="784" text-anchor="end" font-size="17" font-weight="700" letter-spacing="1.5" fill="#eafff0" opacity="0.9">SQUAD <tspan fill="#caff3a">XI</tspan></text>
+<g><circle cx="260.0" cy="688.8" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="260.0" y="693.8" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">JM</text><text x="260.0" y="722.8" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">GK</text><text x="260.0" y="735.8" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Martínez</text></g>
+<g><circle cx="106.4" cy="582.4" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="106.4" y="587.4" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">FD</text><text x="106.4" y="616.4" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">LB</text><text x="106.4" y="629.4" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Dimarco</text></g>
+<g><circle cx="197.6" cy="612.8" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="197.6" y="617.8" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">AB</text><text x="197.6" y="646.8" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">CB</text><text x="197.6" y="659.8" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Bastoni</text></g>
+<g><circle cx="322.4" cy="612.8" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="322.4" y="617.8" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">YB</text><text x="322.4" y="646.8" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">CB</text><text x="322.4" y="659.8" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Bisseck</text></g>
+<g><circle cx="413.6" cy="582.4" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="413.6" y="587.4" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">MD</text><text x="413.6" y="616.4" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">RB</text><text x="413.6" y="629.4" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Darmian</text></g>
+<g><circle cx="96.8" cy="384.8" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="96.8" y="389.8" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">NB</text><text x="96.8" y="418.8" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">LM</text><text x="96.8" y="431.8" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Barella</text></g>
+<g><circle cx="202.4" cy="400.0" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="202.4" y="405" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">PS</text><text x="202.4" y="434" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">CM</text><text x="202.4" y="447" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Petar Sučić</text></g>
+<g><circle cx="317.6" cy="400.0" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="317.6" y="405" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">AS</text><text x="317.6" y="434" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">CM</text><text x="317.6" y="447" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Stanković</text></g>
+<g><circle cx="423.2" cy="384.8" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="423.2" y="389.8" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">DF</text><text x="423.2" y="418.8" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">RM</text><text x="423.2" y="431.8" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Frattesi</text></g>
+<g><circle cx="202.4" cy="141.6" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="202.4" y="146.6" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">LM</text><text x="202.4" y="175.6" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">ST</text><text x="202.4" y="188.6" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Martínez</text></g>
+<g><circle cx="317.6" cy="141.6" r="21" fill="url(#dsc)" stroke="#caff3a" stroke-width="2.5"/><text x="317.6" y="146.6" text-anchor="middle" font-size="14" font-weight="800" fill="#eafff0">MT</text><text x="317.6" y="175.6" text-anchor="middle" font-size="10" font-weight="700" letter-spacing="0.5" fill="#9ec92a">ST</text><text x="317.6" y="188.6" text-anchor="middle" font-size="13" font-weight="700" fill="#fff" style="paint-order:stroke;stroke:#000;stroke-width:2.6px">Thuram</text></g>
+</svg></div>
+<p class="note">Squad XIの市場価値データで自動編成した予想ベストXIです（実際のスタメンとは異なる場合があります）。</p>
 
-<h1>インテルの最新スカッドとスタメン作成【2026-27】</h1>
-<p class="lead">2026年夏にアカンジを完全移籍で確保、スタンコビッチも復帰したイタリアの盟主インテル。 下のスカッド一覧を眺めたら、<a href="../">Squad XI（スカッドイレブン）</a>でインテルのスタメンを実際に組んで、画像でSNSに共有できます。クラブを選ぶだけで自動編成もできます。</p>
-
-<a class="cta" href="../">インテルのスタメンを作る（無料・登録不要）→</a>
-
-<h2>インテル 登録スカッド（全24人）</h2>
-<table>
-<tr><th>ポジション</th><th>選手</th><th>年齢</th><th>国籍</th></tr>
-<tr><td>GK</td><td>Josep Martínez</td><td>28</td><td><img src="../vendor/flag-icons/flags/4x3/es.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ESP</td></tr>
-<tr><td>GK</td><td>Raffaele Di Gennaro</td><td>32</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>GK</td><td>Yann Sommer</td><td>37</td><td><img src="../vendor/flag-icons/flags/4x3/ch.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> SUI</td></tr>
-<tr><td>CB</td><td>Yann Bisseck</td><td>25</td><td><img src="../vendor/flag-icons/flags/4x3/de.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> GER</td></tr>
-<tr><td>CB</td><td>Alessandro Bastoni</td><td>27</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>CB</td><td>Manuel Akanji</td><td>30</td><td><img src="../vendor/flag-icons/flags/4x3/ch.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> SUI</td></tr>
-<tr><td>CB</td><td>Stefan de Vrij</td><td>34</td><td><img src="../vendor/flag-icons/flags/4x3/nl.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> NED</td></tr>
-<tr><td>CB</td><td>Francesco Acerbi</td><td>38</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>LB</td><td>Carlos Augusto</td><td>27</td><td><img src="../vendor/flag-icons/flags/4x3/br.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> BRA</td></tr>
-<tr><td>LB</td><td>Federico Dimarco</td><td>28</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>RB</td><td>Matteo Darmian</td><td>36</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>守備的MF</td><td>Aleksandar Stanković</td><td>20</td><td><img src="../vendor/flag-icons/flags/4x3/rs.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> SRB</td></tr>
-<tr><td>守備的MF</td><td>Hakan Çalhanoğlu</td><td>32</td><td><img src="../vendor/flag-icons/flags/4x3/tr.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> TUR</td></tr>
-<tr><td>MF</td><td>Petar Sučić</td><td>22</td><td><img src="../vendor/flag-icons/flags/4x3/hr.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> CRO</td></tr>
-<tr><td>MF</td><td>Andy Diouf</td><td>23</td><td><img src="../vendor/flag-icons/flags/4x3/fr.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> FRA</td></tr>
-<tr><td>MF</td><td>Davide Frattesi</td><td>26</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>MF</td><td>Nicolò Barella</td><td>29</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>MF</td><td>Piotr Zielinski</td><td>32</td><td><img src="../vendor/flag-icons/flags/4x3/pl.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> POL</td></tr>
-<tr><td>MF</td><td>Henrikh Mkhitaryan</td><td>37</td><td><img src="../vendor/flag-icons/flags/4x3/am.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ARM</td></tr>
-<tr><td>右WG</td><td>Luis Henrique</td><td>24</td><td><img src="../vendor/flag-icons/flags/4x3/br.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> BRA</td></tr>
-<tr><td>CF/ST</td><td>Pio Esposito</td><td>20</td><td><img src="../vendor/flag-icons/flags/4x3/it.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ITA</td></tr>
-<tr><td>CF/ST</td><td>Ange-Yoan Bonny</td><td>22</td><td><img src="../vendor/flag-icons/flags/4x3/ci.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> CIV</td></tr>
-<tr><td>CF/ST</td><td>Lautaro Martínez</td><td>28</td><td><img src="../vendor/flag-icons/flags/4x3/ar.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> ARG</td></tr>
-<tr><td>CF/ST</td><td>Marcus Thuram</td><td>28</td><td><img src="../vendor/flag-icons/flags/4x3/fr.svg" width="18" height="14" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> FRA</td></tr>
+<h2>インテル 所属選手</h2>
+<table><tr><th>ポジション</th><th>選手</th><th>年齢</th></tr>
+<tr><td>GK</td><td>Josep Martínez</td><td>28</td></tr>
+<tr><td>GK</td><td>Yann Sommer</td><td>37</td></tr>
+<tr><td>GK</td><td>Raffaele Di Gennaro</td><td>32</td></tr>
+<tr><td>CB</td><td>Alessandro Bastoni</td><td>27</td></tr>
+<tr><td>CB</td><td>Yann Bisseck</td><td>25</td></tr>
+<tr><td>CB</td><td>Manuel Akanji</td><td>30</td></tr>
+<tr><td>CB</td><td>Stefan de Vrij</td><td>34</td></tr>
+<tr><td>CB</td><td>Francesco Acerbi</td><td>38</td></tr>
+<tr><td>LB</td><td>Federico Dimarco</td><td>28</td></tr>
+<tr><td>LB</td><td>Carlos Augusto</td><td>27</td></tr>
+<tr><td>RB</td><td>Matteo Darmian</td><td>36</td></tr>
+<tr><td>守備的MF</td><td>Aleksandar Stanković</td><td>20</td></tr>
+<tr><td>守備的MF</td><td>Hakan Çalhanoğlu</td><td>32</td></tr>
+<tr><td>MF</td><td>Nicolò Barella</td><td>29</td></tr>
+<tr><td>MF</td><td>Petar Sučić</td><td>22</td></tr>
+<tr><td>MF</td><td>Davide Frattesi</td><td>26</td></tr>
+<tr><td>MF</td><td>Andy Diouf</td><td>23</td></tr>
+<tr><td>MF</td><td>Piotr Zielinski</td><td>32</td></tr>
+<tr><td>MF</td><td>Henrikh Mkhitaryan</td><td>37</td></tr>
+<tr><td>右WG</td><td>Luis Henrique</td><td>24</td></tr>
+<tr><td>CF/ST</td><td>Lautaro Martínez</td><td>28</td></tr>
+<tr><td>CF/ST</td><td>Marcus Thuram</td><td>28</td></tr>
+<tr><td>CF/ST</td><td>Pio Esposito</td><td>20</td></tr>
+<tr><td>CF/ST</td><td>Ange-Yoan Bonny</td><td>22</td></tr>
 </table>
-<p class="note">※Squad XI収録データ（2026年夏の主要移籍を反映）に基づく参考情報です。公式のクラブ登録リストとは異なる場合があります。</p>
-
-<h2>このスカッドで遊ぶ</h2>
-<p><a href="../">Squad XI</a>でクラブ検索から「Inter」を選ぶと、市場価値ベースのベストイレブンが自動で並びます。そこから<a href="../formations.html">18種類のフォーメーション</a>に組み替えたり、控え中心の「セカンドXI」や、<a href="../worldcup-xi.html">W杯ベストイレブン</a>との比較画像を作るのもおすすめです。</p>
-
+<p class="note">※Squad XI収録データ（2026年夏の移籍反映）。予想XIは市場価値上位で自動編成。</p>
 <footer>
-<p><a href="../">Squad XI（アプリ）</a><a href="../formations.html">フォーメーション解説</a><a href="../worldcup-xi.html">W杯ベストイレブン</a><a href="../japan-xi.html">日本代表スタメン予想</a><a href="index.html">クラブ一覧</a></p>
-<p>他のクラブ: <a href="real-madrid.html">レアル・マドリード</a> <a href="barcelona.html">バルセロナ</a> <a href="atletico-madrid.html">アトレティコ・マドリード</a> <a href="manchester-city.html">マンチェスター・シティ</a> <a href="arsenal.html">アーセナル</a> <a href="liverpool.html">リバプール</a> <a href="chelsea.html">チェルシー</a> <a href="manchester-united.html">マンチェスター・ユナイテッド</a> <a href="tottenham.html">トッテナム</a> <a href="newcastle-united.html">ニューカッスル</a> <a href="bayern-munich.html">バイエルン・ミュンヘン</a> <a href="borussia-dortmund.html">ボルシア・ドルトムント</a> <a href="bayer-leverkusen.html">バイヤー・レバークーゼン</a> <a href="psg.html">パリ・サンジェルマン</a> <a href="marseille.html">マルセイユ</a> <a href="inter.html">インテル</a> <a href="ac-milan.html">ACミラン</a> <a href="juventus.html">ユベントス</a> <a href="napoli.html">ナポリ</a> <a href="as-roma.html">ASローマ</a></p>
-<p>© Squad XI — 実在のクラブ・リーグ・選手とは無関係の非公式ファンツールです。</p>
+<p><a href="/">Squad XI</a><a href="/clubs/">クラブ一覧</a><a href="/nations/">代表チーム一覧</a><a href="/en/clubs/inter.html">English</a></p>
+<p>© Squad XI — 実在のクラブ・選手とは無関係の非公式ファンツールです。</p>
 </footer>
 </div>
 </body>

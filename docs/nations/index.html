@@ -3,19 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>各国代表のベストイレブン一覧【2026-27】｜Squad XI</title>
-<meta name="description" content="日本・ブラジル・アルゼンチン・スペインなど各国代表の最新ベストイレブン・スタメン予想一覧。市場価値上位の主力で組んだ布陣を無料で作成・共有できます。スカッドイレブン。">
+<title>各国代表のベストイレブン・スタメン予想一覧｜Squad XI</title>
+<meta name="description" content="日本・ブラジル・スペインなど各国代表の予想スターティングXIと最新スカッド一覧。無料で布陣を作成・共有。">
 <link rel="canonical" href="https://squadxi.futbol/nations/">
-<link rel="icon" type="image/png" href="https://squadxi.futbol/favicon.png" sizes="192x192">
-<meta property="og:type" content="website">
+<link rel="alternate" hreflang="ja" href="https://squadxi.futbol/nations/">
+<link rel="alternate" hreflang="en" href="https://squadxi.futbol/en/nations/">
+<link rel="alternate" hreflang="x-default" href="https://squadxi.futbol/nations/">
+<link rel="icon" type="image/png" href="/favicon.png" sizes="192x192">
+<meta property="og:type" content="article">
 <meta property="og:site_name" content="Squad XI">
-<meta property="og:title" content="各国代表のベストイレブン一覧">
-<meta property="og:description" content="各国代表の最新ベストイレブン・スタメン予想。無料で作成・共有。">
+<meta property="og:title" content="各国代表のベストイレブン・スタメン予想一覧｜Squad XI">
+<meta property="og:description" content="日本・ブラジル・スペインなど各国代表の予想スターティングXIと最新スカッド一覧。無料で布陣を作成・共有。">
 <meta property="og:url" content="https://squadxi.futbol/nations/">
-<meta property="og:image" content="https://squadxi.futbol/og.png">
+<meta property="og:image" content="/og.png">
+<meta property="og:locale" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
 <style>
-@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/bebas-latin.woff2') format('woff2')}
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#0a0e0c;--panel:#10160f;--line:#1f2b1e;--ink:#eafff0;--sub:#7d9389;--lime:#C8FF4F}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;line-height:1.85}
@@ -24,93 +28,91 @@ a{color:var(--lime)}
 header.site{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line)}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1.5px;color:var(--ink);text-decoration:none}
 .logo b{color:var(--lime);font-weight:400}
+.nav a{color:var(--sub);text-decoration:none;font-size:13px;margin-left:14px}
 .open{background:var(--lime);color:#0a0e0c;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:10px;font-size:14px}
-h1{font-size:24px;line-height:1.4;margin:30px 0 10px;display:flex;align-items:center;gap:10px}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(200,255,79,.12);border:1px solid var(--lime);color:var(--lime);font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:999px;margin:26px 0 0}
+h1{font-size:24px;line-height:1.4;margin:10px 0 10px;display:flex;align-items:center;gap:10px}
 h1 img{width:34px;height:26px;border-radius:3px}
 .lead{color:var(--sub);margin-bottom:8px}
 h2{font-size:19px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--lime)}
+h3{font-size:15px;margin:18px 0 6px;color:var(--lime)}
 p{margin:10px 0}
-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:14px}
 th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
 th{background:var(--panel);white-space:nowrap}
+.res td.r{font-weight:800;text-align:center;width:44px}
+.win{color:#7CFF9B}.draw{color:#ffd166}.loss{color:#ff7d7d}
+.pitchbox{margin:8px 0 6px}
 .cta{display:block;background:var(--lime);color:#0a0e0c;text-align:center;text-decoration:none;font-weight:800;font-size:16px;padding:14px;border-radius:12px;margin:26px 0}
 .note{font-size:12px;color:var(--sub)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
-.card{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--ink)}
-.card img{width:26px;height:20px;border-radius:3px}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
 footer a{color:var(--sub);margin-right:12px;display:inline-block}
 @media(max-width:480px){h1{font-size:21px}}
-</style>
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.card{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--ink)}.card img{width:26px;height:20px;border-radius:3px}</style>
 </head>
 <body>
 <div class="wrap">
 <header class="site">
-  <a class="logo" href="../">Squad <b>XI</b></a>
-  <a class="open" href="../">アプリを開く</a>
+  <a class="logo" href="/">Squad <b>XI</b></a>
+  <span class="nav"><a href="https://squadxi.futbol/en/nations/">English</a> <a class="open" href="/">アプリを開く</a></span>
 </header>
-<h1>各国代表のベストイレブン一覧</h1>
-<p class="lead">主要国代表の最新ベストイレブン・スタメン予想。気になる国を選ぶと主力メンバーが見られ、そのまま<a href="../">Squad XI</a>で布陣を作れます。</p>
+<h1>各国代表 ベストイレブン一覧</h1>
+<p class="lead">気になる国を選ぶと予想スターティングXIと主力メンバーが見られます。</p>
 <div class="grid">
-<a class="card" href="japan.html"><img src="../vendor/flag-icons/flags/4x3/jp.svg" alt=""><span>日本代表</span></a>
-<a class="card" href="brazil.html"><img src="../vendor/flag-icons/flags/4x3/br.svg" alt=""><span>ブラジル代表</span></a>
-<a class="card" href="spain.html"><img src="../vendor/flag-icons/flags/4x3/es.svg" alt=""><span>スペイン代表</span></a>
-<a class="card" href="argentina.html"><img src="../vendor/flag-icons/flags/4x3/ar.svg" alt=""><span>アルゼンチン代表</span></a>
-<a class="card" href="france.html"><img src="../vendor/flag-icons/flags/4x3/fr.svg" alt=""><span>フランス代表</span></a>
-<a class="card" href="germany.html"><img src="../vendor/flag-icons/flags/4x3/de.svg" alt=""><span>ドイツ代表</span></a>
-<a class="card" href="italy.html"><img src="../vendor/flag-icons/flags/4x3/it.svg" alt=""><span>イタリア代表</span></a>
-<a class="card" href="colombia.html"><img src="../vendor/flag-icons/flags/4x3/co.svg" alt=""><span>コロンビア代表</span></a>
-<a class="card" href="england.html"><img src="../vendor/flag-icons/flags/4x3/gb-eng.svg" alt=""><span>イングランド代表</span></a>
-<a class="card" href="egypt.html"><img src="../vendor/flag-icons/flags/4x3/eg.svg" alt=""><span>エジプト代表</span></a>
-<a class="card" href="morocco.html"><img src="../vendor/flag-icons/flags/4x3/ma.svg" alt=""><span>モロッコ代表</span></a>
-<a class="card" href="south-africa.html"><img src="../vendor/flag-icons/flags/4x3/za.svg" alt=""><span>南アフリカ代表</span></a>
-<a class="card" href="tunisia.html"><img src="../vendor/flag-icons/flags/4x3/tn.svg" alt=""><span>チュニジア代表</span></a>
-<a class="card" href="serbia.html"><img src="../vendor/flag-icons/flags/4x3/rs.svg" alt=""><span>セルビア代表</span></a>
-<a class="card" href="south-korea.html"><img src="../vendor/flag-icons/flags/4x3/kr.svg" alt=""><span>韓国代表</span></a>
-<a class="card" href="netherlands.html"><img src="../vendor/flag-icons/flags/4x3/nl.svg" alt=""><span>オランダ代表</span></a>
-<a class="card" href="united-states.html"><img src="../vendor/flag-icons/flags/4x3/us.svg" alt=""><span>アメリカ合衆国代表</span></a>
-<a class="card" href="china.html"><img src="../vendor/flag-icons/flags/4x3/cn.svg" alt=""><span>中国代表</span></a>
-<a class="card" href="norway.html"><img src="../vendor/flag-icons/flags/4x3/no.svg" alt=""><span>ノルウェー代表</span></a>
-<a class="card" href="portugal.html"><img src="../vendor/flag-icons/flags/4x3/pt.svg" alt=""><span>ポルトガル代表</span></a>
-<a class="card" href="denmark.html"><img src="../vendor/flag-icons/flags/4x3/dk.svg" alt=""><span>デンマーク代表</span></a>
-<a class="card" href="poland.html"><img src="../vendor/flag-icons/flags/4x3/pl.svg" alt=""><span>ポーランド代表</span></a>
-<a class="card" href="mexico.html"><img src="../vendor/flag-icons/flags/4x3/mx.svg" alt=""><span>メキシコ代表</span></a>
-<a class="card" href="czechia.html"><img src="../vendor/flag-icons/flags/4x3/cz.svg" alt=""><span>チェコ代表</span></a>
-<a class="card" href="belgium.html"><img src="../vendor/flag-icons/flags/4x3/be.svg" alt=""><span>ベルギー代表</span></a>
-<a class="card" href="saudi-arabia.html"><img src="../vendor/flag-icons/flags/4x3/sa.svg" alt=""><span>サウジアラビア代表</span></a>
-<a class="card" href="turkey.html"><img src="../vendor/flag-icons/flags/4x3/tr.svg" alt=""><span>トルコ代表</span></a>
-<a class="card" href="russia.html"><img src="../vendor/flag-icons/flags/4x3/ru.svg" alt=""><span>ロシア代表</span></a>
-<a class="card" href="austria.html"><img src="../vendor/flag-icons/flags/4x3/at.svg" alt=""><span>オーストリア代表</span></a>
-<a class="card" href="switzerland.html"><img src="../vendor/flag-icons/flags/4x3/ch.svg" alt=""><span>スイス代表</span></a>
-<a class="card" href="nigeria.html"><img src="../vendor/flag-icons/flags/4x3/ng.svg" alt=""><span>ナイジェリア代表</span></a>
-<a class="card" href="greece.html"><img src="../vendor/flag-icons/flags/4x3/gr.svg" alt=""><span>ギリシャ代表</span></a>
-<a class="card" href="sweden.html"><img src="../vendor/flag-icons/flags/4x3/se.svg" alt=""><span>スウェーデン代表</span></a>
-<a class="card" href="senegal.html"><img src="../vendor/flag-icons/flags/4x3/sn.svg" alt=""><span>セネガル代表</span></a>
-<a class="card" href="scotland.html"><img src="../vendor/flag-icons/flags/4x3/gb-sct.svg" alt=""><span>スコットランド代表</span></a>
-<a class="card" href="united-arab-emirates.html"><img src="../vendor/flag-icons/flags/4x3/ae.svg" alt=""><span>アラブ首長国連邦代表</span></a>
-<a class="card" href="cote-divoire.html"><img src="../vendor/flag-icons/flags/4x3/ci.svg" alt=""><span>コートジボワール代表</span></a>
-<a class="card" href="uruguay.html"><img src="../vendor/flag-icons/flags/4x3/uy.svg" alt=""><span>ウルグアイ代表</span></a>
-<a class="card" href="ghana.html"><img src="../vendor/flag-icons/flags/4x3/gh.svg" alt=""><span>ガーナ代表</span></a>
-<a class="card" href="qatar.html"><img src="../vendor/flag-icons/flags/4x3/qa.svg" alt=""><span>カタール代表</span></a>
-<a class="card" href="croatia.html"><img src="../vendor/flag-icons/flags/4x3/hr.svg" alt=""><span>クロアチア代表</span></a>
-<a class="card" href="mali.html"><img src="../vendor/flag-icons/flags/4x3/ml.svg" alt=""><span>マリ代表</span></a>
-<a class="card" href="cameroon.html"><img src="../vendor/flag-icons/flags/4x3/cm.svg" alt=""><span>カメルーン代表</span></a>
-<a class="card" href="algeria.html"><img src="../vendor/flag-icons/flags/4x3/dz.svg" alt=""><span>アルジェリア代表</span></a>
-<a class="card" href="ukraine.html"><img src="../vendor/flag-icons/flags/4x3/ua.svg" alt=""><span>ウクライナ代表</span></a>
-<a class="card" href="canada.html"><img src="../vendor/flag-icons/flags/4x3/ca.svg" alt=""><span>カナダ代表</span></a>
-<a class="card" href="ireland.html"><img src="../vendor/flag-icons/flags/4x3/ie.svg" alt=""><span>アイルランド代表</span></a>
-<a class="card" href="australia.html"><img src="../vendor/flag-icons/flags/4x3/au.svg" alt=""><span>オーストラリア代表</span></a>
-<a class="card" href="paraguay.html"><img src="../vendor/flag-icons/flags/4x3/py.svg" alt=""><span>パラグアイ代表</span></a>
-<a class="card" href="chile.html"><img src="../vendor/flag-icons/flags/4x3/cl.svg" alt=""><span>チリ代表</span></a>
-<a class="card" href="ecuador.html"><img src="../vendor/flag-icons/flags/4x3/ec.svg" alt=""><span>エクアドル代表</span></a>
-<a class="card" href="iran.html"><img src="../vendor/flag-icons/flags/4x3/ir.svg" alt=""><span>イラン代表</span></a>
-<a class="card" href="costa-rica.html"><img src="../vendor/flag-icons/flags/4x3/cr.svg" alt=""><span>コスタリカ代表</span></a>
-<a class="card" href="peru.html"><img src="../vendor/flag-icons/flags/4x3/pe.svg" alt=""><span>ペルー代表</span></a>
+<a class="card" href="/nations/algeria.html"><img src="/vendor/flag-icons/flags/4x3/dz.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>アルジェリア代表</span></a>
+<a class="card" href="/nations/argentina.html"><img src="/vendor/flag-icons/flags/4x3/ar.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>アルゼンチン代表</span></a>
+<a class="card" href="/nations/australia.html"><img src="/vendor/flag-icons/flags/4x3/au.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>オーストラリア代表</span></a>
+<a class="card" href="/nations/austria.html"><img src="/vendor/flag-icons/flags/4x3/at.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>オーストリア代表</span></a>
+<a class="card" href="/nations/belgium.html"><img src="/vendor/flag-icons/flags/4x3/be.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ベルギー代表</span></a>
+<a class="card" href="/nations/brazil.html"><img src="/vendor/flag-icons/flags/4x3/br.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ブラジル代表</span></a>
+<a class="card" href="/nations/canada.html"><img src="/vendor/flag-icons/flags/4x3/ca.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>カナダ代表</span></a>
+<a class="card" href="/nations/colombia.html"><img src="/vendor/flag-icons/flags/4x3/co.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>コロンビア代表</span></a>
+<a class="card" href="/nations/cote-divoire.html"><img src="/vendor/flag-icons/flags/4x3/ci.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>コートジボワール代表</span></a>
+<a class="card" href="/nations/croatia.html"><img src="/vendor/flag-icons/flags/4x3/hr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>クロアチア代表</span></a>
+<a class="card" href="/nations/czechia.html"><img src="/vendor/flag-icons/flags/4x3/cz.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>チェコ代表</span></a>
+<a class="card" href="/nations/ecuador.html"><img src="/vendor/flag-icons/flags/4x3/ec.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>エクアドル代表</span></a>
+<a class="card" href="/nations/egypt.html"><img src="/vendor/flag-icons/flags/4x3/eg.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>エジプト代表</span></a>
+<a class="card" href="/nations/england.html"><img src="/vendor/flag-icons/flags/4x3/gb-eng.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>イングランド代表</span></a>
+<a class="card" href="/nations/france.html"><img src="/vendor/flag-icons/flags/4x3/fr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>フランス代表</span></a>
+<a class="card" href="/nations/germany.html"><img src="/vendor/flag-icons/flags/4x3/de.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ドイツ代表</span></a>
+<a class="card" href="/nations/ghana.html"><img src="/vendor/flag-icons/flags/4x3/gh.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ガーナ代表</span></a>
+<a class="card" href="/nations/iran.html"><img src="/vendor/flag-icons/flags/4x3/ir.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>イラン代表</span></a>
+<a class="card" href="/nations/japan.html"><img src="/vendor/flag-icons/flags/4x3/jp.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>日本代表</span></a>
+<a class="card" href="/nations/mexico.html"><img src="/vendor/flag-icons/flags/4x3/mx.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>メキシコ代表</span></a>
+<a class="card" href="/nations/morocco.html"><img src="/vendor/flag-icons/flags/4x3/ma.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>モロッコ代表</span></a>
+<a class="card" href="/nations/netherlands.html"><img src="/vendor/flag-icons/flags/4x3/nl.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>オランダ代表</span></a>
+<a class="card" href="/nations/norway.html"><img src="/vendor/flag-icons/flags/4x3/no.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ノルウェー代表</span></a>
+<a class="card" href="/nations/paraguay.html"><img src="/vendor/flag-icons/flags/4x3/py.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>パラグアイ代表</span></a>
+<a class="card" href="/nations/portugal.html"><img src="/vendor/flag-icons/flags/4x3/pt.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ポルトガル代表</span></a>
+<a class="card" href="/nations/qatar.html"><img src="/vendor/flag-icons/flags/4x3/qa.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>カタール代表</span></a>
+<a class="card" href="/nations/saudi-arabia.html"><img src="/vendor/flag-icons/flags/4x3/sa.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>サウジアラビア代表</span></a>
+<a class="card" href="/nations/scotland.html"><img src="/vendor/flag-icons/flags/4x3/gb-sct.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>スコットランド代表</span></a>
+<a class="card" href="/nations/senegal.html"><img src="/vendor/flag-icons/flags/4x3/sn.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>セネガル代表</span></a>
+<a class="card" href="/nations/south-africa.html"><img src="/vendor/flag-icons/flags/4x3/za.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>南アフリカ代表</span></a>
+<a class="card" href="/nations/south-korea.html"><img src="/vendor/flag-icons/flags/4x3/kr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>韓国代表</span></a>
+<a class="card" href="/nations/spain.html"><img src="/vendor/flag-icons/flags/4x3/es.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>スペイン代表</span></a>
+<a class="card" href="/nations/sweden.html"><img src="/vendor/flag-icons/flags/4x3/se.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>スウェーデン代表</span></a>
+<a class="card" href="/nations/switzerland.html"><img src="/vendor/flag-icons/flags/4x3/ch.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>スイス代表</span></a>
+<a class="card" href="/nations/tunisia.html"><img src="/vendor/flag-icons/flags/4x3/tn.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>チュニジア代表</span></a>
+<a class="card" href="/nations/turkey.html"><img src="/vendor/flag-icons/flags/4x3/tr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>トルコ代表</span></a>
+<a class="card" href="/nations/united-states.html"><img src="/vendor/flag-icons/flags/4x3/us.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>アメリカ代表</span></a>
+<a class="card" href="/nations/uruguay.html"><img src="/vendor/flag-icons/flags/4x3/uy.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ウルグアイ代表</span></a>
+<a class="card" href="/nations/cameroon.html"><img src="/vendor/flag-icons/flags/4x3/cm.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>カメルーン代表</span></a>
+<a class="card" href="/nations/chile.html"><img src="/vendor/flag-icons/flags/4x3/cl.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>チリ代表</span></a>
+<a class="card" href="/nations/china.html"><img src="/vendor/flag-icons/flags/4x3/cn.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>中国代表</span></a>
+<a class="card" href="/nations/costa-rica.html"><img src="/vendor/flag-icons/flags/4x3/cr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>コスタリカ代表</span></a>
+<a class="card" href="/nations/denmark.html"><img src="/vendor/flag-icons/flags/4x3/dk.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>デンマーク代表</span></a>
+<a class="card" href="/nations/greece.html"><img src="/vendor/flag-icons/flags/4x3/gr.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ギリシャ代表</span></a>
+<a class="card" href="/nations/ireland.html"><img src="/vendor/flag-icons/flags/4x3/ie.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>アイルランド代表</span></a>
+<a class="card" href="/nations/italy.html"><img src="/vendor/flag-icons/flags/4x3/it.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>イタリア代表</span></a>
+<a class="card" href="/nations/mali.html"><img src="/vendor/flag-icons/flags/4x3/ml.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>マリ代表</span></a>
+<a class="card" href="/nations/nigeria.html"><img src="/vendor/flag-icons/flags/4x3/ng.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ナイジェリア代表</span></a>
+<a class="card" href="/nations/peru.html"><img src="/vendor/flag-icons/flags/4x3/pe.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ペルー代表</span></a>
+<a class="card" href="/nations/poland.html"><img src="/vendor/flag-icons/flags/4x3/pl.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ポーランド代表</span></a>
+<a class="card" href="/nations/russia.html"><img src="/vendor/flag-icons/flags/4x3/ru.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ロシア代表</span></a>
+<a class="card" href="/nations/serbia.html"><img src="/vendor/flag-icons/flags/4x3/rs.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>セルビア代表</span></a>
+<a class="card" href="/nations/ukraine.html"><img src="/vendor/flag-icons/flags/4x3/ua.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>ウクライナ代表</span></a>
+<a class="card" href="/nations/united-arab-emirates.html"><img src="/vendor/flag-icons/flags/4x3/ae.svg" width="26" height="20" alt="" loading="lazy" style="vertical-align:-2px;border-radius:2px"> <span>アラブ首長国連邦代表</span></a>
 </div>
-<footer>
-<p><a href="../">Squad XI（アプリ）</a><a href="../formations.html">フォーメーション解説</a><a href="../worldcup-xi.html">W杯XI</a><a href="../japan-xi.html">日本代表スタメン予想</a><a href="../en/">English</a></p>
-<p>© Squad XI — 非公式ファンツール</p>
-</footer>
-</div>
-</body>
-</html>
+<footer><p><a href="/">Squad XI</a><a href="/clubs/">クラブ一覧</a><a href="/en/nations/">English</a></p></footer>
+</div></body></html>
