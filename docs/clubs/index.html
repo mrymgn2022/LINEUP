@@ -10,14 +10,24 @@
 <link rel="alternate" hreflang="en" href="https://squadxi.futbol/en/clubs/">
 <link rel="alternate" hreflang="x-default" href="https://squadxi.futbol/clubs/">
 <link rel="icon" type="image/png" href="/favicon.png" sizes="192x192">
-<meta property="og:type" content="article">
+<link rel="preload" href="/fonts/bebas-latin.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="Squad XI">
 <meta property="og:title" content="人気クラブのベストイレブン・スタメン予想一覧｜Squad XI">
 <meta property="og:description" content="レアル・バルサ・シティなど人気クラブの予想スターティングXIと最新スカッド一覧。無料で布陣を作成・共有。">
 <meta property="og:url" content="https://squadxi.futbol/clubs/">
-<meta property="og:image" content="/og.png">
+<meta property="og:image" content="https://squadxi.futbol/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Squad XI">
 <meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="人気クラブのベストイレブン・スタメン予想一覧｜Squad XI">
+<meta name="twitter:description" content="レアル・バルサ・シティなど人気クラブの予想スターティングXIと最新スカッド一覧。無料で布陣を作成・共有。">
+<meta name="twitter:image" content="https://squadxi.futbol/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"ホーム","item":"https://squadxi.futbol/"},{"@type":"ListItem","position":2,"name":"人気クラブ","item":"https://squadxi.futbol/clubs/"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"レアル・マドリード","url":"https://squadxi.futbol/clubs/real-madrid.html"},{"@type":"ListItem","position":2,"name":"バルセロナ","url":"https://squadxi.futbol/clubs/barcelona.html"},{"@type":"ListItem","position":3,"name":"アトレティコ・マドリード","url":"https://squadxi.futbol/clubs/atletico-madrid.html"},{"@type":"ListItem","position":4,"name":"マンチェスター・シティ","url":"https://squadxi.futbol/clubs/manchester-city.html"},{"@type":"ListItem","position":5,"name":"アーセナル","url":"https://squadxi.futbol/clubs/arsenal.html"},{"@type":"ListItem","position":6,"name":"リバプール","url":"https://squadxi.futbol/clubs/liverpool.html"},{"@type":"ListItem","position":7,"name":"チェルシー","url":"https://squadxi.futbol/clubs/chelsea.html"},{"@type":"ListItem","position":8,"name":"マンチェスター・ユナイテッド","url":"https://squadxi.futbol/clubs/manchester-united.html"},{"@type":"ListItem","position":9,"name":"トッテナム","url":"https://squadxi.futbol/clubs/tottenham.html"},{"@type":"ListItem","position":10,"name":"ニューカッスル","url":"https://squadxi.futbol/clubs/newcastle-united.html"},{"@type":"ListItem","position":11,"name":"バイエルン・ミュンヘン","url":"https://squadxi.futbol/clubs/bayern-munich.html"},{"@type":"ListItem","position":12,"name":"ボルシア・ドルトムント","url":"https://squadxi.futbol/clubs/borussia-dortmund.html"},{"@type":"ListItem","position":13,"name":"バイヤー・レバークーゼン","url":"https://squadxi.futbol/clubs/bayer-leverkusen.html"},{"@type":"ListItem","position":14,"name":"パリ・サンジェルマン","url":"https://squadxi.futbol/clubs/psg.html"},{"@type":"ListItem","position":15,"name":"マルセイユ","url":"https://squadxi.futbol/clubs/marseille.html"},{"@type":"ListItem","position":16,"name":"インテル","url":"https://squadxi.futbol/clubs/inter.html"},{"@type":"ListItem","position":17,"name":"ACミラン","url":"https://squadxi.futbol/clubs/ac-milan.html"},{"@type":"ListItem","position":18,"name":"ユベントス","url":"https://squadxi.futbol/clubs/juventus.html"},{"@type":"ListItem","position":19,"name":"ナポリ","url":"https://squadxi.futbol/clubs/napoli.html"},{"@type":"ListItem","position":20,"name":"ASローマ","url":"https://squadxi.futbol/clubs/as-roma.html"}]}</script>
 <style>
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#0a0e0c;--panel:#10160f;--line:#1f2b1e;--ink:#eafff0;--sub:#7d9389;--lime:#C8FF4F}
@@ -47,6 +57,14 @@ th{background:var(--panel);white-space:nowrap}
 .note{font-size:12px;color:var(--sub)}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
 footer a{color:var(--sub);margin-right:12px;display:inline-block}
+.bc{font-size:12.5px;color:var(--sub);margin:16px 0 2px}
+.bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--lime)}.bc .sep{opacity:.5;margin:0 2px}
+.faq{margin:6px 0}
+.faq .qa{border-top:1px solid var(--line);padding:12px 0}
+.faq .q{font-size:15px;margin:0 0 4px;color:var(--ink)}
+.faq p{margin:0;color:var(--sub);font-size:14px}
+.rel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.rel a{font-size:13px;color:var(--lime);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 @media(max-width:480px){h1{font-size:21px}}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.card{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--ink)}.card img{width:26px;height:20px;border-radius:3px}</style>
 </head>
@@ -56,7 +74,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
   <a class="logo" href="/">Squad <b>XI</b></a>
   <span class="nav"><a href="https://squadxi.futbol/en/clubs/">English</a> <a class="open" href="/">アプリを開く</a></span>
 </header>
-<h1>人気クラブ ベストイレブン一覧</h1>
+<nav class="bc" aria-label="パンくず"><a href="https://squadxi.futbol/">ホーム</a> <span class="sep">›</span> <span>人気クラブ</span></nav><h1>人気クラブ ベストイレブン一覧</h1>
 <p class="lead">気になるクラブを選ぶと予想スターティングXIと所属選手が見られます。</p>
 <div class="grid">
 <a class="card" href="/clubs/real-madrid.html"><span>レアル・マドリード</span></a>

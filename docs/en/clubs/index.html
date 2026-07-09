@@ -10,14 +10,24 @@
 <link rel="alternate" hreflang="en" href="https://squadxi.futbol/en/clubs/">
 <link rel="alternate" hreflang="x-default" href="https://squadxi.futbol/clubs/">
 <link rel="icon" type="image/png" href="/favicon.png" sizes="192x192">
-<meta property="og:type" content="article">
+<link rel="preload" href="/fonts/bebas-latin.woff2" as="font" type="font/woff2" crossorigin>
+<meta property="og:type" content="website">
 <meta property="og:site_name" content="Squad XI">
 <meta property="og:title" content="Top club best XIs &amp; predicted lineups | Squad XI">
 <meta property="og:description" content="Predicted starting XIs and squads for top clubs — Real, Barça, City and more. Build and share free.">
 <meta property="og:url" content="https://squadxi.futbol/en/clubs/">
-<meta property="og:image" content="/og.png">
+<meta property="og:image" content="https://squadxi.futbol/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Squad XI">
 <meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ja_JP">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Top club best XIs &amp; predicted lineups | Squad XI">
+<meta name="twitter:description" content="Predicted starting XIs and squads for top clubs — Real, Barça, City and more. Build and share free.">
+<meta name="twitter:image" content="https://squadxi.futbol/og.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://squadxi.futbol/en/"},{"@type":"ListItem","position":2,"name":"Top clubs","item":"https://squadxi.futbol/en/clubs/"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Real Madrid","url":"https://squadxi.futbol/en/clubs/real-madrid.html"},{"@type":"ListItem","position":2,"name":"Barcelona","url":"https://squadxi.futbol/en/clubs/barcelona.html"},{"@type":"ListItem","position":3,"name":"Atlético Madrid","url":"https://squadxi.futbol/en/clubs/atletico-madrid.html"},{"@type":"ListItem","position":4,"name":"Manchester City","url":"https://squadxi.futbol/en/clubs/manchester-city.html"},{"@type":"ListItem","position":5,"name":"Arsenal","url":"https://squadxi.futbol/en/clubs/arsenal.html"},{"@type":"ListItem","position":6,"name":"Liverpool","url":"https://squadxi.futbol/en/clubs/liverpool.html"},{"@type":"ListItem","position":7,"name":"Chelsea","url":"https://squadxi.futbol/en/clubs/chelsea.html"},{"@type":"ListItem","position":8,"name":"Manchester United","url":"https://squadxi.futbol/en/clubs/manchester-united.html"},{"@type":"ListItem","position":9,"name":"Tottenham","url":"https://squadxi.futbol/en/clubs/tottenham.html"},{"@type":"ListItem","position":10,"name":"Newcastle United","url":"https://squadxi.futbol/en/clubs/newcastle-united.html"},{"@type":"ListItem","position":11,"name":"Bayern Munich","url":"https://squadxi.futbol/en/clubs/bayern-munich.html"},{"@type":"ListItem","position":12,"name":"Borussia Dortmund","url":"https://squadxi.futbol/en/clubs/borussia-dortmund.html"},{"@type":"ListItem","position":13,"name":"Bayer Leverkusen","url":"https://squadxi.futbol/en/clubs/bayer-leverkusen.html"},{"@type":"ListItem","position":14,"name":"Paris Saint-Germain","url":"https://squadxi.futbol/en/clubs/psg.html"},{"@type":"ListItem","position":15,"name":"Marseille","url":"https://squadxi.futbol/en/clubs/marseille.html"},{"@type":"ListItem","position":16,"name":"Inter Milan","url":"https://squadxi.futbol/en/clubs/inter.html"},{"@type":"ListItem","position":17,"name":"AC Milan","url":"https://squadxi.futbol/en/clubs/ac-milan.html"},{"@type":"ListItem","position":18,"name":"Juventus","url":"https://squadxi.futbol/en/clubs/juventus.html"},{"@type":"ListItem","position":19,"name":"Napoli","url":"https://squadxi.futbol/en/clubs/napoli.html"},{"@type":"ListItem","position":20,"name":"AS Roma","url":"https://squadxi.futbol/en/clubs/as-roma.html"}]}</script>
 <style>
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#0a0e0c;--panel:#10160f;--line:#1f2b1e;--ink:#eafff0;--sub:#7d9389;--lime:#C8FF4F}
@@ -47,6 +57,14 @@ th{background:var(--panel);white-space:nowrap}
 .note{font-size:12px;color:var(--sub)}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
 footer a{color:var(--sub);margin-right:12px;display:inline-block}
+.bc{font-size:12.5px;color:var(--sub);margin:16px 0 2px}
+.bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--lime)}.bc .sep{opacity:.5;margin:0 2px}
+.faq{margin:6px 0}
+.faq .qa{border-top:1px solid var(--line);padding:12px 0}
+.faq .q{font-size:15px;margin:0 0 4px;color:var(--ink)}
+.faq p{margin:0;color:var(--sub);font-size:14px}
+.rel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.rel a{font-size:13px;color:var(--lime);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 @media(max-width:480px){h1{font-size:21px}}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.card{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--ink)}.card img{width:26px;height:20px;border-radius:3px}</style>
 </head>
@@ -56,7 +74,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
   <a class="logo" href="/">Squad <b>XI</b></a>
   <span class="nav"><a href="https://squadxi.futbol/clubs/">日本語</a> <a class="open" href="/">Open app</a></span>
 </header>
-<h1>Top club best XIs</h1>
+<nav class="bc" aria-label="breadcrumb"><a href="https://squadxi.futbol/en/">Home</a> <span class="sep">›</span> <span>Top clubs</span></nav><h1>Top club best XIs</h1>
 <p class="lead">Pick a club to see its predicted starting XI and squad.</p>
 <div class="grid">
 <a class="card" href="/en/clubs/real-madrid.html"><span>Real Madrid</span></a>
