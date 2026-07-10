@@ -60,6 +60,12 @@ th{background:var(--panel);white-space:nowrap}
 .cta{display:block;background:var(--lime);color:#0a0e0c;text-align:center;text-decoration:none;font-weight:800;font-size:16px;padding:14px;border-radius:12px;margin:26px 0}
 .note{font-size:12px;color:var(--sub)}
 .upd{font-size:12px;color:var(--sub);margin:6px 0 0}.upd b{color:var(--lime);font-weight:700;font-variant-numeric:tabular-nums}
+.sqt td.num{font-weight:800;color:var(--lime);text-align:center;font-variant-numeric:tabular-nums;width:46px}
+.sqt td b{font-weight:700}
+.sqt .en{color:var(--sub);font-size:11.5px}
+.sqt .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.tag-loan{background:rgba(255,209,102,.13);color:#ffd166;border:1px solid rgba(255,209,102,.45)}
+.tag-new{background:rgba(200,255,79,.14);color:var(--lime);border:1px solid var(--lime)}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
 footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .bc{font-size:12.5px;color:var(--sub);margin:16px 0 2px}
@@ -111,42 +117,48 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 </svg></div>
 <p class="note">Squad XIの市場価値データで自動編成した予想ベストXIです（実際のスタメンとは異なる場合があります）。</p>
 
-<h2>マンチェスター・シティ 所属選手</h2>
-<table><tr><th>ポジション</th><th>選手</th><th>年齢</th></tr>
-<tr><td>GK</td><td>Gianluigi Donnarumma</td><td>27</td></tr>
-<tr><td>GK</td><td>James Trafford</td><td>23</td></tr>
-<tr><td>GK</td><td>Marcus Bettinelli</td><td>34</td></tr>
-<tr><td>CB</td><td>Marc Guéhi</td><td>25</td></tr>
-<tr><td>CB</td><td>Josko Gvardiol</td><td>24</td></tr>
-<tr><td>CB</td><td>Rúben Dias</td><td>29</td></tr>
-<tr><td>CB</td><td>Abdukodir Khusanov</td><td>22</td></tr>
-<tr><td>CB</td><td>Vitor Reis</td><td>20</td></tr>
-<tr><td>CB</td><td>John Stones</td><td>32</td></tr>
-<tr><td>CB</td><td>Juma Bah</td><td>20</td></tr>
-<tr><td>CB</td><td>Max Alleyne</td><td>20</td></tr>
-<tr><td>LB</td><td>Nico O'Reilly</td><td>21</td></tr>
-<tr><td>LB</td><td>Rayan Aït-Nouri</td><td>25</td></tr>
-<tr><td>LB</td><td>Josh Wilson-Esbrand</td><td>23</td></tr>
-<tr><td>RB</td><td>Matheus Nunes</td><td>27</td></tr>
-<tr><td>RB</td><td>Rico Lewis</td><td>21</td></tr>
-<tr><td>RB</td><td>Issa Kaboré</td><td>25</td></tr>
-<tr><td>守備的MF</td><td>Rodri</td><td>29</td></tr>
-<tr><td>守備的MF</td><td>Nico González</td><td>24</td></tr>
-<tr><td>守備的MF</td><td>Kalvin Phillips</td><td>30</td></tr>
-<tr><td>MF</td><td>Elliot Anderson</td><td>23</td></tr>
-<tr><td>MF</td><td>Tijjani Reijnders</td><td>27</td></tr>
-<tr><td>MF</td><td>Sverre Nypan</td><td>19</td></tr>
-<tr><td>MF</td><td>Mateo Kovacic</td><td>32</td></tr>
-<tr><td>攻撃的MF</td><td>Rayan Cherki</td><td>22</td></tr>
-<tr><td>攻撃的MF</td><td>Phil Foden</td><td>26</td></tr>
-<tr><td>攻撃的MF</td><td>Claudio Echeverri</td><td>20</td></tr>
-<tr><td>左WG</td><td>Jérémy Doku</td><td>24</td></tr>
-<tr><td>左WG</td><td>Savinho</td><td>22</td></tr>
-<tr><td>右WG</td><td>Antoine Semenyo</td><td>26</td></tr>
-<tr><td>CF/ST</td><td>Erling Haaland</td><td>25</td></tr>
-<tr><td>CF/ST</td><td>Omar Marmoush</td><td>27</td></tr>
+<h2>マンチェスター・シティ 最新スカッド（背番号・生年月日）</h2>
+<h3>GK</h3><table class="sqt"><tr><th>番号</th><th>選手</th><th>ポジション</th><th>生年月日</th><th>備考</th></tr>
+<tr><td class="num">25</td><td><b>ジャンルイジ・ドンナルンマ</b><br><span class="en">Gianluigi Donnarumma</span></td><td>GK</td><td>1999-02-25</td><td></td></tr>
+<tr><td class="num">1</td><td><b>ジェームズ・トラフォード</b><br><span class="en">James Trafford</span></td><td>GK</td><td>2002-10-10</td><td></td></tr>
+<tr><td class="num">13</td><td><b>マーカス・ベッティネッリ</b><br><span class="en">Marcus Bettinelli</span></td><td>GK</td><td>1992-05-24</td><td></td></tr>
 </table>
-<p class="note">※Squad XI収録データ（2026年夏の移籍反映）。予想XIは市場価値上位で自動編成。</p>
+<h3>DF</h3><table class="sqt"><tr><th>番号</th><th>選手</th><th>ポジション</th><th>生年月日</th><th>備考</th></tr>
+<tr><td class="num">15</td><td><b>マーク・グエイ</b><br><span class="en">Marc Guéhi</span></td><td>CB</td><td>2000-07-13</td><td></td></tr>
+<tr><td class="num">24</td><td><b>ヨシュコ・グバルディオル</b><br><span class="en">Josko Gvardiol</span></td><td>CB</td><td>2002-01-23</td><td></td></tr>
+<tr><td class="num">3</td><td><b>ルベン・ディアス</b><br><span class="en">Rúben Dias</span></td><td>CB</td><td>1997-05-14</td><td></td></tr>
+<tr><td class="num">45</td><td><b>アブドゥコディル・フサノフ</b><br><span class="en">Abdukodir Khusanov</span></td><td>CB</td><td>2004-02-29</td><td></td></tr>
+<tr><td class="num">22</td><td><b>ヴィトール・レイス</b><br><span class="en">Vitor Reis</span></td><td>CB</td><td>2006-01-12</td><td><span class="tag tag-loan">2025-26 スペインへのローンから6/30復帰</span></td></tr>
+<tr><td class="num">—</td><td><b>ジュマ・バー</b><br><span class="en">Juma Bah</span></td><td>CB</td><td>2006-04-11</td><td><span class="tag tag-loan">2025-26 ニース(仏)へのローンから6/30復帰</span></td></tr>
+<tr><td class="num">68</td><td><b>マックス・アレイン</b><br><span class="en">Max Alleyne</span></td><td>CB</td><td>2005-07-21</td><td></td></tr>
+<tr><td class="num">33</td><td><b>ニコ・オライリー</b><br><span class="en">Nico O'Reilly</span></td><td>LB</td><td>2005-03-21</td><td></td></tr>
+<tr><td class="num">21</td><td><b>ラヤン・アイト＝ヌーリ</b><br><span class="en">Rayan Aït-Nouri</span></td><td>LB</td><td>2001-06-06</td><td></td></tr>
+<tr><td class="num">97</td><td><b>ジョシュ・ウィルソン＝エスブランド</b><br><span class="en">Josh Wilson-Esbrand</span></td><td>LB</td><td>2002-12-26</td><td><span class="tag tag-loan">ローンから6/30復帰</span></td></tr>
+<tr><td class="num">27</td><td><b>マテウス・ヌネス</b><br><span class="en">Matheus Nunes</span></td><td>RB</td><td>1998-08-27</td><td></td></tr>
+<tr><td class="num">82</td><td><b>リコ・ルイス</b><br><span class="en">Rico Lewis</span></td><td>RB</td><td>2004-11-21</td><td></td></tr>
+<tr><td class="num">—</td><td><b>イッサ・カボレ</b><br><span class="en">Issa Kaboré</span></td><td>RB</td><td>2001-05-12</td><td><span class="tag tag-loan">2025-26 レクサムへのローンから6/30復帰</span></td></tr>
+</table>
+<h3>MF</h3><table class="sqt"><tr><th>番号</th><th>選手</th><th>ポジション</th><th>生年月日</th><th>備考</th></tr>
+<tr><td class="num">16</td><td><b>ロドリ</b><br><span class="en">Rodri</span></td><td>守備的MF</td><td>1996-06-22</td><td></td></tr>
+<tr><td class="num">14</td><td><b>ニコラス・ゴンサレス</b><br><span class="en">Nico González</span></td><td>守備的MF</td><td>2002-01-03</td><td></td></tr>
+<tr><td class="num">44</td><td><b>カルビン・フィリップス</b><br><span class="en">Kalvin Phillips</span></td><td>守備的MF</td><td>1995-12-02</td><td><span class="tag tag-loan">ローンから6/30復帰</span></td></tr>
+<tr><td class="num">—</td><td><b>エリオット・アンダーソン</b><br><span class="en">Elliot Anderson</span></td><td>MF</td><td>2002-11-06</td><td><span class="tag tag-new">今夏ノッティンガム・フォレストから加入</span></td></tr>
+<tr><td class="num">4</td><td><b>タイアニ・ラインデルス</b><br><span class="en">Tijjani Reijnders</span></td><td>MF</td><td>1998-07-29</td><td></td></tr>
+<tr><td class="num">41</td><td><b>スベレ・ニーパン</b><br><span class="en">Sverre Nypan</span></td><td>MF</td><td>2006-12-19</td><td></td></tr>
+<tr><td class="num">8</td><td><b>マテオ・コバチッチ</b><br><span class="en">Mateo Kovacic</span></td><td>MF</td><td>1994-05-06</td><td></td></tr>
+<tr><td class="num">10</td><td><b>ラヤン・シェルキ</b><br><span class="en">Rayan Cherki</span></td><td>攻撃的MF</td><td>2003-08-17</td><td></td></tr>
+<tr><td class="num">47</td><td><b>フィル・フォーデン</b><br><span class="en">Phil Foden</span></td><td>攻撃的MF</td><td>2000-05-28</td><td></td></tr>
+<tr><td class="num">30</td><td><b>クラウディオ・エチェベリ</b><br><span class="en">Claudio Echeverri</span></td><td>攻撃的MF</td><td>2006-01-02</td><td><span class="tag tag-loan">ローンから6/30復帰</span></td></tr>
+</table>
+<h3>FW</h3><table class="sqt"><tr><th>番号</th><th>選手</th><th>ポジション</th><th>生年月日</th><th>備考</th></tr>
+<tr><td class="num">11</td><td><b>ジェレミ・ドク</b><br><span class="en">Jérémy Doku</span></td><td>左WG</td><td>2002-05-27</td><td></td></tr>
+<tr><td class="num">26</td><td><b>サビーニョ</b><br><span class="en">Savinho</span></td><td>左WG</td><td>2004-04-10</td><td></td></tr>
+<tr><td class="num">—</td><td><b>ジャック・グリーリッシュ</b><br><span class="en">Jack Grealish</span></td><td>左WG</td><td>1995-09-10</td><td><span class="tag tag-loan">2025-26 エヴァートンへのローンから6/30復帰</span></td></tr>
+<tr><td class="num">42</td><td><b>アントワヌ・セメンヨ</b><br><span class="en">Antoine Semenyo</span></td><td>右WG</td><td>2000-01-07</td><td></td></tr>
+<tr><td class="num">9</td><td><b>アーリング・ハーランド</b><br><span class="en">Erling Haaland</span></td><td>CF/ST</td><td>2000-07-21</td><td></td></tr>
+<tr><td class="num">7</td><td><b>オマル・マルムーシュ</b><br><span class="en">Omar Marmoush</span></td><td>CF/ST</td><td>1999-02-07</td><td></td></tr>
+</table>
+<p class="note">背番号・生年月日は Transfermarkt、カタカナ名は Yahoo!スポーツ 準拠。<b style="color:#ffd166">ローン復帰</b>＝2025-26シーズンのレンタルから6/30に復帰（背番号未定の場合あり）。<b style="color:#C8FF4F">加入</b>＝今夏の新加入。エリオット・アンダーソンはノッティンガム・フォレストから加入。</p>
 <h2>よくある質問</h2><div class="faq"><div class="qa"><h3 class="q">マンチェスター・シティ の予想スタメン・フォーメーションは？</h3><p>フォーメーションは 4-3-3。予想スターティングXIは Gianluigi Donnarumma、Nico O'Reilly、Marc Guéhi、Josko Gvardiol、Matheus Nunes、Rayan Cherki、Elliot Anderson、Phil Foden、Jérémy Doku、Erling Haaland、Antoine Semenyo。</p></div><div class="qa"><h3 class="q">マンチェスター・シティ の主力選手は？</h3><p>市場価値トップは Erling Haaland です。</p></div></div><h2>他の人気クラブ</h2><div class="rel"><a href="/clubs/real-madrid.html">レアル・マドリード</a><a href="/clubs/barcelona.html">バルセロナ</a><a href="/clubs/atletico-madrid.html">アトレティコ・マドリード</a><a href="/clubs/arsenal.html">アーセナル</a><a href="/clubs/liverpool.html">リバプール</a><a href="/clubs/chelsea.html">チェルシー</a><a href="/clubs/manchester-united.html">マンチェスター・ユナイテッド</a><a href="/clubs/tottenham.html">トッテナム</a></div><footer>
 <p><a href="/">Squad XI</a><a href="/clubs/">クラブ一覧</a><a href="/nations/">代表チーム一覧</a><a href="/en/clubs/manchester-city.html">English</a></p>
 <p>© Squad XI — 実在のクラブ・選手とは無関係の非公式ファンツールです。</p>
