@@ -34,48 +34,51 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"トッテナム の予想スタメン・フォーメーションは？","acceptedAnswer":{"@type":"Answer","text":"フォーメーションは 4-2-3-1。予想スターティングXIは Guglielmo Vicario、Destiny Udogie、Luka Vuskovic、Micky van de Ven、Pedro Porro、Sandro Tonali、Mateus Fernandes、Wilson Odobert、Xavi Simons、Mohammed Kudus、Dominic Solanke。"}},{"@type":"Question","name":"トッテナム の主力選手は？","acceptedAnswer":{"@type":"Answer","text":"市場価値トップは Sandro Tonali です。"}}]}</script>
 <style>
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
-:root{--bg:#0a0e0c;--panel:#10160f;--line:#1f2b1e;--ink:#eafff0;--sub:#7d9389;--lime:#C8FF4F}
+:root{--bg:#ffffff;--panel:#f4f6f8;--line:#e5e8ec;--ink:#15181c;--sub:#5c6773;--accent:#0f9d58;--accent-d:#0b7a44;--accent-ink:#0b6b3c}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;line-height:1.85}
-a{color:var(--lime)}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;line-height:1.85;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-d)}
 .wrap{max-width:860px;margin:0 auto;padding:0 20px 60px}
-header.site{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line)}
+header.site{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border-bottom:1px solid var(--line)}
 .logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1.5px;color:var(--ink);text-decoration:none}
-.logo b{color:var(--lime);font-weight:400}
+.logo b{color:var(--accent);font-weight:400}
 .nav a{color:var(--sub);text-decoration:none;font-size:13px;margin-left:14px}
-.open{background:var(--lime);color:#0a0e0c;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:10px;font-size:14px}
-.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(200,255,79,.12);border:1px solid var(--lime);color:var(--lime);font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:999px;margin:26px 0 0}
-h1{font-size:24px;line-height:1.4;margin:10px 0 10px;display:flex;align-items:center;gap:10px}
+.open,.nav a.open{background:var(--accent);color:#fff;text-decoration:none;font-weight:700;padding:8px 16px;border-radius:10px;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:7px;background:rgba(15,157,88,.1);border:1px solid rgba(15,157,88,.5);color:var(--accent-ink);font-weight:800;font-size:12.5px;padding:5px 12px;border-radius:999px;margin:26px 0 0}
+h1{font-size:25px;line-height:1.42;margin:12px 0 10px;display:flex;align-items:center;gap:10px;color:#0e1013;font-weight:800}
 h1 img{width:34px;height:26px;border-radius:3px}
 .lead{color:var(--sub);margin-bottom:8px}
-h2{font-size:19px;margin:34px 0 12px;padding-left:10px;border-left:4px solid var(--lime)}
-h3{font-size:15px;margin:18px 0 6px;color:var(--lime)}
+h2{font-size:19px;margin:34px 0 12px;padding-left:11px;border-left:4px solid var(--accent);color:#141618;font-weight:800}
+h3{font-size:15px;margin:20px 0 7px;color:var(--accent-d);font-weight:800}
 p{margin:10px 0}
-table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:14px}
-th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
-th{background:var(--panel);white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:14px;background:#fff}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left}
+th{background:var(--panel);white-space:nowrap;color:#3a444e;font-weight:700}
+table tr:nth-child(even) td{background:#fafbfc}
 .res td.r{font-weight:800;text-align:center;width:44px}
-.win{color:#7CFF9B}.draw{color:#ffd166}.loss{color:#ff7d7d}
-.pitchbox{margin:8px 0 6px}
-.cta{display:block;background:var(--lime);color:#0a0e0c;text-align:center;text-decoration:none;font-weight:800;font-size:16px;padding:14px;border-radius:12px;margin:26px 0}
+.win{color:#15803d}.draw{color:#b7791f}.loss{color:#dc2626}
+.pitchbox{margin:10px 0 6px}
+.pitchbox svg{border-radius:18px;box-shadow:0 3px 14px rgba(20,40,25,.16)}
+.cta{display:block;background:var(--accent);color:#fff;text-align:center;text-decoration:none;font-weight:800;font-size:16px;padding:14px;border-radius:12px;margin:26px 0;box-shadow:0 3px 10px rgba(15,157,88,.28)}
 .note{font-size:12px;color:var(--sub)}
-.upd{font-size:12px;color:var(--sub);margin:6px 0 0}.upd b{color:var(--lime);font-weight:700;font-variant-numeric:tabular-nums}
-.sqt td.num{font-weight:800;color:var(--lime);text-align:center;font-variant-numeric:tabular-nums;width:46px}
-.sqt td b{font-weight:700}
+.upd{font-size:12px;color:var(--sub);margin:6px 0 0}.upd b{color:var(--accent-d);font-weight:700;font-variant-numeric:tabular-nums}
+.sqt td.num{font-weight:800;color:var(--accent);text-align:center;font-variant-numeric:tabular-nums;width:46px}
+.sqt td b{font-weight:700;color:#15181c}
 .sqt .en{color:var(--sub);font-size:11.5px}
 .sqt .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
-.tag-loan{background:rgba(255,209,102,.13);color:#ffd166;border:1px solid rgba(255,209,102,.45)}
-.tag-new{background:rgba(200,255,79,.14);color:var(--lime);border:1px solid var(--lime)}
+.tag-loan{background:#fff6e5;color:#b26a00;border:1px solid #f0cf94}
+.tag-new{background:#e7f8ee;color:var(--accent-ink);border:1px solid var(--accent)}
 footer{border-top:1px solid var(--line);margin-top:50px;padding-top:18px;font-size:13px;color:var(--sub)}
 footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .bc{font-size:12.5px;color:var(--sub);margin:16px 0 2px}
-.bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--lime)}.bc .sep{opacity:.5;margin:0 2px}
+.bc a{color:var(--sub);text-decoration:none}.bc a:hover{color:var(--accent-d)}.bc .sep{opacity:.5;margin:0 2px}
 .faq{margin:6px 0}
 .faq .qa{border-top:1px solid var(--line);padding:12px 0}
-.faq .q{font-size:15px;margin:0 0 4px;color:var(--ink)}
+.faq .q{font-size:15px;margin:0 0 4px;color:var(--ink);font-weight:700}
 .faq p{margin:0;color:var(--sub);font-size:14px}
 .rel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.rel a{font-size:13px;color:var(--lime);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.rel a{font-size:13px;color:var(--accent-d);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:#fff}
+.rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
 </head>
