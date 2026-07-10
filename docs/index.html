@@ -165,7 +165,11 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   font-weight:800;font-size:15px;color:var(--ink);
 }
 .tok.drag .disc{transform:scale(1.12);border-color:#fff}
-.disc.empty{border-style:dashed;border-color:var(--mut);background:rgba(255,255,255,.03);color:var(--mut);font-weight:600;font-size:20px}
+.disc.empty{border-style:dashed;border-color:rgba(200,255,79,.42);background:rgba(200,255,79,.045);color:var(--mut)}
+.disc.empty svg{opacity:.5}
+.disc.empty .addplus{position:absolute;bottom:-6px;right:-6px;width:19px;height:19px;border-radius:50%;background:var(--lime);color:#0a0e0c;font-size:14px;font-weight:800;display:grid;place-items:center;border:1.5px solid #0a0e0c;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,.45)}
+.disc.empty:hover{border-color:var(--lime);background:rgba(200,255,79,.1)}
+.disc.empty:hover svg{opacity:.8}
 .disc svg{width:26px;height:26px;opacity:.9}
 .disc.photo{background-size:cover;background-position:center 20%}
 .disc.photo svg{display:none}
@@ -25923,7 +25927,8 @@ function render(){
     tok.dataset.i=i;
     const disc=document.createElement('div');
     if(s.pid==null){
-      disc.className='disc empty';disc.textContent='+';
+      disc.className='disc empty';disc.innerHTML=SIL+'<span class="addplus">+</span>';  // 空きスロット=人型シルエット＋追加バッジで「ここに選手が入る」を明示
+      disc.setAttribute('aria-label', LANG==='en'?'Add a player here':'ここに選手を追加');
       tok.appendChild(disc);
       const role=document.createElement('div');role.className='role';role.textContent=s.role;tok.appendChild(role);
     }else{
