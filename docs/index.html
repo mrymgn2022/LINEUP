@@ -296,8 +296,9 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 }
 .sheet.on{transform:translateY(0)}
 .sheet.expanded{max-height:96dvh}
-#sheetBody{display:flex;flex-direction:column;min-height:0;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#sheetBody{display:flex;flex-direction:column;min-height:0;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 #sheetBody>h2,#sheetBody>.controls{flex:0 0 auto}
+#sheetBody>h2{cursor:grab}
 .grabzone{flex:0 0 auto;display:flex;justify-content:center;align-items:center;height:30px;cursor:grab;touch-action:none}
 .grabzone:active{cursor:grabbing}
 .grab{width:44px;height:5px;border-radius:3px;background:var(--line);transition:width .15s,background .15s}
@@ -26593,42 +26594,64 @@ function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=htm
 function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
 scrim.onclick=closeSheet;
 
-/* シートのスワイプ操作：上で拡大／下で閉じる（グラブハンドル） */
+/* シートのスワイプ操作：ハンドル/見出しは即ドラッグ、本文も最上部なら下方向ドラッグで閉じる（閉じやすさ改善） */
 (function setupSheetDrag(){
   const zone=document.getElementById('grabzone'); if(!zone)return;
-  let startY=null,dy=0,dragging=false;
-  zone.addEventListener('pointerdown',e=>{
-    dragging=true;startY=e.clientY;dy=0;
-    sheet.style.transition='none';
-    try{ zone.setPointerCapture(e.pointerId); }catch(_){}
-  });
-  zone.addEventListener('pointermove',e=>{
+  let startY=0,startX=0,dy=0,dragging=false,pending=false,fromHandle=false,suppressClick=false,scroller=null;
+  function nearestScroller(el){                                  // ポインタ直下の実スクロール要素（.list等の入れ子対応）
+    for(; el && el!==sheet; el=el.parentElement){
+      if(el.scrollHeight>el.clientHeight+1){
+        const oy=getComputedStyle(el).overflowY;
+        if(oy==='auto'||oy==='scroll') return el;
+      }
+    }
+    return null;
+  }
+  function begin(e){
+    if(e.button)return;                                          // 右クリック等は無視
+    if(e.target.closest('canvas,input,textarea,select'))return;  // クロップ/入力欄は専用処理に委ねる
+    startY=e.clientY;startX=e.clientX;dy=0;dragging=false;pending=false;suppressClick=false;scroller=null;
+    fromHandle = zone.contains(e.target) || !!e.target.closest('#sheetBody>h2');
+    if(fromHandle){                                              // ハンドル/見出し：即ドラッグ（上方向は拡大）
+      dragging=true; sheet.style.transition='none';
+      try{ sheet.setPointerCapture(e.pointerId); }catch(_){}
+    }else{
+      scroller=nearestScroller(e.target);                        // 本文：スクロール最上部かどうかの判定に使う
+      pending=true;                                              // 動きを見て「最上部＆下方向」なら閉じドラッグへ昇格
+    }
+  }
+  function move(e){
+    if(pending){
+      const mx=e.clientX-startX, my=e.clientY-startY;
+      if(Math.abs(my)<8 && Math.abs(mx)<8) return;               // 微動：判定保留（タップは妨げない）
+      if(my>0 && Math.abs(my)>Math.abs(mx) && (!scroller||scroller.scrollTop<=2)){
+        dragging=true; pending=false; suppressClick=true;        // 最上部で下方向：閉じドラッグへ
+        sheet.style.transition='none';
+        try{ sheet.setPointerCapture(e.pointerId); }catch(_){}
+      }else{ pending=false; return; }                            // 上方向/横/スクロール中は本文スクロールに任せる
+    }
     if(!dragging)return;
     dy=e.clientY-startY;
-    if(dy>0){ // 下方向：指に追従
-      sheet.style.transform='translateY('+dy+'px)';
-    }else{ // 上方向：拡大
-      sheet.classList.add('expanded');
-      sheet.style.transform='translateY(0)';
-    }
-  });
-  const end=()=>{
+    if(dy>0){ e.preventDefault(); sheet.style.transform='translateY('+dy+'px)'; }
+    else if(fromHandle){ sheet.classList.add('expanded'); sheet.style.transform='translateY(0)'; }
+  }
+  function end(){
+    pending=false;
     if(!dragging)return; dragging=false;
-    sheet.style.transition='';
-    sheet.style.transform='';
-    if(dy>110){ closeSheet(); }                                  // 大きく下げたら閉じる
-    else if(dy>30){ sheet.classList.remove('expanded'); }        // 少し下げたら通常サイズへ
-    startY=null;dy=0;
-  };
-  zone.addEventListener('pointerup',end);
-  zone.addEventListener('pointercancel',end);
+    sheet.style.transition=''; sheet.style.transform='';
+    if(dy>100){ closeSheet(); }                                  // 下げて離したら閉じる
+    else if(dy>30){ sheet.classList.remove('expanded'); }
+    dy=0;
+  }
+  sheet.addEventListener('pointerdown',begin);
+  sheet.addEventListener('pointermove',move);
+  sheet.addEventListener('pointerup',end);
+  sheet.addEventListener('pointercancel',end);
+  // 本文ドラッグ直後の誤クリック（ボタン発火）を抑止
+  sheet.addEventListener('click',e=>{ if(suppressClick){ e.stopPropagation(); e.preventDefault(); suppressClick=false; } },true);
   // ハンドルのダブルタップで拡大⇔通常をトグル
   let lastTap=0;
-  zone.addEventListener('click',()=>{
-    const now=Date.now();
-    if(now-lastTap<300){ sheet.classList.toggle('expanded'); }
-    lastTap=now;
-  });
+  zone.addEventListener('click',()=>{ const now=Date.now(); if(now-lastTap<300){ sheet.classList.toggle('expanded'); } lastTap=now; });
 })();
 
 /* ---- Player picker (assign to slot) ---- */
