@@ -26075,7 +26075,7 @@ function renderBench(){
     const p=P[pid],ph=state.photos[pid];
     return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}${mktBenchSwap!=null?' pickbench':''}" data-pid="${pid}" draggable="false">
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${squadShortName(pid)}</div>
+      <div class="bn">${escAttr(squadShortName(pid))}</div>
       <div class="bp">${p[1]}</div>
       <div class="bv${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?' withclub':''}">${flagHTMLForPid(pid)}${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?`<span class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</span>`:''}</div>
     </div>`;
@@ -26094,7 +26094,7 @@ function renderBench(){
     const p=P[pid],ph=state.photos[pid];
     return `<div class="bcard ocard${(swapSel&&swapSel.t==='reserve'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
       <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${squadShortName(pid)}</div>
+      <div class="bn">${escAttr(squadShortName(pid))}</div>
       <div class="bp">${p[1]}</div>
       <div class="bv">${flagHTMLForPid(pid)}</div>
     </div>`;
@@ -27774,7 +27774,7 @@ function prowHTML(i,hideBench){
   return `<div class="prow ${already?'inxi':''}${lock?' locked':''}" ${lock?'':`data-pid="${i}"`}${lock?' style="opacity:.5;pointer-events:none"':''}>
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
-      <div class="nm">${nameOf(i,false)} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
+      <div class="nm">${escAttr(nameOf(i,false))} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
       <div class="sub">${flagHTML(p[3])}${p[4]?' · '+escAttr(dispClub(p[4])):''}${p[2]>0?' · '+p[2]+(LANG==='en'?'':'歳'):''}</div>
     </div>
   </div>`;
@@ -27921,7 +27921,7 @@ function openSubPicker(slotIdx){
         <div class="filters" id="lgF">${lgChips()}</div>
         <div class="filters" id="clubF" style="display:none"></div>
       </div>
-      ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?shortName(P[cur][0]):'-'}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
+      ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?escAttr(shortName(P[cur][0])):"-"}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
     </div>
     <div class="list" id="plist"></div>`);
   const drawSub=()=>{
@@ -29410,7 +29410,7 @@ function openSquadAnalysis(scope){
       </div>`;
   }
   openSheet(`
-    <h2>${t('squadAnalysis')} <span>${teamDisplayName()||t('saOriginal')}</span></h2>
+    <h2>${t('squadAnalysis')} <span>${escAttr(teamDisplayName()||t("saOriginal"))}</span></h2>
     <div class="detail">
       ${body}
       <button class="bigbtn ghost" id="saClose">${t('close')}</button>
