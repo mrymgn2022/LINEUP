@@ -33,7 +33,6 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://squadxi.futbol/en/"},{"@type":"ListItem","position":2,"name":"National teams","item":"https://squadxi.futbol/en/nations/"},{"@type":"ListItem","position":3,"name":"Brazil","item":"https://squadxi.futbol/en/nations/brazil.html"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsTeam","name":"Brazil national team","sport":"Association football","url":"https://squadxi.futbol/en/nations/brazil.html","logo":"https://squadxi.futbol/og.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","url":"https://squadxi.futbol/en/nations/brazil.html","name":"Brazil World Cup 2026 squad (26), predicted XI & results | Squad XI","dateModified":"2026-07-12","publisher":{"@type":"Organization","name":"Squad XI","logo":{"@type":"ImageObject","url":"https://squadxi.futbol/og.png"}}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How far did Brazil go at the 2026 World Cup?","acceptedAnswer":{"@type":"Answer","text":"Reached the Round of 16 before elimination (3 W 1 D 1 L)."}},{"@type":"Question","name":"Who is the Brazil captain?","acceptedAnswer":{"@type":"Answer","text":"Marquinhos."}},{"@type":"Question","name":"What is Brazil's predicted starting XI and formation?","acceptedAnswer":{"@type":"Answer","text":"Formation: 4-3-3. Predicted starting XI: Alisson, Douglas Santos, Gabriel Magalhães, Marquinhos, Danilo, Casemiro, Bruno Guimarães, Lucas Paquetá, Vinicius Junior, Matheus Cunha, Rayan."}}]}</script>
 <style>
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#ffffff;--panel:#f4f6f8;--line:#e5e8ec;--ink:#15181c;--sub:#5c6773;--accent:#0f9d58;--accent-d:#0b7a44;--accent-ink:#0b6b3c}
@@ -78,6 +77,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .faq .qa{border-top:1px solid var(--line);padding:12px 0}
 .faq .q{font-size:15px;margin:0 0 4px;color:var(--ink);font-weight:700}
 .faq p{margin:0;color:var(--sub);font-size:14px}
+.appintro{margin:40px 0 8px;padding:26px 22px;background:linear-gradient(180deg,#f7faf8,var(--panel));border:1px solid var(--line);border-radius:18px;text-align:center}
+.appintro h2{border:0;margin:0 0 16px;font-size:22px;color:var(--ink)}
+.apshot{margin:0 0 18px}
+.apshot img{max-width:300px;width:78%;height:auto;border-radius:15px;box-shadow:0 8px 26px rgba(20,40,25,.18)}
+.apintro-lead{color:var(--sub);font-size:15px;line-height:1.9;margin:0 auto 20px;max-width:580px;text-align:left}
+.apintro-lead b{color:var(--ink)}
+.apstats{list-style:none;display:flex;justify-content:center;gap:26px;flex-wrap:wrap;padding:0;margin:0 0 22px}
+.apstats li{font-size:13px;color:var(--sub)}
+.apstats b{display:block;font-size:28px;color:var(--accent);font-weight:800;line-height:1.15}
+.apsteps{text-align:left;max-width:520px;margin:0 auto 4px;padding-left:1.3em;color:var(--ink);font-size:15px;line-height:2}
+.apsteps li{padding-left:4px}
+.apshare{font-weight:700;color:var(--ink);font-size:15px;margin:16px 0 0}
 .rel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .rel a{font-size:13px;color:var(--accent-d);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:#fff}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
@@ -172,7 +183,23 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Rayan</td><td>Bournemouth</td></tr>
 </table>
 <p class="note">Sources: 26-man squad (worldcuppass) / results (Wikipedia). Clubs as of the tournament.</p>
-<h2>FAQ</h2><div class="faq"><div class="qa"><h3 class="q">How far did Brazil go at the 2026 World Cup?</h3><p>Reached the Round of 16 before elimination (3 W 1 D 1 L).</p></div><div class="qa"><h3 class="q">Who is the Brazil captain?</h3><p>Marquinhos.</p></div><div class="qa"><h3 class="q">What is Brazil's predicted starting XI and formation?</h3><p>Formation: 4-3-3. Predicted starting XI: Alisson, Douglas Santos, Gabriel Magalhães, Marquinhos, Danilo, Casemiro, Bruno Guimarães, Lucas Paquetá, Vinicius Junior, Matheus Cunha, Rayan.</p></div></div><h2>Other national teams</h2><div class="rel"><a href="/en/nations/japan.html">Japan</a><a href="/en/nations/argentina.html">Argentina</a><a href="/en/nations/spain.html">Spain</a><a href="/en/nations/france.html">France</a><a href="/en/nations/england.html">England</a><a href="/en/nations/germany.html">Germany</a><a href="/en/nations/portugal.html">Portugal</a><a href="/en/nations/netherlands.html">Netherlands</a></div><footer>
+<section class="appintro">
+<h2>Your squad. Built by you.</h2>
+<figure class="apshot"><img src="/appshot.png" width="360" height="450" loading="lazy" onerror="this.closest('figure').style.display='none'" alt="An example lineup made with Squad XI"></figure>
+<p class="apintro-lead"><b>Squad XI</b> is a free lineup builder for turning real footballers into your own dream XI. You never have to add players yourself — over 24,000 real players are already built in, so you just search by name and drop them onto the pitch.</p>
+<ul class="apstats">
+<li><b>24,000+</b><span>real players</span></li>
+<li><b>800+</b><span>clubs</span></li>
+<li><b>170+</b><span>countries</span></li>
+</ul>
+<ol class="apsteps">
+<li>Pick a formation</li>
+<li>Search for players and drag them into place</li>
+<li>Turn your finished lineup into an image and share it</li>
+</ol>
+<a class="cta" href="/#s=0.eyJiZW5jaCI6WyJSYXBoaW5oYXxCUkEiLCJOZXltYXJ8QlJBIiwiSWdvciBUaGlhZ298QlJBIiwiw4lkZXJzb258QlJBIiwiR2FicmllbCBNYXJ0aW5lbGxpfEJSQSIsIkVuZHJpY2t8QlJBIiwiQnJlbWVyfEJSQSIsIkx1aXogSGVucmlxdWV8QlJBIiwiUm9nZXIgSWJhw7FlenxCUkEiLCJGYWJpbmhvfEJSQXxBbC1JdHRpaGFkIENsdWJ8Q0RNIiwiRWRlcnNvbnxCUkEiLCJMw6lvIFBlcmVpcmF8QlJBIiwiQWxleCBTYW5kcm98QlJBIiwiV2V2ZXJ0b258QlJBfEdyw6ptaW8gRm9vdC1CYWxsIFBvcnRvIEFsZWdyZW5zZXxHSyJdLCJmb3JtYXRpb24iOiI0LTMtMyIsIm1hcmtzIjp7fSwibWVtb3MiOnt9LCJuYW1lcyI6e30sInNsb3RzIjpbeyJwaWQiOiJBbGlzc29ufEJSQXxMaXZlcnBvb2x8R0siLCJyb2xlIjoiR0siLCJzdWIiOm51bGwsIngiOjUwLCJ5IjoxMn0seyJwaWQiOiJEb3VnbGFzIFNhbnRvc3xCUkEiLCJyb2xlIjoiTEIiLCJzdWIiOm51bGwsIngiOjE4LCJ5IjoyNn0seyJwaWQiOiJHYWJyaWVsfEJSQXxBcnNlbmFsfENCIiwicm9sZSI6IkNCIiwic3ViIjpudWxsLCJ4IjozNywieSI6MjJ9LHsicGlkIjoiTWFycXVpbmhvc3xCUkF8UGFyaXMgU2FpbnQtR2VybWFpbnxDQiIsInJvbGUiOiJDQiIsInN1YiI6bnVsbCwieCI6NjMsInkiOjIyfSx7InBpZCI6IkRhbmlsb3xCUkF8Q1IgRmxhbWVuZ298Q0IiLCJyb2xlIjoiUkIiLCJzdWIiOm51bGwsIngiOjgyLCJ5IjoyNn0seyJwaWQiOiJDYXNlbWlyb3xCUkEiLCJyb2xlIjoiQ00iLCJzdWIiOm51bGwsIngiOjMwLCJ5Ijo1MH0seyJwaWQiOiJCcnVubyBHdWltYXLDo2VzfEJSQSIsInJvbGUiOiJDTSIsInN1YiI6bnVsbCwieCI6NTAsInkiOjQ3fSx7InBpZCI6Ikx1Y2FzIFBhcXVldMOhfEJSQSIsInJvbGUiOiJDTSIsInN1YiI6bnVsbCwieCI6NzAsInkiOjUwfSx7InBpZCI6IlZpbmljaXVzIEp1bmlvcnxCUkEiLCJyb2xlIjoiTFciLCJzdWIiOm51bGwsIngiOjIwLCJ5Ijo4MH0seyJwaWQiOiJNYXRoZXVzIEN1bmhhfEJSQXxNYW5jaGVzdGVyIFVuaXRlZHxTVCIsInJvbGUiOiJTVCIsInN1YiI6bnVsbCwieCI6NTAsInkiOjg1fSx7InBpZCI6IlJheWFufEJSQSIsInJvbGUiOiJSVyIsInN1YiI6bnVsbCwieCI6ODAsInkiOjgwfV0sInN0IjoxLCJ0ZWFtTmFtZSI6IkJyYXppbCIsInYiOjN9">▶ Open Brazil's lineup in the app (free)</a>
+<p class="apshare">Share your very own best XI on social media.</p>
+</section><h2>Other national teams</h2><div class="rel"><a href="/en/nations/japan.html">Japan</a><a href="/en/nations/argentina.html">Argentina</a><a href="/en/nations/spain.html">Spain</a><a href="/en/nations/france.html">France</a><a href="/en/nations/england.html">England</a><a href="/en/nations/germany.html">Germany</a><a href="/en/nations/portugal.html">Portugal</a><a href="/en/nations/netherlands.html">Netherlands</a></div><footer>
 <p><a href="/">Squad XI</a><a href="/en/nations/">All national teams</a><a href="/clubs/">Clubs</a><a href="/nations/brazil.html">日本語</a></p>
 <p>© Squad XI — Unofficial fan tool, not affiliated with FIFA, any federation or the players.</p>
 </footer>

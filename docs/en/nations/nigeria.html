@@ -33,7 +33,6 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://squadxi.futbol/en/"},{"@type":"ListItem","position":2,"name":"National teams","item":"https://squadxi.futbol/en/nations/"},{"@type":"ListItem","position":3,"name":"Nigeria","item":"https://squadxi.futbol/en/nations/nigeria.html"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsTeam","name":"Nigeria national team","sport":"Association football","url":"https://squadxi.futbol/en/nations/nigeria.html","logo":"https://squadxi.futbol/og.png"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","url":"https://squadxi.futbol/en/nations/nigeria.html","name":"Nigeria national team best XI & predicted lineup 2026-27 | Squad XI","dateModified":"2026-07-12","publisher":{"@type":"Organization","name":"Squad XI","logo":{"@type":"ImageObject","url":"https://squadxi.futbol/og.png"}}}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Who is Nigeria's star player?","acceptedAnswer":{"@type":"Answer","text":"Victor Osimhen."}},{"@type":"Question","name":"What is Nigeria's predicted starting XI and formation?","acceptedAnswer":{"@type":"Answer","text":"Formation: 4-3-3. Predicted starting XI: Maduka Okoye, Felix Agu, Calvin Bassey, Emmanuel Fernandez, Ola Aina, Wilfred Ndidi, Raphael Onyedika, David Moses, Ademola Lookman, Victor Osimhen, Samuel Chukwueze."}}]}</script>
 <style>
 @font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/bebas-latin.woff2') format('woff2')}
 :root{--bg:#ffffff;--panel:#f4f6f8;--line:#e5e8ec;--ink:#15181c;--sub:#5c6773;--accent:#0f9d58;--accent-d:#0b7a44;--accent-ink:#0b6b3c}
@@ -78,6 +77,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .faq .qa{border-top:1px solid var(--line);padding:12px 0}
 .faq .q{font-size:15px;margin:0 0 4px;color:var(--ink);font-weight:700}
 .faq p{margin:0;color:var(--sub);font-size:14px}
+.appintro{margin:40px 0 8px;padding:26px 22px;background:linear-gradient(180deg,#f7faf8,var(--panel));border:1px solid var(--line);border-radius:18px;text-align:center}
+.appintro h2{border:0;margin:0 0 16px;font-size:22px;color:var(--ink)}
+.apshot{margin:0 0 18px}
+.apshot img{max-width:300px;width:78%;height:auto;border-radius:15px;box-shadow:0 8px 26px rgba(20,40,25,.18)}
+.apintro-lead{color:var(--sub);font-size:15px;line-height:1.9;margin:0 auto 20px;max-width:580px;text-align:left}
+.apintro-lead b{color:var(--ink)}
+.apstats{list-style:none;display:flex;justify-content:center;gap:26px;flex-wrap:wrap;padding:0;margin:0 0 22px}
+.apstats li{font-size:13px;color:var(--sub)}
+.apstats b{display:block;font-size:28px;color:var(--accent);font-weight:800;line-height:1.15}
+.apsteps{text-align:left;max-width:520px;margin:0 auto 4px;padding-left:1.3em;color:var(--ink);font-size:15px;line-height:2}
+.apsteps li{padding-left:4px}
+.apshare{font-weight:700;color:var(--ink);font-size:15px;margin:16px 0 0}
 .rel{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
 .rel a{font-size:13px;color:var(--accent-d);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:#fff}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
@@ -152,7 +163,23 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>CM</td><td>Ebenezer Akinsanmiro</td><td>21</td><td>Inter</td></tr>
 </table>
 <p class="note">Based on Squad XI data (2026 summer transfers), ranked by market value.</p>
-<h2>FAQ</h2><div class="faq"><div class="qa"><h3 class="q">Who is Nigeria's star player?</h3><p>Victor Osimhen.</p></div><div class="qa"><h3 class="q">What is Nigeria's predicted starting XI and formation?</h3><p>Formation: 4-3-3. Predicted starting XI: Maduka Okoye, Felix Agu, Calvin Bassey, Emmanuel Fernandez, Ola Aina, Wilfred Ndidi, Raphael Onyedika, David Moses, Ademola Lookman, Victor Osimhen, Samuel Chukwueze.</p></div></div><h2>Other national teams</h2><div class="rel"><a href="/en/nations/japan.html">Japan</a><a href="/en/nations/brazil.html">Brazil</a><a href="/en/nations/argentina.html">Argentina</a><a href="/en/nations/spain.html">Spain</a><a href="/en/nations/france.html">France</a><a href="/en/nations/england.html">England</a><a href="/en/nations/germany.html">Germany</a><a href="/en/nations/portugal.html">Portugal</a></div><footer>
+<section class="appintro">
+<h2>Your squad. Built by you.</h2>
+<figure class="apshot"><img src="/appshot.png" width="360" height="450" loading="lazy" onerror="this.closest('figure').style.display='none'" alt="An example lineup made with Squad XI"></figure>
+<p class="apintro-lead"><b>Squad XI</b> is a free lineup builder for turning real footballers into your own dream XI. You never have to add players yourself — over 24,000 real players are already built in, so you just search by name and drop them onto the pitch.</p>
+<ul class="apstats">
+<li><b>24,000+</b><span>real players</span></li>
+<li><b>800+</b><span>clubs</span></li>
+<li><b>170+</b><span>countries</span></li>
+</ul>
+<ol class="apsteps">
+<li>Pick a formation</li>
+<li>Search for players and drag them into place</li>
+<li>Turn your finished lineup into an image and share it</li>
+</ol>
+<a class="cta" href="/#s=0.eyJiZW5jaCI6WyJBbGV4IEl3b2JpfE5HQSIsIlRvbHUgQXJva29kYXJlfE5HQSIsIkFrb3IgQWRhbXN8TkdBIiwiTmF0aGFuIFRlbGxhfE5HQSIsIkZlbWkgQXplZXp8TkdBIiwiQ2hyaXN0YW50dXMgVWNoZXxOR0EiLCJHZW9yZ2UgSWxlbmlraGVuYXxOR0EiLCJDaGlidWlrZSBOd2Fpd3V8TkdBIiwiTW9zZXMgU2ltb258TkdBIiwiUGF1bCBPbnVhY2h1fE5HQSIsIlRhaXdvIEF3b25peWl8TkdBIiwiRnJhbmsgT255ZWthfE5HQSIsIkFudGhvbnkgRGVubmlzfE5HQSIsIlRlcmVtIE1vZmZpfE5HQSIsIlJhZml1IER1cm9zaW5taXxOR0EiXSwiZm9ybWF0aW9uIjoiNC0zLTMiLCJtYXJrcyI6e30sIm1lbW9zIjp7fSwibmFtZXMiOnt9LCJzbG90cyI6W3sicGlkIjoiTWFkdWthIE9rb3llfE5HQSIsInJvbGUiOiJHSyIsInN1YiI6bnVsbCwieCI6NTAsInkiOjEyfSx7InBpZCI6IkZlbGl4IEFndXxOR0EiLCJyb2xlIjoiTEIiLCJzdWIiOm51bGwsIngiOjE4LCJ5IjoyNn0seyJwaWQiOiJDYWx2aW4gQmFzc2V5fE5HQSIsInJvbGUiOiJDQiIsInN1YiI6bnVsbCwieCI6MzcsInkiOjIyfSx7InBpZCI6IkVtbWFudWVsIEZlcm5hbmRlenxOR0EiLCJyb2xlIjoiQ0IiLCJzdWIiOm51bGwsIngiOjYzLCJ5IjoyMn0seyJwaWQiOiJPbGEgQWluYXxOR0EiLCJyb2xlIjoiUkIiLCJzdWIiOm51bGwsIngiOjgyLCJ5IjoyNn0seyJwaWQiOiJXaWxmcmVkIE5kaWRpfE5HQSIsInJvbGUiOiJDTSIsInN1YiI6bnVsbCwieCI6MzAsInkiOjUwfSx7InBpZCI6IlJhcGhhZWwgT255ZWRpa2F8TkdBIiwicm9sZSI6IkNNIiwic3ViIjpudWxsLCJ4Ijo1MCwieSI6NDd9LHsicGlkIjoiRGF2aWQgTW9zZXN8TkdBIiwicm9sZSI6IkNNIiwic3ViIjpudWxsLCJ4Ijo3MCwieSI6NTB9LHsicGlkIjoiQWRlbW9sYSBMb29rbWFufE5HQSIsInJvbGUiOiJMVyIsInN1YiI6bnVsbCwieCI6MjAsInkiOjgwfSx7InBpZCI6IlZpY3RvciBPc2ltaGVufE5HQSIsInJvbGUiOiJTVCIsInN1YiI6bnVsbCwieCI6NTAsInkiOjg1fSx7InBpZCI6IlNhbXVlbCBDaHVrd3VlemV8TkdBIiwicm9sZSI6IlJXIiwic3ViIjpudWxsLCJ4Ijo4MCwieSI6ODB9XSwic3QiOjEsInRlYW1OYW1lIjoiTmlnZXJpYSIsInYiOjN9">▶ Open Nigeria's lineup in the app (free)</a>
+<p class="apshare">Share your very own best XI on social media.</p>
+</section><h2>Other national teams</h2><div class="rel"><a href="/en/nations/japan.html">Japan</a><a href="/en/nations/brazil.html">Brazil</a><a href="/en/nations/argentina.html">Argentina</a><a href="/en/nations/spain.html">Spain</a><a href="/en/nations/france.html">France</a><a href="/en/nations/england.html">England</a><a href="/en/nations/germany.html">Germany</a><a href="/en/nations/portugal.html">Portugal</a></div><footer>
 <p><a href="/">Squad XI</a><a href="/en/nations/">All national teams</a><a href="/clubs/">Clubs</a><a href="/nations/nigeria.html">日本語</a></p>
 <p>© Squad XI — Unofficial fan tool, not affiliated with FIFA, any federation or the players.</p>
 </footer>
