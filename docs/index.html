@@ -30138,7 +30138,9 @@ window.__selftest=function(){
   try{
     const sharedRaw=await decodeSquadHash(location.hash);
     if(sharedRaw){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
-      if(sharedRaw.st){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
+      // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
+      const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
+      if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
   }catch(e){}
 })();
