@@ -27539,8 +27539,8 @@ function lgSelRows(f, extra=''){
 function wireLgSelect(container, f, onChange){
   if(!container) return;
   const xtra=()=>container._lgextra||'';
-  const rerenderList=()=>{ const l=container.querySelector('.lgsel-list'); if(l) l.innerHTML=lgSelRows(f, xtra()); };
-  const full=()=>{ container.innerHTML=lgSelectHTML(f, xtra()); const inp=container.querySelector('.lgsel-q'); if(inp){ inp.oninput=()=>{ f.lgq=inp.value; rerenderList(); }; inp.focus(); } };
+  const rerenderList=()=>{ const l=container.querySelector('.lgsel-list'); if(l){ const st=l.scrollTop; l.innerHTML=lgSelRows(f, xtra()); l.scrollTop=st; } }; // 展開/再描画してもスクロール位置を保持（先頭に飛ばない）
+  const full=()=>{ const ol=container.querySelector('.lgsel-list'); const st=ol?ol.scrollTop:0; container.innerHTML=lgSelectHTML(f, xtra()); const inp=container.querySelector('.lgsel-q'); if(inp){ inp.oninput=()=>{ f.lgq=inp.value; rerenderList(); }; } const nl=container.querySelector('.lgsel-list'); if(nl) nl.scrollTop=st; }; // 検索欄に自動フォーカスしない（キーボードを勝手に出さない）／リストのスクロール位置を保持
   container.onclick=e=>{
     if(e.target.closest('.lgsel-q')) return;
     if(e.target.closest('[data-lgtoggle]')){ f.lgopen=!f.lgopen; if(!f.lgopen)f.lgq=''; full(); return; }
