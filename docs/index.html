@@ -274,6 +274,15 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .bcard.pickbench{animation:swapblinkcard .7s ease-in-out infinite;border-color:var(--lime)!important;cursor:pointer}
 .modebar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--lime);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(0,0,0,.55);font-size:13px;color:var(--ink);max-width:92vw}
 .modebar span{white-space:normal;line-height:1.28;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical} /* 長い英語説明も2行で全文表示（末尾"…点滅中"が切れない） */
+/* 画像検索から戻った時のワンタップ貼り付けバナー */
+.pastebanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:60;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--lime);border-radius:14px;padding:11px 12px;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(150%);opacity:0;transition:transform .25s ease,opacity .2s;cursor:pointer}
+.pastebanner.show{transform:translateY(0);opacity:1}
+.pastebanner .pbico{width:34px;height:34px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;color:var(--lime);flex-shrink:0}
+.pastebanner .pbico svg{width:19px;height:19px}
+.pastebanner .pbtxt{flex:1;min-width:0;font-size:12px;line-height:1.35;color:var(--mut);overflow:hidden}
+.pastebanner .pbtxt b{display:block;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pastebanner .pbgo{flex-shrink:0;background:var(--lime);color:#0a0e0c;border:none;border-radius:9px;padding:9px 15px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit}
+.pastebanner .pbx{flex-shrink:0;background:transparent;border:none;color:var(--mut);font-size:22px;line-height:1;padding:2px 6px;cursor:pointer}
 .modebar button{background:var(--lime);color:#0a0e0c;border:0;border-radius:999px;padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
 /* ベンチ外 */
 .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;padding-bottom:4px}
@@ -25562,7 +25571,7 @@ const I18N = {
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
-    addChangePhoto:'写真を追加 / 変更', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    addChangePhoto:'写真を追加 / 変更', photoDevice:'端末の写真から選ぶ', pasteShort:'貼り付け', pastePromptTitle:'コピーした画像を貼り付け', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
@@ -25641,7 +25650,7 @@ const I18N = {
     createPlayer:'＋ Create a player', noMatch:'No matching players',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
-    addChangePhoto:'Add / change photo', photoDevice:'Choose from your photos', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    addChangePhoto:'Add / change photo', photoDevice:'Choose from your photos', pasteShort:'Paste', pastePromptTitle:'Paste the copied image', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
@@ -26611,12 +26620,39 @@ function openPasteBox(pid){
   document.getElementById('pasteBoxCancel').onclick=()=>{ closeSheet(); if(pid!=null&&P[pid]) try{openDetail(pid);}catch(e){} };
 }
 // 選手名でネット画像検索（別タブ）。保存した画像を「写真を追加」で取り込める導線
+// 画像検索から戻ってきた時、その選手への「貼り付け」をワンタップで出すバナー用の記憶
+let _pastePromptPid=null,_pastePromptAt=0,_pasteBanner=null,_pasteBannerTO=null;
 function searchPlayerWeb(pid){
   const p=P[pid]; if(!p)return;
+  _pastePromptPid=pid; _pastePromptAt=Date.now(); // アプリに戻ったらワンタップ貼り付けバナーを出す
+  closeSheet();                                   // メニューを閉じてから検索タブへ（戻った時に盤面＋バナーがきれいに出る）
   const q=encodeURIComponent(p[0].trim()+' '+p[4].trim()+' footballer');
   window.open('https://www.google.com/search?tbm=isch&q='+q,'_blank','noopener');
   toast(t('tstWebOpened'));
 }
+// 復帰時（visibilitychange=visible）に呼ぶ。検索から一定時間内で、他UIが開いていなければバナーを出す。
+function maybeShowPastePrompt(){
+  if(_pastePromptPid==null) return;
+  if(Date.now()-_pastePromptAt>600000){ _pastePromptPid=null; return; } // 10分超で無効
+  const pid=_pastePromptPid; if(!P[pid]){ _pastePromptPid=null; return; }
+  const dw=document.getElementById('drawer');
+  if(sheet.classList.contains('on')||(dw&&dw.classList.contains('on'))||document.querySelector('.modebar')) return; // シート/ドロワー/モードバー表示中は出さない
+  showPastePrompt(pid);
+}
+function showPastePrompt(pid){
+  hidePastePrompt();
+  const nm=nameOf(pid,true)||nameOf(pid)||'';
+  const b=document.createElement('div'); b.className='pastebanner'; b.id='pasteBanner';
+  b.innerHTML='<div class="pbico">'+ICN.copyicon+'</div><div class="pbtxt">'+escAttr(t('pastePromptTitle'))+'<b>'+escAttr(nm)+'</b></div><button class="pbgo">'+escAttr(t('pasteShort'))+'</button><button class="pbx" aria-label="'+escAttr(t('cancel'))+'">×</button>';
+  document.body.appendChild(b); _pasteBanner=b;
+  const go=()=>{ const p=pid; _pastePromptPid=null; hidePastePrompt(); pastePhoto(p); };
+  b.querySelector('.pbgo').onclick=function(e){ e.stopPropagation(); go(); };
+  b.querySelector('.pbx').onclick=function(e){ e.stopPropagation(); _pastePromptPid=null; hidePastePrompt(); };
+  b.onclick=go;
+  requestAnimationFrame(function(){ if(_pasteBanner===b) b.classList.add('show'); });
+  clearTimeout(_pasteBannerTO); _pasteBannerTO=setTimeout(hidePastePrompt,15000); // 押されなければ引っ込める（pendingは残す＝次に戻った時また出る／×で恒久停止）
+}
+function hidePastePrompt(){ clearTimeout(_pasteBannerTO); const b=_pasteBanner; _pasteBanner=null; if(b){ b.classList.remove('show'); setTimeout(function(){ try{b.remove();}catch(e){} },250); } }
 photoInput.addEventListener('change',()=>{
   const f=photoInput.files&&photoInput.files[0]; if(!f||photoTarget==null)return;
   const fr=new FileReader();
@@ -29090,7 +29126,7 @@ function newTeamFlow(){ guardUnsaved(()=>startOriginal()); }
 
 document.getElementById('btnMenu').onclick=openDrawer;
 // 画面/アプリを閉じる時に作業中の下書きだけ同期保存（再起動時に最後のスカッドを復元。一覧へは手動保存のみ）
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } else if(document.visibilityState==='visible'){ try{ maybeShowPastePrompt(); }catch(e){} } });
 window.addEventListener('pagehide',()=>{ autoSaveDraft(); recordExitSquad(); });
 // ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
 // ドロワーのスワイプ操作：左端からの右スワイプで開く／開いている時は左スワイプで閉じる（×・スクリムタップに加えて）
@@ -30345,6 +30381,24 @@ window.__selftest=function(){
         _pass=!!_s && _s.sub===_c[2]; _msg=_pass?'':'フォメ変更で手動控えが消えた';
       }
       ok('form_change_keeps_sub',_pass,_msg); }
+    // T18: 画像検索→復帰時のワンタップ貼り付けバナー（生成・×でpendingクリア＆非表示・シート表示中は出さない）
+    { let _p=true,_m='';
+      let _pid=-1; for(let i=0;i<P.length;i++){ if(P[i]&&P[i][0]&&!isCustomPid(i)){ _pid=i; break; } }
+      const _sp=_pastePromptPid,_sa=_pastePromptAt,_wasOpen=sheet.classList.contains('on');
+      try{
+        if(_wasOpen) sheet.classList.remove('on');
+        _pastePromptPid=_pid; _pastePromptAt=Date.now(); maybeShowPastePrompt();
+        const _b=document.getElementById('pasteBanner');
+        if(!_b||!_b.querySelector('.pbgo')||!_b.querySelector('.pbx')){ _p=false; _m='バナー生成失敗'; }
+        else{ _b.querySelector('.pbx').click(); if(_pastePromptPid!=null){ _p=false; _m='×でpending未クリア'; } }
+        hidePastePrompt(); let _o=document.getElementById('pasteBanner'); if(_o){try{_o.remove();}catch(e){}}
+        _pastePromptPid=_pid; _pastePromptAt=Date.now();
+        sheet.classList.add('on'); maybeShowPastePrompt(); const _shown=!!document.getElementById('pasteBanner'); sheet.classList.remove('on');
+        if(_shown){ _p=false; _m=_m||'シート表示中に出た'; }
+      }catch(e){ _p=false; _m='例外:'+e; }
+      hidePastePrompt(); let _o2=document.getElementById('pasteBanner'); if(_o2){try{_o2.remove();}catch(e){}}
+      _pastePromptPid=_sp; _pastePromptAt=_sa; if(_wasOpen) sheet.classList.add('on');
+      ok('paste_prompt',_p,_m); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
