@@ -26600,7 +26600,7 @@ function openPasteBox(pid){
     <h2>${t('pasteBoxTitle')}</h2>
     <div style="margin:2px 16px 12px;color:var(--mut);font-size:13px;line-height:1.7">${t('pasteBoxHelp')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 20px)">
-      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:120px;border:2px dashed var(--lime);border-radius:14px;padding:16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--panel);display:flex;align-items:center;justify-content:center;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div>
+      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:90px;border:2px dashed var(--lime);border-radius:14px;padding:34px 16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--panel);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div><!-- display:blockが必須。iOS WebKitはflex/gridのcontenteditableにキャレットを置けずペースト不可になる -->
       <button class="bigbtn ghost" id="pasteBoxCancel" style="margin-top:14px">${t('cancel')}</button>
     </div>`);
   const box=document.getElementById('pasteBox'); let done=false;
@@ -26797,7 +26797,7 @@ scrim.onclick=closeSheet;
   }
   function begin(e){
     if(e.button)return;                                          // 右クリック等は無視
-    if(e.target.closest('canvas,input,textarea,select'))return;  // クロップ/入力欄は専用処理に委ねる
+    if(e.target.closest('canvas,input,textarea,select,[contenteditable],#pasteBox'))return;  // クロップ/入力欄/貼り付けボックスは専用処理に委ねる（シートのドラッグで横取りしない）
     startY=e.clientY;startX=e.clientX;dy=0;dragging=false;pending=false;suppressClick=false;scroller=null;
     fromHandle = zone.contains(e.target) || !!e.target.closest('#sheetBody>h2');
     if(fromHandle){                                              // ハンドル/見出し：即ドラッグ（上方向は拡大）
