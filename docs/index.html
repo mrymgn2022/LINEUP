@@ -614,12 +614,12 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
       <h1 class="logo" style="margin:0;font-weight:400">Squad <b>XI</b></h1><!-- SEO用h1化。見た目は.logoのまま（quirks mode対策でUA既定のmargin/boldだけinline打ち消し） -->
       <div class="tag" id="teamTag">build your XI</div>
     </div>
-    <div class="hbtn">
-      <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
-      <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
+    <div class="hbtn"><!-- 並び: 新規→共有→検索→整列→削除（破壊的な「盤面を空にする」を右端に隔離し誤タップ防止。2026-07-14） -->
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
+      <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div>
+      <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
     </div>
   </header>
 
@@ -27780,7 +27780,9 @@ function openReserveMenu(pid){
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
+      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
       <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromTeam')}</div>
     </div>`);
   const _r=document.getElementById('omRename'); if(_r)_r.onclick=()=>openRename(pid);
@@ -27792,7 +27794,9 @@ function openReserveMenu(pid){
     if(a==='memo') openMemo(pid);
     if(a==='detail') openDetail(pid,null);
     if(a==='photo') pickPhoto(pid);
+    if(a==='search') searchPlayerWeb(pid);
     if(a==='paste') pastePhoto(pid);
+    if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(pid); }
     if(a==='remove') removeReserve(pid);
   };
 }
@@ -28028,10 +28032,11 @@ function openBenchMenu(pid){
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
+      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
       <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>${t('removeFromBench')}</div>
     </div>`);
   const _r=document.getElementById('bmRename'); if(_r)_r.onclick=()=>openRename(pid);
@@ -28044,6 +28049,7 @@ function openBenchMenu(pid){
     if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(pid); }
     if(a==='detail') openDetail(pid,null);
     if(a==='photo') pickPhoto(pid);
+    if(a==='search') searchPlayerWeb(pid);
     if(a==='paste') pastePhoto(pid);
     if(a==='unbench'){ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast(t('tstBenchRemoved')); }
   };
@@ -28671,8 +28677,8 @@ function storeBadgesHTML(){
     + `<div class="dwsec">${soon?t('getAppSoon'):t('getApp')}</div>`
     + `<div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 16px 10px">${badge('ios',APPSTORE_URL)}${badge('android',PLAYSTORE_URL)}</div>`;
 }
-// バックアップ（書き出し/読み込み）をドロワーに表示するか。false＝非表示（機能一式は残置。復活はこれをtrueに戻すだけ。2026-07-14 ユーザー判断で一旦非表示）
-const SHOW_BACKUP=false;
+// バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
+const SHOW_BACKUP=true;
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
@@ -28698,10 +28704,10 @@ function drawerHTML(){
     <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>${t('announcements')}${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>${t('premium')}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">${ICN.help}</span>${t('help')}<span class="dchev">›</span></div>
-    ${SHOW_BACKUP?`<div class="dwitem" data-page="backup"><span class="di">${ICN.backup}</span>${t('backup')}<span class="dchev">›</span></div>`:''}
     <div class="dwitem" data-page="feedback"><span class="di">${ICN.mail}</span>${t('feedback')}<span class="dchev">›</span></div>
     ${storeBadgesHTML()}
     <div class="dwdiv"></div>
+    ${SHOW_BACKUP?`<div class="dwitem" data-page="backup"><span class="di">${ICN.backup}</span>${t('backup')}<span class="dchev">›</span></div>`:''}
     <div class="dwitem" data-page="privacy"><span class="di">${ICN.lock}</span>${t('privacy')}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
