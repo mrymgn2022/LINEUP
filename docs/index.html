@@ -25747,16 +25747,21 @@ function tShareCaption(tn){ return LANG==='en'? (tn?tn+'’s ultimate XI ⚽ Bui
 // 数え方は「保存のたびに+1」（端末をまたいだ重複排除はしない。1回の保存内で同じ選手を二重には数えない）。
 // バックエンド未接続（POP_ENDPOINT=''）の間は完全に何もしない。ローンチ前にエンドポイントURLを入れるだけで収集開始。
 let POP_ENDPOINT='https://squadxi-pop.mrymgn2018.workers.dev'; // ← Cloudflare Worker（設定済み＝収集オン）
+// 流入元タグ（匿名・粗粒度）。起動時に判定：自サイトのXIリンク= site:<ページ> / 共有リンク= share / それ以外= direct。
+// ビーコンに同梱して「スタメンサイト経由か」を集計可能にする。URLや個人情報は送らない（プライバシーポリシーの匿名集計の範囲内）
+let _popSrc='direct';
+// 開発環境(localhost)からのビーコンは送らない＝プレビュー検証で人気データを汚染しない
+function _popDev(){ try{ const h=location.hostname; return h==='localhost'||h==='127.0.0.1'; }catch(e){ return false; } }
 function _deviceId(){ let d=lsGet('xi_did'); if(!d){ d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)); lsSet('xi_did',d); } return d; }
 function recordSquadSave(){
   try{
-    if(!POP_ENDPOINT) return;
+    if(!POP_ENDPOINT||_popDev()) return;
     const keys=[], seen=new Set();
     const add=pid=>{ if(pid==null||!P[pid]||isCustomPid(pid)) return; const k=popKey(pid); if(!k||seen.has(k)) return; seen.add(k); keys.push(k); }; // popKey=同名選手も移籍で分裂しない集計キー
     state.slots.forEach(s=>{ if(s){ add(s.pid); add(s.sub); } });   // スタメン11＋第2候補（自動サジェスト含む）
     (state.bench||[]).forEach(add);                                 // ベンチ
     if(!keys.length) return;
-    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys}),keepalive:true}).catch(()=>{});
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys,src:_popSrc}),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
 // 検索トレンド収集：「選手を検索」一覧から選手を開いた＝“検索された1回”。トレンドは 検索回数＋保存回数(placements) で集計する想定。
@@ -25764,10 +25769,10 @@ function recordSquadSave(){
 const _searchSent=new Set();
 function recordSearch(pid){
   try{
-    if(!POP_ENDPOINT||pid==null||!P[pid]||isCustomPid(pid)) return;
+    if(!POP_ENDPOINT||_popDev()||pid==null||!P[pid]||isCustomPid(pid)) return;
     const k=popKey(pid); if(!k||_searchSent.has(k)) return; // popKey=同名選手も移籍で分裂しない集計キー
     _searchSent.add(k);
-    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k],kind:'search'}),keepalive:true}).catch(()=>{});
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k],kind:'search',src:_popSrc}),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
 // 離脱時カウント：スカッドを組んだのに「保存」せず画面を閉じる初心者を取りこぼさないための集計。
@@ -25789,10 +25794,10 @@ function exitSquadKeys(){
 }
 function recordExitSquad(){
   try{
-    if(!POP_ENDPOINT) return;
+    if(!POP_ENDPOINT||_popDev()) return;
     const r=exitSquadKeys(); if(!r) return;
     _lastExitSig=r.sig;
-    const body=JSON.stringify({did:_deviceId(),keys:r.keys});
+    const body=JSON.stringify({did:_deviceId(),keys:r.keys,src:_popSrc});
     // 離脱時は fetch より確実に届く sendBeacon を優先（非対応環境は keepalive fetch でフォールバック）
     if(navigator.sendBeacon){ navigator.sendBeacon(POP_ENDPOINT, new Blob([body],{type:'application/json'})); }
     else { fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true}).catch(()=>{}); }
@@ -28819,7 +28824,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
+const BUILD='0715d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30508,6 +30513,23 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ window.isIOSDevice=_realIOS; _pastePromptPid=null; try{hidePastePrompt();}catch(e){} }
       ok('paste_prompt_v2',_pass,_msg); }
+
+    // T19: 人気ビーコンに流入元(src)が同梱される＆localhostでは送信しない
+    { let _pass=true,_msg='';
+      const _realFetch=window.fetch, _realDev=window._popDev;
+      try{
+        let sent=null; window.fetch=(u,o)=>{ sent={u,body:o&&o.body}; return Promise.resolve({ok:true}); };
+        const _pid=P.findIndex(x=>x&&x[0]);
+        buildSlots('4-3-3',false); state.slots[0].pid=_pid;
+        window._popDev=()=>true; recordSquadSave();
+        const devBlocked=(sent===null);                       // localhost扱い＝送らない
+        window._popDev=()=>false; recordSquadSave();
+        let b=null; try{ b=JSON.parse(sent&&sent.body||'null'); }catch(e){}
+        const hasSrc=!!(b&&b.did&&Array.isArray(b.keys)&&b.keys.length>0&&typeof b.src==='string'&&b.src.length>0);
+        _pass=devBlocked&&hasSrc; _msg=_pass?'':('devBlocked='+devBlocked+' hasSrc='+hasSrc+' src='+(b&&b.src));
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ window.fetch=_realFetch; window._popDev=_realDev; }
+      ok('pop_src_beacon',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -30547,6 +30569,8 @@ window.__selftest=function(){
       try{ toast(navigator.onLine===false?t('tstShareOffline'):t('tstShareBad')); }catch(e){}
     }
     if(sharedRaw){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+      // 流入元を記録（人気集計のsrc属性）：自サイトのXIリンク=site(:ページ)、通常の共有リンク=share。確認ダイアログの採否に関わらず「そこから来た」事実で付与
+      try{ _popSrc = sharedRaw.st ? ('site'+((typeof sharedRaw.pg==='string'&&/^[a-z0-9_-]{1,40}$/i.test(sharedRaw.pg))?(':'+sharedRaw.pg):'')) : 'share'; }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
       if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
