@@ -275,7 +275,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .modebar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:90;display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--lime);border-radius:999px;padding:8px 8px 8px 16px;box-shadow:0 8px 24px rgba(0,0,0,.55);font-size:13px;color:var(--ink);max-width:92vw}
 .modebar span{white-space:normal;line-height:1.28;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical} /* 長い英語説明も2行で全文表示（末尾"…点滅中"が切れない） */
 /* 画像検索から戻った時のワンタップ貼り付けバナー */
-.pastebanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:60;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--lime);border-radius:14px;padding:11px 12px;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(150%);opacity:0;transition:transform .25s ease,opacity .2s;cursor:pointer}
+.pastebanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:40;max-width:520px;margin:0 auto;display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--lime);border-radius:14px;padding:11px 12px;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(150%);opacity:0;transition:transform .25s ease,opacity .2s;cursor:pointer} /* z<スクリム(50)/シート(60)＝シートを覆わない */
 .pastebanner.show{transform:translateY(0);opacity:1}
 .pastebanner .pbico{width:34px;height:34px;border-radius:10px;background:var(--panel2);display:grid;place-items:center;color:var(--lime);flex-shrink:0}
 .pastebanner .pbico svg{width:19px;height:19px}
@@ -26586,7 +26586,7 @@ async function pastePhoto(pid){
   if(isIOSDevice()){ openPasteBox(pid); return; }                                     // iOSは read() をあてにせず最初からボックス（Safariタブ含む）
   if(!(navigator.clipboard&&navigator.clipboard.read)){ openPasteBox(pid); return; }   // その他で read() 非対応→ボックス
   try{
-    const items=await navigator.clipboard.read();
+    const items=await Promise.race([navigator.clipboard.read(), new Promise((_,rej)=>setTimeout(()=>rej(new Error('clip-timeout')),4000))]); // 万一 read() が返らない環境でハングしない保険
     let blob=null;
     for(const it of items){ const tp=(it.types||[]).find(tt=>tt&&tt.indexOf('image/')===0); if(tp){ blob=await it.getType(tp); break; } }
     if(blob){ importPhotoBlob(pid,blob); return; } // read()が使える環境＝画像があれば即ワンタップ取り込み（PC/Android）
@@ -26652,7 +26652,7 @@ function showPastePrompt(pid){
   requestAnimationFrame(function(){ if(_pasteBanner===b) b.classList.add('show'); });
   clearTimeout(_pasteBannerTO); _pasteBannerTO=setTimeout(hidePastePrompt,15000); // 押されなければ引っ込める（pendingは残す＝次に戻った時また出る／×で恒久停止）
 }
-function hidePastePrompt(){ clearTimeout(_pasteBannerTO); const b=_pasteBanner; _pasteBanner=null; if(b){ b.classList.remove('show'); setTimeout(function(){ try{b.remove();}catch(e){} },250); } }
+function hidePastePrompt(){ clearTimeout(_pasteBannerTO); const b=_pasteBanner; _pasteBanner=null; if(b){ try{b.remove();}catch(e){} } } // 即時除去（フェード待ちの被り窓を作らない＝シートを覆ってフリーズを防ぐ）
 photoInput.addEventListener('change',()=>{
   const f=photoInput.files&&photoInput.files[0]; if(!f||photoTarget==null)return;
   const fr=new FileReader();
