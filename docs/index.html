@@ -25371,6 +25371,7 @@ function buildSlots(formKey,keepPlayers){
   const f=FORM[formKey];
   // フォーメーション変更時：現在ピッチにいる選手を保持して、新フォーメーションに最適配置
   const keptPids = keepPlayers ? state.slots.filter(s=>s.pid!=null).map(s=>s.pid) : [];
+  const prevSub={}; if(keepPlayers){ state.slots.forEach(s=>{ if(s.pid!=null&&s.sub!=null) prevSub[s.pid]=s.sub; }); } // 各スタメンの控え(第2候補)を退避し、フォメ変更後も引き継ぐ
   state.slots=f.map(s=>({role:s[0],x:s[1],y:s[2],pid:null,sub:null}));
   spreadRowsEven(); // 列を均等間隔へ（無駄な空き解消・重なり防止）
   state.formation=formKey;
@@ -25384,7 +25385,13 @@ function buildSlots(formKey,keepPlayers){
       if(pid!=null){ used.add(pid); s.pid=pid; }
     });
     pickRole=savedRole;
-    autoAssignSubs(); // 第二候補を新しい役割で再割当（控えがいる場合）
+    autoAssignSubs(); // 控えのいない枠に第二候補を自動割当
+    // 変更前に各選手へ付いていた控えを優先復元（新役割でも適性があり控えに残っていれば）。手動で選んだ第2候補が消えないように。
+    state.slots.forEach(s=>{ if(s.pid==null) return; const ps=prevSub[s.pid];
+      if(ps==null || ps===s.sub || !state.bench.includes(ps) || inXI(ps) || !subEligible(P[ps][1],s.role)) return;
+      state.slots.forEach(o=>{ if(o!==s && o.sub===ps) o.sub=null; }); // 他枠が使っていたら解放（重複防止）
+      s.sub=ps;
+    });
   }
 }
 
@@ -25518,7 +25525,7 @@ function keyToPid(key){
   return (key in _keyMap)?_keyMap[key]:null;
 }
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
-function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } }catch(e){} }
+function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } return true; }catch(e){ return false; } } // 書込成功でtrue（容量超過QuotaExceeded等はfalse）
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
@@ -25555,6 +25562,7 @@ const I18N = {
     tstSubCleared:'第二候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
     tstNameUpdated:'表示名を更新しました', tstMemoSaved:'メモを保存しました', tstMemoDeleted:'メモを削除しました', tstXIFull:'スタメンが11人埋まっています。誰かを外してください', tstCanceled:'キャンセルしました',
     tstNotBackup:'Squad XI のバックアップではありません', tstBackupEmpty:'このバックアップにはデータが入っていません（空かもしれません）', tstRestored:'復元しました。再読み込みします…', tstReadFail:'テキストを読み込めませんでした（内容が壊れている可能性）',
+    tstSaveFail:'保存できませんでした（端末の空き容量不足か、写真が多すぎる可能性）', tstShareBad:'このリンクを開けませんでした（URLが壊れているか期限切れの可能性）', tstShareOffline:'オフラインのため共有スカッドを読み込めませんでした', rstTitle:'バックアップを復元', rstBody:'現在保存されている{n}件のスカッドと写真・入力データを、このバックアップで置き換えます。<br>※現在のデータは元に戻せません。先に「バックアップを作成」で書き出しておくことをおすすめします。', rstConfirm:'復元する',
     tstNoSaveData:'保存データがありません。先にスカッドを保存してください', tstExported:'バックアップを書き出しました', tstExportFail:'書き出しに失敗しました', tstFileReadFail:'ファイルを読み込めませんでした',
     tstCopiedKeep:'コピーしました。メモ等に貼り付けて保管を', tstSelectCopy:'上の枠のテキストを全選択してコピーしてください', tstTextEmpty:'テキストが空です。バックアップを貼り付けてください',
     tstSaved2:'保存しました', tstGenerating:'画像を生成中…', tstGenFail:'画像の生成に失敗しました', tstImgSaved:'画像を保存しました', tstImgSavedX:'画像を保存しました。Xの投稿画面に貼り付けてください', tstImgSavedIG:'画像を保存しました。Instagramアプリで投稿してください',
@@ -25633,6 +25641,7 @@ const I18N = {
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
     tstNameUpdated:'Display name updated', tstMemoSaved:'Note saved', tstMemoDeleted:'Note deleted', tstXIFull:'The XI already has 11. Remove someone first.', tstCanceled:'Canceled',
     tstNotBackup:'This isn’t a Squad XI backup.', tstBackupEmpty:'This backup contains no data (it may be empty).', tstRestored:'Restored. Reloading…', tstReadFail:'Could not read the text (it may be corrupted).',
+    tstSaveFail:'Couldn’t save — your device storage may be full or you have too many photos.', tstShareBad:'Couldn’t open this shared lineup — the link may be broken or expired.', tstShareOffline:'You’re offline, so the shared lineup couldn’t load.', rstTitle:'Restore backup', rstBody:'This replaces your {n} saved squad(s), photos and entries with this backup.<br>Note: your current data can’t be recovered — we recommend exporting it first via “Create backup”.', rstConfirm:'Restore',
     tstNoSaveData:'No saved data. Save a squad first.', tstExported:'Backup exported', tstExportFail:'Export failed', tstFileReadFail:'Could not read the file',
     tstCopiedKeep:'Copied. Paste it somewhere safe to keep it.', tstSelectCopy:'Select all the text above and copy it.', tstTextEmpty:'The text is empty. Paste your backup.',
     tstSaved2:'Saved', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved', tstImgSavedX:'Image saved. Paste it into your X post.', tstImgSavedIG:'Image saved. Post it from the Instagram app.',
@@ -25832,8 +25841,9 @@ async function savePhotos(){
   const keyed={}; for(const pid in state.photos){ const k=pidToKey(+pid); if(k!=null) keyed[k]=state.photos[pid]; }
   const json=JSON.stringify({v:3,photos:keyed});
   try{ if(window.storage){ await window.storage.set('xi_photos_v2',json,false); } }catch(e){}
-  lsSet('xi_photos_v2',json);
+  const ok=lsSet('xi_photos_v2',json);
   memPhotos=state.photos;
+  return ok;
 }
 // 保存データ(キー形式v3)を現在のindexへ解決。データ更新で番号がズレても正しい選手に復元。複数チーム読込でも使う。
 function resolveRaw(raw){
@@ -25911,19 +25921,23 @@ function getTeams(){
   const s=lsGet('xi_teams_v1'); if(s){ try{ const a=JSON.parse(s); if(Array.isArray(a)){ memTeams=a; return a; } }catch(e){} }
   memTeams=[]; return memTeams;
 }
-function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} }
+function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); const ok=lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} return ok; }
 function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||defaultTeamName(); }
 // 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
 function saveCurrentTeam(){
   const teams=getTeams(); const data=serializeTeam();
-  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; setTeams(teams); cleanJson=JSON.stringify(serializeTeam()); recordSquadSave(); return 'updated'; } }
-  if(teams.length>=teamCap()) return 'limit';
-  const id='t'+Date.now()+Math.floor(Math.random()*1000);
-  state.teamId=id; data.teamId=id;
-  teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
-  setTeams(teams); save(); cleanJson=JSON.stringify(serializeTeam());
-  recordSquadSave();
-  return 'added';
+  let ok, kind;
+  if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; ok=setTeams(teams); kind='updated'; } }
+  if(kind===undefined){
+    if(teams.length>=teamCap()) return 'limit';
+    const id='t'+Date.now()+Math.floor(Math.random()*1000);
+    state.teamId=id; data.teamId=id;
+    teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
+    ok=setTeams(teams); save(); kind='added';
+  }
+  if(!ok) return 'error'; // localStorage書込失敗（容量超過）→ 成功トーストを出さず警告（データ消失の誤認防止）
+  cleanJson=JSON.stringify(serializeTeam()); recordSquadSave();
+  return kind;
 }
 async function loadTeamFromList(id){
   const t=getTeams().find(x=>x.id===id); if(!t) return;
@@ -26603,7 +26617,7 @@ function savePhotoCrop(img,sx,sy){
   ctx.drawImage(img,sx,sy,side,side,0,0,S,S);
   state.photos[photoTarget]=c.toDataURL('image/jpeg',0.82);
   photoTarget=null;
-  savePhotos();closeSheet();render();toast(t('tstPhotoSet'));
+  closeSheet();render();savePhotos().then(ok=>toast(ok?t('tstPhotoSet'):t('tstSaveFail'))); // 保存失敗（容量超過）時は成功トーストを出さない
 }
 // 写真の切り抜き位置調整シート：丸枠プレビューをドラッグして「円に入る範囲」を自分で決める。
 // 初期位置は 縦長=上寄り10%（顔は上部にあることが多い）/ 横長=中央。ドラッグで全域に動かせる。
@@ -26701,8 +26715,15 @@ function tapReserveInSwap(targetPid){
    Sheet helpers
    ========================================================= */
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
-function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');}
+function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');_ovPush();}
 function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
+// Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
+// overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
+// history.back() はプログラムから呼ばない（高速開閉で暴発してページ外へ飛ぶ事故を避ける）＝安全側。手動で閉じた後はマーカーが1つ残り、次の「戻る」1回だけが吸収される（アプリは終了しない）。
+let _ovNav=false;
+function _ovAnyOpen(){ try{ const dw=document.getElementById('drawer'); return sheet.classList.contains('on') || (dw&&dw.classList.contains('on')); }catch(e){ return false; } }
+function _ovPush(){ if(!_ovNav){ _ovNav=true; try{ history.pushState({xiOv:1},''); }catch(e){} } }
+window.addEventListener('popstate',function(){ if(_ovNav){ _ovNav=false; if(_ovAnyOpen()){ try{closeSheet();}catch(e){} try{closeDrawer();}catch(e){} } } });
 scrim.onclick=closeSheet;
 
 /* シートのスワイプ操作：ハンドル/見出しは即ドラッグ、本文も最上部なら下方向ドラッグで閉じる（閉じやすさ改善） */
@@ -28605,7 +28626,7 @@ let _resetDrawerGesture=null; // initDrawerGestures がジェスチャ状態リ�
 // ドロワー/スクリムに残ったインラインスタイル（スワイプ途中のtransform/opacity）を消し、開閉はCSSクラスだけで決まる状態に戻す。
 // PWAでOSが左端スワイプを横取りして pointerup が来ず、ジェスチャが固着した場合でも、開閉のたびに必ず自己修復する。
 function _drawerClearInline(){ try{ const d=document.getElementById('drawer'), sc=document.getElementById('dscrim'); if(d){ d.style.transition=''; d.style.transform=''; } if(sc){ sc.style.transition=''; sc.style.opacity=''; } }catch(e){} }
-function openDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline(); document.getElementById('dscrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); }
+function openDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline(); document.getElementById('dscrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); _ovPush(); }
 function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
 // Web版（通常のブラウザ）判定。インストール済みPWA / ネイティブ(Capacitor)では false → ストア誘導を出さない
 function isWebVersion(){
@@ -28679,7 +28700,7 @@ function wireDrawer(){
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
-  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
+  const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDeleteTeam(el.dataset.del); });
   d.querySelectorAll('[data-rename]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); openRenameTeam(el.dataset.rename); });
@@ -28837,14 +28858,21 @@ function backupText(){
 }
 // テキスト（ファイル or 貼り付け）から復元。ファイル選択を使わないのでiOSホーム画面アプリでも動く。
 function restoreFromBackupText(text){
-  try{
-    const j=JSON.parse(text);
-    if(!j||j.app!=='SquadXI'||typeof j.data!=='object'){ toast(t('tstNotBackup')); return; }
-    const keys=Object.keys(j.data).filter(k=>BACKUP_KEYS.includes(k));
-    if(!keys.length){ toast(t('tstBackupEmpty')); return; }
-    keys.forEach(k=>lsSet(k, j.data[k]));
-    toast(t('tstRestored')); setTimeout(()=>location.reload(),700);
-  }catch(e){ toast(t('tstReadFail')); }
+  let j; try{ j=JSON.parse(text); }catch(e){ toast(t('tstReadFail')); return; }
+  if(!j||j.app!=='SquadXI'||typeof j.data!=='object'){ toast(t('tstNotBackup')); return; }
+  const keys=Object.keys(j.data).filter(k=>BACKUP_KEYS.includes(k));
+  if(!keys.length){ toast(t('tstBackupEmpty')); return; }
+  let n=0; try{ n=getTeams().length; }catch(e){}
+  // 復元は保存済みスカッド・写真・入力データを丸ごと置き換える破壊操作 → 実行前に確認（1件削除に確認があるのと整合）
+  openSheet(`
+    <h2>${t('rstTitle')}</h2>
+    <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('rstBody').replace('{n}',n)}</div>
+    <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
+      <button class="bigbtn" id="rstOk">${t('rstConfirm')}</button>
+      <button class="bigbtn ghost" id="rstCancel">${t('cancel')}</button>
+    </div>`);
+  document.getElementById('rstOk').onclick=()=>{ try{ keys.forEach(k=>lsSet(k, j.data[k])); toast(t('tstRestored')); setTimeout(()=>location.reload(),700); }catch(e){ toast(t('tstReadFail')); } };
+  document.getElementById('rstCancel').onclick=()=>{ closeSheet(); };
 }
 async function exportBackup(){
   try{
@@ -28986,7 +29014,7 @@ function openConfirmSave(proceed,mode){
       <button class="bigbtn ghost" id="csSkip">${t(mode==='load'?'skipAndLoad':'skipAndNew')}</button>
       <button class="bigbtn ghost" id="csCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
+  document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } if(r==='error'){ toast(t('tstSaveFail')); closeSheet(); return; } /* 保存失敗時は先へ進めない（作業消失防止） */ toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
   document.getElementById('csSkip').onclick=()=>{ closeSheet(); proceed(); };
   document.getElementById('csCancel').onclick=()=>{ closeSheet(); };
 }
@@ -29958,6 +29986,7 @@ function clearSquad(){
   document.getElementById('clrSave').onclick=()=>{ // 現在のスカッドを保存してから盤面を消す
     const r=saveCurrentTeam();
     if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ doClear(); closeSheet(); toast(t('tstSavedCleared')); } }}); return; }
+    if(r==='error'){ toast(t('tstSaveFail')); return; } // 保存失敗時は盤面を消さない（作業消失防止）
     doClear(); closeSheet(); toast(t('tstSavedCleared'));
   };
   document.getElementById('clrOk').onclick=()=>{ doClear(); closeSheet(); toast(t('tstCleared')); };
@@ -30292,7 +30321,12 @@ window.__selftest=function(){
   // スカッド共有リンク（#s=...）で開かれた場合：URLから復元して確認ダイアログ（拒否なら何も変えない）
   // ただし自サイトのページから飛んできたリンク（raw.st=1）は確認なしで即盤面に展開する
   try{
+    const wasShareLink=/^#?s=/.test(location.hash||'');
     const sharedRaw=await decodeSquadHash(location.hash);
+    if(!sharedRaw && wasShareLink){ // 共有リンク(#s=)なのに復元失敗（URL破損・切り詰め・期限切れ・オフライン）→ 無反応にせず通知
+      try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+      try{ toast(navigator.onLine===false?t('tstShareOffline'):t('tstShareBad')); }catch(e){}
+    }
     if(sharedRaw){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
