@@ -25752,10 +25752,21 @@ let POP_ENDPOINT='https://squadxi-pop.mrymgn2018.workers.dev'; // ← Cloudflare
 let _popSrc='direct';
 // 開発環境(localhost)からのビーコンは送らない＝プレビュー検証で人気データを汚染しない
 function _popDev(){ try{ const h=location.hostname; return h==='localhost'||h==='127.0.0.1'; }catch(e){ return false; } }
+// 管理者オプトアウト：ドロワー最下部の版数(build)を長押しで切替。オンの端末は一切ビーコンを送らない（管理者の実機テストを集計から除外）
+function _popBlocked(){ try{ return _popDev() || lsGet('xi_pop_optout')==='1'; }catch(e){ return false; } }
+let _showDid=false; // 長押し後、ドロワー最下部に端末ID(did)を表示（削除SQL用にIDを知らせるため）
+function toggleAdminOptout(){
+  const on=lsGet('xi_pop_optout')==='1';
+  if(on){ try{ localStorage.removeItem('xi_pop_optout'); }catch(e){} } else { lsSet('xi_pop_optout','1'); }
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(_deviceId()); }catch(e){} // 端末IDをコピー（失敗しても下に全文表示される）
+  toast(!on ? (LANG==='en'?'This device is now EXCLUDED from stats (admin)':'この端末の記録を送信しない設定にしました（管理者モード）')
+            : (LANG==='en'?'This device now sends stats again':'この端末の記録送信を再開しました'));
+  _showDid=true; try{ renderDrawer(); }catch(e){}
+}
 function _deviceId(){ let d=lsGet('xi_did'); if(!d){ d=(self.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2)); lsSet('xi_did',d); } return d; }
 function recordSquadSave(){
   try{
-    if(!POP_ENDPOINT||_popDev()) return;
+    if(!POP_ENDPOINT||_popBlocked()) return;
     const keys=[], seen=new Set();
     const add=pid=>{ if(pid==null||!P[pid]||isCustomPid(pid)) return; const k=popKey(pid); if(!k||seen.has(k)) return; seen.add(k); keys.push(k); }; // popKey=同名選手も移籍で分裂しない集計キー
     state.slots.forEach(s=>{ if(s){ add(s.pid); add(s.sub); } });   // スタメン11＋第2候補（自動サジェスト含む）
@@ -25769,7 +25780,7 @@ function recordSquadSave(){
 const _searchSent=new Set();
 function recordSearch(pid){
   try{
-    if(!POP_ENDPOINT||_popDev()||pid==null||!P[pid]||isCustomPid(pid)) return;
+    if(!POP_ENDPOINT||_popBlocked()||pid==null||!P[pid]||isCustomPid(pid)) return;
     const k=popKey(pid); if(!k||_searchSent.has(k)) return; // popKey=同名選手も移籍で分裂しない集計キー
     _searchSent.add(k);
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys:[k],kind:'search',src:_popSrc}),keepalive:true}).catch(()=>{});
@@ -25794,7 +25805,7 @@ function exitSquadKeys(){
 }
 function recordExitSquad(){
   try{
-    if(!POP_ENDPOINT||_popDev()) return;
+    if(!POP_ENDPOINT||_popBlocked()) return;
     const r=exitSquadKeys(); if(!r) return;
     _lastExitSig=r.sig;
     const body=JSON.stringify({did:_deviceId(),keys:r.keys,src:_popSrc});
@@ -28824,7 +28835,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
+const BUILD='0715e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -28866,7 +28877,8 @@ function drawerHTML(){
     <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px;display:inline-flex;align-items:center;gap:5px">${ICN.globe}${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
-    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')} · build ${BUILD}
+    <div class="dwfoot">Squad XI — ${t('tagline')}<br><span id="dwBuild" style="-webkit-touch-callout:none;-webkit-user-select:none;user-select:none">v0.9${t('preview')} · build ${BUILD}${lsGet('xi_pop_optout')==='1'?(LANG==='en'?' · no-stats':' · 収集オフ'):''}</span>
+      ${_showDid?`<div style="margin-top:6px;font-size:10px;-webkit-user-select:text;user-select:text;word-break:break-all;color:var(--mut)">${LANG==='en'?'device id':'端末ID'}: ${escAttr(_deviceId())}</div>`:''}
       <div style="margin-top:9px"><button id="dwUpdate" class="bigbtn ghost" style="padding:9px;font-size:12px;font-weight:800">${LANG==='en'?'↻ Update to the latest version':'↻ 最新版に更新'}</button></div>
     </div>`;
 }
@@ -28875,6 +28887,11 @@ function wireDrawer(){
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
   { const up=d.querySelector('#dwUpdate'); if(up) up.onclick=forceUpdateApp; }
+  { const bl=d.querySelector('#dwBuild'); if(bl){ let _lpTO=null; // 版数の長押し(650ms)＝この端末の記録送信オン/オフ（管理者用の隠し機能）＋端末ID表示
+      const cancel=()=>{ if(_lpTO){ clearTimeout(_lpTO); _lpTO=null; } };
+      bl.addEventListener('pointerdown',e=>{ cancel(); _lpTO=setTimeout(()=>{ _lpTO=null; toggleAdminOptout(); },650); });
+      bl.addEventListener('pointerup',cancel); bl.addEventListener('pointerleave',cancel); bl.addEventListener('pointercancel',cancel);
+      bl.addEventListener('contextmenu',e=>{ try{e.preventDefault();}catch(_){} }); } }
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
@@ -30492,6 +30509,7 @@ window.__selftest=function(){
       const _pid=P.findIndex(x=>x&&x[0]);
       const _realIOS=window.isIOSDevice;
       try{
+        try{ closeDrawer(); }catch(e){}  // ドロワーが開いているとバナーが抑止され(b)が誤判定になる
         // (a) シートが開いている間はバナー抑止（開いているメニューの貼り付け行に誘導する仕様）
         openSheet('<h2>t18</h2>');
         _pastePromptPid=_pid; _pastePromptAt=Date.now(); maybeShowPastePrompt();
@@ -30514,21 +30532,24 @@ window.__selftest=function(){
       finally{ window.isIOSDevice=_realIOS; _pastePromptPid=null; try{hidePastePrompt();}catch(e){} }
       ok('paste_prompt_v2',_pass,_msg); }
 
-    // T19: 人気ビーコンに流入元(src)が同梱される＆localhostでは送信しない
+    // T19: 人気ビーコンに流入元(src)が同梱される＆localhost/管理者オプトアウトでは送信しない
     { let _pass=true,_msg='';
-      const _realFetch=window.fetch, _realDev=window._popDev;
+      const _realFetch=window.fetch, _realDev=window._popDev, _realOpt=lsGet('xi_pop_optout');
       try{
         let sent=null; window.fetch=(u,o)=>{ sent={u,body:o&&o.body}; return Promise.resolve({ok:true}); };
         const _pid=P.findIndex(x=>x&&x[0]);
         buildSlots('4-3-3',false); state.slots[0].pid=_pid;
-        window._popDev=()=>true; recordSquadSave();
+        window._popDev=()=>true; try{localStorage.removeItem('xi_pop_optout');}catch(e){} recordSquadSave();
         const devBlocked=(sent===null);                       // localhost扱い＝送らない
-        window._popDev=()=>false; recordSquadSave();
+        window._popDev=()=>false; lsSet('xi_pop_optout','1'); recordSquadSave();
+        const optBlocked=(sent===null);                       // 管理者オプトアウト＝送らない
+        try{localStorage.removeItem('xi_pop_optout');}catch(e){} recordSquadSave();
         let b=null; try{ b=JSON.parse(sent&&sent.body||'null'); }catch(e){}
         const hasSrc=!!(b&&b.did&&Array.isArray(b.keys)&&b.keys.length>0&&typeof b.src==='string'&&b.src.length>0);
-        _pass=devBlocked&&hasSrc; _msg=_pass?'':('devBlocked='+devBlocked+' hasSrc='+hasSrc+' src='+(b&&b.src));
+        _pass=devBlocked&&optBlocked&&hasSrc; _msg=_pass?'':('devBlocked='+devBlocked+' optBlocked='+optBlocked+' hasSrc='+hasSrc+' src='+(b&&b.src));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
-      finally{ window.fetch=_realFetch; window._popDev=_realDev; }
+      finally{ window.fetch=_realFetch; window._popDev=_realDev;
+        try{ if(_realOpt!=null) lsSet('xi_pop_optout',_realOpt); else localStorage.removeItem('xi_pop_optout'); }catch(e){} }
       ok('pop_src_beacon',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
