@@ -437,6 +437,14 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .mitem .mi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--panel2);font-size:15px}
 .micon{width:18px;height:18px;display:inline-block;vertical-align:-.18em;flex:0 0 auto}
 .mitem .mi .micon{width:19px;height:19px;display:block}
+/* 写真の追加方法を1グループに集約（タップで下に展開） */
+.mitem.photogrp .miexp{margin-left:auto;font-size:12px;opacity:.6;transition:transform .2s}
+.mitem.photogrp.open .miexp{transform:rotate(180deg)}
+.photosub{overflow:hidden;max-height:0;transition:max-height .22s ease}
+.mitem.photogrp.open + .photosub{max-height:220px}
+.photosub .mitem.sub{padding-top:11px;padding-bottom:11px;padding-left:26px;font-size:14px;position:relative}
+.photosub .mitem.sub::before{content:'';position:absolute;left:13px;top:2px;bottom:2px;width:2px;border-radius:2px;background:var(--line)}
+.photosub .mitem.sub .mi{width:30px;height:30px;font-size:14px}
 .bigbtn .micon{width:18px;height:18px;vertical-align:-.16em;margin-right:3px}
 .statbar .micon{width:18px;height:18px;vertical-align:-.2em}
 .mitem.danger{color:var(--red)}
@@ -25554,7 +25562,7 @@ const I18N = {
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
-    addChangePhoto:'写真を追加 / 変更', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    addChangePhoto:'写真を追加 / 変更', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
@@ -25633,7 +25641,7 @@ const I18N = {
     createPlayer:'＋ Create a player', noMatch:'No matching players',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
-    addChangePhoto:'Add / change photo', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    addChangePhoto:'Add / change photo', photoDevice:'Choose from your photos', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
@@ -27780,9 +27788,12 @@ function openReserveMenu(pid){
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
-      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
-      <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
+      <div class="photosub">
+        <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
+        <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+        <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      </div>
       <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromTeam')}</div>
     </div>`);
@@ -27790,6 +27801,7 @@ function openReserveMenu(pid){
   body.querySelector('.menu').onclick=e=>{
     const it=e.target.closest('[data-act]');if(!it)return;
     const a=it.dataset.act;
+    if(a==='photogrp'){ it.classList.toggle('open'); return; } // 写真の追加方法グループを開閉（シートは閉じない）
     if(a==='swap') startSwapReserve(pid);
     if(a==='change') openReserveSwap(pid);
     if(a==='memo') openMemo(pid);
@@ -27959,9 +27971,12 @@ function openSlotMenu(i){
   openSheet(`
     <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${s.role}</span></h2>
     <div class="menu">
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
-      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
-      <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
+      <div class="photosub">
+        <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
+        <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+        <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      </div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
@@ -27975,6 +27990,7 @@ function openSlotMenu(i){
   body.querySelector('.menu').onclick=e=>{
     const it=e.target.closest('[data-act]');if(!it)return;
     const a=it.dataset.act;
+    if(a==='photogrp'){ it.classList.toggle('open'); return; } // 写真の追加方法グループを開閉（シートは閉じない）
     if(a==='photo')pickPhoto(s.pid);
     if(a==='paste')pastePhoto(s.pid);
     if(a==='search')searchPlayerWeb(s.pid);
@@ -28034,9 +28050,12 @@ function openBenchMenu(pid){
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
-      <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
-      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
-      <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
+      <div class="photosub">
+        <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
+        <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+        <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
+      </div>
       <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>${t('removeFromBench')}</div>
     </div>`);
@@ -28044,6 +28063,7 @@ function openBenchMenu(pid){
   body.querySelector('.menu').onclick=e=>{
     const it=e.target.closest('[data-act]');if(!it)return;
     const a=it.dataset.act;
+    if(a==='photogrp'){ it.classList.toggle('open'); return; } // 写真の追加方法グループを開閉（シートは閉じない）
     if(a==='swap') startSwapBench(pid);
     if(a==='change') openBenchSwap(pid);
     if(a==='memo') openMemo(pid);
