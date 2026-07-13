@@ -27955,15 +27955,15 @@ function openSlotMenu(i){
     <h2><span class="renameTrigger" id="smRename">${nameOf(s.pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${s.role}</span></h2>
     <div class="menu">
       <div class="mitem" data-act="photo"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}</div>
-      <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
       <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+      <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
       <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
       <div class="mitem" data-act="sub"><div class="mi">${ICN.sub}</div>${subLabel}</div>
       <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(s.pid)?'（'+memoOf(s.pid)+'）':''}</div>
-      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(s.pid):_ICN_GOLDLOCK}</div>
       <div class="mitem" data-act="captain"><div class="mi">${isCapt?ICN.star:ICN.crown}</div>${isCapt?t('captainOff'):t('captainOn')}</div>
+      <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(s.pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromXI')}</div>
     </div>`);
   const _smr=document.getElementById('smRename'); if(_smr)_smr.onclick=()=>openRename(s.pid);
@@ -28671,6 +28671,8 @@ function storeBadgesHTML(){
     + `<div class="dwsec">${soon?t('getAppSoon'):t('getApp')}</div>`
     + `<div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 16px 10px">${badge('ios',APPSTORE_URL)}${badge('android',PLAYSTORE_URL)}</div>`;
 }
+// バックアップ（書き出し/読み込み）をドロワーに表示するか。false＝非表示（機能一式は残置。復活はこれをtrueに戻すだけ。2026-07-14 ユーザー判断で一旦非表示）
+const SHOW_BACKUP=false;
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
@@ -28696,7 +28698,7 @@ function drawerHTML(){
     <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>${t('announcements')}${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>${t('premium')}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="help"><span class="di">${ICN.help}</span>${t('help')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-page="backup"><span class="di">${ICN.backup}</span>${t('backup')}<span class="dchev">›</span></div>
+    ${SHOW_BACKUP?`<div class="dwitem" data-page="backup"><span class="di">${ICN.backup}</span>${t('backup')}<span class="dchev">›</span></div>`:''}
     <div class="dwitem" data-page="feedback"><span class="di">${ICN.mail}</span>${t('feedback')}<span class="dchev">›</span></div>
     ${storeBadgesHTML()}
     <div class="dwdiv"></div>
