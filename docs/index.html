@@ -26646,7 +26646,10 @@ function showPastePrompt(pid){
   b.innerHTML='<div class="pbico">'+ICN.copyicon+'</div><div class="pbtxt">'+escAttr(t('pastePromptTitle'))+'<b>'+escAttr(nm)+'</b></div><button class="pbgo">'+escAttr(t('pasteShort'))+'</button><button class="pbx" aria-label="'+escAttr(t('cancel'))+'">×</button>';
   document.body.appendChild(b); _pasteBanner=b;
   let _went=false;
-  const go=()=>{ if(_went)return; _went=true; const p=pid; _pastePromptPid=null; hidePastePrompt(); setTimeout(function(){ try{ pastePhoto(p); }catch(e){} },0); }; // 二重発火ガード＋クリック完了後(次tick)に開く（iOSのゴーストクリック/再入回避）
+  // 二重発火ガード＋「指のタッチ/iOSゴーストが完全に終わってから」箱を開く。それまでバナーは残して(pointer-events auto)下の盤面/ベンチを触らせない＝touch-throughでpointer captureが固着→フリーズするのを根本から防ぐ。
+  const go=()=>{ if(_went)return; _went=true; const p=pid; _pastePromptPid=null; clearTimeout(_pasteBannerTO);
+    try{ b.style.opacity='.55'; const gb=b.querySelector('.pbgo'); if(gb)gb.textContent='…'; }catch(e){}
+    setTimeout(function(){ hidePastePrompt(); try{ pastePhoto(p); }catch(e){} }, 300); };
   b.querySelector('.pbgo').onclick=function(e){ e.stopPropagation(); e.preventDefault(); go(); };
   b.querySelector('.pbx').onclick=function(e){ e.stopPropagation(); e.preventDefault(); _pastePromptPid=null; hidePastePrompt(); };
   b.onclick=go;
@@ -28743,6 +28746,14 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
+const BUILD='0714f'; // ドロワー末尾に表示。ユーザーが「今どの版か」を確認/報告できるように（キャッシュ切り分け用）
+// SW/キャッシュを消して最新版を取りに行く（iOS PWAはキャッシュが強いので手動更新の逃げ道）
+async function forceUpdateApp(){
+  try{ toast(LANG==='en'?'Updating to the latest…':'最新版に更新しています…'); }catch(e){}
+  try{ if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); for(const r of rs){ try{await r.unregister();}catch(e){} } } }catch(e){}
+  try{ if(window.caches){ const ks=await caches.keys(); for(const k of ks){ try{await caches.delete(k);}catch(e){} } } }catch(e){}
+  setTimeout(function(){ try{ location.reload(); }catch(e){} }, 300);
+}
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
@@ -28776,12 +28787,15 @@ function drawerHTML(){
     <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px;display:inline-flex;align-items:center;gap:5px">${ICN.globe}${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
-    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')}</div>`;
+    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')} · build ${BUILD}
+      <div style="margin-top:9px"><button id="dwUpdate" class="bigbtn ghost" style="padding:9px;font-size:12px;font-weight:800">${LANG==='en'?'↻ Update to the latest version':'↻ 最新版に更新'}</button></div>
+    </div>`;
 }
 function wireDrawer(){
   const d=document.getElementById('drawer');
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
+  { const up=d.querySelector('#dwUpdate'); if(up) up.onclick=forceUpdateApp; }
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
