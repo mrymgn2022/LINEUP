@@ -26606,7 +26606,11 @@ function openPasteBox(pid){
   const box=document.getElementById('pasteBox'); let done=false;
   const consume=blob=>{ if(done||!blob)return; done=true; closeSheet(); importPhotoBlob(pid,blob); };
   const scanImg=()=>{ const im=box.querySelector('img'); if(!im)return false; // 挿入画像をcanvasでBlob化
-    const draw=()=>{ try{ const w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; if(!w||!h)return; const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(im,0,0); c.toBlob(b=>{ b?consume(b):toast(t('tstPasteBoxNoImage')); },'image/png'); }catch(e){ toast(t('tstPasteBoxNoImage')); } }; // 外部URL画像はcanvas汚染で落ちる→案内
+    const draw=()=>{ try{ let w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; if(!w||!h)return;
+      // 大きなWeb画像をフルサイズでcanvas化→PNGエンコードすると iOS がメモリ枯渇でハング/クラッシュ（＝貼り付けで固まる原因）。上限1400pxへ縮小＋軽いJPEGに。
+      const MAX=1400, sc=Math.min(1,MAX/Math.max(w,h)), cw=Math.max(1,Math.round(w*sc)), ch=Math.max(1,Math.round(h*sc));
+      const c=document.createElement('canvas'); c.width=cw; c.height=ch; c.getContext('2d').drawImage(im,0,0,cw,ch);
+      c.toBlob(b=>{ b?consume(b):toast(t('tstPasteBoxNoImage')); },'image/jpeg',0.9); }catch(e){ toast(t('tstPasteBoxNoImage')); } }; // 外部URL画像はcanvas汚染で落ちる→案内
     if(im.complete&&(im.naturalWidth||im.width)) draw(); else { im.onload=draw; im.onerror=()=>toast(t('tstPasteBoxNoImage')); }
     return true;
   };
@@ -28748,7 +28752,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0714g'; // ドロワー末尾に表示。ユーザーが「今どの版か」を確認/報告できるように（キャッシュ切り分け用）
+const BUILD='0714h'; // ドロワー末尾に表示。ユーザーが「今どの版か」を確認/報告できるように（キャッシュ切り分け用）
 // SW/キャッシュを消して最新版を取りに行く（iOS PWAはキャッシュが強いので手動更新の逃げ道）
 async function forceUpdateApp(){
   try{ toast(LANG==='en'?'Updating to the latest…':'最新版に更新しています…'); }catch(e){}
