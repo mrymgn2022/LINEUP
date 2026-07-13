@@ -30290,6 +30290,18 @@ window.__selftest=function(){
       }
       LANG=_lang; state.teamCond=_tc; state.flagByLeague=_fbl; state.names=_nm;
       ok('j1_ja_names',_m.length===0,'J日本語表示: '+_m.join(',')); }
+    // T17: フォーメーション変更で手動の第2候補(控え)が保持される（自動再割当で消えない）
+    { let _pass=true,_msg='skip';
+      buildSlots('4-4-2',false);
+      const _r=state.slots[0].role;
+      const _c=[]; for(let i=0;i<P.length&&_c.length<3;i++){ if(P[i]&&!isCustomPid(i)&&P[i][1]===_r) _c.push(i); }
+      if(_c.length>=3){
+        state.slots[0].pid=_c[0]; state.bench=[_c[1],_c[2]]; state.slots[0].sub=_c[2]; // 2人目を手動で控えに
+        buildSlots('4-3-3',true);                                                       // フォメ変更（keepPlayers）
+        const _s=state.slots.find(x=>x.pid===_c[0]);
+        _pass=!!_s && _s.sub===_c[2]; _msg=_pass?'':'フォメ変更で手動控えが消えた';
+      }
+      ok('form_change_keeps_sub',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
