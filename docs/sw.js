@@ -3,7 +3,7 @@
 // 方針: 本番 = stale-while-revalidate（キャッシュを即返し、裏で最新を取得→次回反映）
 //       開発(localhost) = network-first（編集が常に反映。落ちた時だけキャッシュ）
 // 注意: 外部オリジン（人気度APIのCloudflare Worker、Web Analyticsビーコン等）には一切触らない
-const CACHE='squadxi-v2'; // v2: Webフォント同梱（fonts/）を追加
+const CACHE='squadxi-v3'; // v3: 貼り付けフロー修正の強制反映（旧キャッシュを破棄させ、最新index.htmlを取得）
 const CORE=['./index.html','./favicon.png','./privacy.html','./privacy.en.html','./terms.html','./terms.en.html',
   './fonts/manrope-latin.woff2','./fonts/manrope-latin-ext.woff2','./fonts/bebas-latin.woff2','./fonts/bebas-latin-ext.woff2',
   './vendor/flag-icons/css/flag-icons.min.css']; // 国旗SVG本体(270枚)は事前キャッシュせず、表示したものから実行時キャッシュ（SWRのput）で貯める

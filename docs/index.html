@@ -26645,9 +26645,10 @@ function showPastePrompt(pid){
   const b=document.createElement('div'); b.className='pastebanner'; b.id='pasteBanner';
   b.innerHTML='<div class="pbico">'+ICN.copyicon+'</div><div class="pbtxt">'+escAttr(t('pastePromptTitle'))+'<b>'+escAttr(nm)+'</b></div><button class="pbgo">'+escAttr(t('pasteShort'))+'</button><button class="pbx" aria-label="'+escAttr(t('cancel'))+'">×</button>';
   document.body.appendChild(b); _pasteBanner=b;
-  const go=()=>{ const p=pid; _pastePromptPid=null; hidePastePrompt(); pastePhoto(p); };
-  b.querySelector('.pbgo').onclick=function(e){ e.stopPropagation(); go(); };
-  b.querySelector('.pbx').onclick=function(e){ e.stopPropagation(); _pastePromptPid=null; hidePastePrompt(); };
+  let _went=false;
+  const go=()=>{ if(_went)return; _went=true; const p=pid; _pastePromptPid=null; hidePastePrompt(); setTimeout(function(){ try{ pastePhoto(p); }catch(e){} },0); }; // 二重発火ガード＋クリック完了後(次tick)に開く（iOSのゴーストクリック/再入回避）
+  b.querySelector('.pbgo').onclick=function(e){ e.stopPropagation(); e.preventDefault(); go(); };
+  b.querySelector('.pbx').onclick=function(e){ e.stopPropagation(); e.preventDefault(); _pastePromptPid=null; hidePastePrompt(); };
   b.onclick=go;
   requestAnimationFrame(function(){ if(_pasteBanner===b) b.classList.add('show'); });
   clearTimeout(_pasteBannerTO); _pasteBannerTO=setTimeout(hidePastePrompt,15000); // 押されなければ引っ込める（pendingは残す＝次に戻った時また出る／×で恒久停止）
