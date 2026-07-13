@@ -26772,7 +26772,8 @@ function tapReserveInSwap(targetPid){
    Sheet helpers
    ========================================================= */
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
-function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');_ovPush();}
+let _lastSheetOpen=0,_resetSheetGesture=null; // シートを開いた直後のドラッグ暴発（バナータップの残りタッチ/ゴースト等）でpointer captureが固着→全タップを奪ってフリーズ、を防ぐ
+function openSheet(html){ if(_resetSheetGesture)_resetSheetGesture(); benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');_ovPush(); _lastSheetOpen=Date.now(); }
 function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
 // Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
 // overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
@@ -26786,7 +26787,7 @@ scrim.onclick=closeSheet;
 /* シートのスワイプ操作：ハンドル/見出しは即ドラッグ、本文も最上部なら下方向ドラッグで閉じる（閉じやすさ改善） */
 (function setupSheetDrag(){
   const zone=document.getElementById('grabzone'); if(!zone)return;
-  let startY=0,startX=0,dy=0,dragging=false,pending=false,fromHandle=false,suppressClick=false,scroller=null;
+  let startY=0,startX=0,dy=0,dragging=false,pending=false,fromHandle=false,suppressClick=false,scroller=null,_capId=null;
   function nearestScroller(el){                                  // ポインタ直下の実スクロール要素（.list等の入れ子対応）
     for(; el && el!==sheet; el=el.parentElement){
       if(el.scrollHeight>el.clientHeight+1){
@@ -26798,12 +26799,13 @@ scrim.onclick=closeSheet;
   }
   function begin(e){
     if(e.button)return;                                          // 右クリック等は無視
+    if(Date.now()-_lastSheetOpen<500)return;                     // 開いた直後(~0.5s)はドラッグ無視＝バナータップの残りタッチ/ゴーストでキャプチャ固着→フリーズを防ぐ（タップ/クリックは妨げない）
     if(e.target.closest('canvas,input,textarea,select,[contenteditable],#pasteBox'))return;  // クロップ/入力欄/貼り付けボックスは専用処理に委ねる（シートのドラッグで横取りしない）
     startY=e.clientY;startX=e.clientX;dy=0;dragging=false;pending=false;suppressClick=false;scroller=null;
     fromHandle = zone.contains(e.target) || !!e.target.closest('#sheetBody>h2');
     if(fromHandle){                                              // ハンドル/見出し：即ドラッグ（上方向は拡大）
       dragging=true; sheet.style.transition='none';
-      try{ sheet.setPointerCapture(e.pointerId); }catch(_){}
+      try{ sheet.setPointerCapture(e.pointerId); _capId=e.pointerId; }catch(_){}
     }else{
       scroller=nearestScroller(e.target);                        // 本文：スクロール最上部かどうかの判定に使う
       pending=true;                                              // 動きを見て「最上部＆下方向」なら閉じドラッグへ昇格
@@ -26816,7 +26818,7 @@ scrim.onclick=closeSheet;
       if(my>0 && Math.abs(my)>Math.abs(mx) && (!scroller||scroller.scrollTop<=2)){
         dragging=true; pending=false; suppressClick=true;        // 最上部で下方向：閉じドラッグへ
         sheet.style.transition='none';
-        try{ sheet.setPointerCapture(e.pointerId); }catch(_){}
+        try{ sheet.setPointerCapture(e.pointerId); _capId=e.pointerId; }catch(_){}
       }else{ pending=false; return; }                            // 上方向/横/スクロール中は本文スクロールに任せる
     }
     if(!dragging)return;
@@ -26826,6 +26828,7 @@ scrim.onclick=closeSheet;
   }
   function end(){
     pending=false;
+    try{ if(_capId!=null) sheet.releasePointerCapture(_capId); }catch(_){} _capId=null; // キャプチャは必ず解放（固着防止）
     if(!dragging)return; dragging=false;
     sheet.style.transition=''; sheet.style.transform='';
     if(dy>100){ closeSheet(); }                                  // 下げて離したら閉じる
@@ -26836,6 +26839,9 @@ scrim.onclick=closeSheet;
   sheet.addEventListener('pointermove',move);
   sheet.addEventListener('pointerup',end);
   sheet.addEventListener('pointercancel',end);
+  sheet.addEventListener('lostpointercapture',end); // capture喪失時も必ず状態リセット（iOSで pointerup が来ない事故の保険）
+  // シートを開く/閉じる時にドラッグ状態を強制リセット（pointer capture固着→フリーズの保険。openSheetから呼ぶ）
+  _resetSheetGesture=()=>{ pending=false; dragging=false; suppressClick=false; try{ if(_capId!=null) sheet.releasePointerCapture(_capId); }catch(_){} _capId=null; sheet.style.transition=''; sheet.style.transform=''; };
   // 本文ドラッグ直後の誤クリック（ボタン発火）を抑止
   sheet.addEventListener('click',e=>{ if(suppressClick){ e.stopPropagation(); e.preventDefault(); suppressClick=false; } },true);
   // ハンドルのダブルタップで拡大⇔通常をトグル
