@@ -287,6 +287,19 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .benchEmpty{color:var(--mut);font-size:12px;padding:6px 4px 24px;line-height:1.8}
 .scrollcue{text-align:center;color:var(--mut);font-size:11px;letter-spacing:2px;padding:2px 0 6px;opacity:.8}
 
+/* ---------- Paste banner（画像検索から復帰した時のワンタップ貼り付け。シート/スクリム/アニメ不使用の独立要素） ---------- */
+.pastebanner{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);max-width:536px;margin:0 auto;z-index:40;background:var(--panel);border:1.5px solid var(--lime);border-radius:16px;box-shadow:0 10px 34px rgba(0,0,0,.5);padding:12px 14px}
+.pastebanner .pbrow{display:flex;align-items:center;gap:10px}
+.pastebanner .pbtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--mut)}
+.pastebanner .pbtxt b{color:var(--ink);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pastebanner .pbgo{flex:0 0 auto;background:var(--lime);color:#10140a;font-weight:800;border:0;border-radius:12px;padding:11px 18px;font-size:14px;cursor:pointer}
+.pastebanner .pbx{flex:0 0 auto;background:none;border:0;color:var(--mut);font-size:20px;line-height:1;padding:6px 8px;cursor:pointer}
+.pastebanner.panel .pbtitle{font-weight:800;font-size:15px;color:var(--ink);margin-bottom:6px}
+.pastebanner.panel .pbhelp{color:var(--mut);font-size:12.5px;line-height:1.6;margin-bottom:10px}
+.pastebanner.panel #pasteBox2{min-height:110px;border:2px dashed var(--lime);border-radius:14px;padding:30px 16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--bg);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden} /* display:block必須（flexはiOSでキャレット不可） */
+.pastebanner.panel #pb2Cancel{margin-top:12px;width:100%}
+@keyframes pbpulse{0%{background:rgba(202,255,58,.30)}100%{background:transparent}}
+.mitem.pulse{animation:pbpulse 1.5s ease-out 2}
 /* ---------- Sheet / Modal ---------- */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:50;opacity:0;pointer-events:none;transition:.2s}
 .scrim.on{opacity:1;pointer-events:auto}
@@ -25568,7 +25581,7 @@ const I18N = {
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
-    tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を保存して「写真を追加」で取り込めます',
+    tstMaxBench:'ベンチは最大15人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした', swapPrompt:'入れ替える相手をタップ（スタメン / ベンチ / ベンチ外）。同じ選手で取消',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
     tstSubCleared:'第二候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
@@ -25647,7 +25660,7 @@ const I18N = {
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
-    tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Save an image, then import it with “Add photo”.',
+    tstMaxBench:'The bench is full (max 15).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
     tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image', swapPrompt:'Tap who to swap with (XI / bench / reserves). Tap the same player to cancel.',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
@@ -26568,12 +26581,23 @@ function importPhotoBlob(pid,blob){
   img.onerror=()=>{ try{URL.revokeObjectURL(url);}catch(e){} photoTarget=null; toast(t('tstPhotoFail')); };
   img.src=url;
 }
+// 挿入<img>→縮小Blob化の共通処理。大きなWeb画像をフルサイズでcanvas化+PNGエンコードすると
+// iOSがメモリ枯渇でハング/クラッシュし得るため、上限1400pxへ縮小し軽いJPEGにする（貼り付け経路すべてで使用）
+function _imgToScaledBlob(im,cb){
+  try{
+    const w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; if(!w||!h){ cb(null); return; }
+    const MAX=1400, sc=Math.min(1,MAX/Math.max(w,h)), cw=Math.max(1,Math.round(w*sc)), ch=Math.max(1,Math.round(h*sc));
+    const c=document.createElement('canvas'); c.width=cw; c.height=ch; c.getContext('2d').drawImage(im,0,0,cw,ch);
+    c.toBlob(b=>cb(b),'image/jpeg',0.9);
+  }catch(e){ cb(null); } // 外部URL画像はcanvas汚染(SecurityError)で落ちる→null
+}
 // クリップボードの画像を貼り付けて追加（ネット検索→画像を長押しコピー→このボタン、の最短経路）。従来のファイル選択と併存。
 // iOS(iPhone/iPad)は Safari通常タブでも PWA でも clipboard.read() の画像取得が不安定なため、端末判定で一律に貼り付けボックスを使う。
 // iPadOS 13+ の Safari は UA が "Macintosh" になるので、タッチ対応(Mac風UA＋ontouchend)も iOS とみなす。
 function isIOSDevice(){ const ua=navigator.userAgent||''; return /iP(hone|od|ad)/.test(ua) || (/Macintosh|Mac OS X/.test(ua) && ('ontouchend' in document)); }
 // まず clipboard.read() を試し、使えない/拒否される環境（iOS全般）では貼り付けボックスへフォールバック。
 async function pastePhoto(pid){
+  _pastePromptPid=null; // メニューから貼り付けたら復帰バナーの記憶は不要
   if(isIOSDevice()){ openPasteBox(pid); return; }                                     // iOSは read() をあてにせず最初からボックス（Safariタブ含む）
   if(!(navigator.clipboard&&navigator.clipboard.read)){ openPasteBox(pid); return; }   // その他で read() 非対応→ボックス
   try{
@@ -26591,13 +26615,13 @@ function openPasteBox(pid){
     <h2>${t('pasteBoxTitle')}</h2>
     <div style="margin:2px 16px 12px;color:var(--mut);font-size:13px;line-height:1.7">${t('pasteBoxHelp')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 20px)">
-      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:120px;border:2px dashed var(--lime);border-radius:14px;padding:16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--panel);display:flex;align-items:center;justify-content:center;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div>
+      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:120px;border:2px dashed var(--lime);border-radius:14px;padding:34px 16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--panel);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div><!-- display:blockであること：flex/gridのcontenteditableはiOS WebKitでキャレットを置けず貼り付けが無反応になる -->
       <button class="bigbtn ghost" id="pasteBoxCancel" style="margin-top:14px">${t('cancel')}</button>
     </div>`);
   const box=document.getElementById('pasteBox'); let done=false;
   const consume=blob=>{ if(done||!blob)return; done=true; closeSheet(); importPhotoBlob(pid,blob); };
-  const scanImg=()=>{ const im=box.querySelector('img'); if(!im)return false; // 挿入画像をcanvasでBlob化
-    const draw=()=>{ try{ const w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; if(!w||!h)return; const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(im,0,0); c.toBlob(b=>{ b?consume(b):toast(t('tstPasteBoxNoImage')); },'image/png'); }catch(e){ toast(t('tstPasteBoxNoImage')); } }; // 外部URL画像はcanvas汚染で落ちる→案内
+  const scanImg=()=>{ const im=box.querySelector('img'); if(!im)return false; // 挿入画像を縮小Blob化（フルサイズcanvasはiOSでメモリ枯渇の危険）
+    const draw=()=>_imgToScaledBlob(im,b=>{ b?consume(b):toast(t('tstPasteBoxNoImage')); });
     if(im.complete&&(im.naturalWidth||im.width)) draw(); else { im.onload=draw; im.onerror=()=>toast(t('tstPasteBoxNoImage')); }
     return true;
   };
@@ -26611,11 +26635,85 @@ function openPasteBox(pid){
   document.getElementById('pasteBoxCancel').onclick=()=>{ closeSheet(); if(pid!=null&&P[pid]) try{openDetail(pid);}catch(e){} };
 }
 // 選手名でネット画像検索（別タブ）。保存した画像を「写真を追加」で取り込める導線
+// 重要：ここでシートは閉じない（メニューを開いたまま検索→戻って「貼り付け」が実績のある安全動線。
+// 以前closeSheet()を入れたところ、復帰後に新しいシートを開く必要が生じ、iOSでフリーズを誘発した）
 function searchPlayerWeb(pid){
   const p=P[pid]; if(!p)return;
+  _pastePromptPid=pid; _pastePromptAt=Date.now(); // 復帰時のワンタップ貼り付け用に記憶
   const q=encodeURIComponent(p[0].trim()+' '+p[4].trim()+' footballer');
   window.open('https://www.google.com/search?tbm=isch&q='+q,'_blank','noopener');
   toast(t('tstWebOpened'));
+}
+/* ---- 画像検索から戻った時のワンタップ貼り付け（v2＝復帰後に新しいシートを絶対に開かない安全設計） ----
+   ・メニューが開いたまま（通常）：何も出さず、開いているメニューの「貼り付け」行を光らせて誘導するだけ
+   ・メニューが無い（閉じた/再読込された）時だけ画面下部にバナーを表示
+     - PC/Android：タップで clipboard.read() → 即取り込み
+     - iOS：バナー自身がその場で貼り付けパネルに変形（シート・スクリム・アニメを一切使わない） */
+let _pastePromptPid=null,_pastePromptAt=0,_pasteBannerTO=null;
+function hidePastePrompt(){ const b=document.getElementById('pasteBanner'); if(b){ try{b.remove();}catch(e){} } if(_pasteBannerTO){ clearTimeout(_pasteBannerTO); _pasteBannerTO=null; } }
+function maybeShowPastePrompt(){
+  if(_pastePromptPid==null) return;
+  if(Date.now()-_pastePromptAt>10*60*1000){ _pastePromptPid=null; return; } // 10分で失効
+  const pid=_pastePromptPid; if(!P[pid]){ _pastePromptPid=null; return; }
+  if(_ovAnyOpen()){ // メニューが開いたまま＝既知の安全動線。新しいオーバーレイは開かず、貼り付け行を光らせるだけ
+    try{
+      const row=document.querySelector('#sheetBody .mitem[data-act="paste"]');
+      if(row){ const grp=document.querySelector('#sheetBody .mitem.photogrp'); if(grp&&!grp.classList.contains('open')) grp.classList.add('open');
+        row.classList.remove('pulse'); void row.offsetWidth; row.classList.add('pulse'); }
+    }catch(e){}
+    return;
+  }
+  showPastePrompt(pid);
+}
+function showPastePrompt(pid){
+  hidePastePrompt();
+  const p=P[pid]; if(!p) return;
+  const nm=(LANG==='ja'&&typeof nameJa==='function'&&(nameJa(pid)||''))||p[0];
+  const b=document.createElement('div'); b.id='pasteBanner'; b.className='pastebanner';
+  b.innerHTML=`<div class="pbrow"><div class="pbtxt"><b>${escAttr(nm)}</b><span>${t('pastePromptTitle')}</span></div><button class="pbgo">${t('pasteShort')}</button><button class="pbx" aria-label="${escAttr(t('close'))}">×</button></div>`;
+  document.body.appendChild(b);
+  // 消す時は600ms「効かない状態」で残す＝iOSのゴーストタップを吸収し、下の盤面に触れさせない
+  const inert=()=>{ try{ b.style.opacity='.55'; b.onclick=null; b.querySelectorAll('button').forEach(x=>{ x.onclick=null; x.disabled=true; }); }catch(e){} setTimeout(()=>{ try{b.remove();}catch(e){} },600); };
+  b.querySelector('.pbx').onclick=()=>{ _pastePromptPid=null; if(_pasteBannerTO){clearTimeout(_pasteBannerTO);_pasteBannerTO=null;} inert(); };
+  let went=false;
+  b.querySelector('.pbgo').onclick=()=>{
+    if(went) return; went=true; _pastePromptPid=null; if(_pasteBannerTO){clearTimeout(_pasteBannerTO);_pasteBannerTO=null;}
+    if(isIOSDevice()) morphPastePanel(b,pid);   // iOS：この場でパネル化（シートは開かない）
+    else pastePromptRead(b,pid,inert);          // PC/Android：clipboard.read()で即取り込み
+  };
+  _pasteBannerTO=setTimeout(()=>{ hidePastePrompt(); },20000); // 20秒で自動で消える（pidは保持＝次の復帰で再表示）
+}
+async function pastePromptRead(b,pid,inert){
+  try{
+    if(!(navigator.clipboard&&navigator.clipboard.read)) throw 0;
+    const items=await Promise.race([navigator.clipboard.read(), new Promise((_,rj)=>setTimeout(rj,4000))]); // 4秒でハング保険
+    let blob=null;
+    for(const it of items){ const tp=(it.types||[]).find(tt=>tt&&tt.indexOf('image/')===0); if(tp){ blob=await it.getType(tp); break; } }
+    if(blob){ inert(); _forceNoAnimSheet=true; importPhotoBlob(pid,blob); return; } // クロップが開く場合も無アニメで
+    toast(t('tstPasteNoImage')); inert();
+  }catch(e){ morphPastePanel(b,pid); } // read()不可/拒否→パネルへ（シートは開かない）
+}
+// バナーをその場で貼り付けパネルに変形（iOS用）。openPasteBoxと同じ取り込みロジックだが、シート/スクリムを一切使わない
+function morphPastePanel(b,pid){
+  b.classList.add('panel');
+  b.innerHTML=`<div class="pbtitle">${t('pasteBoxTitle')}</div><div class="pbhelp">${t('pasteBoxHelp')}</div>
+    <div id="pasteBox2" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}">${t('pasteBoxPh')}</div>
+    <button class="bigbtn ghost" id="pb2Cancel">${t('cancel')}</button>`;
+  const box=document.getElementById('pasteBox2'); let done=false;
+  const finish=()=>{ try{ b.style.opacity='.55'; }catch(e){} setTimeout(()=>{ try{b.remove();}catch(e){} },600); };
+  const consume=blob=>{ if(done||!blob) return; done=true; finish(); _forceNoAnimSheet=true; importPhotoBlob(pid,blob); };
+  const scan=()=>{ const im=box.querySelector('img'); if(!im) return false;
+    const go=()=>_imgToScaledBlob(im,bl=>{ bl?consume(bl):toast(t('tstPasteBoxNoImage')); });
+    if(im.complete&&(im.naturalWidth||im.width)) go(); else { im.onload=go; im.onerror=()=>toast(t('tstPasteBoxNoImage')); }
+    return true; };
+  box.addEventListener('paste',e=>{
+    const items=(e.clipboardData&&e.clipboardData.items)||[];
+    for(const it of items){ if(it.type&&it.type.indexOf('image/')===0){ const f=it.getAsFile(); if(f){ e.preventDefault(); consume(f); return; } } }
+    setTimeout(()=>{ if(!done&&!scan()){ toast(t('tstPasteBoxNoImage')); box.innerHTML=t('pasteBoxPh'); } },140);
+  });
+  box.addEventListener('focus',()=>{ if(box.textContent.trim()===t('pasteBoxPh')) box.innerHTML=''; });
+  box.addEventListener('blur',()=>{ if(!box.querySelector('img')&&box.textContent.trim()==='') box.innerHTML=t('pasteBoxPh'); });
+  document.getElementById('pb2Cancel').onclick=finish;
 }
 photoInput.addEventListener('change',()=>{
   const f=photoInput.files&&photoInput.files[0]; if(!f||photoTarget==null)return;
@@ -26735,7 +26833,15 @@ function tapReserveInSwap(targetPid){
    Sheet helpers
    ========================================================= */
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
-function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');_ovPush();}
+// 外部（画像検索の別タブ等）から復帰した直後は、シート/ドロワーをCSSアニメ無しで即表示する。
+// iOS PWAで「window.openから戻った直後に開くオーバーレイの遷移アニメ」がコンポジタごと固まる症状の対策（復帰4秒間 or 明示フラグ）。
+let _visReturnAt=0,_forceNoAnimSheet=false;
+function _noAnimNow(){ const f=_forceNoAnimSheet||(Date.now()-_visReturnAt<4000); _forceNoAnimSheet=false; return f; }
+function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
+  const na=_noAnimNow(); if(na){ sheet.style.transition='none'; scrim.style.transition='none'; }
+  sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');
+  if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
+  _ovPush();}
 function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
 // Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
 // overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
@@ -28664,7 +28770,12 @@ let _resetDrawerGesture=null; // initDrawerGestures がジェスチャ状態リ�
 // ドロワー/スクリムに残ったインラインスタイル（スワイプ途中のtransform/opacity）を消し、開閉はCSSクラスだけで決まる状態に戻す。
 // PWAでOSが左端スワイプを横取りして pointerup が来ず、ジェスチャが固着した場合でも、開閉のたびに必ず自己修復する。
 function _drawerClearInline(){ try{ const d=document.getElementById('drawer'), sc=document.getElementById('dscrim'); if(d){ d.style.transition=''; d.style.transform=''; } if(sc){ sc.style.transition=''; sc.style.opacity=''; } }catch(e){} }
-function openDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline(); document.getElementById('dscrim').classList.add('on'); document.getElementById('drawer').classList.add('on'); _ovPush(); }
+function openDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline();
+  const dw=document.getElementById('drawer'), ds=document.getElementById('dscrim');
+  const na=(Date.now()-_visReturnAt<4000); if(na){ dw.style.transition='none'; ds.style.transition='none'; } // 復帰直後は無アニメ（openSheetと同じ対策）
+  ds.classList.add('on'); dw.classList.add('on');
+  if(na){ setTimeout(()=>{ dw.style.transition=''; ds.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
+  _ovPush(); }
 function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
 // Web版（通常のブラウザ）判定。インストール済みPWA / ネイティブ(Capacitor)では false → ストア誘導を出さない
 function isWebVersion(){
@@ -28700,6 +28811,14 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
+const BUILD='0715a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
+// SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
+async function forceUpdateApp(){
+  try{ toast(LANG==='en'?'Updating to the latest…':'最新版に更新しています…'); }catch(e){}
+  try{ if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); for(const r of rs){ try{await r.unregister();}catch(e){} } } }catch(e){}
+  try{ if(window.caches){ const ks=await caches.keys(); for(const k of ks){ try{await caches.delete(k);}catch(e){} } } }catch(e){}
+  setTimeout(function(){ try{ location.reload(); }catch(e){} }, 300);
+}
 function drawerHTML(){
   const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
@@ -28733,12 +28852,15 @@ function drawerHTML(){
     <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px;display:inline-flex;align-items:center;gap:5px">${ICN.globe}${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
-    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')}</div>`;
+    <div class="dwfoot">Squad XI — ${t('tagline')}<br>v0.9${t('preview')} · build ${BUILD}
+      <div style="margin-top:9px"><button id="dwUpdate" class="bigbtn ghost" style="padding:9px;font-size:12px;font-weight:800">${LANG==='en'?'↻ Update to the latest version':'↻ 最新版に更新'}</button></div>
+    </div>`;
 }
 function wireDrawer(){
   const d=document.getElementById('drawer');
   document.getElementById('dscrim').onclick=closeDrawer;
   d.querySelector('#dwClose').onclick=closeDrawer;
+  { const up=d.querySelector('#dwUpdate'); if(up) up.onclick=forceUpdateApp; }
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
@@ -29090,7 +29212,7 @@ function newTeamFlow(){ guardUnsaved(()=>startOriginal()); }
 
 document.getElementById('btnMenu').onclick=openDrawer;
 // 画面/アプリを閉じる時に作業中の下書きだけ同期保存（再起動時に最後のスカッドを復元。一覧へは手動保存のみ）
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } else if(document.visibilityState==='visible'){ _visReturnAt=Date.now(); try{ maybeShowPastePrompt(); }catch(e){} } }); // 復帰時刻の記録（シート無アニメ化）＋ワンタップ貼り付け
 window.addEventListener('pagehide',()=>{ autoSaveDraft(); recordExitSquad(); });
 // ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
 // ドロワーのスワイプ操作：左端からの右スワイプで開く／開いている時は左スワイプで閉じる（×・スクリムタップに加えて）
@@ -30345,6 +30467,33 @@ window.__selftest=function(){
         _pass=!!_s && _s.sub===_c[2]; _msg=_pass?'':'フォメ変更で手動控えが消えた';
       }
       ok('form_change_keeps_sub',_pass,_msg); }
+
+    // T18: 画像検索→復帰のワンタップ貼り付けv2（「復帰後に新しいシートを開かない」設計の検証）
+    { let _pass=true,_msg='';
+      const _pid=P.findIndex(x=>x&&x[0]);
+      const _realIOS=window.isIOSDevice;
+      try{
+        // (a) シートが開いている間はバナー抑止（開いているメニューの貼り付け行に誘導する仕様）
+        openSheet('<h2>t18</h2>');
+        _pastePromptPid=_pid; _pastePromptAt=Date.now(); maybeShowPastePrompt();
+        const _sup=!document.getElementById('pasteBanner');
+        closeSheet();
+        // (b) シートが無ければバナー表示→iOSではタップでその場がパネル化し、シートは開かれない
+        window.isIOSDevice=()=>true;
+        _pastePromptPid=_pid; _pastePromptAt=Date.now(); maybeShowPastePrompt();
+        const _b=document.getElementById('pasteBanner'); const _shown=!!_b;
+        if(_b) _b.querySelector('.pbgo').click();
+        const _panel=!!document.getElementById('pasteBox2');
+        const _noSheet=!sheet.classList.contains('on');
+        // (c) 復帰直後(4秒以内)のopenSheetは無アニメ（transition:none）で開く
+        _visReturnAt=Date.now(); openSheet('<h2>t18b</h2>');
+        const _noAnim=sheet.style.transition==='none';
+        closeSheet(); _visReturnAt=0;
+        _pass=_sup&&_shown&&_panel&&_noSheet&&_noAnim;
+        _msg=_pass?'':('sup='+_sup+' shown='+_shown+' panel='+_panel+' noSheet='+_noSheet+' noAnim='+_noAnim);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ window.isIOSDevice=_realIOS; _pastePromptPid=null; try{hidePastePrompt();}catch(e){} }
+      ok('paste_prompt_v2',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
