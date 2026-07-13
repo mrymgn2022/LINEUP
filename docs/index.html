@@ -26621,6 +26621,8 @@ function openPasteBox(pid){
 }
 // 選手名でネット画像検索（別タブ）。保存した画像を「写真を追加」で取り込める導線
 // 画像検索から戻ってきた時、その選手への「貼り付け」をワンタップで出すバナー用の記憶
+// 復帰時のワンタップ貼り付けバナーは一旦オフ（iOS実機で本バナー経由がフリーズする問題が未解決のため。通常の「選手タップ→写真→貼り付け」は正常）。原因特定後にtrueで再有効化。機能コードは残置。
+const PASTE_BANNER=false;
 let _pastePromptPid=null,_pastePromptAt=0,_pasteBanner=null,_pasteBannerTO=null;
 function searchPlayerWeb(pid){
   const p=P[pid]; if(!p)return;
@@ -28746,7 +28748,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0714f'; // ドロワー末尾に表示。ユーザーが「今どの版か」を確認/報告できるように（キャッシュ切り分け用）
+const BUILD='0714g'; // ドロワー末尾に表示。ユーザーが「今どの版か」を確認/報告できるように（キャッシュ切り分け用）
 // SW/キャッシュを消して最新版を取りに行く（iOS PWAはキャッシュが強いので手動更新の逃げ道）
 async function forceUpdateApp(){
   try{ toast(LANG==='en'?'Updating to the latest…':'最新版に更新しています…'); }catch(e){}
@@ -29147,7 +29149,7 @@ function newTeamFlow(){ guardUnsaved(()=>startOriginal()); }
 
 document.getElementById('btnMenu').onclick=openDrawer;
 // 画面/アプリを閉じる時に作業中の下書きだけ同期保存（再起動時に最後のスカッドを復元。一覧へは手動保存のみ）
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } else if(document.visibilityState==='visible'){ try{ maybeShowPastePrompt(); }catch(e){} } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ autoSaveDraft(); recordExitSquad(); } else if(document.visibilityState==='visible'){ if(PASTE_BANNER){ try{ maybeShowPastePrompt(); }catch(e){} } } });
 window.addEventListener('pagehide',()=>{ autoSaveDraft(); recordExitSquad(); });
 // ドロワーを左スワイプで閉じる（×ボタン・スクリムに加えて）
 // ドロワーのスワイプ操作：左端からの右スワイプで開く／開いている時は左スワイプで閉じる（×・スクリムタップに加えて）
