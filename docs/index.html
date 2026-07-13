@@ -297,7 +297,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 #pasteBox img,#pasteBox2 img{max-width:100%;max-height:140px;object-fit:contain} /* 巨大画像を貼ってもボックス/パネルが画面を突き抜けない */
 .pastebanner.panel .pbtitle{font-weight:800;font-size:15px;color:var(--ink);margin-bottom:6px}
 .pastebanner.panel .pbhelp{color:var(--mut);font-size:12.5px;line-height:1.6;margin-bottom:10px}
-.pastebanner.panel #pasteBox2{min-height:110px;border:2px dashed var(--lime);border-radius:14px;padding:30px 16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--bg);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden} /* display:block必須（flexはiOSでキャレット不可） */
+.pastebanner.panel #pasteBox2{min-height:110px;border:2px dashed var(--lime);border-radius:14px;padding:30px 16px;color:var(--mut);font-size:16px;font-weight:700;background:var(--bg);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden} /* display:block必須（flexはiOSでキャレット不可）。16px未満はiOSフォーカス自動ズームを誘発 */
 .pastebanner.panel #pb2Cancel{margin-top:12px;width:100%}
 @keyframes pbpulse{0%{background:rgba(202,255,58,.30)}100%{background:transparent}}
 .mitem.pulse{animation:pbpulse 1.5s ease-out 2}
@@ -26617,7 +26617,7 @@ function openPasteBox(pid){
     <h2>${t('pasteBoxTitle')}</h2>
     <div style="margin:2px 16px 12px;color:var(--mut);font-size:13px;line-height:1.7">${t('pasteBoxHelp')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 20px)">
-      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:120px;border:2px dashed var(--lime);border-radius:14px;padding:34px 16px;color:var(--mut);font-size:14px;font-weight:700;background:var(--panel);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div><!-- display:blockであること：flex/gridのcontenteditableはiOS WebKitでキャレットを置けず貼り付けが無反応になる -->
+      <div id="pasteBox" contenteditable="true" role="textbox" aria-label="${escAttr(t('pasteBoxPh'))}" style="min-height:120px;border:2px dashed var(--lime);border-radius:14px;padding:34px 16px;color:var(--mut);font-size:16px;font-weight:700;background:var(--panel);display:block;text-align:center;-webkit-user-select:text;user-select:text;overflow:hidden">${t('pasteBoxPh')}</div><!-- display:blockであること：flex/gridのcontenteditableはiOS WebKitでキャレット不可。font-sizeは16px以上：未満だとiOSがフォーカス時に自動ズーム→解除時に画面がパンして見える -->
       <button class="bigbtn ghost" id="pasteBoxCancel" style="margin-top:14px">${t('cancel')}</button>
     </div>`);
   const box=document.getElementById('pasteBox'); let done=false;
@@ -28819,7 +28819,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
+const BUILD='0715c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30211,7 +30211,12 @@ document.getElementById('btnReset').onclick=()=>{
    Toast
    ========================================================= */
 let tT;const toastEl=document.getElementById('toast');
-function toast(m){toastEl.textContent=m;toastEl.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>toastEl.classList.remove('on'),1900);}
+function toast(m){
+  // 文言変更＝幅変更を遷移無しで確定させてから表示する。translateX(-50%)は自身の幅基準のため、
+  // 幅変化がtransition(all)に乗るとiOS Safariで「左にずれて中央に戻る」スライドに見える
+  toastEl.style.transition='none'; toastEl.textContent=m; void toastEl.offsetWidth; toastEl.style.transition='';
+  toastEl.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>toastEl.classList.remove('on'),1900);
+}
 
 /* =========================================================
    開発用スモークテスト（隠し機能・ユーザーには非表示）
