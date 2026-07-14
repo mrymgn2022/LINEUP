@@ -30622,4 +30622,14 @@ window.__selftest=function(){
 // Service Worker 登録（オフライン対応＆2回目以降の即時起動）。未対応環境や失敗時も本体動作には影響しない
 if('serviceWorker' in navigator){ addEventListener('load',function(){ try{ navigator.serviceWorker.register('./sw.js'); }catch(e){} }); }
 </script>
-<!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "3779ba1a2d4c471094631eaf4a8135a8"}'></script><!-- End Cloudflare Web Analytics -->
+<!-- Cloudflare Web Analytics。★人気度ビーコンと同じ基準で遮断する（2026-07-15）：
+     以前は無条件に発火していたため、管理者自身のテスト訪問(iPhone/PC)やlocalhostのプレビュー検証まで
+     アクセス数に計上され、「完走率」等の判断が歪んでいた（分子=人気度は除外済み／分母=訪問は汚染、の非対称）。 -->
+<script>(function(){try{
+  var h=location.hostname; if(h==='localhost'||h==='127.0.0.1') return;          // 開発プレビューは送らない
+  if(localStorage.getItem('xi_pop_optout')==='1') return;                        // 収集オフ端末（版数長押し）は送らない
+  var s=document.createElement('script'); s.defer=true;
+  s.src='https://static.cloudflareinsights.com/beacon.min.js';
+  s.setAttribute('data-cf-beacon','{"token": "3779ba1a2d4c471094631eaf4a8135a8"}');
+  document.head.appendChild(s);
+}catch(e){}})();</script><!-- End Cloudflare Web Analytics -->
