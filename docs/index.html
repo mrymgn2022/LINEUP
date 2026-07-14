@@ -25793,6 +25793,25 @@ function recordSquadSave(){
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({did:_deviceId(),keys,src:_popSrc,lang:LANG}),keepalive:true}).catch(()=>{}); // lang=UI言語（日英ユーザー比率のKPI用）
   }catch(e){}
 }
+// ── ファネル計測（2026-07-15）──
+// 「訪問410 → XI完成21（=5%）」までしか見えておらず、"残り95%がどこで消えたか"が完全に不明だった。
+// arrive → first_action → autobuild → xi_complete → save → share の各段階を1イベントずつ記録し、
+// 離脱ポイントと成長ループ（シェア）を可視化する。src(流入元)とlangも同送するので、
+// 「サイト経由(完成XIを見た人)」と「直接来た人(空のピッチを見た人)」を分離して分析できる。
+// once=true は1セッション（1ページロード）に1回だけ送る。localhost/収集オフ端末は _popBlocked() で遮断。
+const _evSent=new Set();
+function recordEvent(ev,once){
+  try{
+    if(!POP_ENDPOINT||_popBlocked()||!ev) return;
+    if(once){ if(_evSent.has(ev)) return; _evSent.add(ev); }
+    fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({did:_deviceId(),kind:'event',ev:ev,src:_popSrc,lang:LANG}),keepalive:true}).catch(()=>{});
+  }catch(e){}
+}
+// スタメン11人が埋まった瞬間を1回だけ記録（renderから毎回呼ばれるが once ガードで1回に丸まる）
+function _checkXIComplete(){
+  try{ if(state.slots&&state.slots.length===11&&state.slots.every(s=>s&&s.pid!=null)) recordEvent('xi_complete',true); }catch(e){}
+}
 // 検索トレンド収集：「選手を検索」一覧から選手を開いた＝“検索された1回”。トレンドは 検索回数＋保存回数(placements) で集計する想定。
 // バックエンド未接続(POP_ENDPOINT='')の間は何もしない。1セッション内での同一選手の連打は1回に丸める（連打スパム防止）。
 const _searchSent=new Set();
@@ -25998,6 +26017,7 @@ function saveCurrentTeam(){
   }
   if(!ok) return 'error'; // localStorage書込失敗（容量超過）→ 成功トーストを出さず警告（データ消失の誤認防止）
   cleanJson=JSON.stringify(serializeTeam()); recordSquadSave();
+  recordEvent('save'); // ファネル：手動保存（＝離脱時の自動カウントと区別できるようにする）
   return kind;
 }
 async function loadTeamFromList(id){
@@ -26102,6 +26122,7 @@ function benchReturn(pid){
 }
 
 function render(){
+  _checkXIComplete(); // ファネル：スタメン11人が揃った瞬間を1回だけ記録（onceガードで重複しない）
   // remove existing tokens
   pitch.querySelectorAll('.tok').forEach(t=>t.remove());
   pitch.classList.toggle('bigname',!!state.hideRoles);
@@ -26470,6 +26491,7 @@ function formationThumb(key){
     +dots+`</svg>`;
 }
 function openFormationPicker(){
+  recordEvent('first_action',true); // ファネル：フォーメーション変更も"手を出した"に含む
   const cards=FORMS.map(f=>`<div class="fcard${f===state.formation?' on':''}" data-f="${f}">${formationThumb(f)}<div class="fname">${f}</div></div>`).join('');
   openSheet(`<h2>${t('fmChange')} <span>${state.formation}</span></h2>
     <div class="detail"><div class="fgrid">${cards}</div>
@@ -26822,6 +26844,7 @@ function openPhotoCrop(img){
 }
 
 function onSlotTap(i){
+  recordEvent('first_action',true); // ファネル：ユーザーが盤面に手を出した（＝最大の入口）
   if(mktPlace!=null){ placeMarketIntoSlot(i); return; } // 移籍市場の配置モード：タップした枠に配置
   if(swapSel){ tapSlotInSwap(i); return; }   // 入れ替えモード中はスロットタップで交換
   currentSlot=i;
@@ -28624,6 +28647,7 @@ function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; 
 // 移籍市場（全選手ブラウズ）
 let mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
 function openMarket(){
+  recordEvent('first_action',true); // ファネル：選手検索も"手を出した"に含む
   mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
   openSheet(`
     <h2>${t('tipSearch')} <span>${LANG==='en'?P.length+' players':'全'+P.length+'選手'}</span></h2>
@@ -28812,7 +28836,7 @@ let _resetDrawerGesture=null; // initDrawerGestures がジェスチャ状態リ�
 // ドロワー/スクリムに残ったインラインスタイル（スワイプ途中のtransform/opacity）を消し、開閉はCSSクラスだけで決まる状態に戻す。
 // PWAでOSが左端スワイプを横取りして pointerup が来ず、ジェスチャが固着した場合でも、開閉のたびに必ず自己修復する。
 function _drawerClearInline(){ try{ const d=document.getElementById('drawer'), sc=document.getElementById('dscrim'); if(d){ d.style.transition=''; d.style.transform=''; } if(sc){ sc.style.transition=''; sc.style.opacity=''; } }catch(e){} }
-function openDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline();
+function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline();
   const dw=document.getElementById('drawer'), ds=document.getElementById('dscrim');
   const na=(Date.now()-_visReturnAt<4000); if(na){ dw.style.transition='none'; ds.style.transition='none'; } // 復帰直後は無アニメ（openSheetと同じ対策）
   ds.classList.add('on'); dw.classList.add('on');
@@ -28853,7 +28877,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0715g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29316,6 +29340,8 @@ function clubRow(c){
 // オリジナルチーム作成：チーム名とフォーメーションだけ
 // 指定の選手プール(ids)で、適性ポジション＆市場価値順に自動配置（loadClubと同じロジック）
 function autoFillFrom(ids){
+  recordEvent('autobuild'); // ファネル：Auto Build（クラブ/国籍でXIを一括生成）が実際に使われた回数。
+                            // 「魔法の機能が初見に見つけられていないのでは」という仮説の検証に使う
   const used=new Set(); const savedRole=pickRole;
   state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
@@ -30060,8 +30086,10 @@ async function buildShareCanvas(){
 }
 
 async function shareLineup(){
+  recordEvent('first_action',true);
   const filled=state.slots.filter(s=>s.pid!=null).length;
   if(!filled){ toast(t('tstPlaceFirst')); return; }
+  recordEvent('share_open'); // ファネル：シェアしようとした（＝成長ループの入口。実際の共有手段は下の share_* で分岐）
   toast(t('tstGenerating'));
   const tn=teamDisplayName();
   const shareText=tShareCaption(tn);
@@ -30127,15 +30155,17 @@ function openShareFallback(imgUrl,shareText,file){
   document.getElementById('shFmt').onclick=e=>{ const b=e.target.closest('[data-fmt]'); if(!b)return; state.shareFmt=b.dataset.fmt; save(); syncFmt(); regen(); };
   // スカッド再現リンク（#s=...）を先に生成しておき、共有系ボタンのURLを「開くと同じスカッドが出るリンク」へ格上げ。生成失敗時はトップURLのまま
   let squadLink=APP_URL; buildSquadLink().then(u=>{ if(u) squadLink=u; }).catch(()=>{});
-  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ navigator.share({files:[curFile],text:shareText,url:squadLink}).catch(()=>{}); }; }
+  if(canNative){ const sb=document.getElementById('shShare'); if(sb) sb.onclick=()=>{ recordEvent('share_native'); navigator.share({files:[curFile],text:shareText,url:squadLink}).catch(()=>{}); }; }
   const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='squad-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{
+    recordEvent('share_image'); // ファネル：XI画像を実際に書き出した＝拡散の実弾
     // iOSでは a[download] が写真アプリに入らず「ファイル」/プレビュー行きになるため、
     // 共有シートを開いて「画像を保存」→写真アプリ直行の2タップにする（PC/Androidは従来どおり直ダウンロード）
     if(isIOSDevice()&&canNative&&curFile){ navigator.share({files:[curFile]}).catch(()=>{}); return; }
     dlImg();toast(t('tstImgSaved'));
   };
   document.getElementById('shX').onclick=()=>{
+    recordEvent('share_x');
     dlImg();
     const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink);
     window.open(url,'_blank','noopener');
@@ -30144,13 +30174,15 @@ function openShareFallback(imgUrl,shareText,file){
   document.getElementById('shIG').onclick=()=>{
     // モバイル：OSの共有シートを開き、そこからInstagramを選んで直接投稿（以前の window.open は
     // PWA/ポップアップブロックで「何も起きない」ことがあった）。非対応環境は先にIGを開いてから画像保存
+    recordEvent('share_ig');
     if(canNative&&curFile){ navigator.share({files:[curFile]}).catch(()=>{}); return; }
     window.open('https://www.instagram.com/','_blank','noopener'); // dlImgより先＝ユーザー操作の同期中に開く
     dlImg();
     toast(t('tstImgSavedIG'));
   };
-  document.getElementById('shCopy').onclick=async()=>{try{await navigator.clipboard.writeText(shareText+' '+squadLink);toast(t('tstCopied'));}catch(e){toast(t('tstCopyFail'));}};
+  document.getElementById('shCopy').onclick=async()=>{recordEvent('share_caption');try{await navigator.clipboard.writeText(shareText+' '+squadLink);toast(t('tstCopied'));}catch(e){toast(t('tstCopyFail'));}};
   document.getElementById('shLink').onclick=async()=>{
+    recordEvent('share_link'); // ファネル：スカッド再現リンクの共有（＝人を呼び込む最短経路）
     // iOS対策：タップ→非同期待ち(Worker発行)→writeText はユーザー操作の有効期限切れで失敗し、
     // クリップボードに「前回コピーした別スカッドのリンク」が残る（＝古いスカッドに飛ぶ誤共有事故）。
     // 対策: ①シート表示時に事前生成済みならその場で書き込み ②未生成なら ClipboardItem(Promise) で
@@ -30570,6 +30602,32 @@ window.__selftest=function(){
       finally{ window.fetch=_realFetch; window._popDev=_realDev;
         try{ if(_realOpt!=null) lsSet('xi_pop_optout',_realOpt); else localStorage.removeItem('xi_pop_optout'); }catch(e){} }
       ok('pop_src_beacon',_pass,_msg); }
+
+    // T20: ファネル計測（arrive→first_action→autobuild→xi_complete→save→share）
+    //      once=1回に丸まる／localhost・収集オフで遮断／payloadにdid,src,langが乗る
+    { let _pass=true,_msg='';
+      const _rf=window.fetch, _rd=window._popDev, _opt=lsGet('xi_pop_optout');
+      try{
+        const sent=[];
+        window.fetch=(u,o)=>{ try{ const b=JSON.parse(o&&o.body||'{}'); if(b.kind==='event') sent.push(b); }catch(e){} return Promise.resolve({ok:true}); };
+        window._popDev=()=>false; try{localStorage.removeItem('xi_pop_optout');}catch(e){}
+        _evSent.clear();
+        recordEvent('arrive',true); recordEvent('arrive',true);      // once → 1回
+        recordEvent('autobuild'); recordEvent('autobuild');          // once無し → 2回
+        const c={}; sent.forEach(e=>c[e.ev]=(c[e.ev]||0)+1);
+        const onceOK = (c.arrive===1), manyOK = (c.autobuild===2);
+        const p=sent[0], payloadOK = !!(p && p.kind==='event' && p.did && typeof p.src==='string' && (p.lang==='ja'||p.lang==='en'));
+        // 遮断（localhost / 収集オフ）
+        const before=sent.length;
+        window._popDev=()=>true;  _evSent.clear(); recordEvent('arrive',true);
+        window._popDev=()=>false; lsSet('xi_pop_optout','1'); _evSent.clear(); recordEvent('arrive',true);
+        const blockOK = (sent.length===before);
+        _pass = onceOK && manyOK && payloadOK && blockOK;
+        _msg = _pass?'':('once='+onceOK+' many='+manyOK+' payload='+payloadOK+' blocked='+blockOK);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ window.fetch=_rf; window._popDev=_rd; _evSent.clear();
+        try{ if(_opt!=null) lsSet('xi_pop_optout',_opt); else localStorage.removeItem('xi_pop_optout'); }catch(e){} }
+      ok('funnel_events',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -30616,6 +30674,9 @@ window.__selftest=function(){
       if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
   }catch(e){}
+  // ファネルの分母。_popSrc(流入元)が確定した後に1回だけ送る。
+  // これがあって初めて「site経由/direct/share それぞれ何人来て、何人が手を出し、何人が完成させたか」が出せる。
+  try{ recordEvent('arrive',true); }catch(e){}
 })();
 </script>
 <script>
