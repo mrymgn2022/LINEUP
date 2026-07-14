@@ -25812,6 +25812,23 @@ function recordEvent(ev,once){
 function _checkXIComplete(){
   try{ if(state.slots&&state.slots.length===11&&state.slots.every(s=>s&&s.pid!=null)) recordEvent('xi_complete',true); }catch(e){}
 }
+// 端末の属性を1回だけ記録（イベント名で表現するので、Worker/DB側の変更は不要）
+//  pwa    … ホーム画面に追加して起動している＝"実質アプリ利用者"。App Storeを出すべきかの最重要判断材料
+//  mobile … スマホ利用者。空のピッチ問題がスマホで特に深刻かどうかを切り分ける
+function recordDeviceTraits(){
+  try{
+    const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+    if(standalone) recordEvent('pwa',true);
+    const mob=(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)||window.innerWidth<768;
+    recordEvent(mob?'mobile':'desktop',true);
+  }catch(e){}
+}
+// JSエラーの検知（1セッション1回）。今まで完全に無かったため、特定ブラウザだけでアプリが壊れていても
+// 誰も気づけなかった（iOSフリーズ地獄の教訓）。0でないなら即調査する。
+try{
+  window.addEventListener('error',function(){ try{ recordEvent('js_error',true); }catch(e){} });
+  window.addEventListener('unhandledrejection',function(){ try{ recordEvent('js_error',true); }catch(e){} });
+}catch(e){}
 // 検索トレンド収集：「選手を検索」一覧から選手を開いた＝“検索された1回”。トレンドは 検索回数＋保存回数(placements) で集計する想定。
 // バックエンド未接続(POP_ENDPOINT='')の間は何もしない。1セッション内での同一選手の連打は1回に丸める（連打スパム防止）。
 const _searchSent=new Set();
@@ -26015,7 +26032,7 @@ function saveCurrentTeam(){
     teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
     ok=setTeams(teams); save(); kind='added';
   }
-  if(!ok) return 'error'; // localStorage書込失敗（容量超過）→ 成功トーストを出さず警告（データ消失の誤認防止）
+  if(!ok){ recordEvent('save_fail'); return 'error'; } // localStorage書込失敗（容量超過）。今まで silent だったので実際に何人が保存できていないか不明だった
   cleanJson=JSON.stringify(serializeTeam()); recordSquadSave();
   recordEvent('save'); // ファネル：手動保存（＝離脱時の自動カウントと区別できるようにする）
   return kind;
@@ -27859,7 +27876,8 @@ function drawPickList(slotIdx){
   else if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
-  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+  if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
+    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
@@ -28116,6 +28134,8 @@ function prowHTML(i,hideBench){
   </div>`;
 }
 function assign(slotIdx,pid){
+  recordEvent('player_placed',true); // ファネル：自力で1人でも配置できたか（autoFillFromは通らない＝手動のみ）。
+                                     // 「触ったが1人も置けなかった」と「数人置いて諦めた」を区別する要の指標
   // 同じ選手が他スロットにいたら外す（重複起用防止）
   const outgoing=state.slots[slotIdx].pid;
   const benchIdx=state.bench.indexOf(pid); // 交代先がこのスカッドのベンチにいるか
@@ -28313,7 +28333,8 @@ function drawSubFull(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
-  if(!pickCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+  if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
+    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
@@ -28701,7 +28722,8 @@ function drawMkt(){
   else { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
     mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 注目順=市場価値の高い順
   _iconFloorActive=true;
-  if(!mktCurIdx.length){list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+  if(!mktCurIdx.length){ if((mktFilter.q||'').trim()) recordEvent('search_noresult'); // 選手検索でも0件を記録
+    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
   list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,mktCurIdx.length);
@@ -28877,7 +28899,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0715h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29170,6 +29192,7 @@ function openBackup(){
   const cl=document.getElementById('bkClose'); if(cl)cl.onclick=closeSheet;
 }
 function openInfoPage(kind){
+  if(kind==='help') recordEvent('help_open',true); // 「使い方」を開いた＝UIが直感的でない可能性のシグナル
   if(kind==='help'){ openHelp(); return; }
   if(kind==='announcements'){ openAnnouncementList(); return; }
   if(kind==='backup'){ openBackup(); return; }
@@ -30676,7 +30699,7 @@ window.__selftest=function(){
   }catch(e){}
   // ファネルの分母。_popSrc(流入元)が確定した後に1回だけ送る。
   // これがあって初めて「site経由/direct/share それぞれ何人来て、何人が手を出し、何人が完成させたか」が出せる。
-  try{ recordEvent('arrive',true); }catch(e){}
+  try{ recordEvent('arrive',true); recordDeviceTraits(); }catch(e){}
 })();
 </script>
 <script>
