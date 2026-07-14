@@ -692,6 +692,19 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 <aside class="drawer" id="drawer" aria-label="メニュー"></aside>
 <div class="annwrap" id="annwrap" aria-label="お知らせ"></div>
 
+<!-- SEO用フッター：クロール可能なサイト内リンク＋概要。body{overflow:hidden}＋.app{height:100dvh}により画面外にクリップされ、アプリUIには一切影響しない（ユーザーには不可視／検索エンジンは読む）。ルート(アプリ)の「発リンク0本・低語数」を解消し、ホームからクラブ/代表ページへ評価を流す。 -->
+<footer class="seofoot" style="max-width:560px;margin:0 auto;padding:28px 16px 64px;color:#8a978d;font-size:12px;line-height:1.9;font-family:'Manrope',system-ui,sans-serif">
+  <p>Squad XI（スカッドイレブン）は、23,000人以上の実名選手からサッカーのスターティングメンバー（スタメン）とフォーメーションを自由に作成し、画像で共有できる無料ツールです。クラブ・各国代表・ワールドカップ2026の予想スターティングXIも作成できます。</p>
+  <nav aria-label="サイト内ナビゲーション">
+    <p><a href="/clubs/">クラブ一覧</a> ・ <a href="/nations/">代表チーム一覧</a> ・ <a href="/formations.html">フォーメーション一覧</a> ・ <a href="/worldcup-xi.html">ワールドカップ2026 予想XI</a> ・ <a href="/japan-xi.html">日本代表 予想スタメン</a> ・ <a href="/en/">English version</a></p>
+    <p>人気クラブ: <a href="/clubs/real-madrid.html">レアル・マドリード</a> ・ <a href="/clubs/barcelona.html">バルセロナ</a> ・ <a href="/clubs/manchester-city.html">マンチェスター・シティ</a> ・ <a href="/clubs/liverpool.html">リヴァプール</a> ・ <a href="/clubs/arsenal.html">アーセナル</a> ・ <a href="/clubs/manchester-united.html">マンチェスター・ユナイテッド</a> ・ <a href="/clubs/psg.html">パリ・サンジェルマン</a> ・ <a href="/clubs/bayern-munich.html">バイエルン・ミュンヘン</a> ・ <a href="/clubs/inter.html">インテル</a> ・ <a href="/clubs/ac-milan.html">ACミラン</a></p>
+    <p>Jリーグ: <a href="/clubs/urawa-reds.html">浦和レッズ</a> ・ <a href="/clubs/kashima-antlers.html">鹿島アントラーズ</a> ・ <a href="/clubs/vissel-kobe.html">ヴィッセル神戸</a> ・ <a href="/clubs/fc-tokyo.html">FC東京</a> ・ <a href="/clubs/kawasaki-frontale.html">川崎フロンターレ</a> ・ <a href="/clubs/yokohama-f-marinos.html">横浜F・マリノス</a></p>
+    <p>代表チーム: <a href="/nations/japan.html">日本代表</a> ・ <a href="/nations/brazil.html">ブラジル代表</a> ・ <a href="/nations/argentina.html">アルゼンチン代表</a> ・ <a href="/nations/france.html">フランス代表</a> ・ <a href="/nations/england.html">イングランド代表</a> ・ <a href="/nations/spain.html">スペイン代表</a> ・ <a href="/nations/germany.html">ドイツ代表</a> ・ <a href="/nations/portugal.html">ポルトガル代表</a></p>
+    <p><a href="/privacy.html">プライバシーポリシー</a> ・ <a href="/terms.html">利用規約</a></p>
+  </nav>
+  <p>© Squad XI — squadxi.futbol</p>
+</footer>
+
 <script>
 /* 起動スプラッシュ：タップで即スキップ／約2.8秒で自動的に消える */
 (function(){
