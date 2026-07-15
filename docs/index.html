@@ -26012,7 +26012,10 @@ let memTeams=null;
 const FREE_TEAM_LIMIT=10;
 function isPaidUser(){ return lsGet('xi_paid_dev')==='1'; }  // 課金判定（本番は基本false。テスト解放：コンソールで __unlockPaid()）
 window.__unlockPaid=function(on){ lsSet('xi_paid_dev', on===false?'0':'1'); try{toast(on===false?'プレミアムOFF':'プレミアムON（テスト）');render();}catch(e){} }; // 開発用アンロック
-function teamCap(){ return isPaidUser()?Infinity:FREE_TEAM_LIMIT; }
+// 管理者端末（版数長押しで統計オフにした自分の端末）は、テスト運用で多数のスカッドを作るため保存上限を無制限にする。
+// プレミアム機能（負傷マーカー等）は解放しない＝保存上限のみ。判定は統計オフフラグ xi_pop_optout に一致させる。
+function isAdminDevice(){ try{ return lsGet('xi_pop_optout')==='1'; }catch(e){ return false; } }
+function teamCap(){ return (isPaidUser()||isAdminDevice())?Infinity:FREE_TEAM_LIMIT; }
 function getTeams(){
   if(memTeams) return memTeams;
   const s=lsGet('xi_teams_v1'); if(s){ try{ const a=JSON.parse(s); if(Array.isArray(a)){ memTeams=a; return a; } }catch(e){} }
@@ -28899,7 +28902,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0715i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -28909,7 +28912,7 @@ async function forceUpdateApp(){
   setTimeout(function(){ try{ location.reload(); }catch(e){} }, 300);
 }
 function drawerHTML(){
-  const teams=getTeams(), cap=teamCap(), capLabel=isPaidUser()?'∞':String(cap);
+  const teams=getTeams(), cap=teamCap(), capLabel=(cap===Infinity)?'∞':String(cap);
   const teamRows = teams.length ? teams.map(tm=>`
     <div class="dwteam ${tm.id===state.teamId?'cur':''}" data-team="${tm.id}">
       <div class="tn">${escAttr(tm.name||t('myTeam'))}<small>${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
@@ -30651,6 +30654,20 @@ window.__selftest=function(){
       finally{ window.fetch=_rf; window._popDev=_rd; _evSent.clear();
         try{ if(_opt!=null) lsSet('xi_pop_optout',_opt); else localStorage.removeItem('xi_pop_optout'); }catch(e){} }
       ok('funnel_events',_pass,_msg); }
+    // T21: 管理者端末（統計オフ xi_pop_optout=1）は保存上限が無制限。プレミアム機能は解放しない（保存上限のみ）。
+    { const _opt=lsGet('xi_pop_optout'), _paid=lsGet('xi_paid_dev');
+      try{
+        try{localStorage.removeItem('xi_paid_dev');}catch(e){}                 // 非課金を保証
+        try{localStorage.removeItem('xi_pop_optout');}catch(e){}
+        const capNormal = teamCap();                                          // 通常ユーザー → FREE_TEAM_LIMIT
+        lsSet('xi_pop_optout','1');
+        const capAdmin = teamCap();                                           // 管理者 → Infinity
+        const markGatedStill = !isPaidUser();                                 // 負傷マーカー等は依然ロック（保存上限だけ解放）
+        ok('admin_unlimited_save', capNormal===FREE_TEAM_LIMIT && capAdmin===Infinity && markGatedStill,
+           'cap normal='+capNormal+' admin='+capAdmin+' paidStill='+!markGatedStill);
+      }
+      finally{ try{ if(_opt!=null) lsSet('xi_pop_optout',_opt); else localStorage.removeItem('xi_pop_optout');
+                    if(_paid!=null) lsSet('xi_paid_dev',_paid); else localStorage.removeItem('xi_paid_dev'); }catch(e){} } }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
