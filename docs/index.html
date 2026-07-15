@@ -25617,8 +25617,8 @@ const I18N = {
     create:'新規作成', chooseClub:'クラブを選択…', teamName:'スカッド名', optional:'任意', egTeamName:'例：レッドドラゴンズ',
     nameHelp:'未入力でもOK。クラブだけ／国籍だけを選んだ場合は、その名前（例：Arsenal、日本）が自動で入ります。',
     autoConds:'自動配置の条件（任意・組み合わせ可）', teamSearch:'チーム検索', teamSearchPh:'チーム名で検索（例：Barcelona、Schalke）', clubLabel:'クラブ',
-    clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの市場価値上位で自動配置します。',
-    clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う選手を市場価値の高い順に適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
+    clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外・第二候補）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの主力選手で自動配置します。',
+    clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う主力選手を適性ポジションへ自動配置します。何も選ばなければ空のフォーメーションになります。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
     unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', clearTitle:'盤面を空にする', clearBody:'現在表示されているスカッドを削除します。<br>※保存されていないスカッドは復元できません。', clearConfirm:'削除する', saveAndDelete:'保存して削除', tstCleared:'盤面を空にしました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'写真をドラッグして、円に入る位置を合わせてください。', cropSet:'この位置で設定', pastePhoto:'コピーした画像を貼り付け', tstPasteNoImage:'クリップボードに画像がありません。画像を長押し→「コピー」してからもう一度', tstPasteFail:'この環境では貼り付けを使えません。「写真を追加」から選んでください', pasteBoxTitle:'画像を貼り付け', pasteBoxHelp:'下の枠を長押しして「ペースト」を選ぶと、コピーした画像を取り込めます。', pasteBoxPh:'ここを長押し →「ペースト」', tstPasteBoxNoImage:'画像が貼り付けられませんでした。先に画像を長押し→「コピー」してください',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
@@ -25632,7 +25632,7 @@ const I18N = {
     helpS3T:'画像でシェア', helpS3D:'右上の共有ボタンで画像を作成 → X・Instagram に投稿、保存もできます。',
     helpSec2:'もっと使いこなす', helpS4T:'まとめて自動配置', helpS4D:'右上の ＋ から、クラブ・国籍・リーグを選ぶと11人を自動配置。「レアル」「日本代表」なども一発。',
     helpS5T:'スカッドを保存・切り替え', helpS5D:'メニューで保存（最大10スカッド／無制限はプレミアム）。作ったスカッドの切り替えもここから。',
-    helpS6D:'全選手を市場価値順などで一覧。誰がいるか眺めたり、そのまま起用できます。',
+    helpS6D:'全選手を注目順などで一覧。誰がいるか眺めたり、そのまま起用できます。',
     helpS7T:'選手をカスタム', helpS7D:'駒をタップ → 写真追加・キャプテン・第2候補・メモ・入れ替え。名前は長押しで短縮や愛称に変更。写真は「画像をネット検索 → 長押しでコピー → 貼り付け」が最速。位置はドラッグで調整できます。',
     helpS8T:'位置を微調整', helpS8D:'駒を長押ししてドラッグで移動。⟲（整列リセット）でいつでも既定の配置に戻せます。',
     helpSec3:'画面のボタン', legMenu:'メニュー', legMenuD:'スカッドの保存・切り替え、各ページ', legNewD:'自動配置でスカッドを作る', legSearchD:'全選手を一覧から探す', legResetD:'動かした駒を既定の配置へ',
@@ -25696,8 +25696,8 @@ const I18N = {
     create:'Create a squad', chooseClub:'Choose a club…', teamName:'Squad name', optional:'optional', egTeamName:'e.g. Red Dragons',
     nameHelp:'Optional. If you pick only a club or only a nationality, that name (e.g. Arsenal, Japan) is filled in automatically.',
     autoConds:'Auto-build conditions (optional, combinable)', teamSearch:'Team search', teamSearchPh:'Search by team (e.g. Barcelona, Schalke)', clubLabel:'Club',
-    clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players by market value in that league are placed automatically.',
-    clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions by market value. Pick nothing for an empty formation.',
+    clubHelp:'Pick a club to place its real squad (XI, subs, reserves, second choices) as-is — this takes priority over nationality and league. Otherwise the top players in that league are placed automatically.',
+    clearConds:'× Clear conditions', autoBuild:'Auto-build →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions. Pick nothing for an empty formation.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
     unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', clearTitle:'Clear the board', clearBody:'This deletes the squad currently on the board.<br>Note: an unsaved squad can’t be restored.', clearConfirm:'Delete', saveAndDelete:'Save and delete', tstCleared:'Board cleared', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag the photo to position it inside the circle.', cropSet:'Use this position', pastePhoto:'Paste a copied image', tstPasteNoImage:'No image on the clipboard. Copy an image first, then try again.', tstPasteFail:'Paste isn’t available here — use “Add photo” instead.', pasteBoxTitle:'Paste an image', pasteBoxHelp:'Long-press the box below and choose “Paste” to import the copied image.', pasteBoxPh:'Long-press here → “Paste”', tstPasteBoxNoImage:'No image was pasted. Copy an image first (long-press → Copy).',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
@@ -25711,7 +25711,7 @@ const I18N = {
     helpS3T:'Share as an image', helpS3D:'Use the share button (top-right) to create an image → post to X or Instagram, or save it.',
     helpSec2:'Go further', helpS4T:'Auto-build in one tap', helpS4D:'From ＋ (top-right), pick a club, nationality or league to auto-place 11 players — “Real Madrid”, “Japan” and more in one tap.',
     helpS5T:'Save & switch squads', helpS5D:'Save from the menu (up to 10 squads; unlimited with Premium). Switch between your squads there too.',
-    helpS6D:'Browse all players by market value and more. See who’s available and add them straight in.',
+    helpS6D:'Browse all players and more. See who’s available and add them straight in.',
     helpS7T:'Customize players', helpS7D:'Tap a token → add a photo, set captain, second choice, notes, or swap. Long-press the name to shorten it or set a nickname. Fastest way to add a photo: web-search the image → long-press to copy → paste it in the app, then drag to position.',
     helpS8T:'Fine-tune positions', helpS8D:'Long-press and drag a token to move it. ⟲ (reset layout) restores the default arrangement anytime.',
     helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch squads, and all pages', legNewD:'Build a squad via auto-place', legSearchD:'Find players from the full list', legResetD:'Return moved tokens to the default',
@@ -28902,7 +28902,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0715i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0715j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
