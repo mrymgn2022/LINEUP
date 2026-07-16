@@ -25935,7 +25935,22 @@ const SHOWCASE_NATS=['FRA','ESP','ARG','ENG','BRA','NED'];
 let demoApplying=false; // サンプル適用中は save()/toast を抑止する内部フラグ
 function syncDemoBar(){ try{ if(!state.demo){ const b=document.getElementById('demoBar'); if(b) b.remove(); } }catch(e){} }
 function showDemoBar(code){
+  // 起動スプラッシュ表示中は待ち、消えてから出す（ガイドが起動アニメに被らないように）。
   try{
+    const sp=document.getElementById('splash');
+    if(sp && sp.style.display!=='none' && !sp.classList.contains('out')){
+      let n=0; const tm=setInterval(()=>{ const s=document.getElementById('splash');
+        if(!s || s.style.display==='none' || s.classList.contains('out')){ clearInterval(tm); setTimeout(()=>_showDemoBarNow(code),560); } // フェード(520ms)完了後
+        else if(++n>40){ clearInterval(tm); _showDemoBarNow(code); }                                                                       // 保険(約8秒)
+      },200);
+      return;
+    }
+  }catch(e){}
+  _showDemoBarNow(code);
+}
+function _showDemoBarNow(code){
+  try{
+    if(!state.demo) return; // 待っている間にユーザーが操作してデモ解除済みなら出さない
     const old=document.getElementById('demoBar'); if(old) old.remove();
     const b=document.createElement('div'); b.id='demoBar';
     b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:58px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
@@ -28953,7 +28968,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
