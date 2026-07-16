@@ -28837,6 +28837,19 @@ function openAnnouncementList(){
 //     preview:'試合の見どころ(任意・\nで改行)' }  ※記事は必ず日本のサイトで選手名表記をダブルチェック
 //   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
 const FEATURED_SQUADS=[
+  { comp:'FIFAワールドカップ2026 決勝', compEn:'FIFA World Cup 2026 Final', kickoff:'2026-07-20T04:00',
+    previewEn:'The final. Argentina, winners of all seven games so far, meet a Spain side unbeaten in the tournament (6 W 1 D). Argentina are chasing back-to-back World Cups; for 38-year-old Messi it could be the crowning night. European champions Spain are aiming for a first world title since 2010.\n\n■ Spain (4-2-3-1)\nRodri and Pedri control midfield while Yamal and Baena attack from the flanks. Olmo floats between the lines and Oyarzabal leads the line.\n\n■ Argentina (4-4-2)\nA compact 4-4-2 built on Romero and Li. Martínez. Enzo Fernández and Paredes set the tempo, De Paul and Mac Allister cover huge ground, and everything runs through Messi and Alvarez.\n\n■ Things to watch\n• Midfield control: Rodri & Pedri vs Enzo & Paredes\n• Yamal vs Tagliafico — the teenage star against the veteran\n• E. Martínez in the biggest moments: set pieces and (maybe) penalties',
+    home:{ team:'スペイン', nat:'ESP', form:'4-2-3-1', xi:[
+      {name:'U. Simón',club:'Athletic Club'},{name:'Cucurella',club:'Real Madrid'},{name:'Laporte',club:'Athletic Club'},
+      {name:'Cubarsí',club:'Barcelona'},{name:'Porro',club:'Tottenham'},{name:'Rodri',club:'Man City'},
+      {name:'Pedri',club:'Barcelona'},{name:'Baena',club:'Atlético'},{name:'Olmo',club:'Barcelona'},
+      {name:'Yamal',club:'Barcelona'},{name:'Oyarzabal',club:'R. Sociedad'}] },
+    away:{ team:'アルゼンチン', nat:'ARG', form:'4-4-2', xi:[
+      {name:'E. Martínez',club:'Aston Villa'},{name:'Tagliafico',club:'Lyon'},{name:'Li. Martínez',club:'Man Utd'},
+      {name:'Romero',club:'Tottenham'},{name:'Molina',club:'Atlético'},{name:'Mac Allister',club:'Liverpool'},
+      {name:'Fernández',club:'Chelsea'},{name:'Paredes',club:'Boca Juniors'},{name:'De Paul',club:'Inter Miami'},
+      {name:'Alvarez',club:'Atlético'},{name:'Messi',club:'Inter Miami'}] },
+    preview:'いよいよ決勝。ここまで7戦全勝のアルゼンチンと、無敗（6勝1分）で勝ち上がったスペインが頂点を争う。アルゼンチンは2大会連続の優勝、38歳のメッシにとっては集大成となり得る一戦。欧州王者スペインは2010年以来の世界一を狙う。\n\n■ スペイン（4-2-3-1）\nロドリとペドリが中盤を掌握し、ヤマルとバエナが両翼から仕掛ける。ライン間ではオルモが浮遊し、最前線はオヤルサバルが起点となる。\n\n■ アルゼンチン（4-4-2）\nロメロとリサンドロ・マルティネスを軸にした堅い4-4-2。エンソ・フェルナンデスとパレデスがテンポを作り、デ・パウルとマク・アリステルが広範囲をカバー。最後はメッシとアルバレスが仕留める。\n\n■ 焦点\n・中盤の主導権：ロドリ＆ペドリ vs エンソ＆パレデス\n・ヤマル vs タリアフィコ、10代の至宝と百戦錬磨の対決\n・セットプレーと（もつれれば）PK戦、E.マルティネスの勝負強さ' },
   { comp:'FIFAワールドカップ2026 ラウンド32', compEn:'FIFA World Cup 2026 Round of 32', kickoff:'2026-06-30T02:00',
     previewEn:'In the October 2025 friendly, Japan came back from 0-2 down at the break to win 3-2 — their first-ever victory over Brazil. Around eight months later, the rematch comes in a single-elimination Round of 32.\n\n■ Japan (3-4-2-1)\nHigh pressing to limit Brazil’s build-up, with Ueda as the focal point and Kamada and Maeda linking up as the two shadow strikers. The space beside the back three and the wing-backs’ up-and-down running are key.\n\n■ Brazil (4-3-3)\nBuilt around the drive of Vinícius and Cunha and a midfield of Casemiro and Bruno Guimarães. With Alisson behind them, Marquinhos and Gabriel marshal the defensive line.\n\n■ Things to watch\n• Japan’s high press vs Brazil’s build-up\n• Vinícius vs Japan’s right side (Doan, Tomiyasu)\n• Ueda’s aerial duels from set pieces and counters',
     home:{ team:'日本', nat:'JPN', form:'3-4-2-1', xi:[
@@ -28939,7 +28952,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
