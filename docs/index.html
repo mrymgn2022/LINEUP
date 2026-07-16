@@ -28831,13 +28831,13 @@ function openAnnouncementList(){
 
 /* ---------- ハンバーガーメニュー（左ドロワー） ---------- */
 // 注目スカッド：注目試合の予想スタメン（ピッチ図・両チーム）。1エントリ=1試合。目標は1日1試合以上。
-//   { comp:'大会名(必須)', kickoff:'2026-06-29T20:00'(ISO・24時間前表示の判定に使用),
+//   { comp:'大会名(必須)', kickoff:'2026-06-29T20:00'(ISO・24時間前表示の判定に使用), showFrom:'…'(任意・これ以降すぐ表示=早出し),
 //     home/away:{ team:'チーム名', nat:'FIキー(RSA/CAN等)', form:'FORMのキー(4-3-3等)',
 //                 xi:[{name,club} を11個。GK→DF→MF→FWの順＝FORM[form]と同じ並びで置く。clubは省略可] } }
 //     preview:'試合の見どころ(任意・\nで改行)' }  ※記事は必ず日本のサイトで選手名表記をダブルチェック
 //   kickoff未設定なら常時表示／xi未設定なら「予想スタメン準備中」。新試合はスクショ等で受け取り次第ここへ追加。
 const FEATURED_SQUADS=[
-  { comp:'FIFAワールドカップ2026 決勝', compEn:'FIFA World Cup 2026 Final', kickoff:'2026-07-20T04:00',
+  { comp:'FIFAワールドカップ2026 決勝', compEn:'FIFA World Cup 2026 Final', kickoff:'2026-07-20T04:00', showFrom:'2026-07-17T00:00',
     previewEn:'The final. Argentina, winners of all seven games so far, meet a Spain side unbeaten in the tournament (6 W 1 D). Argentina are chasing back-to-back World Cups; for 38-year-old Messi it could be the crowning night. European champions Spain are aiming for a first world title since 2010.\n\n■ Spain (4-2-3-1)\nRodri and Pedri control midfield while Yamal and Baena attack from the flanks. Olmo floats between the lines and Oyarzabal leads the line.\n\n■ Argentina (4-4-2)\nA compact 4-4-2 built on Romero and Li. Martínez. Enzo Fernández and Paredes set the tempo, De Paul and Mac Allister cover huge ground, and everything runs through Messi and Alvarez.\n\n■ Things to watch\n• Midfield control: Rodri & Pedri vs Enzo & Paredes\n• Yamal vs Tagliafico — the teenage star against the veteran\n• E. Martínez in the biggest moments: set pieces and (maybe) penalties',
     home:{ team:'スペイン', nat:'ESP', form:'4-2-3-1', xi:[
       {name:'U. Simón',club:'Athletic Club'},{name:'Cucurella',club:'Real Madrid'},{name:'Laporte',club:'Athletic Club'},
@@ -28952,7 +28952,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29068,8 +29068,9 @@ function transferCardHTML(it){
 function squadInWindow(m){
   if(!m||!m.kickoff) return true;
   const ko=new Date(m.kickoff).getTime(); if(isNaN(ko)) return true;
+  const from=m.showFrom?new Date(m.showFrom).getTime():ko-24*3600e3; // showFrom(任意)で24時間前より早く掲出できる（決勝等の早出し用）
   const now=Date.now();
-  return now >= ko-24*3600e3 && now <= ko+3*3600e3;
+  return now >= from && now <= ko+3*3600e3;
 }
 function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w=(LANG==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['日','月','火','水','木','金','土'])[d.getDay()];
   return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; }
