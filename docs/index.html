@@ -25650,7 +25650,7 @@ const I18N = {
     seeHowTo:'使い方を見る', noAnnounce:'お知らせはまだありません。',
     featPredicted:'予想', featSquadDesc:'注目試合の予想スタメンを随時更新。', featSquadNote:'※キックオフ24時間前から表示します', featSquadEmpty:'本日の注目試合はありません。<br>キックオフ24時間前から表示されます。',
     featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※データベースへの反映まで時間がかかる場合があります', featComingSoon:'近日公開予定です。',
-    featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ', freeWord:'フリー',
+    featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ（日本時間）', freeWord:'フリー',
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
@@ -25729,7 +25729,7 @@ const I18N = {
     seeHowTo:'See how to use', noAnnounce:'No announcements yet.',
     featPredicted:'Predicted', featSquadDesc:'Predicted line-ups for featured matches, updated regularly.', featSquadNote:'Shown from 24 hours before kickoff.', featSquadEmpty:'No featured matches today.<br>They appear from 24 hours before kickoff.',
     featTransferDesc:'Big-money moves and big-name transfers, updated regularly.', featTransferNote:'It may take some time for these transfers to appear in the player database.', featComingSoon:'Coming soon.',
-    featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff', freeWord:'Free',
+    featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff (UK time)', freeWord:'Free',
     saTabXI:'Starting XI', saTabAll:'XI + bench', saNoXI:'No players in the XI', saSquadSize:'Squad size', saAvgAge:'Avg. age', saAvgHeight:'Avg. height', saCaptain:'Captain', saNone:'None', saYoungest:'Youngest', saOldest:'Oldest', saNat:'Nationalities', saOriginal:'Original'
   }
 };
@@ -28953,7 +28953,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29068,13 +29068,25 @@ function transferCardHTML(it){
 // キックオフ24時間前〜終了後3時間だけ表示（日時未設定なら常時表示）
 function squadInWindow(m){
   if(!m||!m.kickoff) return true;
-  const ko=new Date(m.kickoff).getTime(); if(isNaN(ko)) return true;
-  const from=m.showFrom?new Date(m.showFrom).getTime():ko-24*3600e3; // showFrom(任意)で24時間前より早く掲出できる（決勝等の早出し用）
+  const ko=koDate(m.kickoff).getTime(); if(isNaN(ko)) return true;
+  const from=m.showFrom?koDate(m.showFrom).getTime():ko-24*3600e3; // showFrom(任意)で24時間前より早く掲出できる（決勝等の早出し用）
   const now=Date.now();
   return now >= from && now <= ko+3*3600e3;
 }
-function fmtKickoff(iso){ const d=new Date(iso); if(isNaN(d)) return ''; const w=(LANG==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['日','月','火','水','木','金','土'])[d.getDay()];
-  return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; }
+// kickoff/showFrom はJSTの壁時計で書く（TZ無指定は+09:00として解釈）→ どの端末でも絶対時刻が一致。
+function koDate(iso){ if(typeof iso==='string'&&/T\d{2}:\d{2}(:\d{2})?$/.test(iso)) iso+='+09:00'; return new Date(iso); }
+// 表示: 日本語=日本時間 / 英語=英国時間（Europe/London, 夏時間はIntlが自動処理）
+function fmtKickoff(iso){ const d=koDate(iso); if(isNaN(d)) return '';
+  try{
+    if(LANG==='en'){
+      const P={}; new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',day:'numeric',month:'short',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d).forEach(p=>P[p.type]=p.value);
+      return `${P.weekday} ${P.day} ${P.month}, ${P.hour}:${P.minute}`;
+    }
+    const P={}; new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',day:'numeric',month:'numeric',weekday:'short',hour:'numeric',minute:'2-digit',hour12:false}).formatToParts(d).forEach(p=>P[p.type]=p.value);
+    return `${P.month}/${P.day}(${P.weekday}) ${P.hour}:${P.minute}`;
+  }catch(e){ const w=(LANG==='en'?['Sun','Mon','Tue','Wed','Thu','Fri','Sat']:['日','月','火','水','木','金','土'])[d.getDay()];
+    return `${d.getMonth()+1}/${d.getDate()}(${w}) ${d.getHours()}:${('0'+d.getMinutes()).slice(-2)}`; }
+}
 // ミニピッチ：FORMの座標(GK下→FW上)を再利用。xi[i] を FORM[form][i] の位置に配置。
 function squadPitchHTML(side){
   const coords = FORM[side.form] || FORM['4-3-3'];
@@ -29139,7 +29151,7 @@ function squadMatchHTML(m){
 }
 function openFeatured(kind){
   if(kind==='squad'){
-    const matches=FEATURED_SQUADS.filter(squadInWindow).sort((a,b)=> new Date(a.kickoff||0)-new Date(b.kickoff||0));
+    const matches=FEATURED_SQUADS.filter(squadInWindow).sort((a,b)=> koDate(a.kickoff||0)-koDate(b.kickoff||0));
     const body = matches.length ? matches.map(squadMatchHTML).join('')
       : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">${t('featSquadEmpty')}</div>`;
     openSheet(`<h2>${t('featSquad')} <span>${t('featPredicted')}</span></h2>
