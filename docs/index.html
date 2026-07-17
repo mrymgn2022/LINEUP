@@ -26799,7 +26799,17 @@ function searchPlayerWeb(pid){
   const p=P[pid]; if(!p)return;
   try{ hidePastePrompt(); }catch(e){} // 別選手の古いバナーが残っていると誤った選手に貼り付くため掃除
   _pastePromptPid=pid; _pastePromptAt=Date.now(); // 復帰時のワンタップ貼り付け用に記憶
-  const q=encodeURIComponent(p[0].trim()+' '+p[4].trim()+' footballer');
+  // Jリーグ在籍の日本人選手は日本語名＋日本語クラブ名で検索（結果が段違いに豊富。UI言語は問わない）。
+  // 外国籍選手・海外組はローマ字のまま。J1JAは同名重複の拡張キーにも対応済み（pidToKeyと同形式）。
+  let qs=p[0].trim()+' '+p[4].trim()+' footballer';
+  try{
+    const lg=p[5], isJ=(lg==='J1'||lg==='J2'||lg==='J3');
+    if(isJ && natCode(p)==='JPN' && typeof J1JA!=='undefined'){
+      const ja=J1JA[pidToKey(pid)];
+      if(ja){ const jc=(typeof CLUB_JA!=='undefined'&&CLUB_JA[(p[4]||'').trim()])||p[4].trim(); qs=ja+' '+jc+' サッカー'; }
+    }
+  }catch(e){}
+  const q=encodeURIComponent(qs);
   window.open('https://www.google.com/search?tbm=isch&q='+q,'_blank','noopener');
   toast(t('tstWebOpened'));
 }
@@ -28996,7 +29006,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30876,6 +30886,22 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ window.__forceShortName=null; try{ closeSheet(); }catch(e){} }
       ok('teamname_short_and_clear',_pass,_msg); }
+    // T27: 画像検索クエリ＝J日本人は日本語（名前+クラブ+サッカー）、外国籍はローマ字のまま
+    { let _pass=true,_msg='';
+      const _wo=window.open, _pp=_pastePromptPid;
+      try{
+        let _url=null; window.open=function(u){ _url=u; return null; };
+        _keyMap=null; buildKeyMap();
+        const _jp=keyToPid('Seiya Inoue|JPN');            // J1在籍の日本人（井上 聖也）
+        if(_jp==null){ _pass=false; _msg='pid解決失敗(jp)'; }
+        else{ searchPlayerWeb(_jp); const d=decodeURIComponent(_url||'');
+          if(!(d.indexOf('井上 聖也')>=0 && d.indexOf('サッカー')>=0 && d.indexOf('footballer')<0)){ _pass=false; _msg='jp query: '+d.slice(-80); } }
+        const _fr=keyToPid('Alexander Scholz|DEN');       // J1在籍の外国籍
+        if(_fr!=null){ searchPlayerWeb(_fr); const d2=decodeURIComponent(_url||'');
+          if(!(d2.indexOf('Alexander Scholz')>=0 && d2.indexOf('footballer')>=0)){ _pass=false; _msg+=' fr query: '+d2.slice(-80); } }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ window.open=_wo; _pastePromptPid=_pp; try{ hidePastePrompt(); }catch(e){} }
+      ok('img_search_ja_query',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
