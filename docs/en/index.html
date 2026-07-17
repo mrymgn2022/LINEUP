@@ -3,11 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 2026-07-17: 英語検索からの流入を誘導ページ経由にせず、アプリ本体(/)へ即転送する（0秒リダイレクト）。
+     アプリはブラウザ言語で自動的に英語UIになるため、英語ユーザーもそのまま使える。以下のLP本文はJS無効環境のフォールバック。 -->
+<meta http-equiv="refresh" content="0;url=https://squadxi.futbol/">
+<script>location.replace('https://squadxi.futbol/');</script>
 <title>Squad XI — Free Football Lineup Builder &amp; Starting XI Maker</title>
 <meta name="description" content="Build your dream starting XI from 23,000+ real players across 53 leagues. Pick a formation, drag players into place, and share your lineup as an image. Free, no sign-up.">
-<link rel="canonical" href="https://squadxi.futbol/en/">
-<link rel="alternate" hreflang="en" href="https://squadxi.futbol/en/">
+<link rel="canonical" href="https://squadxi.futbol/">
 <link rel="alternate" hreflang="ja" href="https://squadxi.futbol/">
+<link rel="alternate" hreflang="en" href="https://squadxi.futbol/">
 <link rel="alternate" hreflang="x-default" href="https://squadxi.futbol/">
 <link rel="icon" type="image/png" href="https://squadxi.futbol/favicon.png" sizes="192x192">
 <meta property="og:type" content="website">
