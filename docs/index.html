@@ -26325,6 +26325,8 @@ let _teamShortMap=null;
 function shortTeamName(name){
   const n=(name==null?'':String(name)).trim(); if(!n) return n;
   try{
+    // 短縮はモバイル配置のみ（デスクトップ=isWideDock はスペースが潤沢なのでフル名のまま）。__forceShortName はselftest用
+    if(window.__forceShortName!=null ? !window.__forceShortName : isWideDock()) return n;
     if(TEAMNAME_SHORT_JA[n]) return TEAMNAME_SHORT_JA[n];
     if(!_teamShortMap){
       _teamShortMap={}; const seen=new Set();
@@ -26339,6 +26341,7 @@ function shortTeamName(name){
     return hit ? ((LANG==='ja'?hit.ja:hit.en)||n) : n;
   }catch(e){ return n; }
 }
+window.addEventListener('resize',()=>{ try{ updateTeamTag(); }catch(e){} }); // 画面幅で短縮/フル表示が変わるため追従
 function updateTeamTag(){
   const el=document.getElementById('teamTag');if(!el)return;
   const name=teamDisplayName();
@@ -28992,7 +28995,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30856,11 +30859,13 @@ window.__selftest=function(){
     { let _pass=true,_msg='';
       try{
         const _lang=LANG;
+        window.__forceShortName=true;
         LANG='ja'; _teamShortMap=null;
         const ja1=shortTeamName('Paris Saint-Germain'), ja2=shortTeamName('パリ・サンジェルマン'), ja3=shortTeamName('浦和レッズ'), ja4=shortTeamName('俺のドリームチーム'), ja5=shortTeamName('マンチェスター・ユナイテッド');
         LANG='en'; const en1=shortTeamName('Paris Saint-Germain'), en2=shortTeamName('Urawa Red Diamonds');
+        window.__forceShortName=false; const fullDesk=shortTeamName('Paris Saint-Germain'); window.__forceShortName=true; // デスクトップ相当＝フル名
         LANG=_lang;
-        _pass=(ja1==='PSG')&&(ja2==='PSG')&&(ja3==='浦和レッズ')&&(ja4==='俺のドリームチーム')&&(ja5==='マンU')&&(en1==='PSG')&&(en2==='Urawa Reds');
+        _pass=(ja1==='PSG')&&(ja2==='PSG')&&(ja3==='浦和レッズ')&&(ja4==='俺のドリームチーム')&&(ja5==='マンU')&&(en1==='PSG')&&(en2==='Urawa Reds')&&(fullDesk==='Paris Saint-Germain');
         _msg=_pass?'':('ja='+ja1+'/'+ja2+'/'+ja3+'/'+ja4+' en='+en1+'/'+en2);
         buildSlots('4-3-3',false); state.slots[0].pid=0; state.teamName='パリ・サンジェルマン';
         clearSquad();
@@ -30868,7 +30873,7 @@ window.__selftest=function(){
         if(btn){ btn.click(); } else { _pass=false; _msg+=' no clrOk'; }
         if(state.teamName!=null||state.slots.some(s=>s.pid!=null)){ _pass=false; _msg+=' クリア後に残留(name='+state.teamName+')'; }
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
-      finally{ try{ closeSheet(); }catch(e){} }
+      finally{ window.__forceShortName=null; try{ closeSheet(); }catch(e){} }
       ok('teamname_short_and_clear',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
