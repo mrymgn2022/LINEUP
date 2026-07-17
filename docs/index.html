@@ -25573,6 +25573,14 @@ function keyToPid(key){
 }
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } return true; }catch(e){ return false; } } // 書込成功でtrue（容量超過QuotaExceeded等はfalse）
+// 写真の主保存先はIndexedDB（localStorageの約5MB制限で「写真は付くのに保存失敗」となる問題の恒久対策 2026-07-17）
+function idbOpen(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('squadxi',1);
+  r.onupgradeneeded=()=>{ try{ r.result.createObjectStore('kv'); }catch(e){} };
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error('blocked')); }catch(e){ rej(e); } }); }
+function idbSet(k,v){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; })); }
+function idbGet(k){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readonly'); const rq=tx.objectStore('kv').get(k); rq.onsuccess=()=>{ db.close(); res(rq.result); }; rq.onerror=()=>{ db.close(); rej(rq.error); }; })); }
+function idbDel(k){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').delete(k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; })); }
+let _photosJson=null; // 最後に保存/読込した写真JSON（バックアップのls欠落時フォールバック）
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
@@ -25993,9 +26001,11 @@ async function savePhotos(){
   const keyed={}; for(const pid in state.photos){ const k=pidToKey(+pid); if(k!=null) keyed[k]=state.photos[pid]; }
   const json=JSON.stringify({v:3,photos:keyed});
   try{ if(window.storage){ await window.storage.set('xi_photos_v2',json,false); } }catch(e){}
-  const ok=lsSet('xi_photos_v2',json);
-  memPhotos=state.photos;
-  return ok;
+  memPhotos=state.photos; _photosJson=json;
+  let idbOk=false; try{ idbOk=await idbSet('xi_photos_v2',json); }catch(e){}
+  const lsOk=lsSet('xi_photos_v2',json);                     // 副系（容量に収まる間はバックアップ経路も従来どおり）
+  if(idbOk && !lsOk){ try{ localStorage.removeItem('xi_photos_v2'); }catch(e){} } // 古い断片を残さない（読込はIndexedDB優先なので安全）
+  return idbOk||lsOk;
 }
 // 保存データ(キー形式v3)を現在のindexへ解決。データ更新で番号がズレても正しい選手に復元。複数チーム読込でも使う。
 function resolveRaw(raw){
@@ -26022,8 +26032,9 @@ async function load(){
 }
 async function loadPhotos(){
   let raw=null;
-  try{ if(window.storage){ const r=await window.storage.get('xi_photos_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){}
-  if(!raw){ const s=lsGet('xi_photos_v2'); if(s){ try{ raw=JSON.parse(s); }catch(e){} } }
+  try{ const s=await idbGet('xi_photos_v2'); if(s){ raw=JSON.parse(s); _photosJson=s; } }catch(e){} // 主系（IndexedDB）
+  if(!raw){ try{ if(window.storage){ const r=await window.storage.get('xi_photos_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){} }
+  if(!raw){ const s=lsGet('xi_photos_v2'); if(s){ try{ raw=JSON.parse(s); _photosJson=s; }catch(e){} } }
   if(!raw) return memPhotos;
   if(raw.v>=3&&raw.photos){ if(!_keyMap) buildKeyMap(); const out={}; for(const k in raw.photos){ const i=keyToPid(k); if(i!=null) out[i]=raw.photos[k]; } return out; }
   return raw; // 旧形式(index-keyed)
@@ -29008,7 +29019,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717k'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717m'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29233,7 +29244,7 @@ const BACKUP_KEYS=['xi_teams_v1','xi_state_v2','xi_photos_v2'];
 // バックアップ本文（JSON文字列）を作る。保存データが無ければ空文字。
 function backupText(){
   const out={app:'SquadXI',v:1,ts:Date.now(),data:{}};
-  BACKUP_KEYS.forEach(k=>{ const v=lsGet(k); if(v!=null) out.data[k]=v; });
+  BACKUP_KEYS.forEach(k=>{ let v=lsGet(k); if(v==null && k==='xi_photos_v2') v=_photosJson; if(v!=null) out.data[k]=v; }); // 写真はIndexedDB主のためls欠落時はセッションキャッシュから
   return Object.keys(out.data).length ? JSON.stringify(out) : '';
 }
 // テキスト（ファイル or 貼り付け）から復元。ファイル選択を使わないのでiOSホーム画面アプリでも動く。
@@ -29251,7 +29262,7 @@ function restoreFromBackupText(text){
       <button class="bigbtn" id="rstOk">${t('rstConfirm')}</button>
       <button class="bigbtn ghost" id="rstCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('rstOk').onclick=()=>{ try{ keys.forEach(k=>lsSet(k, j.data[k])); toast(t('tstRestored')); setTimeout(()=>location.reload(),700); }catch(e){ toast(t('tstReadFail')); } };
+  document.getElementById('rstOk').onclick=()=>{ try{ keys.forEach(k=>lsSet(k, j.data[k])); Promise.resolve().then(()=>idbDel('xi_photos_v2')).catch(()=>{}).then(()=>{ toast(t('tstRestored')); setTimeout(()=>location.reload(),700); }); }catch(e){ toast(t('tstReadFail')); } }; // 復元時はIndexedDB側の写真を破棄（古い写真が優先されるのを防ぐ）
   document.getElementById('rstCancel').onclick=()=>{ closeSheet(); };
 }
 async function exportBackup(){
