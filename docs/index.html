@@ -643,7 +643,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
     </div>
     <div class="hbtn"><!-- 並び: 新規→共有→検索→整列→削除（破壊的な「盤面を空にする」を右端に隔離し誤タップ防止。2026-07-14） -->
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
-      <div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
+      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div>
       <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
@@ -25922,7 +25922,7 @@ function recordEvent(ev,once){
 }
 // スタメン11人が埋まった瞬間を1回だけ記録（renderから毎回呼ばれるが once ガードで1回に丸まる）
 function _checkXIComplete(){
-  try{ if(state.demo) return; if(state.slots&&state.slots.length===11&&state.slots.every(s=>s&&s.pid!=null)) recordEvent('xi_complete',true); }catch(e){}
+  try{ if(state.demo) return; if(state.slots&&state.slots.length===11&&state.slots.every(s=>s&&s.pid!=null)){ recordEvent('xi_complete',true); maybeShowXiDoneBar(); } }catch(e){}
 }
 // 端末の属性を1回だけ記録（イベント名で表現するので、Worker/DB側の変更は不要）
 //  pwa    … ホーム画面に追加して起動している＝"実質アプリ利用者"。App Storeを出すべきかの最重要判断材料
@@ -29178,7 +29178,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717w'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717x'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30190,6 +30190,37 @@ function drawSilhouette(x,fx,fy,R){
   x.beginPath();x.arc(fx,fy+30*k,23*k,Math.PI,2*Math.PI);x.fill();
   x.restore();
 }
+// P0: XI完成の瞬間に保存/共有の2択を提示（感情のピークで次アクションを示す）
+//     セッション1回・未保存スカッドのみ（teamIdありは既存チーム＝出さない）・ショーケースdemo除外
+let _xiBarShown=false;
+function maybeShowXiDoneBar(){
+  try{
+    if(_xiBarShown||state.demo||state.teamId) return;
+    if(document.getElementById('xiDoneBar')) return;
+    _xiBarShown=true;
+    const en=(typeof LANG!=='undefined'&&LANG==='en');
+    const bar=document.createElement('div');
+    bar.id='xiDoneBar';
+    bar.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:340;background:#111a14;border:1px solid rgba(202,255,58,.4);border-radius:14px;padding:10px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 22px rgba(0,0,0,.5);max-width:94vw';
+    const msg=document.createElement('span');
+    msg.textContent=en?'XI complete!':'XI完成！';
+    msg.style.cssText='color:#eafff0;font-weight:800;font-size:13px;white-space:nowrap';
+    const mk=(label,fn,primary)=>{ const b=document.createElement('button');
+      b.textContent=label;
+      b.style.cssText='border:0;border-radius:9px;padding:8px 12px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap;'+(primary?'background:#caff3a;color:#0a0e0c':'background:#243026;color:#eafff0');
+      b.onclick=()=>{ bar.remove(); fn(); }; return b; };
+    bar.appendChild(msg);
+    bar.appendChild(mk(en?'Save':'保存する',()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); } else { toast(t('tstSaved2')); } },true));
+    bar.appendChild(mk(en?'Share':'画像で共有',()=>{ shareLineup(); },false));
+    const x=document.createElement('button');
+    x.textContent='×';
+    x.style.cssText='border:0;background:transparent;color:#7d9389;font-size:16px;cursor:pointer;padding:2px 4px';
+    x.onclick=()=>bar.remove();
+    bar.appendChild(x);
+    document.body.appendChild(bar);
+    setTimeout(()=>{ try{ bar.remove(); }catch(e){} },15000);
+  }catch(e){}
+}
 async function buildShareCanvas(){
   // Webフォントのロード完了を待ってから焼く（待たないと、タイミング次第でシステムフォントの画像になり盤面と字形が変わる）
   try{ await Promise.all([document.fonts.load('700 20px Manrope'),document.fonts.load('800 20px Manrope'),document.fonts.load('600 20px Manrope'),document.fonts.load('20px "Bebas Neue"')]); }catch(e){}
@@ -30277,14 +30308,20 @@ async function buildShareCanvas(){
     x.fillStyle='rgba(234,255,240,.15)'; x.fillText(sq,sx,wmY);
     x.fillStyle='rgba(200,255,79,.22)'; x.fillText(xi,sx+wSq,wmY);
     x.letterSpacing='0px'; x.restore(); })();
-  // 右下にアプリ名：不透明ロゴ（署名風・大きめ）。中央＝トリミング対策、右下＝視認性の高いブランド表示
+  // 右下にアプリ名ロゴ＋URL（P0: 画像だけを見た人がアプリへ辿り着けるように）
   (function(){ x.save(); x.textBaseline='alphabetic'; const fs=Math.round(pw*0.046), pad=Math.round(pw*0.03);
+    const ufs=Math.round(fs*0.44);
     x.font=fs+'px "Bebas Neue",Manrope,sans-serif'; x.letterSpacing=Math.round(fs*0.07)+'px'; x.textAlign='left';
     x.shadowColor='rgba(0,0,0,.55)'; x.shadowBlur=Math.round(fs*0.18); x.shadowOffsetY=Math.round(fs*0.05);
-    const sq='SQUAD ', xi='XI', wSq=x.measureText(sq).width, startX=px+pw-pad-(wSq+x.measureText(xi).width), baseY=py+ph-pad;
+    const sq='SQUAD ', xi='XI', wSq=x.measureText(sq).width, wTot=wSq+x.measureText(xi).width;
+    const baseY=py+ph-pad-ufs-Math.round(fs*0.18), startX=px+pw-pad-wTot;
     x.fillStyle='#eafff0'; x.fillText(sq,startX,baseY);
     x.fillStyle='#C8FF4F'; x.fillText(xi,startX+wSq,baseY);
-    x.letterSpacing='0px'; x.restore(); })();
+    x.letterSpacing='0px';
+    x.font='700 '+ufs+'px Manrope,sans-serif'; x.shadowBlur=Math.round(ufs*0.3);
+    const url='squadxi.futbol', wUrl=x.measureText(url).width;
+    x.fillStyle='rgba(234,255,240,.85)'; x.fillText(url,px+pw-pad-wUrl,py+ph-pad);
+    x.restore(); })();
   // トークン描画：名前は省略せず全文表示。サイズは全員で統一（盤面のようにバラつかせない）
   const maxName=m(state.hideRoles?16:13), minName=m(8); // 盤面の名前フォント(13/bigname16)を基準に
   // pass1: 各駒の位置・表示名・国旗を測る
@@ -30531,6 +30568,7 @@ function openShareFallback(imgUrl,shareText,file){
   };
 }
 document.getElementById('btnShare').onclick=shareLineup;
+  document.getElementById('btnSave').onclick=()=>{ try{ recordEvent('first_action',true); }catch(e){} const filled=state.slots.filter(s=>s.pid!=null).length; if(!filled){ toast(t('tstPlaceFirst')); return; } const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); } else { toast(t('tstSaved2')); } }; // P0: 保存の正道化（ヘッダー常設）
 
 // 盤面リセット：配置中の選手・ベンチ・ベンチ外・キャプテン・マーカーを全て外して空のフォーメーションに戻す（保存済みスカッドは消さない）
 function clearSquad(){
