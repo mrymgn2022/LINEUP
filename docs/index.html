@@ -29178,7 +29178,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717u'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717v'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -31132,6 +31132,7 @@ window.__selftest=function(){
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
       if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
+    try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
     // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 代表XIをサンプル表示（W杯期間限定）
     if(!wasShareLink && !saved && !(state.slots&&state.slots.some(s=>s&&s.pid!=null))){
       const _sc=showcaseBoot();
