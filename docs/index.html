@@ -376,8 +376,10 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .drawer .dwx{display:none!important;}             /* ×不要 */
   .app{ margin-left:max(300px, calc(50vw - 130px)); margin-right:auto; } /* サイドバーを除いた残り領域の中央へ（50vw+150が残り領域の中心、アプリ幅560の半分280を引く。狭い時はサイドバー右に接して配置） */
   .sheet{ left:300px; }                             /* シートもサイドバーを避けて本体と同じ位置で中央寄せ */
-  .toast{ left:calc(50% + 150px); }
-  .modebar{ left:calc(50% + 150px); }
+  :root{ --appcx: calc(max(300px, 50vw - 130px) + min(560px, calc(100vw - max(300px, 50vw - 130px)))/2); } /* アプリ列＝盤面の中心X */
+  .toast{ left:var(--appcx) !important; }
+  .modebar{ left:var(--appcx) !important; }
+  #xiDoneBar,#demoBar{ left:var(--appcx) !important; } /* インラインleft:50%を盤面中心へ上書き */
   /* 常時表示時はできるだけ全項目が1画面に収まるよう余白を少し詰める（収まらない高さではスクロール） */
   .drawer .dwitem{padding:10px 16px;}
   .drawer .dwnew{padding:10px 15px;margin:10px 12px 2px;}
@@ -2463,7 +2465,7 @@ function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=htm
   sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');
   if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
   _ovPush();}
-function closeSheet(){scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
+function closeSheet(){_shareConfirmOpen=false;scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
 // Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
 // overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
 // history.back() はプログラムから呼ばない（高速開閉で暴発してページ外へ飛ぶ事故を避ける）＝安全側。手動で閉じた後はマーカーが1つ残り、次の「戻る」1回だけが吸収される（アプリは終了しない）。
@@ -4516,7 +4518,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4926,6 +4928,7 @@ function openHelp(){
 function guardUnsaved(proceed,mode){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed,mode); }
 // 共有リンク（#s=...）で開かれた場合の確認→展開。受け手の保存済みスカッドには一切触れない（盤面のみ置き換え）
 function openSharedSquadConfirm(raw){
+  _shareConfirmOpen=true; // 許可前はXI完成バーを出さない
   openSheet(`
     <h2>${t('shOpenTitle')}</h2>
     <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${raw.teamName?('<b>'+escAttr(raw.teamName)+'</b><br>'):''}${t('shOpenBody')}</div>
@@ -5574,10 +5577,11 @@ function drawSilhouette(x,fx,fy,R){
 }
 // P0: XI完成の瞬間に保存/共有の2択を提示（感情のピークで次アクションを示す）
 //     セッション1回・未保存スカッドのみ（teamIdありは既存チーム＝出さない）・ショーケースdemo除外
-let _xiBarShown=false,_xiBarWaiting=false;
+let _xiBarShown=false,_xiBarWaiting=false,_shareConfirmOpen=false;
 function maybeShowXiDoneBar(){
   try{
     if(_xiBarShown||state.demo||state.teamId) return;
+    if(_shareConfirmOpen) return; // 共有スカッドの表示許可ダイアログ中は出さない（許可後に表示）
     if(document.getElementById('xiDoneBar')) return;
     // 起動スプラッシュ（起動アニメ）中は待ち、消えてから出す（共有リンクで開いた盤面のアニメにバーが被らないように。showDemoBarと同方式）
     const sp=document.getElementById('splash');

@@ -3,7 +3,7 @@
 // 方針: 本番 = stale-while-revalidate（キャッシュを即返し、裏で最新を取得→次回反映）
 //       開発(localhost) = network-first（編集が常に反映。落ちた時だけキャッシュ）
 // 注意: 外部オリジン（人気度APIのCloudflare Worker、Web Analyticsビーコン等）には一切触らない
-const CACHE='squadxi-v53'; // v53: 顔写真3枚追加（ロジャーズ/スペンス/クアンザ=ユーザー提供イングランド盤面から切り出し）
+const CACHE='squadxi-v54'; // v54: 共有スカッド許可前はXI完成バー非表示＋トースト/バー類を盤面（アプリ列）中心に表示
 const CORE=['./index.html','./data/players.js','./favicon.png','./privacy.html','./privacy.en.html','./terms.html','./terms.en.html',
   './fonts/manrope-latin.woff2','./fonts/manrope-latin-ext.woff2','./fonts/bebas-latin.woff2','./fonts/bebas-latin-ext.woff2',
   './vendor/flag-icons/css/flag-icons.min.css']; // 国旗SVG本体(270枚)は事前キャッシュせず、表示したものから実行時キャッシュ（SWRのput）で貯める
