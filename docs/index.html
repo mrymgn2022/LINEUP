@@ -4516,7 +4516,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4596,7 +4596,14 @@ const TR_CLUB_NAT={
 const _ICN_FREE='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#e5484d" stroke-width="2.2" style="flex:0 0 auto;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
 function trFreeCell(){ return `${_ICN_FREE}<span style="color:#e5484d;font-weight:800">${t('freeWord')}</span>`; }
 // 移籍金の表示（英語UIでは「€4000万」→「€40M」に換算。万=1e4なので N/100 で百万単位）
-function trFeeText(fee){ if(!fee) return '—'; if(LANG!=='en') return fee; const m=/^€(\d+(?:\.\d+)?)万$/.exec(fee); if(m){ const mm=parseFloat(m[1])/100; return '€'+(Number.isInteger(mm)?mm:mm.toFixed(1).replace(/\.0$/,''))+'M'; } return fee; }
+function trFeeText(fee){ if(!fee) return '—';
+  if(fee==='フリー') return t('freeWord'); // テキスト文脈用（注目移籍カードは赤斜線セルを先に分岐するのでここには来ない）
+  if(LANG!=='en') return fee;
+  if(fee==='レンタル') return 'Loan';
+  if(fee==='非公開') return 'Undisclosed';
+  let m=/^€(\d+(?:\.\d+)?)万$/.exec(fee); if(m) return '€'+(+(parseFloat(m[1])/100).toFixed(2))+'M';
+  m=/^€(\d+(?:\.\d+)?)億$/.exec(fee); if(m) return '€'+(+(parseFloat(m[1])*100).toFixed(2))+'M';
+  return fee; }
 // 注目スカッドのチーム名（英語UIなら teamEn か、代表は NATNAME、無ければ日本語名）
 function squadTeamName(side){ if(!side) return ''; return (LANG==='en') ? (side.teamEn || NATNAME[side.nat] || side.team || '') : (side.team||''); }
 function featComp(m){ return (LANG==='en' && m && m.compEn) ? m.compEn : ((m&&m.comp)||''); }
@@ -4756,7 +4763,7 @@ function buildSideRail(){
     const r=document.createElement('div'); r.id='siderail'; r.dataset.lang=LANG;
     const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
     const rows=(FEATURED_TRANSFERS||[]).slice(0,3).map(f=>
-      '<div class="srrow" data-sr="transfer"><span class="srp">'+esc(f.player)+'</span><span class="srd">'+esc(f.from)+' → '+esc(f.to)+(f.fee?'　'+esc(f.fee):'')+'</span></div>').join('');
+      '<div class="srrow" data-sr="transfer"><span class="srp">'+esc(f.player)+'</span><span class="srd">'+esc(f.from)+' → '+esc(f.to)+(f.fee?'　'+esc(trFeeText(f.fee)):'')+'</span></div>').join('');
     r.innerHTML='<div class="srcard"><div class="srh">'+t('featTransfer')+'</div>'+rows+'<div class="srmore" data-sr="transfer">'+t('srSeeAll')+' ›</div></div>'
       +'<div class="srcard"><div class="srh">'+t('featSquad')+'</div><button class="srbtn" data-sr="squad">'+t('srOpenSquad')+'</button></div>'
       +'<button class="srbtn" data-sr="help" style="padding:11px">'+t('help')+'</button>';
@@ -6499,6 +6506,18 @@ window.__selftest=function(){
         if(!(typeof sl==='string'&&sl.indexOf('jse_')===0&&sl.length<=32&&/^[a-z_]+$/.test(sl))){ _pass=false; _msg+=' slug異常:'+sl; }
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('p1_fallback_ft_badge_errslug',_pass,_msg); }
+    // T29: 移籍金/形態表示の言語変換（trFeeText: EN=Free/Loan/Undisclosed/€NNM・JA=原文のまま）
+    { let _pass=true,_msg='';
+      try{
+        const _lang=LANG;
+        LANG='en';
+        const cases=[['フリー','Free'],['レンタル','Loan'],['非公開','Undisclosed'],['€2500万','€25M'],['€4275万','€42.75M'],['€5630万','€56.3M'],['€1.4億','€140M'],['€1億','€100M']];
+        for(const cc of cases){ const g=trFeeText(cc[0]); if(g!==cc[1]){ _pass=false; _msg+=' '+cc[0]+'->'+g+'(exp '+cc[1]+')'; } }
+        LANG='ja';
+        if(trFeeText('レンタル')!=='レンタル'||trFeeText('フリー')!=='フリー'||trFeeText('€2500万')!=='€2500万'){ _pass=false; _msg+=' ja側が変化'; }
+        LANG=_lang;
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('tr_fee_lang',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
