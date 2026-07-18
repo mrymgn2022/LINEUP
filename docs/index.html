@@ -1522,11 +1522,19 @@ function getTeams(){
 }
 function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); const ok=lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} return ok; }
 function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||defaultTeamName(); }
-// 現在のスカッドを一覧へ保存。同じteamIdなら上書き、新規なら追加。上限超過は 'limit'。
+// 現在のスカッドを一覧へ保存。teamId一致→上書き、無ければ同名→上書き、それ以外→追加。上限超過は 'limit'。
 function saveCurrentTeam(){
   const teams=getTeams(); const data=serializeTeam();
   let ok, kind;
   if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; ok=setTeams(teams); kind='updated'; } }
+  if(kind===undefined){
+    // 同名スカッドが既にあれば新規追加せず上書き（自動配置の再実行等でteamIdが切れても同名を量産しない）。
+    // 無名スカッドは対象外＝従来どおり新規追加。照合はリスト表示名と保存データ内の生teamNameの両方。
+    const nm=(state.teamName||'').trim();
+    if(nm){ const j=teams.findIndex(t=>t.name===nm||(t.data&&t.data.teamName===nm));
+      if(j>=0){ state.teamId=teams[j].id; data.teamId=state.teamId;
+        teams[j]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; ok=setTeams(teams); save(); kind='updated'; } }
+  }
   if(kind===undefined){
     if(teams.length>=teamCap()) return 'limit';
     const id='t'+Date.now()+Math.floor(Math.random()*1000);
@@ -4518,7 +4526,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718k'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6550,6 +6558,24 @@ window.__selftest=function(){
         } else { _pass=false; _msg='CLUB_XI Arsenal無し'; }
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('cb_feet_rule',_pass,_msg); }
+    // T31: 同名スカッドの上書き保存（自動配置再実行でteamIdが切れても複製を量産しない 2026-07-18）
+    { let _pass=true,_msg=''; let _tid=null;
+      try{
+        if(getTeams().length>=teamCap()-1){ _msg='(満杯のためスキップ)'; }
+        else{
+          const nm='__dup検証__'+Date.now();
+          buildSlots('4-3-3',false); state.slots[0].pid=0; state.teamName=nm; state.teamId=null;
+          const r1=saveCurrentTeam(); _tid=state.teamId;
+          const c1=getTeams().length;
+          state.teamId=null; state.captain=state.slots[0].pid; // 自動配置再実行相当（id切断+内容変更）
+          const r2=saveCurrentTeam();
+          const c2=getTeams().length;
+          if(!(r1==='added'&&r2==='updated'&&c1===c2)){ _pass=false; _msg='r1='+r1+' r2='+r2+' c1='+c1+' c2='+c2; }
+          if(state.teamId!==_tid){ _pass=false; _msg+=' id再採用失敗'; }
+        }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ try{ if(_tid) deleteTeam(_tid); }catch(e){} }
+      ok('same_name_overwrite',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
