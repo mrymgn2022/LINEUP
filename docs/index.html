@@ -367,6 +367,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 
 /* PC・タブレット（iPad含む：横幅768px以上かつ高さ600px以上）＝ハンバーガーメニューを左端に常時表示のサイドバーとしてドッキング。
    本体とモーダルはサイドバー分だけ右へ寄せて中央配置。スマホ（縦長・狭い画面）は従来どおりスライド式のまま。 */
+.seowrap{height:0;overflow:hidden} /* モバイルでは非表示（アプリ体験を崩さない） */
 @media (min-width:768px) and (min-height:600px){
   #btnMenu{display:none!important;}                 /* トグル不要 */
   .dscrim{display:none!important;}                  /* 常時表示なので暗幕なし */
@@ -385,6 +386,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .drawer .dwdiv{margin:5px 0;}
   .drawer .dwfoot{padding:9px 16px calc(env(safe-area-inset-bottom) + 9px);}
   .pastebanner{ left:312px; }                       /* 常設サイドバー(300px)を避けて本体列に合わせる */
+  .seowrap{height:auto;overflow:visible;margin-left:max(300px, calc(50vw - 130px));max-width:560px;padding:6px 0 8px} /* アプリ列と同じ位置に正規表示 */
+  .seowrap .seofoot a{color:#9fb8a8}
 }
 
 /* search + filters */
@@ -697,7 +700,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 <div class="annwrap" id="annwrap" aria-label="お知らせ"></div>
 
 <!-- SEO用フッター：クロール可能なサイト内リンク＋概要。body{overflow:hidden}＋.app{height:100dvh}により画面外にクリップされ、アプリUIには一切影響しない（ユーザーには不可視／検索エンジンは読む）。ルート(アプリ)の「発リンク0本・低語数」を解消し、ホームからクラブ/代表ページへ評価を流す。 -->
-<div style="height:0;overflow:hidden" aria-hidden="true"><!-- 検索エンジン用（ユーザーには常に不可視。2026-07-17: デスクトップ等でスクロール時に見えていた事故を高さ0クリップで恒久修正） --><footer class="seofoot" style="max-width:560px;margin:0 auto;padding:28px 16px 64px;color:#8a978d;font-size:12px;line-height:1.9;font-family:'Manrope',system-ui,sans-serif">
+<div class="seowrap"><!-- モバイル=非表示(高さ0)・デスクトップ(768px+)=アプリ列の下に正規フッターとして表示 2026-07-18 ><footer class="seofoot" style="max-width:560px;margin:0 auto;padding:28px 16px 64px;color:#8a978d;font-size:12px;line-height:1.9;font-family:'Manrope',system-ui,sans-serif">
   <p>Squad XI（スカッドイレブン）は、23,000人以上の実名選手からサッカーのスターティングメンバー（スタメン）とフォーメーションを自由に作成し、画像で共有できる無料ツールです。クラブ・各国代表・ワールドカップ2026の予想スターティングXIも作成できます。</p>
   <nav aria-label="サイト内ナビゲーション">
     <p><a href="/clubs/">クラブ一覧</a> ・ <a href="/nations/">代表チーム一覧</a> ・ <a href="/formations.html">フォーメーション一覧</a> ・ <a href="/worldcup-xi.html">ワールドカップ2026 予想XI</a> ・ <a href="/japan-xi.html">日本代表 予想スタメン</a></p>
@@ -29188,7 +29191,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
