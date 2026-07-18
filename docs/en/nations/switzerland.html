@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Reached the quarter-finals (3 W 2 D 0 L). (Rounds beyond the R16 not yet played.) Scores shown from Switzerland's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Gregor Kobel</td><td>Borussia Dortmund</td></tr>
 <tr><td>Yvon Mvogo</td><td>Lorient</td></tr>
 <tr><td>Marvin Keller</td><td>Young Boys</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Miro Muheim</td><td>Hamburger SV</td></tr>
 <tr><td>Silvan Widmer</td><td>Mainz 05</td></tr>
 <tr><td>Nico Elvedi</td><td>Borussia Mönchengladbach</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Luca Jaquez</td><td>Stuttgart</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Granit Xhaka (captain)</td><td>Sunderland</td></tr>
 <tr><td>Remo Freuler</td><td>Bologna</td></tr>
 <tr><td>Denis Zakaria</td><td>Monaco</td></tr>
@@ -173,7 +185,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Johan Manzambi</td><td>SC Freiburg</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Breel Embolo</td><td>Rennes</td></tr>
 <tr><td>Dan Ndoye</td><td>Nottingham Forest</td></tr>
 <tr><td>Rubén Vargas</td><td>Sevilla</td></tr>

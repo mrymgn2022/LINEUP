@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -144,13 +156,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Advanced from Group E but lost in the Round of 32 (2 W 0 D 2 L). Scores shown from Côte d'Ivoire's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Yahia Fofana</td><td>Çaykur Rizespor</td></tr>
 <tr><td>Mohamed Koné</td><td>Charleroi</td></tr>
 <tr><td>Alban Lafont</td><td>Panathinaikos</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Emmanuel Agbadou</td><td>Beşiktaş</td></tr>
 <tr><td>Christopher Opéri</td><td>İstanbul Başakşehir</td></tr>
 <tr><td>Ousmane Diomande</td><td>Sporting CP</td></tr>
@@ -161,7 +173,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Wilfried Singo</td><td>Galatasaray</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Seko Fofana</td><td>Porto</td></tr>
 <tr><td>Parfait Guiagon</td><td>Charleroi</td></tr>
 <tr><td>Christ Inao Oulaï</td><td>Trabzonspor</td></tr>
@@ -170,7 +182,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Jean-Michaël Seri</td><td>Maribor</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Simon Adingra</td><td>Monaco</td></tr>
 <tr><td>Ange-Yoan Bonny</td><td>Inter Milan</td></tr>
 <tr><td>Amad Diallo</td><td>Manchester United</td></tr>

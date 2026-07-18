@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -144,13 +156,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Advanced from Group L but lost in the Round of 32 (1 W 1 D 2 L). Scores shown from Ghana's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Benjamin Asare</td><td>Hearts of Oak</td></tr>
 <tr><td>Lawrence Ati-Zigi</td><td>St. Gallen</td></tr>
 <tr><td>Joseph Anang</td><td>St Patrick's Athletic</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Baba Rahman</td><td>PAOK</td></tr>
 <tr><td>Gideon Mensah</td><td>Auxerre</td></tr>
 <tr><td>Marvin Senaya</td><td>Auxerre</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Derrick Luckassen</td><td>Pafos</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Elisha Owusu</td><td>Auxerre</td></tr>
 <tr><td>Thomas Partey</td><td>Villarreal</td></tr>
 <tr><td>Kwasi Sibo</td><td>Real Oviedo</td></tr>
@@ -172,7 +184,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Kamaldeen Sulemana</td><td>Atalanta</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Christopher Bonsu Baah</td><td>Al-Qadsiah</td></tr>
 <tr><td>Ernest Nuamah</td><td>Lyon</td></tr>
 <tr><td>Antoine Semenyo</td><td>Manchester City</td></tr>

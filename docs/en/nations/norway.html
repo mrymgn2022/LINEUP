@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Reached the quarter-finals (4 W 0 D 1 L). (Rounds beyond the R16 not yet played.) Scores shown from Norway's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Ørjan Nyland</td><td>Sevilla</td></tr>
 <tr><td>Egil Selvik</td><td>Watford</td></tr>
 <tr><td>Sander Tangvik</td><td>Hamburger SV</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Kristoffer Ajer</td><td>Brentford</td></tr>
 <tr><td>Julian Ryerson</td><td>Borussia Dortmund</td></tr>
 <tr><td>Leo Østigård</td><td>Genoa</td></tr>
@@ -163,7 +175,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Henrik Falchener</td><td>Viking</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Martin Ødegaard (captain)</td><td>Arsenal</td></tr>
 <tr><td>Sander Berge</td><td>Fulham</td></tr>
 <tr><td>Patrick Berg</td><td>Bodø/Glimt</td></tr>
@@ -177,7 +189,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Thelo Aasgaard</td><td>Rangers</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Alexander Sørloth</td><td>Atlético Madrid</td></tr>
 <tr><td>Erling Haaland</td><td>Manchester City</td></tr>
 <tr><td>Jørgen Strand Larsen</td><td>Crystal Palace</td></tr>

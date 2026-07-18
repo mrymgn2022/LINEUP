@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">ラウンド32を突破するも、ラウンド16で敗退。ベスト16で大会を終えました（3勝0分2敗）。 スコアはアメリカ から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Matt Turner</td><td>New England Revolution</td></tr>
 <tr><td>Matt Freese</td><td>New York City FC</td></tr>
 <tr><td>Chris Brady</td><td>Chicago Fire</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Antonee Robinson</td><td>Fulham</td></tr>
 <tr><td>Sergiño Dest</td><td>PSV Eindhoven</td></tr>
 <tr><td>Tim Ream ※主将</td><td>Charlotte FC</td></tr>
@@ -164,7 +176,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Auston Trusty</td><td>Celtic</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Tyler Adams</td><td>Bournemouth</td></tr>
 <tr><td>Weston McKennie</td><td>Juventus</td></tr>
 <tr><td>Cristian Roldan</td><td>Seattle Sounders</td></tr>
@@ -173,7 +185,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Gio Reyna</td><td>Borussia Mönchengladbach</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Christian Pulisic</td><td>AC Milan</td></tr>
 <tr><td>Tim Weah</td><td>Marseille</td></tr>
 <tr><td>Brenden Aaronson</td><td>Leeds United</td></tr>

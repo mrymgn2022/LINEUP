@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -143,13 +155,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Finished Group C (1 W 0 D 2 L) and were eliminated in the group stage. Scores shown from Scotland's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Craig Gordon</td><td>Hearts</td></tr>
 <tr><td>Angus Gunn</td><td>Nottingham Forest</td></tr>
 <tr><td>Liam Kelly</td><td>Rangers</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Grant Hanley</td><td>Hibernian</td></tr>
 <tr><td>Jack Hendry</td><td>Al-Ettifaq</td></tr>
 <tr><td>Aaron Hickey</td><td>Brentford</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Kieran Tierney</td><td>Celtic</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Ryan Christie</td><td>Bournemouth</td></tr>
 <tr><td>Findlay Curtis</td><td>Kilmarnock</td></tr>
 <tr><td>Lewis Ferguson</td><td>Bologna</td></tr>
@@ -173,7 +185,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Scott McTominay</td><td>Napoli</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Che Adams</td><td>Torino</td></tr>
 <tr><td>Lyndon Dykes</td><td>Charlton Athletic</td></tr>
 <tr><td>George Hirst</td><td>Ipswich Town</td></tr>

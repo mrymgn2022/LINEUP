@@ -95,6 +95,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
 <link rel="preload" as="image" href="/img/xi/n-netherlands.webp" fetchpriority="high">
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -121,13 +133,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Advanced from Group F but lost in the Round of 32 (2 W 2 D 0 L). Scores shown from Netherlands's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Bart Verbruggen</td><td>Brighton</td></tr>
 <tr><td>Mark Flekken</td><td>Bayer Leverkusen</td></tr>
 <tr><td>Robin Roefs</td><td>Sunderland</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Virgil van Dijk (captain)</td><td>Liverpool</td></tr>
 <tr><td>Denzel Dumfries</td><td>Inter Milan</td></tr>
 <tr><td>Nathan Aké</td><td>Manchester City</td></tr>
@@ -138,7 +150,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Mats Wieffer</td><td>Brighton</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Frenkie de Jong</td><td>Barcelona</td></tr>
 <tr><td>Marten de Roon</td><td>Atalanta</td></tr>
 <tr><td>Tijjani Reijnders</td><td>Manchester City</td></tr>
@@ -149,7 +161,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Justin Kluivert</td><td>Bournemouth</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Memphis Depay</td><td>Corinthians</td></tr>
 <tr><td>Wout Weghorst</td><td>Ajax</td></tr>
 <tr><td>Donyell Malen</td><td>AS Roma</td></tr>

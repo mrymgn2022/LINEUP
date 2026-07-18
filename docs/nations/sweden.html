@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -144,13 +156,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">グループFを突破して決勝トーナメントに進出。ラウンド32で敗れ、ベスト32で大会を終えました（1勝1分2敗）。 スコアはスウェーデン から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Kristoffer Nordfeldt</td><td>AIK</td></tr>
 <tr><td>Viktor Johansson</td><td>Stoke City</td></tr>
 <tr><td>Jacob Widell Zetterström</td><td>Derby County</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Victor Lindelöf ※主将</td><td>Aston Villa</td></tr>
 <tr><td>Hjalmar Ekdal</td><td>Burnley</td></tr>
 <tr><td>Isak Hien</td><td>Atalanta</td></tr>
@@ -163,7 +175,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Elliot Stroud</td><td>Mjällby</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Mattias Svanberg</td><td>VfL Wolfsburg</td></tr>
 <tr><td>Jesper Karlström</td><td>Udinese</td></tr>
 <tr><td>Yasin Ayari</td><td>Brighton</td></tr>
@@ -172,7 +184,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Ken Sema</td><td>Pafos</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Viktor Gyökeres</td><td>Arsenal</td></tr>
 <tr><td>Alexander Isak</td><td>Liverpool</td></tr>
 <tr><td>Anthony Elanga</td><td>Newcastle United</td></tr>

@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">ラウンド32を突破するも、ラウンド16で敗退。ベスト16で大会を終えました（4勝0分1敗）。 スコアはメキシコ から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Raúl Rangel</td><td>Guadalajara</td></tr>
 <tr><td>Carlos Acevedo</td><td>Santos Laguna</td></tr>
 <tr><td>Guillermo Ochoa</td><td>AEL Limassol</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Israel Reyes</td><td>Club América</td></tr>
 <tr><td>Jorge Sánchez</td><td>PAOK</td></tr>
 <tr><td>César Montes</td><td>Lokomotiv Moscow</td></tr>
@@ -161,7 +173,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Edson Álvarez ※主将</td><td>West Ham United</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Álvaro Fidalgo</td><td>Club América</td></tr>
 <tr><td>Bryan Gutiérrez</td><td>Guadalajara</td></tr>
 <tr><td>Orbelín Pineda</td><td>AEK Athens</td></tr>
@@ -172,7 +184,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Luis Chávez</td><td>Dynamo Moscow</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Raúl Jiménez</td><td>Fulham</td></tr>
 <tr><td>César Huerta</td><td>Anderlecht</td></tr>
 <tr><td>Santiago Giménez</td><td>AC Milan</td></tr>

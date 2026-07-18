@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Reached the Round of 16 before elimination (2 W 1 D 2 L). Scores shown from Canada's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Maxime Crépeau</td><td>Orlando City</td></tr>
 <tr><td>Owen Goodman</td><td>Barnsley</td></tr>
 <tr><td>Dayne St. Clair</td><td>Inter Miami</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Moïse Bombito</td><td>OGC Nice</td></tr>
 <tr><td>Derek Cornelius</td><td>Rangers</td></tr>
 <tr><td>Alphonso Davies (captain)</td><td>Bayern Munich</td></tr>
@@ -163,7 +175,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Joel Waterman</td><td>Chicago Fire</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Ali Ahmed</td><td>Norwich City</td></tr>
 <tr><td>Tajon Buchanan</td><td>Villarreal</td></tr>
 <tr><td>Mathieu Choinière</td><td>Los Angeles FC</td></tr>
@@ -176,7 +188,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Jacob Shaffelburg</td><td>Los Angeles FC</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Jonathan David</td><td>Juventus</td></tr>
 <tr><td>Promise David</td><td>Union Saint-Gilloise</td></tr>
 <tr><td>Cyle Larin</td><td>Mallorca</td></tr>

@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -144,13 +156,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">グループJを突破して決勝トーナメントに進出。ラウンド32で敗れ、ベスト32で大会を終えました（1勝1分2敗）。 スコアはアルジェリア から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Luca Zidane</td><td>Granada</td></tr>
 <tr><td>Oussama Benbot</td><td>USM Alger</td></tr>
 <tr><td>Melvin Mastil</td><td>Stade Nyonnais</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Aïssa Mandi</td><td>Lille</td></tr>
 <tr><td>Ramy Bensebaïni</td><td>Borussia Dortmund</td></tr>
 <tr><td>Rayan Aït-Nouri</td><td>Manchester City</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Mohamed Amine Tougaï</td><td>Espérance de Tunis</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Nabil Bentaleb</td><td>Lille</td></tr>
 <tr><td>Hicham Boudaoui</td><td>OGC Nice</td></tr>
 <tr><td>Houssem Aouar</td><td>Al-Ittihad</td></tr>
@@ -172,7 +184,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Ramiz Zerrouki</td><td>FC Twente</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Riyad Mahrez ※主将</td><td>Al-Ahli</td></tr>
 <tr><td>Mohamed Amoura</td><td>VfL Wolfsburg</td></tr>
 <tr><td>Amine Gouiri</td><td>Marseille</td></tr>

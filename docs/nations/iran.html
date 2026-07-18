@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -143,13 +155,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">グループGを（0勝3分0敗）で終え、グループステージで敗退しました。 スコアはイラン から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Alireza Beiranvand</td><td>Tractor</td></tr>
 <tr><td>Payam Niazmand</td><td>Persepolis</td></tr>
 <tr><td>Hossein Hosseini</td><td>Sepahan</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Ehsan Hajsafi</td><td>Sepahan</td></tr>
 <tr><td>Milad Mohammadi</td><td>Persepolis</td></tr>
 <tr><td>Ramin Rezaeian</td><td>Foolad</td></tr>
@@ -160,7 +172,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Danial Eiri</td><td>Malavan</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Alireza Jahanbakhsh ※主将</td><td>Dender</td></tr>
 <tr><td>Saeid Ezatolahi</td><td>Shabab Al-Ahli</td></tr>
 <tr><td>Saman Ghoddos</td><td>Ittihad Kalba</td></tr>
@@ -173,7 +185,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Amirmohammad Razzaghinia</td><td>Esteghlal</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Mehdi Taremi</td><td>Olympiacos</td></tr>
 <tr><td>Shahriyar Moghanlou</td><td>Ittihad Kalba</td></tr>
 <tr><td>Amirhossein Hosseinzadeh</td><td>Tractor</td></tr>

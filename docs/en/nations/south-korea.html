@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -143,13 +155,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Finished Group A (1 W 0 D 2 L) and were eliminated in the group stage. Scores shown from South Korea's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Kim Seung-gyu</td><td>FC Tokyo</td></tr>
 <tr><td>Jo Hyeon-woo</td><td>Ulsan HD</td></tr>
 <tr><td>Song Bum-keun</td><td>Jeonbuk Hyundai Motors</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Kim Min-jae</td><td>Bayern Munich</td></tr>
 <tr><td>Kim Moon-hwan</td><td>Daejeon Hana Citizen</td></tr>
 <tr><td>Seol Young-woo</td><td>Red Star Belgrade</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Lee Ki-hyuk</td><td>Gangwon FC</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Lee Jae-sung</td><td>Mainz 05</td></tr>
 <tr><td>Hwang Hee-chan</td><td>Wolverhampton</td></tr>
 <tr><td>Hwang In-beom</td><td>Feyenoord</td></tr>
@@ -175,7 +187,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Yang Hyun-jun</td><td>Celtic</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Son Heung-min (captain)</td><td>Los Angeles FC</td></tr>
 <tr><td>Cho Gue-sung</td><td>FC Midtjylland</td></tr>
 <tr><td>Oh Hyeon-gyu</td><td>Beşiktaş</td></tr>

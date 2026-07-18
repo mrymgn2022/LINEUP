@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">ラウンド32を突破するも、ラウンド16で敗退。ベスト16で大会を終えました（1勝2分2敗）。 スコアはパラグアイ から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Gatito Fernández</td><td>Cerro Porteño</td></tr>
 <tr><td>Orlando Gill</td><td>San Lorenzo</td></tr>
 <tr><td>Gastón Olveira</td><td>Olimpia</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Gustavo Gómez ※主将</td><td>Palmeiras</td></tr>
 <tr><td>Juan José Cáceres</td><td>Dynamo Moscow</td></tr>
 <tr><td>Gustavo Velázquez</td><td>Cerro Porteño</td></tr>
@@ -162,7 +174,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Alexandro Maidana</td><td>Talleres</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Andrés Cubas</td><td>Vancouver Whitecaps</td></tr>
 <tr><td>Damián Bobadilla</td><td>São Paulo</td></tr>
 <tr><td>Diego Gómez</td><td>Brighton</td></tr>
@@ -172,7 +184,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Maurício Magalhães</td><td>Palmeiras</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Miguel Almirón</td><td>Atlanta United</td></tr>
 <tr><td>Julio Enciso</td><td>Strasbourg</td></tr>
 <tr><td>Antonio Sanabria</td><td>Cremonese</td></tr>

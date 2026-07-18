@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -144,13 +156,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Advanced from Group A but lost in the Round of 32 (1 W 1 D 2 L). Scores shown from South Africa's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Ronwen Williams (captain)</td><td>Mamelodi Sundowns</td></tr>
 <tr><td>Ricardo Goss</td><td>Chippa United</td></tr>
 <tr><td>Sipho Chaine</td><td>Orlando Pirates</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Aubrey Modiba</td><td>Mamelodi Sundowns</td></tr>
 <tr><td>Khuliso Mudau</td><td>Mamelodi Sundowns</td></tr>
 <tr><td>Khulumani Ndamane</td><td>Mamelodi Sundowns</td></tr>
@@ -164,7 +176,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Ime Okon</td><td>Hannover 96</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Oswin Appollis</td><td>Orlando Pirates</td></tr>
 <tr><td>Thalente Mbatha</td><td>Orlando Pirates</td></tr>
 <tr><td>Relebohile Mofokeng</td><td>Orlando Pirates</td></tr>
@@ -174,7 +186,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Sphephelo Sithole</td><td>CD Tondela</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Evidence Makgopa</td><td>Orlando Pirates</td></tr>
 <tr><td>Tshepang Moremi</td><td>Orlando Pirates</td></tr>
 <tr><td>Lyle Foster</td><td>Burnley</td></tr>

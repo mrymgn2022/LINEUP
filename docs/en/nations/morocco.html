@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -145,13 +157,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Reached the quarter-finals (3 W 2 D 0 L). (Rounds beyond the R16 not yet played.) Scores shown from Morocco's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Yassine Bounou</td><td>Al-Hilal</td></tr>
 <tr><td>Munir Mohamedi</td><td>RS Berkane</td></tr>
 <tr><td>Reda Tagnaouti</td><td>AS FAR</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Achraf Hakimi (captain)</td><td>Paris Saint-Germain</td></tr>
 <tr><td>Noussair Mazraoui</td><td>Manchester United</td></tr>
 <tr><td>Nayef Aguerd</td><td>Marseille</td></tr>
@@ -163,7 +175,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Redouane Halhal</td><td>Mechelen</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Sofyan Amrabat</td><td>Real Betis</td></tr>
 <tr><td>Azzedine Ounahi</td><td>Girona</td></tr>
 <tr><td>Bilal El Khannouss</td><td>VfB Stuttgart</td></tr>
@@ -173,7 +185,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Ayyoub Bouaddi</td><td>Lille</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Brahim Díaz</td><td>Real Madrid</td></tr>
 <tr><td>Ayoub El Kaabi</td><td>Olympiacos</td></tr>
 <tr><td>Abde Ezzalzouli</td><td>Real Betis</td></tr>

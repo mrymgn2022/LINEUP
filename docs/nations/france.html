@@ -95,6 +95,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
 <link rel="preload" as="image" href="/img/xi/n-france.webp" fetchpriority="high">
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -124,13 +136,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">準決勝でスペインに敗れました（6勝0分1敗）。3位決定戦でイングランドと対戦します。 スコアはフランス から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Mike Maignan</td><td>AC Milan</td></tr>
 <tr><td>Brice Samba</td><td>Rennes</td></tr>
 <tr><td>Robin Risser</td><td>Lens</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Lucas Digne</td><td>Aston Villa</td></tr>
 <tr><td>Malo Gusto</td><td>Chelsea</td></tr>
 <tr><td>Lucas Hernandez</td><td>Paris Saint-Germain</td></tr>
@@ -142,7 +154,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Dayot Upamecano</td><td>Bayern Munich</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>N'Golo Kanté</td><td>Fenerbahçe</td></tr>
 <tr><td>Manu Koné</td><td>AS Roma</td></tr>
 <tr><td>Adrien Rabiot</td><td>AC Milan</td></tr>
@@ -150,7 +162,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Warren Zaïre-Emery</td><td>Paris Saint-Germain</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Maghnes Akliouche</td><td>Monaco</td></tr>
 <tr><td>Bradley Barcola</td><td>Paris Saint-Germain</td></tr>
 <tr><td>Rayan Cherki</td><td>Manchester City</td></tr>

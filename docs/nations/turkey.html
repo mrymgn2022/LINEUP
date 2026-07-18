@@ -94,6 +94,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 .rel a:hover{border-color:var(--accent);background:#f3faf6}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -143,13 +155,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">グループDを（1勝0分2敗）で終え、グループステージで敗退しました。 スコアはトルコ から見た表記です。</p>
 <h2>招集メンバー26人</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Uğurcan Çakır</td><td>Galatasaray</td></tr>
 <tr><td>Mert Günok</td><td>Beşiktaş</td></tr>
 <tr><td>Altay Bayındır</td><td>Manchester United</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Zeki Çelik</td><td>AS Roma</td></tr>
 <tr><td>Merih Demiral</td><td>Al-Ahli</td></tr>
 <tr><td>Çağlar Söyüncü</td><td>Fenerbahçe</td></tr>
@@ -161,7 +173,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Samet Akaydın</td><td>Çaykur Rizespor</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Hakan Çalhanoğlu ※主将</td><td>Inter Milan</td></tr>
 <tr><td>Kaan Ayhan</td><td>Galatasaray</td></tr>
 <tr><td>Salih Özcan</td><td>Borussia Dortmund</td></tr>
@@ -169,7 +181,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Orkun Kökçü</td><td>Beşiktaş</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Arda Güler</td><td>Real Madrid</td></tr>
 <tr><td>Kenan Yıldız</td><td>Juventus</td></tr>
 <tr><td>Kerem Aktürkoğlu</td><td>Fenerbahçe</td></tr>

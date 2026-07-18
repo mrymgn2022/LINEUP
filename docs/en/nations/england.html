@@ -95,6 +95,18 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 @media(max-width:480px){h1{font-size:21px}}
 </style>
 <link rel="preload" as="image" href="/img/xi/n-england.webp" fetchpriority="high">
+<style id="sqtfix">
+.sqt{table-layout:fixed;width:100%}
+.sqt th:nth-child(1){width:13%}
+.sqt th:nth-child(3){width:11%}
+.sqt th:nth-child(4){width:14%}
+.sqt th:nth-child(5){width:14%}
+.sqt th:nth-child(6){width:20%}
+.sqt td{overflow-wrap:break-word}
+.sqt td span.en{display:block;color:var(--sub,#5c6773);font-size:11px;line-height:1.45;font-weight:400}
+.sqn{table-layout:fixed;width:100%}
+.sqn td:nth-child(1){width:56%}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -124,13 +136,13 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <p class="note">Lost to Argentina in the semi-finals (5 W 1 D 1 L) — England face France in the third-place play-off. Scores shown from England's perspective.</p>
 <h2>Squad (26 players)</h2>
 <h3>GK</h3>
-<table>
+<table class="sqn">
 <tr><td>Jordan Pickford</td><td>Everton</td></tr>
 <tr><td>Dean Henderson</td><td>Crystal Palace</td></tr>
 <tr><td>James Trafford</td><td>Manchester City</td></tr>
 </table>
 <h3>DF</h3>
-<table>
+<table class="sqn">
 <tr><td>Dan Burn</td><td>Newcastle United</td></tr>
 <tr><td>Trevoh Chalobah</td><td>Chelsea</td></tr>
 <tr><td>Marc Guéhi</td><td>Manchester City</td></tr>
@@ -142,7 +154,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>John Stones</td><td>Manchester City</td></tr>
 </table>
 <h3>MF</h3>
-<table>
+<table class="sqn">
 <tr><td>Elliot Anderson</td><td>Nottingham Forest</td></tr>
 <tr><td>Jude Bellingham</td><td>Real Madrid</td></tr>
 <tr><td>Eberechi Eze</td><td>Arsenal</td></tr>
@@ -152,7 +164,7 @@ footer a{color:var(--sub);margin-right:12px;display:inline-block}
 <tr><td>Morgan Rogers</td><td>Aston Villa</td></tr>
 </table>
 <h3>FW</h3>
-<table>
+<table class="sqn">
 <tr><td>Anthony Gordon</td><td>Barcelona</td></tr>
 <tr><td>Harry Kane (captain)</td><td>Bayern Munich</td></tr>
 <tr><td>Noni Madueke</td><td>Arsenal</td></tr>
