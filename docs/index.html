@@ -25704,7 +25704,7 @@ const I18N = {
     place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
     posAll:'全部', allLeagues:'全リーグ', popClubs:'人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
     sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
-    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません',
+    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', reqPlayer:'選手をリクエスト', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
     addChangePhoto:'写真を追加 / 変更', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
@@ -25783,7 +25783,7 @@ const I18N = {
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
     posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
     sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
-    createPlayer:'＋ Create a player', noMatch:'No matching players',
+    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', reqPlayer:'Request a player', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
     addChangePhoto:'Add / change photo', photoDevice:'Choose from your photos', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
@@ -25938,8 +25938,10 @@ function recordDeviceTraits(){
 // JSエラーの検知（1セッション1回）。今まで完全に無かったため、特定ブラウザだけでアプリが壊れていても
 // 誰も気づけなかった（iOSフリーズ地獄の教訓）。0でないなら即調査する。
 try{
-  window.addEventListener('error',function(){ try{ recordEvent('js_error',true); }catch(e){} });
-  window.addEventListener('unhandledrejection',function(){ try{ recordEvent('js_error',true); }catch(e){} });
+  // エラー名も匿名で送る（jse_<スラッグ>、a-z_のみ32字以内=worker検証互換）。どのエラーかfunnelのother欄で判別できる。本文・URL・行番号は送らない
+  function _jsErrSlug(m){ try{ m=String(m||'').toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_+|_+$/g,'').slice(0,27); }catch(e){ m=''; } return m?('jse_'+m):'jse_unknown'; }
+  window.addEventListener('error',function(e){ try{ recordEvent('js_error',true); recordEvent(_jsErrSlug(e&&e.message),true); }catch(_){} });
+  window.addEventListener('unhandledrejection',function(e){ try{ var r=e&&e.reason; recordEvent('js_error',true); recordEvent(_jsErrSlug((r&&r.message)||r),true); }catch(_){} });
 }catch(e){}
 // 検索トレンド収集：「選手を検索」一覧から選手を開いた＝“検索された1回”。トレンドは 検索回数＋保存回数(placements) で集計する想定。
 // バックエンド未接続(POP_ENDPOINT='')の間は何もしない。1セッション内での同一選手の連打は1回に丸める（連打スパム防止）。
@@ -26361,6 +26363,7 @@ function render(){
   renderBench();
   updateTeamTag();
   applyStaticLang();
+  updateMenuDot();
   if(isWideDock()){ const dw=document.getElementById('drawer'); if(dw){ dw.innerHTML=drawerHTML(); wireDrawer(); } } // 常時表示サイドバーを状態に同期
 }
 // PC・タブレット判定：この幅/高さではハンバーガーメニューを左端に常時表示（CSSの @media と一致させる）
@@ -28085,7 +28088,7 @@ function drawPickList(slotIdx){
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
   if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
-    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+    list.innerHTML=noMatchHTML('pickClear');return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
@@ -28542,7 +28545,7 @@ function drawSubFull(slotIdx){
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
   if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
-    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+    list.innerHTML=noMatchHTML('pickClear');return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
@@ -28931,7 +28934,7 @@ function drawMkt(){
     mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 注目順=市場価値の高い順
   _iconFloorActive=true;
   if(!mktCurIdx.length){ if((mktFilter.q||'').trim()) recordEvent('search_noresult'); // 選手検索でも0件を記録
-    list.innerHTML='<div class="empty-msg">'+t('noMatch')+'</div>';return;}
+    list.innerHTML=noMatchHTML('mClear');return;}
   list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,mktCurIdx.length);
@@ -28969,6 +28972,13 @@ function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNO
 // 新しいお知らせは自動ポップアップを「1回だけ」（表示した時点で既読扱い→再起動で再表示しない）。以後はメニューの未読ドットで気づける。
 function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_popped')===a.id) return; lsSet('xi_announce_popped', a.id); openAnnouncement(a); }catch(e){} }
 function announceUnread(){ try{ const a=latestAnnouncement(); return !!(a&&a.id&&lsGet('xi_announce_read')!==a.id); }catch(e){ return false; } }
+// 注目の移籍の未読判定（最新行が変わったら未読）。開いたら既読＝ドット/NEWが消える
+function transferSig(){ try{ const f=FEATURED_TRANSFERS&&FEATURED_TRANSFERS[0]; return f?(f.date+'|'+f.player):''; }catch(e){ return ''; } }
+function transfersUnread(){ try{ const s=transferSig(); return !!(s&&lsGet('xi_ft_seen')!==s); }catch(e){ return false; } }
+// ハンバーガー右上の未読ドット（お知らせ or 注目移籍が未読なら点灯。デスクトップはドロワー常設＝行側の表示で足りる）
+function updateMenuDot(){ try{ const b=document.getElementById('btnMenu'); if(!b) return; let d=document.getElementById('menuDot'); const on=announceUnread()||transfersUnread();
+  if(on&&!d){ b.style.position='relative'; d=document.createElement('span'); d.id='menuDot'; d.style.cssText='position:absolute;top:3px;right:3px;width:8px;height:8px;border-radius:50%;background:#ff4d4f;pointer-events:none'; b.appendChild(d); }
+  else if(!on&&d){ d.remove(); } }catch(e){} }
 
 function openAnnouncement(a){
   a=a||latestAnnouncement(); if(!a) return;
@@ -28985,7 +28995,7 @@ function openAnnouncement(a){
 function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
 // メニュー「お知らせ」：過去のお知らせを新しい順に一覧表示
 function openAnnouncementList(){
-  const _la=latestAnnouncement(); if(_la&&_la.id) lsSet('xi_announce_read', _la.id); // 一覧を開いた＝既読（未読ドットを消す）
+  const _la=latestAnnouncement(); if(_la&&_la.id){ lsSet('xi_announce_read', _la.id); updateMenuDot(); } // 一覧を開いた＝既読（未読ドットを消す）
   const list=ANNOUNCEMENTS||[];
   const body = list.length ? list.map(a=>`
     <div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:0 16px 10px">
@@ -29178,7 +29188,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717z'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29207,7 +29217,7 @@ function drawerHTML(){
     ${saveRow}
     <div class="dwdiv"></div>
     <div class="dwitem" data-feat="squad"><span class="di">${ICN.squad}</span>${t('featSquad')}<span class="dchev">›</span></div>
-    <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>${t('featTransfer')}<span class="dchev">›</span></div>
+    <div class="dwitem" data-feat="transfer"><span class="di">${ICN.swap}</span>${t('featTransfer')}${transfersUnread()?'<span style="font-size:9px;font-weight:800;color:#fff;background:#ff4d4f;padding:2px 7px;border-radius:999px;margin-left:7px;vertical-align:middle">NEW</span>':''}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div class="dwitem" data-page="announcements"><span class="di">${_ICN_BELL}</span>${t('announcements')}${announceUnread()?'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff4d4f;margin-left:7px;vertical-align:middle"></span>':''}<span class="dchev">›</span></div>
     <div class="dwitem" data-page="premium"><span class="di">${ICN.star}</span>${t('premium')}<span class="dchev">›</span></div>
@@ -29374,6 +29384,17 @@ function squadMatchHTML(m){
     </div>`:''}
   </div>`;
 }
+// 検索0件を行き止まりにしない：ヒント＋絞り込み解除＋選手リクエスト（mailto）導線
+function noMatchHTML(clearId){
+  const mail='mailto:support@squadxi.futbol?subject='+encodeURIComponent(t('reqPlayerSubj'))+'&body='+encodeURIComponent(t('reqPlayerBody'));
+  const bs='width:auto;margin-top:0;padding:9px 14px;font-size:12.5px;letter-spacing:0;font-family:\'Manrope\',system-ui,sans-serif';
+  return '<div class="empty-msg">'+t('noMatch')
+    +'<div style="font-size:12px;color:var(--mut);margin-top:8px;line-height:1.8">'+t('noMatchHint')+'</div>'
+    +'<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">'
+    +(clearId&&document.getElementById(clearId)?'<button class="bigbtn ghost" style="'+bs+'" onclick="document.getElementById(\''+clearId+'\').click()">'+t('clearFilters')+'</button>':'')
+    +'<a class="bigbtn ghost" style="'+bs+';display:inline-block;text-decoration:none" href="'+mail+'">'+t('reqPlayer')+'</a>'
+    +'</div></div>';
+}
 function openFeatured(kind){
   if(kind==='squad'){
     const matches=FEATURED_SQUADS.filter(squadInWindow).sort((a,b)=> koDate(a.kickoff||0)-koDate(b.kickoff||0));
@@ -29387,6 +29408,7 @@ function openFeatured(kind){
   }
   if(kind==='transfer'){
     const list=FEATURED_TRANSFERS;
+    try{ lsSet('xi_ft_seen',transferSig()); updateMenuDot(); if(isWideDock()){ const dw=document.getElementById('drawer'); if(dw){ dw.innerHTML=drawerHTML(); wireDrawer(); } } }catch(e){} // 開いたら既読
     const desc=t('featTransferDesc');
     const body = list.length ? list.map(transferCardHTML).join('')
       : `<div style="margin:10px 16px;padding:30px 16px;text-align:center;color:var(--mut);font-size:13px;line-height:1.9;border:1px dashed var(--line);border-radius:13px">${t('featComingSoon')}<br>${desc}</div>`;
@@ -31105,6 +31127,21 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ window.open=_wo; _pastePromptPid=_pp; try{ hidePastePrompt(); }catch(e){} }
       ok('img_search_ja_query',_pass,_msg); }
+    // T28: 検索0件フォールバック＋注目移籍バッジ＋エラー名スラッグ（P1/P2 2026-07-18）
+    { let _pass=true,_msg='';
+      try{
+        const hh=noMatchHTML('pickClear');
+        if(!(typeof hh==='string'&&hh.indexOf('mailto:support@squadxi.futbol')>=0&&hh.indexOf(t('reqPlayer'))>=0)){ _pass=false; _msg='noMatchHTML欠落'; }
+        const sig=transferSig();
+        if(!(typeof sig==='string'&&sig.indexOf('|')>0)){ _pass=false; _msg+=' transferSig異常:'+sig; }
+        const seen=lsGet('xi_ft_seen');
+        lsSet('xi_ft_seen','__t__'); if(!transfersUnread()){ _pass=false; _msg+=' unreadが立たない'; }
+        lsSet('xi_ft_seen',sig);     if(transfersUnread()){ _pass=false; _msg+=' 既読が効かない'; }
+        if(seen!=null) lsSet('xi_ft_seen',seen); else try{ localStorage.removeItem('xi_ft_seen'); }catch(_){}
+        const sl=_jsErrSlug('TypeError: Cannot read properties of undefined');
+        if(!(typeof sl==='string'&&sl.indexOf('jse_')===0&&sl.length<=32&&/^[a-z_]+$/.test(sl))){ _pass=false; _msg+=' slug異常:'+sl; }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('p1_fallback_ft_badge_errslug',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
