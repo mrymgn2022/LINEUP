@@ -29178,7 +29178,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717v'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717w'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30215,31 +30215,19 @@ async function buildShareCanvas(){
   const filledSlots=state.slots.filter(s=>s.pid!=null);
   // 駒中心から下方向のラベル伸び（盤面実測のベースライン：役職+22 / 名前+36 / メモ+53 / 第2候補は+15刻み。disc縁基準）
   const dropOf=s=>{ let d=state.hideRoles?(R+m(23)):(R+m(36)); let info=R+(state.hideRoles?m(37):m(57)),lines=0; if(state.showMemo&&dispMemo(s.pid))lines++; if(state.showSub&&s.sub!=null&&P[s.sub])lines++; if(lines)d=Math.max(d,info+(lines-1)*m(15)); return d; };
-  // y が近い駒（差≤11。SB/CB・WB の段差を吸収）は同じ列へ統合。GK(y<16)は必ず単独行に。配列は最小y側=GK(最後尾)→最大y側=FW(最前線)
-  const rowsV=[]; filledSlots.slice().sort((a,b)=>a.y-b.y).forEach(s=>{ const last=rowsV[rowsV.length-1]; const sGK=s.y<16, lastGK=last&&last.maxy<16; if(last && !sGK && !lastGK && s.y-last.maxy<=11){ last.slots.push(s); last.maxy=s.y; } else rowsV.push({slots:[s],maxy:s.y}); });
-  const NV=rowsV.length;
-  const rowDrop=r=>Math.max.apply(null,r.slots.map(dropOf));
-  const topPad=R+m(5), GAPMARGIN=m(5);                     // 上端余白／行間余白
-  const order=rowsV.slice().reverse();                     // 画面 上(FW)→下(GK) の順
-  // 盤面と同じ縦密度で配置（盤面アスペクト≒盤面高さ600/ピッチ幅REF405≒1.48を忠実再現）。
-  // ハイブリッド：基本は盤面比率のまま。上の行のラベルが下の駒に被る場合だけ、その行間を必要分だけ広げる。
-  const VDENS=kk*5.3;                                      // y1単位あたりの縦px（盤面の縦密度に合わせる。以前のkk*6は行間が広すぎて不格好だった）
-  const ryOf=r=>r.slots.reduce((a,s)=>a+s.y,0)/r.slots.length; // 行の代表y（平均）
-  const cyOf=[]; { let cy=py+topPad; for(let k=0;k<order.length;k++){ cyOf[k]=cy;
-      if(k<order.length-1){ const prop=(ryOf(order[k])-ryOf(order[k+1]))*VDENS, need=rowDrop(order[k])+R+GAPMARGIN; cy+=Math.max(prop,need); } } } // 盤面比率(prop)を基本に、被る所(need)だけ広げる
-  const botPad=NV?Math.round(rowDrop(order[order.length-1]))+m(8):60; // 下：最後尾(GK)行のラベル分
-  const lastCy=cyOf.length?cyOf[cyOf.length-1]:(py+topPad);
-  let ph=Math.max(m(280),Math.round(lastCy-py+botPad)); // ピッチ高さは内容に合わせて可変
-  if(!showBench && cyOf.length>1){
-    // ベンチ非表示でも盤面と同じ縦密度を維持する。以前はW*1.7まで引き伸ばして行間がスカスカになり不格好だった。
-    // 盤面ピッチ比率(≒1.42)相当までだけ軽く整える（伸ばしすぎない）。
-    const phFill=Math.max(ph, Math.round(pw*1.2));
-    if(phFill>ph){ const top0=py+topPad, span0=lastCy-top0, span1=(py+phFill-botPad)-top0, f=span0>0?span1/span0:1;
-      for(let k=0;k<cyOf.length;k++) cyOf[k]=top0+(cyOf[k]-top0)*f; ph=phFill; }
-  }
+  // 盤面の等倍投影（2026-07-18）: 盤面と同じ y% をそのままピッチへ投影する。
+  // 旧実装は「yが近い駒を行に統合→等間隔配置」でフォメの奥行き（CB段差・中盤の高低・手動ドラッグ）が消えていた。
+  const PASPECT=1.42;                                      // 盤面ピッチの縦横比（405:575前後）を踏襲
+  let ph=Math.round(pw*PASPECT*(showBench?1:1.05));        // ベンチ非表示は僅かに縦長（駒拡大kk×1.1とバランス）
+  const yRaw=s=>py+(1-(s.y/100))*ph;                       // 盤面と同座標系: y大=前線(上) / y小=GK(下)
+  // 盤面の liftBottomLabels と同じ思想: 下端からはみ出すラベル分だけその駒を上へ。上端は駒半径分を確保。
+  const yAdj=new Map();
+  filledSlots.forEach(s=>{ let cy=yRaw(s);
+    const over=cy+dropOf(s)-(py+ph-m(6)); if(over>0)cy-=over;
+    const topLim=py+R+m(6); if(cy<topLim)cy=topLim;
+    yAdj.set(s,Math.round(cy)); });
   const pitchBottom=py+ph;
-  const yMapV=new Map(); order.forEach((r,k)=>r.slots.forEach(s=>yMapV.set(s,cyOf[k])));
-  const tokY=s=>yMapV.get(s);                              // 行ごとに必要分だけ離す（重なり防止）
+  const tokY=s=>yAdj.get(s);
   const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,15):[]; // ベンチ最大15人（非表示時は載せない）
   const bCols=3, bRowH=98, bHeadH=70, bGap=44;
   const bRows=Math.ceil(benchPids.length/bCols);
