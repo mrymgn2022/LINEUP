@@ -645,7 +645,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
       <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
-      <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div>
+      
       <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
     </div>
   </header>
@@ -26370,7 +26370,7 @@ function applyStaticLang(){
   // アイコン(div)にtitle＋アクセシブルネーム＋role/tabindexを付与（キーボード/読み上げ対応）
   const tset=(id,tip)=>{ const el=document.getElementById(id); if(el){ el.title=tip; el.setAttribute('aria-label',tip); el.setAttribute('role','button'); if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0'); } };
   tset('btnMenu',t('tipMenu'));
-  tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
+  tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch'));
   tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags'));
   const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
@@ -29178,7 +29178,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717x'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717y'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -30634,14 +30634,6 @@ document.getElementById('btnMemo').onclick=()=>{
 };
 
 // 整列リセット（フォーメーション既定位置へ）。手動で動かしていなければ反応しない（自動配置直後など）
-document.getElementById('btnReset').onclick=()=>{
-  if(!layoutMoved){ toast(t('tstAlreadyDefault')); return; }
-  const f=FORM[state.formation];
-  state.slots.forEach((s,i)=>{s.role=f[i][0];s.x=f[i][1];s.y=f[i][2];});
-  spreadRowsEven(); // 自動配置と同じ均等レイアウトに揃える（生のFORM既定だと詰まって見にくくなる）
-  layoutMoved=false;
-  render();save();toast(t('tstResetLayout'));
-};
 
 /* =========================================================
    Toast
