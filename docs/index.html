@@ -4516,7 +4516,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5232,6 +5232,7 @@ function autoFillNationality(code,form,name){
       const savedRole=pickRole;
       state.slots.forEach(s=>{ if(s.pid!=null)return; pickRole=s.role; const pid=pool.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} });
       pickRole=savedRole;
+      optimizeCBFeet(); // 予想XIでもCB左右は利き足ルール
       state.bench=pool.filter(id=>!used.has(id)).sort(benchPosSort);
       autoAssignSubs();
     }else{
@@ -5427,6 +5428,7 @@ function placeClubSquad(club,name){
     const savedRole=pickRole;
     state.slots.forEach(s=>{ if(s.pid!=null)return; pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} });
     pickRole=savedRole;
+    optimizeCBFeet(); // 確定XIでもCB左右は利き足ルール（左利き→左・右利き→右）
     const fullXI0=state.slots.filter(s=>s.pid!=null).length===11;
     let rest0=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
     if(fullXI0){ let gk=0; rest0=rest0.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
@@ -5572,11 +5574,22 @@ function drawSilhouette(x,fx,fy,R){
 }
 // P0: XI完成の瞬間に保存/共有の2択を提示（感情のピークで次アクションを示す）
 //     セッション1回・未保存スカッドのみ（teamIdありは既存チーム＝出さない）・ショーケースdemo除外
-let _xiBarShown=false;
+let _xiBarShown=false,_xiBarWaiting=false;
 function maybeShowXiDoneBar(){
   try{
     if(_xiBarShown||state.demo||state.teamId) return;
     if(document.getElementById('xiDoneBar')) return;
+    // 起動スプラッシュ（起動アニメ）中は待ち、消えてから出す（共有リンクで開いた盤面のアニメにバーが被らないように。showDemoBarと同方式）
+    const sp=document.getElementById('splash');
+    if(sp && sp.style.display!=='none' && !sp.classList.contains('out')){
+      if(_xiBarWaiting) return;
+      _xiBarWaiting=true;
+      let n=0; const tm=setInterval(()=>{ const s=document.getElementById('splash');
+        if(!s||s.style.display==='none'||s.classList.contains('out')){ clearInterval(tm); setTimeout(()=>{ _xiBarWaiting=false; maybeShowXiDoneBar(); },560); } // フェード(520ms)完了後
+        else if(++n>40){ clearInterval(tm); _xiBarWaiting=false; maybeShowXiDoneBar(); }                                                                        // 保険(約8秒)
+      },200);
+      return;
+    }
     _xiBarShown=true;
     const en=(typeof LANG!=='undefined'&&LANG==='en');
     const bar=document.createElement('div');
@@ -6518,6 +6531,21 @@ window.__selftest=function(){
         LANG=_lang;
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('tr_fee_lang',_pass,_msg); }
+    // T30: CB利き足ルール（確定XI経路含む全自動配置で左CB=左利き優先。アーセナル: ガブリエウ左・サリバ右）
+    { let _pass=true,_msg='';
+      try{
+        if(typeof CLUB_XI!=='undefined'&&CLUB_XI['Arsenal']){
+          buildSlots(CLUB_XI['Arsenal'].form,false);
+          placeClubSquad('Arsenal','Arsenal');
+          const cbs=state.slots.filter(s=>s.role==='CB'&&s.pid!=null).sort((a,b)=>a.x-b.x);
+          if(cbs.length>=2){
+            const lf=footOf(P[cbs[0].pid]), rf=footOf(P[cbs[cbs.length-1].pid]);
+            if(lf!=='左'&&cbs.some(s=>footOf(P[s.pid])==='左')){ _pass=false; _msg='左CBが左利きでない: '+P[cbs[0].pid][0]+'('+lf+')'; }
+            if(lf==='右'&&rf==='左'){ _pass=false; _msg+=' 左右逆'; }
+          } else { _pass=false; _msg='CB<2'; }
+        } else { _pass=false; _msg='CLUB_XI Arsenal無し'; }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('cb_feet_rule',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
