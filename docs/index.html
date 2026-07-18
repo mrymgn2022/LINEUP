@@ -390,6 +390,20 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .seowrap .seofoot a{color:#9fb8a8}
 }
 
+/* ---------- Desktop right rail (1400px+ only) ---------- */
+#siderail{display:none;position:fixed;top:18px;right:18px;width:230px;z-index:30;flex-direction:column;gap:10px;font-family:'Manrope',system-ui,sans-serif}
+@media (min-width:1400px) and (min-height:600px){ #siderail{display:flex} }
+.srcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.srh{font-family:'Bebas Neue',system-ui,sans-serif;font-size:16px;letter-spacing:1.2px;color:var(--ink);margin:0 0 4px}
+.srrow{display:flex;flex-direction:column;gap:1px;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+.srrow:hover .srp{color:var(--lime)}
+.srp{font-size:12.5px;font-weight:800;color:var(--ink)}
+.srd{font-size:11px;color:var(--mut)}
+.srmore{margin-top:8px;font-size:12px;font-weight:800;color:var(--lime);cursor:pointer}
+.srmore:hover{text-decoration:underline}
+.srbtn{display:block;width:100%;border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:9px;font-size:12.5px;font-weight:800;cursor:pointer;text-align:center;font-family:'Manrope',system-ui,sans-serif}
+.srbtn:hover{border-color:var(--lime)}
+
 /* search + filters */
 .controls{padding:0 16px 8px}
 .search{
@@ -25693,7 +25707,7 @@ const I18N = {
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
-    featSquad:'注目スカッド', featTransfer:'注目移籍', announcements:'お知らせ', premium:'プレミアム（近日公開）',
+    featSquad:'注目スカッド', featTransfer:'注目移籍', srSeeAll:'すべて見る', srOpenSquad:'注目の試合を見る', announcements:'お知らせ', premium:'プレミアム（近日公開）',
     help:'使い方', backup:'バックアップ（書き出し / 読み込み）', feedback:'選手追加依頼・不具合報告',
     privacy:'プライバシーポリシー', terms:'利用規約', close:'閉じる', tagline:'build your XI', preview:'（プレビュー）', language:'言語',
     tstLoaded:'スカッドを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'スカッドを保存しました', appSoon:'アプリ版は近日公開予定です',
@@ -25772,7 +25786,7 @@ const I18N = {
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
-    featSquad:'Featured squads', featTransfer:'Featured transfers', announcements:'Announcements', premium:'Premium (coming soon)',
+    featSquad:'Featured squads', featTransfer:'Featured transfers', srSeeAll:'See all', srOpenSquad:'View featured match', announcements:'Announcements', premium:'Premium (coming soon)',
     help:'How to use', backup:'Backup (export / import)', feedback:'Request a player / Report a bug',
     privacy:'Privacy Policy', terms:'Terms of Use', close:'Close', tagline:'build your XI', preview:' (preview)', language:'Language',
     tstLoaded:'Squad loaded', tstDeleted:'Deleted', tstOverwritten:'Squad updated', tstSaved:'Squad saved', appSoon:'The app version is coming soon',
@@ -29191,7 +29205,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -29422,6 +29436,28 @@ function openFeatured(kind){
     return;
   }
 }
+// デスクトップ右レール（1400px+のみCSSで表示）：注目移籍/注目スカッド/使い方への近道。
+// 追加専用のfixed要素なのでアプリ本体・モバイルには一切影響しない。内容はビルド時静的（FEATURED_TRANSFERS先頭3件）
+function buildSideRail(){
+  try{
+    if(document.getElementById('siderail')) return;
+    const r=document.createElement('div'); r.id='siderail';
+    const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    const rows=(FEATURED_TRANSFERS||[]).slice(0,3).map(f=>
+      '<div class="srrow" data-sr="transfer"><span class="srp">'+esc(f.player)+'</span><span class="srd">'+esc(f.from)+' → '+esc(f.to)+(f.fee?'　'+esc(f.fee):'')+'</span></div>').join('');
+    r.innerHTML='<div class="srcard"><div class="srh">'+t('featTransfer')+'</div>'+rows+'<div class="srmore" data-sr="transfer">'+t('srSeeAll')+' ›</div></div>'
+      +'<div class="srcard"><div class="srh">'+t('featSquad')+'</div><button class="srbtn" data-sr="squad">'+t('srOpenSquad')+'</button></div>'
+      +'<button class="srbtn" data-sr="help" style="padding:11px">'+t('help')+'</button>';
+    r.onclick=e=>{ const el=e.target.closest('[data-sr]'); if(!el) return;
+      const k=el.dataset.sr;
+      if(k==='transfer') openFeatured('transfer');
+      else if(k==='squad') openFeatured('squad');
+      else if(k==='help') openInfoPage('help'); };
+    document.body.appendChild(r);
+  }catch(e){}
+}
+buildSideRail();
+
 // バックアップ：保存チーム・現在のスカッド・写真をJSON1ファイルに書き出し／読み込み。
 // Web版は端末保存(localStorage)が消える可能性があるため、機種変更・データ消去前の退避用。
 const BACKUP_KEYS=['xi_teams_v1','xi_state_v2','xi_photos_v2'];
