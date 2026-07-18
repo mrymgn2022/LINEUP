@@ -26009,13 +26009,13 @@ async function buildSquadLink(){
   try{ payload=(typeof CompressionStream==='function')?('1.'+_b64uEnc(await _deflateBytes(bytes))):('0.'+_b64uEnc(bytes)); }
   catch(e){ payload='0.'+_b64uEnc(bytes); }
   // 着地は軽量中継ページ /s/（本体4.6MBはXのカードクローラー上限超えでプレビューが出ないため。/s/がOGカードを出して即アプリへ転送）
-  let link=APP_URL+'/s/#s='+payload; // フォールバック：URL埋め込み（長いが確実に動く）
+  let link=APP_URL+(LANG==='en'?'/s/en/#s=':'/s/#s=')+payload; // フォールバック：URL埋め込み（長いが確実に動く）
   if(POP_ENDPOINT){ // Workerで短縮ID化（例: #s=Ab3xYz12）。未対応・オフライン・タイムアウト時は長いリンクのまま
     try{
       const ac=new AbortController(); const tm=setTimeout(()=>ac.abort(),2500);
       const res=await fetch(POP_ENDPOINT+'/share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:payload}),signal:ac.signal});
       clearTimeout(tm);
-      if(res.ok){ const j=await res.json(); if(j&&j.ok&&typeof j.id==='string'&&/^[A-Za-z0-9]{4,20}$/.test(j.id)) link=APP_URL+'/s/#s='+j.id; }
+      if(res.ok){ const j=await res.json(); if(j&&j.ok&&typeof j.id==='string'&&/^[A-Za-z0-9]{4,20}$/.test(j.id)) link=APP_URL+(LANG==='en'?'/s/en/#s=':'/s/#s=')+j.id; }
     }catch(e){}
   }
   _sqLinkCache={json:jsonStr,url:link};
@@ -29178,7 +29178,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0717y'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0717z'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
