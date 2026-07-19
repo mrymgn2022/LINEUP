@@ -4531,7 +4531,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718n'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718o'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5637,7 +5637,7 @@ async function buildShareCanvas(){
   computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   const photoImgs=await preloadPhotos();
   const flagImgs=await preloadFlags();
-  const W=1080;
+  const W=(typeof window.__shareW==='number'&&window.__shareW>=720&&window.__shareW<=2400)?window.__shareW:1080; // サイト盤面生成用の解像度上書き（通常は1080固定）
   const accent=(state.teamInfo&&state.teamInfo.color)||'#caff3a';
   // レイアウト寸法を先に決めて、画像の高さをベンチ人数に応じて動的に確保
   const tn=teamDisplayName();
