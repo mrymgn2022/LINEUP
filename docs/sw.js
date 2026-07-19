@@ -3,7 +3,7 @@
 // 方針: 本番 = stale-while-revalidate（キャッシュを即返し、裏で最新を取得→次回反映）
 //       開発(localhost) = network-first（編集が常に反映。落ちた時だけキャッシュ）
 // 注意: 外部オリジン（人気度APIのCloudflare Worker、Web Analyticsビーコン等）には一切触らない
-const CACHE='squadxi-v62'; // v62: 日本代表を管理者同期(新XI+写真17枚FACE240px)＋高画質webp盤面(代表メモ=クラブ)＋深リンク
+const CACHE='squadxi-v63'; // v63: 全メンバーサイトから出典note(38代表)とFAQ(JSON-LD4+en/index可視)を撤去
 const CORE=['./index.html','./data/players.js','./favicon.png','./privacy.html','./privacy.en.html','./terms.html','./terms.en.html',
   './fonts/manrope-latin.woff2','./fonts/manrope-latin-ext.woff2','./fonts/bebas-latin.woff2','./fonts/bebas-latin-ext.woff2',
   './vendor/flag-icons/css/flag-icons.min.css']; // 国旗SVG本体(270枚)は事前キャッシュせず、表示したものから実行時キャッシュ（SWRのput）で貯める
