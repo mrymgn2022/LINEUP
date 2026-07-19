@@ -2057,8 +2057,11 @@ function openFormationPicker(){
   body.querySelector('.fgrid').onclick=e=>{
     const c=e.target.closest('[data-f]'); if(!c)return;
     const f=c.dataset.f;
-    if(f!==state.formation){ buildSlots(f,true); setFormLabel(); render(); save(); }
-    closeSheet(); toast(tFormChanged(f));
+    if(f!==state.formation){ buildSlots(f,true); setFormLabel(); render(); save(); closeSheet(); toast(tFormChanged(f)); return; }
+    // 同じフォーメーションの再選択＝配置を既定に整える（手動移動のリセット動線。ボタンの無いスマホでも使える）
+    closeSheet();
+    if(layoutMoved){ const ff=FORM[state.formation]; state.slots.forEach((s,i)=>{s.role=ff[i][0];s.x=ff[i][1];s.y=ff[i][2];}); spreadRowsEven(); layoutMoved=false; render(); save(); toast(t('tstResetLayout')); }
+    else { toast(t('tstAlreadyDefault')); }
   };
   const cl=document.getElementById('fClose'); if(cl)cl.onclick=closeSheet;
 }
@@ -4528,7 +4531,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718m'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718n'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6587,6 +6590,20 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ try{ if(_tid) deleteTeam(_tid); }catch(e){} }
       ok('same_name_overwrite',_pass,_msg); }
+    // T32: 同一フォーメーション再選択＝配置リセット（2026-07-19）
+    { let _pass=true,_msg='';
+      try{
+        buildSlots('4-3-3',false); state.slots[0].pid=0;
+        state.slots[5].x=7; state.slots[5].y=93; layoutMoved=true;
+        openFormationPicker();
+        const card=document.querySelector('.fcard.on');
+        if(!card){ _pass=false; _msg='fcard.on無し'; }
+        else{ card.click();
+          if(state.slots[5].x===7&&state.slots[5].y===93){ _pass=false; _msg='座標が戻らない'; }
+          if(layoutMoved){ _pass=false; _msg+=' layoutMoved残留'; } }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ try{ closeSheet(); }catch(e){} }
+      ok('same_formation_reset',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
