@@ -368,6 +368,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 /* PC・タブレット（iPad含む：横幅768px以上かつ高さ600px以上）＝ハンバーガーメニューを左端に常時表示のサイドバーとしてドッキング。
    本体とモーダルはサイドバー分だけ右へ寄せて中央配置。スマホ（縦長・狭い画面）は従来どおりスライド式のまま。 */
 .seowrap{height:0;overflow:hidden} /* モバイルでは非表示（アプリ体験を崩さない） */
+#btnReset{display:none} /* 配置リセットはPC版のみ（2026-07-19復活） */
 @media (min-width:768px) and (min-height:600px){
   #btnMenu{display:none!important;}                 /* トグル不要 */
   .dscrim{display:none!important;}                  /* 常時表示なので暗幕なし */
@@ -388,6 +389,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .drawer .dwdiv{margin:5px 0;}
   .drawer .dwfoot{padding:9px 16px calc(env(safe-area-inset-bottom) + 9px);}
   .pastebanner{ left:312px; }                       /* 常設サイドバー(300px)を避けて本体列に合わせる */
+  #btnReset{display:grid}
   .seowrap{height:auto;overflow:visible;margin-left:max(300px, calc(50vw - 130px));max-width:560px;padding:6px 0 8px} /* アプリ列と同じ位置に正規表示 */
   .seowrap .seofoot a{color:#9fb8a8}
 }
@@ -665,7 +667,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
       <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       
-      <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
+      <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div><div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
     </div>
   </header>
 
@@ -1711,7 +1713,7 @@ function applyStaticLang(){
   // アイコン(div)にtitle＋アクセシブルネーム＋role/tabindexを付与（キーボード/読み上げ対応）
   const tset=(id,tip)=>{ const el=document.getElementById(id); if(el){ el.title=tip; el.setAttribute('aria-label',tip); el.setAttribute('role','button'); if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0'); } };
   tset('btnMenu',t('tipMenu'));
-  tset('btnSave',t('tipSave')); tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch'));
+  tset('btnSave',t('tipSave')); tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
   tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags'));
   const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
@@ -4526,7 +4528,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0718l'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0718m'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5980,6 +5982,15 @@ function openShareFallback(imgUrl,shareText,file){
 }
 document.getElementById('btnShare').onclick=shareLineup;
   document.getElementById('btnSave').onclick=()=>{ try{ recordEvent('first_action',true); }catch(e){} const filled=state.slots.filter(s=>s.pid!=null).length; if(!filled){ toast(t('tstPlaceFirst')); return; } const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); } else { toast(t('tstSaved2')); } }; // P0: 保存の正道化（ヘッダー常設）
+// 配置リセット（PC版のみ復活 2026-07-19: 手動でポジションを動かした後に既定配置へ戻す唯一の手段）
+document.getElementById('btnReset').onclick=()=>{
+  if(!layoutMoved){ toast(t('tstAlreadyDefault')); return; }
+  const f=FORM[state.formation];
+  state.slots.forEach((s,i)=>{s.role=f[i][0];s.x=f[i][1];s.y=f[i][2];});
+  spreadRowsEven(); // 自動配置と同じ均等レイアウトに揃える（生のFORM既定だと詰まって見にくくなる）
+  layoutMoved=false;
+  render();save();toast(t('tstResetLayout'));
+};
 
 // 盤面リセット：配置中の選手・ベンチ・ベンチ外・キャプテン・マーカーを全て外して空のフォーメーションに戻す（保存済みスカッドは消さない）
 function clearSquad(){
