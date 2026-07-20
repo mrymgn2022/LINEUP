@@ -1045,7 +1045,7 @@ const I18N = {
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
-    tstMaxBench:'ベンチは最大50人です', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
+    tstMaxBench:'ベンチは最大15人です', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした', swapPrompt:'入れ替える相手をタップ（スタメン / ベンチ / ベンチ外）。同じ選手で取消',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
     tstSubCleared:'第二候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
@@ -1124,7 +1124,7 @@ const I18N = {
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
-    tstMaxBench:'The bench is full (max 50).', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
+    tstMaxBench:'The bench is full (max 15).', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
     tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image', swapPrompt:'Tap who to swap with (XI / bench / reserves). Tap the same player to cancel.',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
@@ -1643,7 +1643,7 @@ function optimizeMidfield(){
   orderedSlots.forEach((s,k)=>{ s.pid=players[k]; }); // 最も守備的な枠←最も守備的な選手 …
 }
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
-function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=50; } // 控えは最大50人（自動配置で埋めるのは15人まで）
+function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人（スカッド全体の上限は50人）
 function benchReturn(pid){
   if(pid==null||!state.loadedClub) return;
   if(inXI(pid)) return;
@@ -1977,7 +1977,7 @@ function benchToSlot(pid,slotIdx){
     // 控え選手が居た「その場所」に先発を入れる（末尾に飛ばさない）
     if(outgoing!=null&&outgoing!==pid) state.bench[bi]=outgoing; else state.bench.splice(bi,1);
   }else{
-    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<50) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
+    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<15) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
   }
   render();save();
   toast(outgoing!=null?shortName(P[pid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[pid][0])));
@@ -1989,7 +1989,7 @@ function reserveBenchSwap(reservePid,benchPid){ // ベンチ外⇄ベンチ（�
   render();save();toast(shortName(P[reservePid][0])+' ⇄ '+shortName(P[benchPid][0]));
 }
 function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあれば追加）
-  if(state.bench.filter(b=>!inXI(b)).length>=50){ toast(t('tstMaxBench')); return; }
+  if(state.bench.filter(b=>!inXI(b)).length>=15){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(reservePid)) state.bench.push(reservePid);
   render();save();toast(tToBench(shortName(P[reservePid][0])));
 }
@@ -3491,7 +3491,7 @@ function openBenchAdd(clearAll){
   wirePicker(-1);
 }
 function addPlayerToBench(pid){
-  if(state.bench.filter(b=>!inXI(b)).length>=50){ toast(t('tstMaxBench')); return; }
+  if(state.bench.filter(b=>!inXI(b)).length>=15){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(pid)&&!inXI(pid)) state.bench.push(pid);
   closeSheet();render();save();toast(tAddedBench(shortName(P[pid][0])));
 }
@@ -3499,6 +3499,8 @@ function addPlayerToBench(pid){
 function openReserveAdd(){ openOutsideSwap(t('addToReserve'),addPlayerToReserve,false); }
 function addPlayerToReserve(pid){
   if(inXI(pid)||state.bench.includes(pid)||reserveIds().includes(pid)){ toast(t('tstAlreadyListed')); return; }
+  const _tot=state.slots.filter(sl=>sl.pid!=null).length+state.bench.filter(b=>!inXI(b)).length+reserveIds().length;
+  if(_tot>=50){ toast(t('tstMaxSquad')); return; } // スカッド全体(XI+ベンチ+ベンチ外)で最大50人
   state.excluded=state.excluded.filter(x=>x!==pid);
   state.reserveAdds.push(pid);
   closeSheet();render();save();toast(tToReserve(shortName(P[pid][0])));
@@ -4236,7 +4238,7 @@ function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); 
 function placeMarketIntoSlot(i){ const pid=mktPlace; mktPlace=null; hideModeBar(); state.bench=state.bench.filter(x=>x!==pid); assign(i,pid); }
 // ベンチに加える：空きがあれば自動配置、満杯なら控え全員を点滅→タップした控えと交代
 function startMarketBench(pid){ swapSel=null; mktPlace=null; mktBenchSwap=null; hideModeBar();
-  if(state.bench.filter(b=>!inXI(b)).length<50){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(tAddedBench(squadShortName(pid))); return; }
+  if(state.bench.filter(b=>!inXI(b)).length<15){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(tAddedBench(squadShortName(pid))); return; }
   mktBenchSwap=pid; closeSheet(); render(); showModeBar(t('modeSwapSub'));
 }
 function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; hideModeBar();
@@ -4567,7 +4569,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720l'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0720m'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5706,7 +5708,7 @@ async function buildShareCanvas(){
     yAdj.set(s,Math.round(cy)); });
   const pitchBottom=py+ph;
   const tokY=s=>yAdj.get(s);
-  const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,50):[]; // ベンチ最大50人（非表示時は載せない。段組は3列のまま高さが伸びる）
+  const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,15):[]; // ベンチ最大15人（非表示時は載せない）
   const bCols=3, bRowH=98, bHeadH=70, bGap=44;
   const bRows=Math.ceil(benchPids.length/bCols);
   const benchH=benchPids.length?(bHeadH+bRows*bRowH):0;
