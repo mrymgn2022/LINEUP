@@ -283,7 +283,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 /* ベンチ外 */
 .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;padding-bottom:4px}
 .reservehead{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
-.ocard .bav{border-style:dashed;opacity:.95}
+
 .bgrid.dropon,.rgrid.dropon{outline:2px dashed var(--lime);outline-offset:3px;border-radius:12px;background:rgba(199,255,79,.06)}
 .benchfoot{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;color:var(--mut);font-size:12px;padding:12px 4px 6px}
 .benchfoot b{color:var(--ink);font-family:'Bebas Neue';font-size:19px;letter-spacing:.5px;margin:0 1px}
@@ -2087,7 +2087,7 @@ function attachDrag(el,actor){
   const scroller=document.getElementById('scroll');
   const benchEl=document.getElementById('bench');
   function overBench(x,y){ if(!benchEl)return false; const r=benchEl.getBoundingClientRect(); return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom; }
-  function clearGhost(){ if(ghost){ghost.remove();ghost=null;} el.style.visibility=''; el.style.opacity=''; if(benchEl)benchEl.classList.remove('dropon'); highlightCard(null); }
+  function clearGhost(){ if(ghost){ghost.remove();ghost=null;} el.style.visibility=''; el.style.opacity=''; if(benchEl)benchEl.classList.remove('dropon'); const _rg=document.querySelector('.rgrid'); if(_rg)_rg.classList.remove('dropon'); highlightCard(null); }
   // 画面端で自動スクロール（駒をベンチまで持っていけるように）
   function autoScrollTick(){
     if(!armed){scrollRAF=0;return;}
@@ -2133,7 +2133,7 @@ function attachDrag(el,actor){
     }
     if(ghost){
       ghost.style.left=lastX+'px'; ghost.style.top=lastY+'px';
-      if(benchEl){ const _ea=document.elementFromPoint(lastX,lastY); const _c=_ea&&_ea.closest?_ea.closest('.bcard[data-pid]'):null; highlightCard(_c?+_c.dataset.pid:null); benchEl.classList.toggle('dropon',overBench(lastX,lastY)&&!_c); }
+      if(benchEl){ const _ea=document.elementFromPoint(lastX,lastY); const _c=_ea&&_ea.closest?_ea.closest('.bcard[data-pid]'):null; highlightCard(_c?+_c.dataset.pid:null); const _rs=!_c&&_ea&&_ea.closest?_ea.closest('.rgrid,.reservehead'):null; const _rg=document.querySelector('.rgrid'); if(_rg)_rg.classList.toggle('dropon',!!_rs); benchEl.classList.toggle('dropon',overBench(lastX,lastY)&&!_c&&!_rs); }
     }else{
       const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
       const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
@@ -2156,7 +2156,17 @@ function attachDrag(el,actor){
       const ocR=elAt&&elAt.closest?elAt.closest('.ocard[data-pid]'):null;
       if(ocR){ state.slots[actor].x=ox; state.slots[actor].y=oy; reserveToSlot(+ocR.dataset.pid,actor); return; } // ベンチ外の選手と入れ替え（外れた先発はベンチ外へ）
       const card=elAt&&elAt.closest?elAt.closest('.bcard[data-pid]'):null;
-      if(card){ state.slots[actor].x=ox; state.slots[actor].y=oy; benchToSlot(+card.dataset.pid,actor); return; } // 座標を元に戻してから交代（render/save/toastはbenchToSlot内）
+      if(card){ state.slots[actor].x=ox; state.slots[actor].y=oy; benchToSlot(+card.dataset.pid,actor); return; }
+      const rsec=elAt&&elAt.closest?elAt.closest('.rgrid,.reservehead'):null;
+      if(rsec){ // ベンチ外の余白＝ベンチ外へ（スロットは空きに）
+        if(state.captain===mp) state.captain=null;
+        state.slots[actor].pid=null; state.slots[actor].sub=null;
+        state.slots[actor].x=ox; state.slots[actor].y=oy;
+        state.excluded=state.excluded.filter(x=>x!==mp);
+        if(!reserveIds().includes(mp)&&!state.reserveAdds.includes(mp)) state.reserveAdds.push(mp);
+        render();save();toast(tToReserve(shortName(P[mp][0])));
+        return;
+      } // 座標を元に戻してから交代（render/save/toastはbenchToSlot内）
       // それ以外（ベンチの余白）＝控えへ追加。満員なら追加せず元の位置へ戻す
       if(benchFull()){ state.slots[actor].x=ox; state.slots[actor].y=oy; render(); toast(t('tstMaxBench')); return; }
       if(state.captain===mp) state.captain=null;
@@ -4547,7 +4557,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0720k'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
