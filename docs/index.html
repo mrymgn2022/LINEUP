@@ -817,7 +817,7 @@ function roleFromXY(x,y){
 /* =========================================================
    State
    ========================================================= */
-let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,teamId:null,showBench:true}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,teamId:null,showBench:false}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
 let tokenEls={};
 // 写真なしの駒シルエット＝ラインアートのバスト（頭＋肩の輪郭線）。盤面/ベンチ/ベンチ外/詳細で共通（2026-07-14）
 const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M6 21.5C6 16 9 14 12 14C15 14 18 16 18 21.5"/></svg>';
@@ -1083,7 +1083,7 @@ const I18N = {
     legPos:'ポジション名', legPosD:'駒の下の役職表示を ON/OFF', legSub:'第2候補', legSubD:'控え候補の表示を ON/OFF',
     helpTipLabel:'ヒント', helpTipBody:'未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。',
     previewWord:'プレビュー', tipBench:'ベンチ（控え）表示/非表示', tipMarks:'負傷・カード 表示/非表示', shareBtn:'共有する', shareOnX:'X でシェア', saveImage:'画像を保存', copyCapLink:'キャプション＋リンクをコピー', shareLinkBtn:'スカッドのリンクをコピー', tstLinkCopied:'リンクをコピーしました。開くと同じスカッドが表示されます', helpS9T:'スカッドをリンクで共有', helpS9D:'共有画面の「スカッドのリンクをコピー」で、開くと同じスカッドが再現されるURLを作れます。XやLINEに貼れば、相手はタップするだけであなたのイレブンを見られます。', shOpenTitle:'共有されたスカッド', shOpenBody:'共有リンクからスカッドを受け取りました。盤面に表示しますか？<br>※現在の盤面は置き換わります（保存済みスカッドはそのまま）。', shOpenGo:'表示する',
-    fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'フィード 4:5', fmtFeedU:'フィード<br>Insta・X', fmtSqTitle:'正方形 1:1', fmtSqU:'正方形<br>汎用', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリー<br>IG・TikTok',
+    fmtAuto:'自動', fmtAutoTitle:'内容なりの縦長（全部入り）', fmtAutoU:'標準<br>全表示', fmtFeedTitle:'X向け 4:5（タイムラインで切れない）', fmtFeedU:'X<br>おすすめ', fmtSqTitle:'正方形 1:1', fmtSqU:'Insta<br>投稿', fmtStoryTitle:'ストーリー 9:16', fmtStoryU:'ストーリーズ<br>IG・TikTok',
     backupTitle:'バックアップ', bkWarn:'⚠ 作ったスカッドや写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
     bkExport:'バックアップを書き出す', bkImport:'バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
     bkIosTitle:'iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式', bkIosHelp:'ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。',
@@ -1162,7 +1162,7 @@ const I18N = {
     legPos:'Position labels', legPosD:'Toggle the role labels under tokens', legSub:'Second choice', legSubD:'Toggle the backup-player display',
     helpTipLabel:'Tip', helpTipBody:'If you try to create a new team with unsaved changes, you’ll be asked to confirm. Even if you forget to save, closing the app lets you pick up where you left off next time.',
     previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link', shareLinkBtn:'Copy squad link', tstLinkCopied:'Link copied — opening it shows this exact squad', helpS9T:'Share squads as a link', helpS9D:'In the share screen, "Copy squad link" creates a URL that reproduces your exact squad. Paste it on X or in a chat — anyone who taps it sees your XI instantly.', shOpenTitle:'Shared squad', shOpenBody:'You received a squad via a shared link. Show it on the board?<br>Note: your current board will be replaced (saved squads are untouched).', shOpenGo:'Show squad',
-    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'Feed 4:5', fmtFeedU:'Feed<br>Insta / X', fmtSqTitle:'Square 1:1', fmtSqU:'Square<br>general', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
+    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'For X 4:5 (no timeline crop)', fmtFeedU:'X<br>best', fmtSqTitle:'Square 1:1', fmtSqU:'Insta<br>post', fmtStoryTitle:'Story 9:16', fmtStoryU:'Story<br>IG / TikTok',
     backupTitle:'Backup', bkWarn:'⚠ Your squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
     bkExport:'Export backup', bkImport:'Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
     bkIosTitle:'If it doesn’t work in the iPhone home-screen app<br>= copy & paste method', bkIosHelp:'Home-screen apps sometimes can’t use file pickers (an iOS limitation). Use this instead — no file needed, so it always works.',
@@ -1486,7 +1486,7 @@ function applyRaw(saved){
   if(saved&&typeof saved.showSub==='boolean'){ state.showSub=saved.showSub; state.showMemo=!!saved.showMemo; }
   else if(saved){ state.showSub=(saved.tokInfo==='sub')||(saved.tokInfo==null&&saved.showSubs!==false); state.showMemo=(saved.tokInfo==='memo'); }
   else { state.showSub=true; state.showMemo=false; }
-  state.showBench=saved?(saved.showBench!==false):true;
+  state.showBench=!!(saved&&saved.showBench===true); // 既定OFF(2026-07-21)。明示的にONにした保存だけON
   state.flagByLeague=!!(saved&&saved.flagByLeague);
   syncLabelBtn();syncFlagBtn();syncSubBtn();syncMemoBtn();
   if(saved&&saved.slots&&saved.slots.length===11){
@@ -4569,7 +4569,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720q'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0720s'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5680,15 +5680,18 @@ async function buildShareCanvas(){
   const accent=(state.teamInfo&&state.teamInfo.color)||'#caff3a';
   // レイアウト寸法を先に決めて、画像の高さをベンチ人数に応じて動的に確保
   const tn=teamDisplayName();
-  let headBottom=120;
-  if(tn){ headBottom=210; if(state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
+  const fmtC=state.shareFmt||'auto'; const compact=(fmtC==='feed'||fmtC==='sq'); // 4:5/1:1=枠を使い切る専用レイアウト
+  let headBottom=compact?96:120;
+  if(tn){ headBottom=compact?150:210; if(!compact&&state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
   // 余白圧縮ポリシー：上部は「ヘッダー実体+24px」に追従（旧: 最低270px固定の予約领域）。左右は30px。
   // ピッチ内の配置・駒間はすべて kk=pw/REF 比例なので、左右余白の縮小＝全要素の等倍拡大（レイアウト不変）。
-  const px=30,py=headBottom+24,pw=W-60;
+  const _cb=(state.showBench!==false); // compactのベンチ有無
+  const pw=compact?(fmtC==='feed'?(_cb?770:808):618):(W-60); // compact: ベンチ列ぶん狭める(ベンチ無しなら広げる)
+  const px=(compact&&!_cb)?Math.round((W-pw)/2):30, py=headBottom+24; // ベンチ無しcompactは中央寄せ
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
-  const REF=405;                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
-  const kk=(pw/REF)*(showBench?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
+  const REF=compact?(fmtC==='feed'?340:300):405;                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
+  const kk=(pw/REF)*((showBench||compact)?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
   const m=v=>Math.round(v*kk);                             // 盤面px → 共有画像px
   const R=m(25);                                           // 盤面 .disc 半径25
   const tokX=s=>px+(s.x/100)*pw;
@@ -5698,7 +5701,7 @@ async function buildShareCanvas(){
   // 盤面の等倍投影（2026-07-18）: 盤面と同じ y% をそのままピッチへ投影する。
   // 旧実装は「yが近い駒を行に統合→等間隔配置」でフォメの奥行き（CB段差・中盤の高低・手動ドラッグ）が消えていた。
   const PASPECT=1.42;                                      // 盤面ピッチの縦横比（405:575前後）を踏襲
-  let ph=Math.round(pw*PASPECT*(showBench?1:1.05));        // ベンチ非表示は僅かに縦長（駒拡大kk×1.1とバランス）
+  let ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); // compactは枠固定なので1.05拡大しない(下端はみ出し防止)        // ベンチ非表示は僅かに縦長（駒拡大kk×1.1とバランス）
   const yRaw=s=>py+(1-(s.y/100))*ph;                       // 盤面と同座標系: y大=前線(上) / y小=GK(下)
   // 盤面の liftBottomLabels と同じ思想: 下端からはみ出すラベル分だけその駒を上へ。上端は駒半径分を確保。
   const yAdj=new Map();
@@ -5714,7 +5717,7 @@ async function buildShareCanvas(){
   const benchH=benchPids.length?(bHeadH+bRows*bRowH):0;
   const benchTop=pitchBottom+(benchPids.length?bGap:0);
   const footH=28; // 下端の小さな余白のみ（"made with"のフッター行は廃止＝ピッチ内右下のSQUAD XIロゴに一本化）
-  const H=Math.round(benchTop+benchH+footH);
+  const H=compact?(fmtC==='feed'?1350:1080):Math.round(benchTop+benchH+footH);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const x=cv.getContext('2d');
   // 背景
@@ -5731,12 +5734,12 @@ async function buildShareCanvas(){
   // チーム名：中央に大きく（ヒーロー表示）
   if(tn){
     x.textAlign='center';
-    const maxTW=W-110; let ts=66; x.font='800 '+ts+'px Manrope,sans-serif';
+    const maxTW=compact?(pw-40):(W-110); let ts=compact?46:66; x.font='800 '+ts+'px Manrope,sans-serif';
     while(ts>34 && x.measureText(tn).width>maxTW){ ts-=2; x.font='800 '+ts+'px Manrope,sans-serif'; }
     const hasSlogan=!!(state.teamInfo&&state.teamInfo.slogan);
-    const nameY=hasSlogan?172:190;
-    x.fillStyle=accent; x.fillText(fitCanvasText(x,tn,maxTW),W/2,nameY);
-    if(hasSlogan){ x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,W/2,nameY+42); }
+    const nameY=compact?156:(hasSlogan?172:190); // compactはピッチ上端(py=174)より上に収める
+    x.fillStyle=accent; x.fillText(fitCanvasText(x,tn,maxTW),compact?(px+pw/2):(W/2),nameY); // compactはピッチ中心に合わせる
+    if(hasSlogan&&!compact){ x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,W/2,nameY+42); } // compactはスローガン非表示(高さ予算外)
     x.textAlign='left';
   }
   // 芝のストライプ
@@ -5857,7 +5860,29 @@ async function buildShareCanvas(){
     x.textAlign='left';
   });
   // ベンチ（控え。最大15人をグリッド表示）
-  if(benchPids.length){
+  if(compact&&benchPids.length){ // 右のベンチ縦列（枠の余白を情報で埋める）
+    const colX=px+pw+22, colW=W-colX-26;
+    x.textAlign='left'; x.textBaseline='alphabetic';
+    x.fillStyle=accent; x.font='800 '+(fmtC==='feed'?26:30)+'px "Bebas Neue",Manrope,sans-serif';
+    x.fillText('BENCH ('+benchPids.length+')',colX,py+26);
+    const listTop=py+44, rowH=Math.min(84,Math.floor((H-listTop-24)/Math.max(benchPids.length,1)));
+    const rAv=Math.min(Math.floor(rowH/2)-4,(fmtC==='feed'?24:27));
+    benchPids.forEach((pid,i)=>{
+      const p=P[pid]; const cyc=listTop+i*rowH+rowH/2; const acx=colX+rAv+2;
+      x.beginPath();x.arc(acx,cyc,rAv,0,7);x.fillStyle='#10160f';x.fill();
+      const im=photoImgs[pid];
+      if(im){ x.save();x.beginPath();x.arc(acx,cyc,rAv-2,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,acx-(rAv-2),cyc-(rAv-2),(rAv-2)*2,(rAv-2)*2);x.restore(); }
+      else { drawSilhouette(x,acx,cyc,rAv); }
+      x.lineWidth=3;x.strokeStyle=roleCol(p[1]);x.beginPath();x.arc(acx,cyc,rAv,0,7);x.stroke();
+      const tx0=acx+rAv+10, maxW=colX+colW-tx0;
+      x.textAlign='left';x.textBaseline='middle';
+      x.fillStyle='#eafff0';x.font='800 '+(fmtC==='feed'?21:24)+'px Manrope,sans-serif';
+      x.fillText(fitCanvasText(x,squadShortName(pid),maxW),tx0,cyc-9);
+      x.fillStyle=roleCol(p[1]);x.font='700 '+(fmtC==='feed'?15:17)+'px Manrope,sans-serif';
+      x.fillText(p[1],tx0,cyc+13);
+      x.textBaseline='alphabetic';
+    });
+  } else if(benchPids.length){
     x.textAlign='left';x.textBaseline='alphabetic';
     x.fillStyle=accent;x.font='800 34px "Bebas Neue",Manrope,sans-serif';
     x.fillText((LANG==='en'?'SUBSTITUTES (':'SUBSTITUTES  ベンチ (')+benchPids.length+')',px+10,benchTop+40);
@@ -5883,7 +5908,7 @@ async function buildShareCanvas(){
   // SNS向けフォーマット：選んだ比率(1:1/4:5/9:16)のキャンバスへ中央配置（はみ出し防止＝contain）。'auto'は内容なりの高さのまま。
   const fmt=state.shareFmt||'auto';
   const AR={sq:[1080,1080],feed:[1080,1350],story:[1080,1920]}[fmt];
-  if(AR){
+  if(AR&&!compact){
     const tcv=document.createElement('canvas'); tcv.width=AR[0]; tcv.height=AR[1];
     const tx=tcv.getContext('2d');
     const bg2=tx.createLinearGradient(0,0,0,AR[1]); bg2.addColorStop(0,'#16221c'); bg2.addColorStop(.45,'#0a0e0c'); bg2.addColorStop(1,'#0a0e0c');
@@ -5941,10 +5966,10 @@ function openShareFallback(imgUrl,shareText,file){
         ${isPaidUser()?`<div class="icon" data-tg="marks" title="${t('tipMarks')}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="9" height="13" rx="1.5"/><circle cx="17" cy="16" r="4.4"/><line x1="17" y1="13.6" x2="17" y2="18.4"/><line x1="14.6" y1="16" x2="19.4" y2="16"/></svg></div>`:''}
       </div>
       <div id="shFmt" style="display:flex;justify-content:center;margin:0 0 10px;gap:6px">
-        <div class="fmtcard" data-fmt="auto" title="${t('fmtAutoTitle')}"><div class="fmtsh" style="width:10px;height:24px"></div><div class="fmtr">${t('fmtAuto')}</div><div class="fmtu">${t('fmtAutoU')}</div></div>
         <div class="fmtcard" data-fmt="feed" title="${t('fmtFeedTitle')}"><div class="fmtsh" style="width:19px;height:24px"></div><div class="fmtr">4:5</div><div class="fmtu">${t('fmtFeedU')}</div></div>
         <div class="fmtcard" data-fmt="sq" title="${t('fmtSqTitle')}"><div class="fmtsh" style="width:24px;height:24px"></div><div class="fmtr">1:1</div><div class="fmtu">${t('fmtSqU')}</div></div>
         <div class="fmtcard" data-fmt="story" title="${t('fmtStoryTitle')}"><div class="fmtsh" style="width:14px;height:24px"></div><div class="fmtr">9:16</div><div class="fmtu">${t('fmtStoryU')}</div></div>
+        <div class="fmtcard" data-fmt="auto" title="${t('fmtAutoTitle')}"><div class="fmtsh" style="width:10px;height:24px"></div><div class="fmtr">${t('fmtAuto')}</div><div class="fmtu">${t('fmtAutoU')}</div></div>
       </div>
       <div class="formfield" style="margin:0 16px 8px"><input class="search" id="shName" maxlength="24" placeholder="${escAttr(t('teamName'))}" value="${escAttr(teamDisplayName()||'')}" autocomplete="off"></div>
       </div>
