@@ -269,6 +269,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .benchghost{position:fixed;left:0;top:0;transform:translate(-50%,-50%);z-index:200;pointer-events:none;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
 .bench.dropon{outline:2px dashed var(--lime);outline-offset:4px;border-radius:14px;background:rgba(199,255,79,.05)}
 .tok.droptarget .disc{box-shadow:0 0 0 4px var(--lime),0 5px 14px rgba(0,0,0,.5)!important;border-color:#fff!important}
+.bcard.droptarget{box-shadow:0 0 0 3px var(--lime),0 0 14px var(--lime);border-color:#fff!important}
 @keyframes swapblink{0%,100%{opacity:1;box-shadow:0 0 0 3px var(--lime),0 0 16px var(--lime)}50%{opacity:.3;box-shadow:0 0 0 3px var(--lime),0 0 4px var(--lime)}}
 .tok.swapsel .disc{animation:swapblink .7s ease-in-out infinite;border-color:#fff!important}
 @keyframes swapblinkcard{0%,100%{opacity:1;box-shadow:0 0 0 2px var(--lime),0 0 14px var(--lime)}50%{opacity:.45;box-shadow:0 0 0 2px var(--lime),0 0 3px var(--lime)}}
@@ -1863,6 +1864,11 @@ function highlightSlot(si){
   dropTarget=si;
   if(si>=0&&tokenEls[si])tokenEls[si].classList.add('droptarget');
 }
+let _hlCardEl=null;
+function highlightCard(hpid){ // ドラッグ中: 触れているベンチ/ベンチ外カードだけ光らせる
+  if(_hlCardEl){ _hlCardEl.classList.remove('droptarget'); _hlCardEl=null; }
+  if(hpid!=null){ const el=document.querySelector('#bench .bcard[data-pid="'+hpid+'"]'); if(el){ el.classList.add('droptarget'); _hlCardEl=el; } }
+}
 function slotAtPoint(x,y){
   const r=pitch.getBoundingClientRect();
   if(x<r.left-40||x>r.right+40||y<r.top-40||y>r.bottom+40)return -1;
@@ -1883,15 +1889,16 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   el.style.touchAction='none'; // ドラッグ中にブラウザのスクロールと競合させない（長押しで起動、スクロールは余白から）
   let sx,sy,armed=false,didDrag=false,timer=null,ghost=null,lastX=0,lastY=0,scrollRAF=0,ptrId=null,psy=0;
   const scroller=document.getElementById('scroll');
-  function clearAreas(){ const bg=document.querySelector('#bench .bgrid'),rg=document.querySelector('.rgrid'); if(bg)bg.classList.remove('dropon'); if(rg)rg.classList.remove('dropon'); }
+  function clearAreas(){ const bg=document.querySelector('#bench .bgrid'),rg=document.querySelector('.rgrid'); if(bg)bg.classList.remove('dropon'); if(rg)rg.classList.remove('dropon'); highlightCard(null); }
   function paint(){
     if(!ghost)return;
     ghost.style.left=lastX+'px'; ghost.style.top=lastY+'px';
     const z=dropZone(lastX,lastY);
     highlightSlot(z&&z.z==='slot'?z.i:-1);
     const bg=document.querySelector('#bench .bgrid'),rg=document.querySelector('.rgrid');
-    if(bg)bg.classList.toggle('dropon',!!z&&(z.z==='bencharea'||z.z==='benchcard'));
-    if(rg)rg.classList.toggle('dropon',!!z&&(z.z==='reservearea'||z.z==='reservecard'));
+    if(bg)bg.classList.toggle('dropon',!!z&&z.z==='bencharea');
+    if(rg)rg.classList.toggle('dropon',!!z&&z.z==='reservearea');
+    highlightCard(z&&(z.z==='benchcard'||z.z==='reservecard')&&z.pid!==pid?z.pid:null); // 触れているカードだけ光らせる
   }
   // 画面端に近づいたら自動スクロール（縦長でも前線スロットまでドラッグできる）
   function autoScrollTick(){
@@ -1940,7 +1947,8 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
     if(pool==='bench'){
       if(z.z==='slot') benchToSlot(pid,z.i);
       else if(z.z==='benchcard' && z.pid!==pid && state.bench.includes(z.pid)) benchSwap(pid,z.pid); // ベンチ同士を交換
-      else if(z.z==='reservecard'||z.z==='reservearea') benchToReserve(pid);
+      else if(z.z==='reservecard') reserveBenchSwap(z.pid,pid); // ベンチ外のその選手と交代
+      else if(z.z==='reservearea') benchToReserve(pid);
     }else{ // reserve
       if(z.z==='slot') reserveToSlot(pid,z.i);
       else if(z.z==='benchcard') reserveBenchSwap(pid,z.pid);
@@ -1967,7 +1975,7 @@ function benchToSlot(pid,slotIdx){
     // 控え選手が居た「その場所」に先発を入れる（末尾に飛ばさない）
     if(outgoing!=null&&outgoing!==pid) state.bench[bi]=outgoing; else state.bench.splice(bi,1);
   }else{
-    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)) state.bench.push(outgoing);
+    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<15) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
   }
   render();save();
   toast(outgoing!=null?shortName(P[pid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[pid][0])));
@@ -1993,13 +2001,14 @@ function benchSwap(a,b){ // ベンチ内の2人をドラッグで入れ替え（
   state.bench[ia]=b; state.bench[ib]=a;
   render();save();toast(shortName(P[a][0])+' ⇄ '+shortName(P[b][0]));
 }
-function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（外れた先発はベンチへ、満員ならベンチ外へ）
+function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（入れ替え＝外れた先発はベンチ外へ）
   const outgoing=state.slots[slotIdx].pid;
   state.bench=state.bench.filter(b=>b!==reservePid);
   state.slots[slotIdx].pid=reservePid;
   if(state.slots[slotIdx].sub===reservePid)state.slots[slotIdx].sub=null;
   if(outgoing!=null&&outgoing!==reservePid){
-    if(state.bench.filter(b=>!inXI(b)).length<15&&!state.bench.includes(outgoing)) state.bench.push(outgoing);
+    state.excluded=state.excluded.filter(x=>x!==outgoing); // 除外済みでも再表示
+    if(!reserveIds().includes(outgoing)&&!state.reserveAdds.includes(outgoing)) state.reserveAdds.push(outgoing); // クラブ外の選手もベンチ外に残す
   }
   render();save();toast(outgoing!=null?shortName(P[reservePid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[reservePid][0])));
 }
@@ -2007,8 +2016,9 @@ function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（外
 function dropZone(x,y){
   const si=slotAtPoint(x,y); if(si>=0) return {z:'slot',i:si};
   const el=document.elementFromPoint(x,y); if(!el||!el.closest) return null;
+  const oc=el.closest('.ocard[data-pid]'); if(oc) return {z:'reservecard',pid:+oc.dataset.pid}; // ベンチ外カードは bcard ocard 両クラス→ocardを先に
   const bc=el.closest('.bcard[data-pid]'); if(bc) return {z:'benchcard',pid:+bc.dataset.pid};
-  const oc=el.closest('.ocard[data-pid]'); if(oc) return {z:'reservecard',pid:+oc.dataset.pid};
+  
   if(el.closest('#bench .bgrid')) return {z:'bencharea'};
   if(el.closest('.rgrid')) return {z:'reservearea'};
   return null;
@@ -2077,7 +2087,7 @@ function attachDrag(el,actor){
   const scroller=document.getElementById('scroll');
   const benchEl=document.getElementById('bench');
   function overBench(x,y){ if(!benchEl)return false; const r=benchEl.getBoundingClientRect(); return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom; }
-  function clearGhost(){ if(ghost){ghost.remove();ghost=null;} el.style.visibility=''; el.style.opacity=''; if(benchEl)benchEl.classList.remove('dropon'); }
+  function clearGhost(){ if(ghost){ghost.remove();ghost=null;} el.style.visibility=''; el.style.opacity=''; if(benchEl)benchEl.classList.remove('dropon'); highlightCard(null); }
   // 画面端で自動スクロール（駒をベンチまで持っていけるように）
   function autoScrollTick(){
     if(!armed){scrollRAF=0;return;}
@@ -2123,7 +2133,7 @@ function attachDrag(el,actor){
     }
     if(ghost){
       ghost.style.left=lastX+'px'; ghost.style.top=lastY+'px';
-      if(benchEl) benchEl.classList.toggle('dropon',overBench(lastX,lastY));
+      if(benchEl){ const _ea=document.elementFromPoint(lastX,lastY); const _c=_ea&&_ea.closest?_ea.closest('.bcard[data-pid]'):null; highlightCard(_c?+_c.dataset.pid:null); benchEl.classList.toggle('dropon',overBench(lastX,lastY)&&!_c); }
     }else{
       const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
       const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
@@ -2143,6 +2153,8 @@ function attachDrag(el,actor){
       const mp=state.slots[actor].pid;
       // 特定の控え選手の上なら、その選手と交代（控え→先発、先発→控え）
       const elAt=document.elementFromPoint(e.clientX,e.clientY);
+      const ocR=elAt&&elAt.closest?elAt.closest('.ocard[data-pid]'):null;
+      if(ocR){ state.slots[actor].x=ox; state.slots[actor].y=oy; reserveToSlot(+ocR.dataset.pid,actor); return; } // ベンチ外の選手と入れ替え（外れた先発はベンチ外へ）
       const card=elAt&&elAt.closest?elAt.closest('.bcard[data-pid]'):null;
       if(card){ state.slots[actor].x=ox; state.slots[actor].y=oy; benchToSlot(+card.dataset.pid,actor); return; } // 座標を元に戻してから交代（render/save/toastはbenchToSlot内）
       // それ以外（ベンチの余白）＝控えへ追加。満員なら追加せず元の位置へ戻す
@@ -4535,7 +4547,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0720j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6261,6 +6273,14 @@ window.__selftest=function(){
       const resAfter=reserveIds();
       ok('reserve_replace',!resAfter.includes(oldR)&&resAfter.includes(outP)&&resAfter.length===resBefore.length,'ベンチ外の1対1置き換えが不整合');
     } else ok('reserve_replace',true,'skip: ベンチ外なし');
+    // T: ドラッグ交代の行き先（ベンチ外⇄スタメン=入れ替えでベンチ人数不変・先発はベンチ外へ）
+    loadClub('Arsenal');
+    { const rIds=reserveIds();
+      if(rIds.length){
+        const rp=rIds[0], osP=state.slots[0].pid, bLen=state.bench.filter(b=>!inXI(b)).length;
+        reserveToSlot(rp,0);
+        ok('reserve_slot_swap', state.slots[0].pid===rp && !state.bench.includes(osP) && reserveIds().includes(osP) && state.bench.filter(b=>!inXI(b)).length===bLen, 'ベンチ外⇄スタメンで先発がベンチに落ちる/人数変動');
+      } else ok('reserve_slot_swap',true,'skip'); }
     // T9: 旗ヘルパ・共有関数の健全性
     ok('flag_helpers',flagHTML('ARG').indexOf('fi-ar')>=0&&typeof buildShareCanvas==='function','旗ヘルパ/共有関数の異常');
     // T10: スカッド共有リンクの往復（0.非圧縮パス＝同期検証。serialize→base64url→decode→保存形式が保たれるか）
