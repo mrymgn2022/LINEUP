@@ -758,7 +758,7 @@ const FORM={
 // ---- 4バック ----
 "4-3-3":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CM",30,50],["CM",50,47],["CM",70,50],["LW",20,80],["ST",50,85],["RW",80,80]],
 "4-4-2":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["LM",16,52],["CM",38,50],["CM",62,50],["RM",84,52],["ST",38,84],["ST",62,84]],
-"4-2-3-1":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CDM",38,42],["CDM",62,42],["LW",20,64],["CAM",50,64],["RW",80,64],["ST",50,86]],
+"4-2-3-1":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CDM",38,42],["CDM",62,42],["LM",20,64],["CAM",50,64],["RM",80,64],["ST",50,86]],
 "4-3-1-2":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CM",28,48],["CM",50,46],["CM",72,48],["CAM",50,64],["ST",40,84],["ST",60,84]],
 "4-1-2-1-2":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CDM",50,40],["CM",28,54],["CM",72,54],["CAM",50,66],["ST",40,85],["ST",60,85]],
 "4-1-4-1":[["GK",50,12],["LB",18,26],["CB",37,22],["CB",63,22],["RB",82,26],["CDM",50,42],["LM",16,58],["CM",38,56],["CM",62,56],["RM",84,58],["ST",50,86]],
@@ -3214,8 +3214,8 @@ function suggestRank(pos){
   const tiers=SUGGEST[pickRole]||[pickRole];
   const i=tiers.indexOf(pos);
   if(i>=0){
-    // RWB/LWBはRB/LBを最優先→次にRW/LWの段階サジェスト。それ以外の役割はサジェスト群をまとめる（CDM/CM/CAM等を区別せず後段の市場価値順）
-    if(pickRole==='LWB'||pickRole==='RWB') return i;
+    // RWB/LWB=RB/LB最優先→RW/LW次点。LM/RM=LW/RW最優先→LB/RB次点（SBが市場価値でウイングに勝ってワイドに来る事故を防ぐ）。それ以外はサジェスト群をまとめて後段の市場価値順
+    if(pickRole==='LWB'||pickRole==='RWB'||pickRole==='LM'||pickRole==='RM') return i;
     return 0;
   }
   const sg=grp(pickRole), pg=grp(pos);
@@ -4569,7 +4569,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720n'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0720o'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6303,6 +6303,11 @@ window.__selftest=function(){
         reserveToSlot(rp,0);
         ok('reserve_slot_swap', state.slots[0].pid===rp && !state.bench.includes(osP) && reserveIds().includes(osP) && state.bench.filter(b=>!inXI(b)).length===bLen, 'ベンチ外⇄スタメンで先発がベンチに落ちる/人数変動');
       } else ok('reserve_slot_swap',true,'skip'); }
+    // T: 4-2-3-1のワイド役職はLM/RM＋LM/RM枠はウイング優先(SB次点)
+    { const r4=FORM['4-2-3-1'].map(sl=>sl[0]);
+      const sv=pickRole; pickRole='LM'; const _a=suggestRank('LW')<suggestRank('LB');
+      pickRole='RM'; const _b=suggestRank('RW')<suggestRank('RB'); pickRole=sv;
+      ok('form_4231_lm_rm', r4.includes('LM')&&r4.includes('RM')&&!r4.includes('LW')&&!r4.includes('RW')&&_a&&_b, '4-2-3-1ワイドの役職/優先順が不正'); }
     // T9: 旗ヘルパ・共有関数の健全性
     ok('flag_helpers',flagHTML('ARG').indexOf('fi-ar')>=0&&typeof buildShareCanvas==='function','旗ヘルパ/共有関数の異常');
     // T10: スカッド共有リンクの往復（0.非圧縮パス＝同期検証。serialize→base64url→decode→保存形式が保たれるか）
