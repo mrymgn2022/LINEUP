@@ -2531,7 +2531,7 @@ scrim.onclick=closeSheet;
     if(e.button)return;                                          // 右クリック等は無視
     if(e.target.closest('canvas,input,textarea,select,[contenteditable="true"]'))return;  // クロップ/入力欄/貼り付けボックスは専用処理に委ねる（シート閉じドラッグに奪わせない）
     startY=e.clientY;startX=e.clientX;dy=0;dragging=false;pending=false;suppressClick=false;scroller=null;
-    fromHandle = zone.contains(e.target) || !!e.target.closest('#sheetBody>h2');
+    fromHandle = (zone.contains(e.target) || !!e.target.closest('#sheetBody>h2')) && !e.target.closest('.renameTrigger'); // name+pen(rename) is a button, not a drag handle: without this, setPointerCapture below eats its tap click
     if(fromHandle){                                              // ハンドル/見出し：即ドラッグ（上方向は拡大）
       dragging=true; sheet.style.transition='none';
       try{ sheet.setPointerCapture(e.pointerId); }catch(_){}
@@ -4571,7 +4571,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0721g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0721h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5096,18 +5096,19 @@ function autoFillFrom(ids){
   recordEvent('autobuild'); // ファネル：Auto Build（クラブ/国籍でXIを一括生成）が実際に使われた回数。
                             // 「魔法の機能が初見に見つけられていないのでは」という仮説の検証に使う
   const used=new Set(); const savedRole=pickRole;
-  state.slots.forEach(s=>{ pickRole=s.role; const pid=ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)).sort(suggestSort)[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
+  state.slots.forEach(s=>{ pickRole=s.role; const pid=sortSuggestFast(ids.filter(id=>!used.has(id)&&slotFit(P[id][1],s.role)))[0]; if(pid!=null){used.add(pid);s.pid=pid;} else s.pid=null; });
   optimizeCBFeet(); // 選定後、CBの左右だけ利き足で最適化
   optimizeMidfield(); // 中盤枠(CDM/CM/CAM)で守備度を揃える：CDM枠に本職CDM、CAM枠に攻撃的な選手
   // 控え構成：まず各スタメン枠に同じ大枠(GK/DF/MF/FW)のバックアップを1人ずつ確保し、
   // 残り枠を市場価値順で埋める（こうしないと高額なFW/MFに偏ってDFの第二候補が付かない）
   const benchSet=new Set();
-  state.slots.forEach(s=>{ if(s.pid==null)return; pickRole=s.role; const back=ids.filter(id=>!used.has(id)&&!benchSet.has(id)&&grp(P[id][1])===grp(s.role)).sort(suggestSort)[0]; if(back!=null) benchSet.add(back); });
+  state.slots.forEach(s=>{ if(s.pid==null)return; pickRole=s.role; const back=sortSuggestFast(ids.filter(id=>!used.has(id)&&!benchSet.has(id)&&grp(P[id][1])===grp(s.role)))[0]; if(back!=null) benchSet.add(back); });
   pickRole=savedRole;
   // ベンチGKは最大2人（スタメン込み3人）。ただしXI(11枠)が埋まらない＝薄い選手層なら制限しない。
   const fullXI=state.slots.filter(s=>s.pid!=null).length===11;
   let benchGK=[...benchSet].filter(pid=>P[pid][1]==='GK').length;
-  for(const id of ids.filter(id=>!used.has(id)&&!benchSet.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]))){
+  const _rest=ids.filter(id=>!used.has(id)&&!benchSet.has(id)); { const _mv=new Float64Array(P.length); for(const id of _rest)_mv[id]=mvScore(P[id]); _rest.sort((a,b)=>_mv[b]-_mv[a]); }
+  for(const id of _rest){
     if(benchSet.size>=15)break;
     if(fullXI && P[id][1]==='GK' && benchGK>=2) continue; // GKは2人まで
     if(P[id][1]==='GK') benchGK++;
@@ -5440,10 +5441,11 @@ function startOriginal(){
     // 条件なし＝空のフォーメーション
     if(!useClub&&!useNat&&!useLg){
       buildSlots(chosenForm,false);
-      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.teamId=null; state.bench=[];
+      state.loadedClub=null; state.captain=null; state.teamName=name; state.teamInfo=null; state.teamCond=null; state.teamId=null; state.bench=[]; state.excluded=[]; state.reserveAdds=[]; state.flagByLeague=false;
+      autoFillFrom(P.map((p,i)=>i).filter(i=>!isCustomPid(i))); // 条件なし=全選手（カスタム除く）から市場価値順の理想XI＋控え（初見が「とりあえず自動配置」で空盤面にならないよう）
       state.showMemo=true; syncMemoBtn(); // 自由編成＝所属クラブ（リーグ国旗つき）をメモ位置に自動表示
       setFormLabel(); closeSheet(); render(); save();
-      toast(tCreatedEmpty(name)); return;
+      { const _f=state.slots.filter(s=>s&&s.pid!=null).length; toast(tAutoPlaced(name,_f,'')); } return;
     }
     // 複数条件は AND（すべて満たす選手だけ）。クラブ＋国籍など組み合わせ可
     const ids=P.map((p,i)=>i).filter(i=>{
