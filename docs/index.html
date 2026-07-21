@@ -4569,7 +4569,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0720s'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0721a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5686,7 +5686,7 @@ async function buildShareCanvas(){
   // 余白圧縮ポリシー：上部は「ヘッダー実体+24px」に追従（旧: 最低270px固定の予約领域）。左右は30px。
   // ピッチ内の配置・駒間はすべて kk=pw/REF 比例なので、左右余白の縮小＝全要素の等倍拡大（レイアウト不変）。
   const _cb=(state.showBench!==false); // compactのベンチ有無
-  const pw=compact?(fmtC==='feed'?(_cb?770:808):618):(W-60); // compact: ベンチ列ぶん狭める(ベンチ無しなら広げる)
+  const pw=compact?(fmtC==='feed'?(_cb?770:(W-60)):618):(W-60); // compact: ベンチ列ぶん狭める(ベンチ無しなら広げる)
   const px=(compact&&!_cb)?Math.round((W-pw)/2):30, py=headBottom+24; // ベンチ無しcompactは中央寄せ
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
@@ -5701,7 +5701,7 @@ async function buildShareCanvas(){
   // 盤面の等倍投影（2026-07-18）: 盤面と同じ y% をそのままピッチへ投影する。
   // 旧実装は「yが近い駒を行に統合→等間隔配置」でフォメの奥行き（CB段差・中盤の高低・手動ドラッグ）が消えていた。
   const PASPECT=1.42;                                      // 盤面ピッチの縦横比（405:575前後）を踏襲
-  let ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); // compactは枠固定なので1.05拡大しない(下端はみ出し防止)        // ベンチ非表示は僅かに縦長（駒拡大kk×1.1とバランス）
+  let ph; if(compact&&!_cb&&fmtC==='feed'){ ph=1350-py-26; } else { ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); } // feed(4:5)ベンチ非表示は縦横フレームを使い切る(左右デッドスペース廃止・競合並み)
   const yRaw=s=>py+(1-(s.y/100))*ph;                       // 盤面と同座標系: y大=前線(上) / y小=GK(下)
   // 盤面の liftBottomLabels と同じ思想: 下端からはみ出すラベル分だけその駒を上へ。上端は駒半径分を確保。
   const yAdj=new Map();
