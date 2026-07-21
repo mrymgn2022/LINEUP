@@ -1374,10 +1374,10 @@ async function decodeSquadHash(h){ // '#s=...' → 保存形式raw / 該当な�
     return raw;
   }catch(e){ return null; }
 }
-// ★初回ショーケース（2026-07-17, W杯期間限定）: メンバーサイト外から来た初回訪問者（保存データ無し・空盤面）へ、
-// 人気代表の予想スタメンをサンプル表示する。保存はせず（state.demo）、最初のユーザー操作のsave()で通常盤面として確定。
-// 対象国はユーザー指示で差し替え/終了（配列を空にすれば無効化。W杯後はクラブ版へ切替予定）。
-const SHOWCASE_NATS=['FRA','ESP','ARG','ENG','BRA','NED'];
+// ★初回ショーケース（2026-07-17開始・2026-07-21クラブ版へ切替）: メンバーサイト外から来た初回訪問者（保存データ無し・空盤面）へ、
+// 人気クラブの予想スタメンをサンプル表示する。保存はせず（state.demo）、最初のユーザー操作のsave()で通常盤面として確定。
+// 対象クラブはユーザー指示で差し替え/終了（配列を空にすれば無効化）。W杯終了につき代表→クラブ8チームへ。
+const SHOWCASE_CLUBS=['Real Madrid','Barcelona','Manchester City','Manchester United','Arsenal','Liverpool','Juventus','AC Milan'];
 let demoApplying=false; // サンプル適用中は save()/toast を抑止する内部フラグ
 function syncDemoBar(){ try{ if(!state.demo){ const b=document.getElementById('demoBar'); if(b) b.remove(); } }catch(e){} }
 function showDemoBar(code){
@@ -1400,7 +1400,7 @@ function _showDemoBarNow(code){
     const old=document.getElementById('demoBar'); if(old) old.remove();
     const b=document.createElement('div'); b.id='demoBar';
     b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:58px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
-    const nm=natDisp(code);
+    const nm=dispClub(code);
     b.innerHTML='<span style="overflow:hidden;text-overflow:ellipsis">'+(LANG==='en'?('Sample: '+nm+' predicted XI — edit freely!'):('サンプル: '+nm+'の予想スタメン｜自由に編集できます'))+'</span><button style="all:unset;cursor:pointer;font-size:15px;padding:0 3px;color:#caff3a">×</button>';
     b.querySelector('button').onclick=()=>b.remove();
     document.body.appendChild(b);
@@ -1408,15 +1408,14 @@ function _showDemoBarNow(code){
 }
 function showcaseBoot(){
   try{
-    if(typeof WC_XI==='undefined'||typeof WC_SQUAD==='undefined'||!wcModeOn()) return null;
-    const cand=SHOWCASE_NATS.filter(c=>WC_SQUAD[c]&&WC_SQUAD[c].length>=11);
+    if(typeof CLUB_XI==='undefined') return null;
+    const cand=SHOWCASE_CLUBS.filter(c=>CLUB_XI[c]&&CLUB_XI[c].form&&P.filter((p,i)=>!isCustomPid(i)&&p[4].trim()===c).length>=11);
     if(!cand.length) return null;
-    const code=cand[Math.floor(Math.random()*cand.length)];
-    const fx=WC_XI[code];
+    const code=cand[Math.floor(Math.random()*cand.length)]; // code=クラブ名
     state.demo=true; demoApplying=true;
     try{
-      autoFillNationality(code,(fx&&fx.form)||state.formation||'4-3-3',null);
-      clearAutoClubMemos(); fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true;
+      buildSlots(CLUB_XI[code].form,false); // 予想XIと同じフォーメーション（確定XI適用の前提）
+      placeClubSquad(code,dispClub(code)); // クラブ選択と同じ実在編成（確定XI・控え15・第二候補・CB利き足）。メモ消し/国旗は内部で処理済
       state.showSub=false; if(typeof syncSubBtn==='function')syncSubBtn(); // 第2候補は選定済みだが表示オフ（名前・ポジ・所属だけの簡潔な初見画面に）
       render();
     } finally { demoApplying=false; }
@@ -4571,7 +4570,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0721d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0721e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6572,7 +6571,7 @@ window.__selftest=function(){
         const _notSaved=(lsGet('xi_state_v2')==null);
         const _exitSkip=(exitSquadKeys()===null);
         _pass=!!_c&&state.demo===true&&_filled===11&&_notSaved&&_exitSkip&&(state.showSub===false);
-        _msg=_pass?'':('nat='+_c+' demo='+state.demo+' filled='+_filled+' notSaved='+_notSaved+' exitSkip='+_exitSkip);
+        _msg=_pass?'':('club='+_c+' demo='+state.demo+' filled='+_filled+' notSaved='+_notSaved+' exitSkip='+_exitSkip);
         save();
         _pass=_pass&&(state.demo===false)&&!document.getElementById('demoBar');
         if(!_pass&&!_msg) _msg='after-save demo='+state.demo;
@@ -6735,7 +6734,7 @@ window.__selftest=function(){
       if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
     try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
-    // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 代表XIをサンプル表示（W杯期間限定）
+    // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 人気クラブのXIをサンプル表示
     if(!wasShareLink && !saved && !(state.slots&&state.slots.some(s=>s&&s.pid!=null))){
       const _sc=showcaseBoot();
       if(_sc){ try{ recordEvent('showcase',true); }catch(e){} }
