@@ -4569,7 +4569,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0721a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0721b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5690,7 +5690,7 @@ async function buildShareCanvas(){
   const px=(compact&&!_cb)?Math.round((W-pw)/2):30, py=headBottom+24; // ベンチ無しcompactは中央寄せ
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
-  const REF=compact?(fmtC==='feed'?340:300):405;                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
+  const REF=compact?(fmtC==='feed'?(_cb?340:400):300):405; // feedベンチ無しは駒を約15%小さく(横いっぱいピッチで駒75px→64px=文字被り解消)                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
   const kk=(pw/REF)*((showBench||compact)?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
   const m=v=>Math.round(v*kk);                             // 盤面px → 共有画像px
   const R=m(25);                                           // 盤面 .disc 半径25
