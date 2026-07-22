@@ -4571,7 +4571,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0721m'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0721n'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4981,6 +4981,30 @@ function openHelp(){
 // 未保存の変更があれば確認してから proceed() を実行（新規作成・他チーム読込の前に呼ぶ）
 function guardUnsaved(proceed,mode){ if(!isDirty()){ proceed(); return; } openConfirmSave(proceed,mode); }
 // 共有リンク（#s=...）で開かれた場合の確認→展開。受け手の保存済みスカッドには一切触れない（盤面のみ置き換え）
+// 自サイトのクラブ深リンク(st=1・pg="c-…")で開いた時：現行DBからそのクラブの全選手を
+// ベンチ(最大15)＋ベンチ外(残り・スカッド全体50まで)へ自動充填し、ベンチ枠を開く。
+// これで「スタメンだけ表示」を解消＝登録選手が全員呼び出される。古い深リンクに依存せず常に最新DB基準。
+// 代表(pg="n-…")やユーザー共有(st無し)は対象外＝相手の状態を尊重。
+function hydrateSiteSquad(raw){
+  try{
+    if(!(raw && raw.st)) return;            // 自サイトのリンクのみ。ユーザー共有はそのまま
+    state.showBench=true;                   // ベンチ枠を開く（st=1は常に）
+    if(!(typeof raw.pg==='string' && /^c-/.test(raw.pg))) return; // クラブページのみ全員充填
+    const starterIds=state.slots.map(s=>s&&s.pid).filter(x=>x!=null);
+    if(starterIds.length<6) return;         // XIが薄いリンクは触らない
+    const cnt={}; starterIds.forEach(id=>{ const c=(P[id]&&P[id][4])||''; if(c) cnt[c]=(cnt[c]||0)+1; });
+    let club='',best=0; for(const c in cnt){ if(cnt[c]>best){best=cnt[c];club=c;} }
+    if(!club || best<6) return;             // 単一クラブでない(代表等)なら触らない
+    const inSet=new Set(starterIds);
+    const mates=[]; for(let i=0;i<P.length;i++){ const p=P[i]; if(p && p[4]===club && !inSet.has(i)) mates.push(i); }
+    if(!mates.length) return;
+    const _mv=new Float64Array(P.length); for(const id of mates)_mv[id]=mvScore(P[id]); mates.sort((a,b)=>_mv[b]-_mv[a]);
+    const bench=[], reserve=[]; const cap=Math.max(0,50-starterIds.length);
+    for(const id of mates){ if(bench.length+reserve.length>=cap) break; if(bench.length<15) bench.push(id); else reserve.push(id); }
+    state.bench=bench.sort(benchPosSort);
+    state.reserveAdds=reserve;
+  }catch(e){}
+}
 function openSharedSquadConfirm(raw){
   _shareConfirmOpen=true; // 許可前はXI完成バーを出さない
   openSheet(`
@@ -4990,7 +5014,7 @@ function openSharedSquadConfirm(raw){
       <button class="bigbtn" id="ssGo">${t('shOpenGo')}</button>
       <button class="bigbtn ghost" id="ssCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('ssGo').onclick=()=>{ closeSheet(); const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); };
+  document.getElementById('ssGo').onclick=()=>{ closeSheet(); const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(raw); save(); render(); };
   document.getElementById('ssCancel').onclick=()=>{ closeSheet(); };
 }
 function openConfirmSave(proceed,mode){
@@ -6735,7 +6759,7 @@ window.__selftest=function(){
       try{ _popSrc = sharedRaw.st ? ('site'+((typeof sharedRaw.pg==='string'&&/^[a-z0-9_-]{1,40}$/i.test(sharedRaw.pg))?(':'+sharedRaw.pg):'')) : 'share'; }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
-      if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Lineup loaded':'スタメンを読み込みました')); }
+      if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
     try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
     // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 人気クラブのXIをサンプル表示
