@@ -504,7 +504,7 @@ const P=JSON.parse((`[
 ["Youri Tielemans","CM",29,"🇧🇪 BEL","Manchester United","PL"],
 ["John McGinn","CM",31,"🏴󠁧󠁢󠁳󠁣󠁴󠁿 SCO","Aston Villa","PL"],
 ["Ross Barkley","CM",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
-["Morgan Rogers","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
+["Morgan Rogers","CAM",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Chelsea","PL"],
 ["Emiliano Buendía","LW",29,"🇦🇷 ARG","Aston Villa","PL"],
 ["Lewis Dobbin","LW",23,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Aston Villa","PL"],
 ["Leon Bailey","RW",28,"🇯🇲 JAM","Aston Villa","PL"],
