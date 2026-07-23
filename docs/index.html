@@ -1707,10 +1707,34 @@ function render(){
   applyStaticLang();
   updateMenuDot();
   try{ buildSideRail(); }catch(e){} // 言語切替時に右レールも追随
-  if(isWideDock()){ const dw=document.getElementById('drawer'); if(dw){ dw.innerHTML=drawerHTML(); wireDrawer(); } } // 常時表示サイドバーを状態に同期
+  syncWideDock(false); // 常時表示サイドバーを状態に同期
 }
 // PC・タブレット判定：この幅/高さではハンバーガーメニューを左端に常時表示（CSSの @media と一致させる）
 function isWideDock(){ try{ return window.matchMedia('(min-width:768px) and (min-height:600px)').matches; }catch(e){ return false; } }
+// 常時表示サイドバー（PC）の中身をstateに同期する。onlyOnChange=true は幅/高さが境界をまたいだ時だけ実行。
+// 【バグ修正 2026-07-23】ドロワーの中身は「isWideDockがtrueのrender」か「メニューを開いた時」しか作られない。
+// そのため小さいウィンドウで起動（＝中身が空のまま）→最大化すると、CSSの@mediaで300pxのサイドバーは現れるのに
+// 中身が空っぽ＝「左のメニューが全く出ない」状態になっていた。この幅では #btnMenu も隠れるので開く手段も無くなる。
+// → リサイズ/メディアクエリ変化で境界をまたいだら作り直す。
+let _wideDockNow=null;
+function syncWideDock(onlyOnChange){
+  try{
+    const wide=isWideDock(), changed=(wide!==_wideDockNow);
+    if(onlyOnChange && !changed) return;
+    _wideDockNow=wide;
+    const dw=document.getElementById('drawer'); if(!dw) return;
+    if(wide){ dw.innerHTML=drawerHTML(); wireDrawer(); }
+    if(changed){ // 常設ドック⇔スライド式の切替時だけ、開閉/ドラッグの残骸を掃除する
+      dw.classList.remove('on');
+      const sc=document.getElementById('dscrim'); if(sc) sc.classList.remove('on');
+      _drawerClearInline();
+    }
+  }catch(e){}
+}
+window.addEventListener('resize',()=>{ syncWideDock(true); }); // 最大化・ウィンドウ変形に追従
+try{ const _mqDock=window.matchMedia('(min-width:768px) and (min-height:600px)'); // resizeが来ない環境（ズーム変更等）の保険
+  if(_mqDock.addEventListener) _mqDock.addEventListener('change',()=>syncWideDock(true));
+  else if(_mqDock.addListener) _mqDock.addListener(()=>syncWideDock(true)); }catch(e){}
 // 静的ヘッダー/盤面ラベル（render で作り直されない固定DOM）の多言語適用。boot時+言語切替時にrenderから呼ぶ。
 function applyStaticLang(){
   // アイコン(div)にtitle＋アクセシブルネーム＋role/tabindexを付与（キーボード/読み上げ対応）
@@ -4576,7 +4600,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0723b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0723c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6740,6 +6764,23 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ try{ closeSheet(); }catch(e){} }
       ok('same_formation_reset',_pass,_msg); }
+    // T46: 常時表示サイドバー（PC）は、狭い窓→最大化のリサイズで中身が作り直されるか。
+    //      小さい窓で起動すると中身が空のまま＝最大化後に左メニューが空白になり、#btnMenuも隠れて開けなくなっていた（2026-07-23）
+    { let _pass=true,_msg='';
+      const _real=window.isWideDock, _dw=document.getElementById('drawer'), _html=_dw?_dw.innerHTML:'', _prev=_wideDockNow;
+      try{
+        window.isWideDock=()=>false; _wideDockNow=null; syncWideDock(true); // 狭い状態にする
+        _dw.innerHTML=''; _wideDockNow=false;                               // 「中身が空のまま広くなる」状況を再現
+        window.isWideDock=()=>true;  syncWideDock(true);                    // 最大化
+        const filled=_dw.innerHTML.length>0 && _dw.querySelectorAll('.dwitem').length>0;
+        const noOn=!_dw.classList.contains('on');                           // 常設ドックはスライド用の .on を持たない
+        syncWideDock(true);                                                 // 同じ幅の2回目は何もしない（無駄な再構築をしない）
+        _pass=filled&&noOn; _msg=_pass?'':('filled='+filled+' noOn='+noOn);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ window.isWideDock=_real;
+        try{ if(_dw){ _dw.innerHTML=_html; if(_html) wireDrawer(); } }catch(e){}
+        _wideDockNow=_prev; }
+      ok('wide_dock_resync',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
