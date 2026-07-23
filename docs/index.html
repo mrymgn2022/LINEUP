@@ -4600,7 +4600,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0723c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0723d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5017,6 +5017,8 @@ function guardUnsaved(proceed,mode){ if(!isDirty()){ proceed(); return; } openCo
 // （退団決定の選手をベンチ外に置いた編成が、MV順の自動充填で崩されないように）。
 // 代表(pg="n-…")やユーザー共有(st無し)は対象外＝相手の状態を尊重。
 // 選手はリンクのものをそのまま使う（選定をやり直さない）＝Auto Build(autoFillFrom)の集計イベントは発生しない。
+// 見た目・状態は placeClubSquad（アプリ内の自動配置）に完全に揃える：座標=既定レイアウト、ポジション名と
+// 第2候補は非表示（第2候補の割当自体はやる＝「2nd」を押せば見られる）、loadedClub/teamNameもセット。
 function relayoutToDefault(){
   // 座標をアプリの既定レイアウト(spreadRowsEven済み)へ揃える。選手・第2候補は据え置き。
   // 深リンクのpayloadはFORMの生座標なのでGKとDFラインが詰まり、駒が重なることがあった（2026-07-23）。
@@ -5041,6 +5043,10 @@ function hydrateSiteSquad(raw){
     const cnt={}; starterIds.forEach(id=>{ const c=(P[id]&&P[id][4])||''; if(c) cnt[c]=(cnt[c]||0)+1; });
     let club='',best=0; for(const c in cnt){ if(cnt[c]>best){best=cnt[c];club=c;} }
     if(!club || best<6) return;             // 単一クラブでない(代表等)なら触らない
+    // 以降は placeClubSquad（アプリ内の自動配置）と同じ状態にする
+    state.loadedClub=club;                  // これが無いと freeBuildMode 扱いで、控えカードに所属クラブ名が出てしまう
+    state.teamName=dispClub(club);          // 表記もアプリ準拠＝Jリーグは日本語、それ以外は英語（日本語ページでも英語のまま）
+    state.teamInfo=null; state.teamCond=null; state.captain=null;
     // 深リンクが明示ベンチを持つ場合はそれが正（退団決定選手をベンチ外へ置く編成をそのまま再現）
     const fixed=(Array.isArray(state.bench)?state.bench:[]).filter(id=>P[id]!=null).slice(0,15);
     const inSet=new Set(starterIds); fixed.forEach(id=>inSet.add(id));
@@ -5051,6 +5057,7 @@ function hydrateSiteSquad(raw){
     for(const id of mates){ if(reserve.length+bench.length-fixed.length>=cap) break; if(bench.length<15) bench.push(id); else reserve.push(id); }
     state.bench=bench.sort(benchPosSort);
     state.reserveAdds=reserve;
+    autoAssignSubs();  // 第2候補も自動配置と同じく割り当てる（表示は showSub=false なので「2nd」を押すまで出ない）
   }catch(e){}
 }
 function openSharedSquadConfirm(raw){
@@ -6781,6 +6788,26 @@ window.__selftest=function(){
         try{ if(_dw){ _dw.innerHTML=_html; if(_html) wireDrawer(); } }catch(e){}
         _wideDockNow=_prev; }
       ok('wide_dock_resync',_pass,_msg); }
+    // T47: メンバーサイトの深リンクは「アプリ内の自動配置」と同じ状態になるか（2026-07-23）
+    //      loadedClub未設定だと freeBuildMode 扱いで控えカードに所属クラブ名が出る／teamNameはアプリ準拠(Jリーグ以外は英語)／
+    //      座標は既定レイアウト／ポジション名と第2候補は非表示だが、第2候補の割当自体はされている（「2nd」で見られる）
+    { let _pass=true,_msg='';
+      try{
+        _keyMap=null; buildKeyMap();
+        const cx=CLUB_XI['Barcelona'], f=FORM[cx.form];
+        const raw={v:3,st:1,pg:'c-barcelona',formation:cx.form,teamName:'バルセロナ',names:{},memos:{},marks:{},bench:[],
+          slots:f.map((r,i)=>({role:r[0],x:r[1],y:r[2],pid:cx.keys[i],sub:null}))};
+        applyRaw(resolveRaw(JSON.parse(JSON.stringify(raw)))); hydrateSiteSquad(raw);
+        const clubOK=(state.loadedClub==='Barcelona')&&!freeBuildMode();     // 控えカードにクラブ名を出さない条件
+        const nameOK=(state.teamName==='Barcelona');                         // 日本語ページ由来でも英語表記
+        const jaOK=(LANG!=='ja')||(dispClub('Urawa Red Diamonds')==='浦和レッズ'); // Jリーグだけは日本語のまま
+        const dispOK=(state.hideRoles===true)&&(state.showSub===false)&&(state.showMemo===false);
+        const subOK=state.slots.some(s=>s.pid!=null&&s.sub!=null);           // 第2候補は割り当て済み
+        const geoOK=state.slots.every((s,i)=>s.role===f[i][0])&&(state.slots[2].y!==f[2][2]); // spreadRowsEven後＝生のFORM座標ではない
+        _pass=clubOK&&nameOK&&jaOK&&dispOK&&subOK&&geoOK;
+        _msg=_pass?'':('club='+clubOK+' name='+nameOK+'('+state.teamName+') ja='+jaOK+' disp='+dispOK+' sub='+subOK+' geo='+geoOK);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('site_link_matches_autoplace',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
