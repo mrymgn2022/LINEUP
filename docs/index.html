@@ -3640,9 +3640,12 @@ function natDisp(c){ return (LANG==='en' && NATNAME[c]) ? NATNAME[c] : natJa(c);
 function natDispL(c,l){ return (l==='en' && NATNAME[c]) ? NATNAME[c] : natJa(c); } // 明示言語版
 function defaultTeamName(){ return LANG==='en' ? 'My Team' : 'マイチーム'; }        // 言語別の既定チーム名
 // name が「自動生成名」か判定：'default'（既定名）／'nat'（代表名）／null（ユーザー命名 or クラブ名＝不変）
-function autoNameKind(name,cond){
+// 自動生成チーム名の種別を判定。club=読込クラブ（Jリーグのみ言語で名前が変わる）。
+// ユーザーが手で名前を変えていれば ja/en どちらの自動名とも一致せず null＝不変。
+function autoNameKind(name,cond,club){
   if(name==='マイチーム'||name==='My Team') return 'default';
   if(cond&&cond.nat&&(name===natDispL(cond.nat,'ja')||name===natDispL(cond.nat,'en'))) return 'nat';
+  if(club&&typeof CLUB_JA!=='undefined'&&CLUB_JA[club]&&(name===dispClubL(club,'ja')||name===dispClubL(club,'en'))) return 'club'; // Jリーグの固有クラブ名（自分で触っていない場合のみ）
   return null;
 }
 // 言語切替時：自動生成のチーム名（既定名・代表名）だけ新言語 next へ。ユーザー命名・クラブ名は不変。
@@ -3650,17 +3653,19 @@ function retranslateAutoNames(next){
   const nm=k=> k==='nat'?null : (next==='en'?'My Team':'マイチーム');
   // ライブ盤面
   if(state.teamName!=null){
-    const k=autoNameKind(state.teamName,state.teamCond);
+    const k=autoNameKind(state.teamName,state.teamCond,state.loadedClub);
     if(k==='nat') state.teamName=natDispL(state.teamCond.nat,next);
     else if(k==='default') state.teamName=nm('default');
+    else if(k==='club') state.teamName=dispClubL(state.loadedClub,next); // Jクラブ名を新言語へ
   }
   // 保存済み一覧
   const teams=getTeams(); let changed=false;
   for(const t of teams){
-    const cond=t.data&&t.data.teamCond; const k=autoNameKind(t.name,cond);
+    const cond=t.data&&t.data.teamCond; const club=t.data&&t.data.loadedClub; const k=autoNameKind(t.name,cond,club);
     let nn=null;
     if(k==='nat') nn=natDispL(cond.nat,next);
     else if(k==='default') nn=nm('default');
+    else if(k==='club') nn=dispClubL(club,next);
     if(nn&&nn!==t.name){ t.name=nn; if(t.data&&t.data.teamName!=null) t.data.teamName=nn; changed=true; }
   }
   if(changed) setTeams(teams);
@@ -4609,7 +4614,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0724e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0724f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4856,8 +4861,9 @@ function buildSideRail(){
     if(ex){ if(ex.dataset.lang===LANG) return; ex.remove(); } // 言語切替時は作り直す（同一言語ならno-op）
     const r=document.createElement('div'); r.id='siderail'; r.dataset.lang=LANG;
     const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    const trC=c=>String(c)==='フリー'?t('freeWord'):c;  // 「フリー」は言語化（英語版に日本語を出さない）
     const rows=(FEATURED_TRANSFERS||[]).slice(0,3).map(f=>
-      '<div class="srrow" data-sr="transfer"><span class="srp">'+esc(f.player)+'</span><span class="srd">'+esc(f.from)+' → '+esc(f.to)+(f.fee?'　'+esc(trFeeText(f.fee)):'')+'</span></div>').join('');
+      '<div class="srrow" data-sr="transfer"><span class="srp">'+esc(f.player)+'</span><span class="srd">'+esc(trC(f.from))+' → '+esc(trC(f.to))+(f.fee?' '+esc(trFeeText(f.fee)):'')+'</span></div>').join('');
     r.innerHTML='<div class="srcard"><div class="srh">'+t('featTransfer')+'</div>'+rows+'<div class="srmore" data-sr="transfer">'+t('srSeeAll')+' ›</div></div>'
       +'<div class="srcard"><div class="srh">'+t('featSquad')+'</div><button class="srbtn" data-sr="squad">'+t('srOpenSquad')+'</button></div>'
       +'<button class="srbtn" data-sr="help" style="padding:11px">'+t('help')+'</button>';
@@ -5282,6 +5288,7 @@ const CLUB_JA={
 };
 // クラブ名の表示（日本語UIかつJリーグのクラブなら日本語表記、それ以外はデータ通りのローマ字）
 function dispClub(club){ const c=(club||'').trim(); return (LANG==='ja'&&CLUB_JA[c])?CLUB_JA[c]:club; }
+function dispClubL(club,l){ const c=(club||'').trim(); return (l==='ja'&&CLUB_JA[c])?CLUB_JA[c]:club; } // 明示言語版（言語切替の再導出用）
 // クラブ名の短縮表示。日本語UIのJリーグは日本語クラブ名、それ以外はローマ字短縮。
 // 英語UIのJリーグ盤面名＝都市名（例 Kashima Antlers→Kashima / Kawasaki Frontale→Kawasaki / Urawa Red Diamonds→Urawa）。
 // 同一都市に複数クラブがある東京(FC東京/東京V)・大阪(G/C/FC大阪)・横浜(FM/横浜FC)・栃木(栃木C/栃木SC)は曖昧なので除外＝従来のニックネーム表記のまま。
@@ -6893,6 +6900,25 @@ window.__selftest=function(){
         _msg=_pass?'':('exact='+exact+'('+bk.length+'/'+want.length+') named='+named+' full='+full);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('curated_bench_exact_and_names',_pass,_msg); }
+    // T50: 英語版に日本語を出さない（注目移籍サイドレールの「フリー」）＋ Jクラブ名の言語追随（自分で触ってない時だけ）
+    { let _pass=true,_msg=''; const _lang=LANG;
+      try{
+        // ① サイドレールのフリー表記が英語で Free になる（日本語フリーが残らない）
+        LANG='en'; const it={player:'X',from:'フリー',to:'フリー',fee:'フリー'};
+        const html='<span class="srd">'+(String(it.from)==='フリー'?t('freeWord'):it.from)+' → '+(String(it.to)==='フリー'?t('freeWord'):it.to)+'</span>';
+        const freeEnOK = html.indexOf('フリー')<0 && html.indexOf('Free')>=0;
+        // ② Jクラブ名の言語追随
+        const JC='Urawa Red Diamonds', ja=dispClubL(JC,'ja'), en=dispClubL(JC,'en');
+        const jaOK = (ja==='浦和レッズ') && (en==='Urawa Red Diamonds') && (ja!==en);       // JはJA/EN別名
+        const k1=autoNameKind(ja,null,JC), k2=autoNameKind(en,null,JC);                    // 自動名はどちらも club判定
+        const kindOK = (k1==='club') && (k2==='club');
+        const userEdited = autoNameKind('マイ浦和',null,JC);                                 // 手編集は club にならない
+        const nonJ = autoNameKind('Real Madrid',null,'Real Madrid');                        // 非Jは追随しない
+        _pass = freeEnOK && jaOK && kindOK && (userEdited!=='club') && (nonJ!=='club');
+        _msg = _pass?'':('freeEn='+freeEnOK+' ja='+jaOK+' kind='+kindOK+' edited='+userEdited+' nonJ='+nonJ);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      finally{ LANG=_lang; }
+      ok('lang_free_and_jclub_name',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
