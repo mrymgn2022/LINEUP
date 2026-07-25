@@ -1409,7 +1409,7 @@ async function decodeSquadHash(h){ // '#s=...' → 保存形式raw / 該当な�
 // ★初回ショーケース（2026-07-17開始・2026-07-21クラブ版へ切替）: メンバーサイト外から来た初回訪問者（保存データ無し・空盤面）へ、
 // 人気クラブの予想スタメンをサンプル表示する。保存はせず（state.demo）、最初のユーザー操作のsave()で通常盤面として確定。
 // 対象クラブはユーザー指示で差し替え/終了（配列を空にすれば無効化）。W杯終了につき代表→クラブ8チームへ。
-const SHOWCASE_CLUBS=['Real Madrid','Barcelona','Manchester City','Manchester United','Arsenal','Liverpool','Juventus','AC Milan'];
+const SHOWCASE_CLUBS=['Real Madrid','Barcelona','Manchester City','Manchester United','Arsenal','Liverpool','Chelsea','Bayern München'];
 let demoApplying=false; // サンプル適用中は save()/toast を抑止する内部フラグ
 function syncDemoBar(){ try{ if(!state.demo){ const b=document.getElementById('demoBar'); if(b) b.remove(); } }catch(e){} }
 function showDemoBar(code){
@@ -4685,7 +4685,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0725h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0725i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
