@@ -3629,20 +3629,22 @@ const _PEN=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="
 /* ---- ベンチ外選手メニュー（タップで表示） ---- */
 function openReserveMenu(pid){
   if(!P[pid])return;
-  openSheet(`
-    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('reserves')}</span></h2>
-    <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
-      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
-      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
-      <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
+  const pg=`<div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
       <div class="photosub">
         ${photoOf(pid)?`<div class="mitem sub" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
         <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
         <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
         <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
-      </div>
+      </div>`; // 管理者モードのみ最上部に出す（編集効率化）
+  openSheet(`
+    <h2><span class="renameTrigger" id="omRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('reserves')}</span></h2>
+    <div class="menu">
+      ${isAdminDevice()?pg:''}
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
+      ${isAdminDevice()?'':pg}
       <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="remove"><div class="mi">${ICN.remove}</div>${t('removeFromTeam')}</div>
     </div>`);
@@ -3902,20 +3904,22 @@ function openMarkMenu(pid){
 /* ---- ベンチ選手メニュー（タップで表示。入れ替えボタン付き） ---- */
 function openBenchMenu(pid){
   if(!P[pid])return;
-  openSheet(`
-    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('subsWord')}</span></h2>
-    <div class="menu">
-      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
-      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
-      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
-      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
-      <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
+  const pg=`<div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
       <div class="photosub">
         ${photoOf(pid)?`<div class="mitem sub" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
         <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
         <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
         <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
-      </div>
+      </div>`; // 管理者モードのみ最上部に出す（編集効率化）
+  openSheet(`
+    <h2><span class="renameTrigger" id="bmRename">${nameOf(pid,true)}<span class="penIcon">${_PEN}</span></span> <span>${t('subsWord')}</span></h2>
+    <div class="menu">
+      ${isAdminDevice()?pg:''}
+      <div class="mitem" data-act="swap"><div class="mi">${ICN.swap}</div>${t('swapPlayers')}</div>
+      <div class="mitem" data-act="change"><div class="mi">${ICN.change}</div>${t('outsideSwap')}</div>
+      <div class="mitem" data-act="memo"><div class="mi">${ICN.memo}</div>${t('editNote')}${memoOf(pid)?'（'+memoOf(pid)+'）':''}</div>
+      <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
+      ${isAdminDevice()?'':pg}
       <div class="mitem" data-act="marks"><div class="mi">${ICN.detail}</div>${t('injCard')}${isPaidUser()?markSummary(pid):_ICN_GOLDLOCK}</div>
       <div class="mitem danger" data-act="unbench"><div class="mi">${ICN.remove}</div>${t('removeFromBench')}</div>
     </div>`);
@@ -4666,7 +4670,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0725c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0725d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4708,7 +4712,7 @@ function drawerHTML(){
     <div class="dwitem" data-page="terms"><span class="di">${ICN.doc}</span>${t('terms')}<span class="dchev">›</span></div>
     <div class="dwdiv"></div>
     <div style="display:flex;align-items:center;gap:8px;padding:10px 16px 4px"><span style="font-size:12px;color:var(--mut);margin-right:2px;display:inline-flex;align-items:center;gap:5px">${ICN.globe}${t('language')}</span>${langBtn('ja','日本語')}${langBtn('en','English')}</div>
-    <div class="dwfoot">Squad XI — ${t('tagline')}<br><span id="dwBuild" style="-webkit-touch-callout:none;-webkit-user-select:none;user-select:none">v0.9${t('preview')} · build ${BUILD}${lsGet('xi_pop_optout')==='1'?(LANG==='en'?' · no-stats':' · 収集オフ'):''}</span>
+    <div class="dwfoot">Squad XI — ${t('tagline')}<br><span id="dwBuild" style="-webkit-touch-callout:none;-webkit-user-select:none;user-select:none">v0.9${t('preview')} · build ${BUILD}${lsGet('xi_pop_optout')==='1'?(LANG==='en'?' · admin':' · 管理者モード'):''}</span>
       ${_showDid?`<div style="margin-top:6px;font-size:10px;-webkit-user-select:text;user-select:text;word-break:break-all;color:var(--mut)">${LANG==='en'?'device id':'端末ID'}: ${escAttr(_deviceId())}</div>`:''}
       <div style="margin-top:9px"><button id="dwUpdate" class="bigbtn ghost" style="padding:9px;font-size:12px;font-weight:800">${LANG==='en'?'↻ Update to the latest version':'↻ 最新版に更新'}</button></div>
     </div>`;
@@ -6832,6 +6836,15 @@ window.__selftest=function(){
         if(typeof editPhoto!=='function'){ _pass=false; _msg+=' editPhoto欠落'; } // 写真の再編集関数
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('photo_crop_clamp',_pass,_msg); }
+    // 管理者モードのフラグ判定（xi_pop_optout='1' で isAdminDevice()=true）。実値は退避→復元。
+    { let _pass=true,_msg='';
+      try{
+        const _cur=lsGet('xi_pop_optout');
+        lsSet('xi_pop_optout','1'); if(!isAdminDevice()){ _pass=false; _msg+=' onで不成立'; }
+        try{ localStorage.removeItem('xi_pop_optout'); }catch(_){} if(isAdminDevice()){ _pass=false; _msg+=' offで成立'; }
+        if(_cur!=null) lsSet('xi_pop_optout',_cur);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('admin_mode_flag',_pass,_msg); }
     // T29: 移籍金/形態表示の言語変換（trFeeText: EN=Free/Loan/Undisclosed/€NNM・JA=原文のまま）
     { let _pass=true,_msg='';
       try{
