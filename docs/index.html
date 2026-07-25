@@ -1042,7 +1042,7 @@ const I18N = {
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
-    addChangePhoto:'写真を追加 / 変更', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を変更 / 移籍', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を入れ替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第二候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
@@ -1121,7 +1121,7 @@ const I18N = {
     createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
-    addChangePhoto:'Add / change photo', photoDevice:'Choose from your photos', changeTransfer:'Change / transfer player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace this player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
@@ -2249,6 +2249,17 @@ const photoInput=document.getElementById('photoInput');
 function pickPhoto(pid){ photoTarget=pid; photoInput.value=''; photoInput.click(); }
 // 取り込み共通：どの形の画像でも位置調整シートを出す（ズーム＋自由移動できるので正方形でも寄せる意味がある。分岐をなくして挙動を一貫させる）
 function beginPhotoImport(img){ openPhotoCrop(img); }
+// すでに設定済みの写真（ユーザー写真 or 既定の顔写真）を、もう一度クロップ画面で再編集する。
+// 元画像は保持していないため、現在の写真からさらにズーム/位置調整する運用（＝切り取った外側を広げる方向には戻せない）。写真が無ければ追加フローへ。
+function editPhoto(pid){
+  const src=photoOf(pid);
+  if(!src){ pickPhoto(pid); return; }
+  photoTarget=pid;
+  const img=new Image();
+  img.onload=()=>{ beginPhotoImport(img); };
+  img.onerror=()=>{ photoTarget=null; toast(t('tstPhotoFail')); };
+  img.src=src;
+}
 // 画像Blob→取り込み共通（ほぼ正方形は即保存／縦横は位置調整シート）
 function importPhotoBlob(pid,blob){
   photoTarget=pid;
@@ -3627,6 +3638,7 @@ function openReserveMenu(pid){
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
       <div class="photosub">
+        ${photoOf(pid)?`<div class="mitem sub" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
         <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
         <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
         <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
@@ -3641,6 +3653,7 @@ function openReserveMenu(pid){
     if(a==='photogrp'){ it.classList.toggle('open'); return; } // 写真の追加方法グループを開閉（シートは閉じない）
     if(a==='swap') startSwapReserve(pid);
     if(a==='change') openReserveSwap(pid);
+    if(a==='editphoto') editPhoto(pid);
     if(a==='memo') openMemo(pid);
     if(a==='detail') openDetail(pid,null);
     if(a==='photo') pickPhoto(pid);
@@ -3817,6 +3830,7 @@ function openSlotMenu(i){
     <div class="menu">
       <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
       <div class="photosub">
+        ${photoOf(s.pid)?`<div class="mitem sub" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
         <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
         <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
         <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
@@ -3841,6 +3855,7 @@ function openSlotMenu(i){
     if(a==='detail')openDetail(s.pid,i);
     if(a==='swap') startSwapSlot(i);
     if(a==='change') openSlotAddSearch(i);
+    if(a==='editphoto') editPhoto(s.pid);
     if(a==='sub') openSubPicker(i);
     if(a==='memo') openMemo(s.pid);
     if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(s.pid); }
@@ -3896,6 +3911,7 @@ function openBenchMenu(pid){
       <div class="mitem" data-act="detail"><div class="mi">${ICN.detail}</div>${t('viewDetails')}</div>
       <div class="mitem photogrp" data-act="photogrp"><div class="mi">${ICN.photo}</div>${t('addChangePhoto')}<span class="miexp">▾</span></div>
       <div class="photosub">
+        ${photoOf(pid)?`<div class="mitem sub" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
         <div class="mitem sub" data-act="photo"><div class="mi">${ICN.photo}</div>${t('photoDevice')}</div>
         <div class="mitem sub" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
         <div class="mitem sub" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
@@ -3910,6 +3926,7 @@ function openBenchMenu(pid){
     if(a==='photogrp'){ it.classList.toggle('open'); return; } // 写真の追加方法グループを開閉（シートは閉じない）
     if(a==='swap') startSwapBench(pid);
     if(a==='change') openBenchSwap(pid);
+    if(a==='editphoto') editPhoto(pid);
     if(a==='memo') openMemo(pid);
     if(a==='marks'){ if(!isPaidUser()){ closeSheet(); openInfoPage('premium'); return; } openMarkMenu(pid); }
     if(a==='detail') openDetail(pid,null);
@@ -4245,7 +4262,10 @@ function openDetail(pid,slotIdx){
     <h2>${t('playerProfile')}</h2>
     <div class="detail">
       <div class="dhead">
-        <div class="davatar${ph?' photo':''}"${ph?` style="background-image:url('${ph}')"`:''}>${SIL}</div>
+        <div style="position:relative;flex:0 0 auto">
+          <div class="davatar${ph?' photo':''}" id="dAvatar" role="button" aria-label="${escAttr(t('editPhotoItem'))}" style="cursor:pointer${ph?`;background-image:url('${ph}')`:''}">${SIL}</div>
+          <span aria-hidden="true" style="position:absolute;right:-3px;bottom:-3px;width:22px;height:22px;border-radius:50%;background:var(--lime);color:#0a0e0c;display:grid;place-items:center;border:2px solid var(--panel)">${_PEN}</span>
+        </div>
         <div>
           <div class="dname renameTrigger" id="dRename">${nameOf(pid,false)}<span class="penIcon">${_PEN}</span></div>
           <div class="dclub">${p[4]&&p[4].trim()?`${flagHTML(p[3])} · ${escAttr(dispClub(p[4]))}`:`${flagHTML(p[3])} · ${escAttr(natDisp(natCode(p)))}`}</div>
@@ -4272,6 +4292,7 @@ function openDetail(pid,slotIdx){
   if($('dRename'))$('dRename').onclick=()=>openRename(pid);
   if($('dSearch'))$('dSearch').onclick=()=>searchPlayerWeb(pid);
   if($('dPhoto'))$('dPhoto').onclick=()=>pickPhoto(pid);
+  if($('dAvatar'))$('dAvatar').onclick=()=>{ if(photoOf(pid)) editPhoto(pid); else pickPhoto(pid); }; // 左の顔写真タップで再編集（写真なしは追加へ）
   if($('dPaste'))$('dPaste').onclick=()=>pastePhoto(pid);
   if($('dChange'))$('dChange').onclick=()=>{const useBench=slotIdx!=null&&state.loadedClub&&state.bench.length>0;useBench?openBenchPicker(slotIdx):openPicker(slotIdx);};
   if($('dRemove'))$('dRemove').onclick=()=>{const out=state.slots[slotIdx].pid;state.slots[slotIdx].pid=null;benchReturn(out);closeSheet();render();save();toast(t('tstRemoved'));};
@@ -4645,7 +4666,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0725b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0725c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6808,6 +6829,7 @@ window.__selftest=function(){
         const c2=_cropClamp(1000,600,50,0,0);      if(c2.size!==150){ _pass=false; _msg+=' c2:'+c2.size; }   // 過小→短辺/4=150(4倍上限)
         const c3=_cropClamp(1000,600,9999,0,0);    if(c3.size!==600){ _pass=false; _msg+=' c3:'+c3.size; }   // 過大→短辺=600(ズーム1が下限)
         const c4=_cropClamp(400,400,200,999,-5);   if(!(c4.sx===200&&c4.sy===0)){ _pass=false; _msg+=' c4:'+JSON.stringify(c4); } // 位置は[0,w-size]にクランプ
+        if(typeof editPhoto!=='function'){ _pass=false; _msg+=' editPhoto欠落'; } // 写真の再編集関数
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('photo_crop_clamp',_pass,_msg); }
     // T29: 移籍金/形態表示の言語変換（trFeeText: EN=Free/Loan/Undisclosed/€NNM・JA=原文のまま）
