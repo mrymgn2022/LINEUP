@@ -1239,6 +1239,7 @@ function openAdminPin(){
       <button class="bigbtn" id="pinOk" style="margin-top:14px">${LANG==='en'?'OK':'決定'}</button>
       <button class="bigbtn ghost" id="pinCancel" style="margin-top:10px">${t('cancel')}</button>
     </div>`);
+  _sheetLockUntil=Date.now()+6000; // 連打の余韻タップ/誤タップで即閉じしないよう6秒ロック（OK/キャンセルは効く）
   const inp=document.getElementById('pinIn'); if(inp){ try{inp.focus();}catch(e){} }
   const submit=()=>{ const v=((inp&&inp.value)||'').replace(/[^0-9]/g,''); if(v==='7324'){ closeSheet(); setAppMode('admin'); try{ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(_deviceId()); }catch(e){} toast(t('modeToAdmin')); } else { toast(t('pinNg')); if(inp){ inp.value=''; try{inp.focus();}catch(e){} } } };
   const ok=document.getElementById('pinOk'); if(ok)ok.onclick=submit;
@@ -2582,9 +2583,9 @@ function tapReserveInSwap(targetPid){
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
 // 外部（画像検索の別タブ等）から復帰した直後は、シート/ドロワーをCSSアニメ無しで即表示する。
 // iOS PWAで「window.openから戻った直後に開くオーバーレイの遷移アニメ」がコンポジタごと固まる症状の対策（復帰4秒間 or 明示フラグ）。
-let _visReturnAt=0,_forceNoAnimSheet=false;
+let _visReturnAt=0,_forceNoAnimSheet=false,_sheetLockUntil=0; // _sheetLockUntil: この時刻までスクリム/下スワイプで閉じない(PIN画面が連打の余韻タップで即消えるのを防ぐ)。openSheet毎に0へ戻し、openAdminPinだけ再設定。OK/キャンセルは直接closeSheetで通す
 function _noAnimNow(){ const f=_forceNoAnimSheet||(Date.now()-_visReturnAt<4000); _forceNoAnimSheet=false; return f; }
-function openSheet(html){benchAddMode=false;subFilterOn=false;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
+function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
   const na=_noAnimNow(); if(na){ sheet.style.transition='none'; scrim.style.transition='none'; }
   sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');
   if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
@@ -2597,7 +2598,7 @@ let _ovNav=false;
 function _ovAnyOpen(){ try{ const dw=document.getElementById('drawer'); return sheet.classList.contains('on') || (dw&&dw.classList.contains('on')); }catch(e){ return false; } }
 function _ovPush(){ if(!_ovNav){ _ovNav=true; try{ history.pushState({xiOv:1},''); }catch(e){} } }
 window.addEventListener('popstate',function(){ if(_ovNav){ _ovNav=false; if(_ovAnyOpen()){ try{closeSheet();}catch(e){} try{closeDrawer();}catch(e){} } } });
-scrim.onclick=closeSheet;
+scrim.onclick=()=>{ if(Date.now()<_sheetLockUntil) return; closeSheet(); };
 
 /* シートのスワイプ操作：ハンドル/見出しは即ドラッグ、本文も最上部なら下方向ドラッグで閉じる（閉じやすさ改善） */
 (function setupSheetDrag(){
@@ -2644,7 +2645,7 @@ scrim.onclick=closeSheet;
     pending=false;
     if(!dragging)return; dragging=false;
     sheet.style.transition=''; sheet.style.transform='';
-    if(dy>100){ closeSheet(); }                                  // 下げて離したら閉じる
+    if(dy>100){ if(Date.now()>=_sheetLockUntil) closeSheet(); } // 下げて離したら閉じる（ロック中は閉じない）
     else if(dy>30){ sheet.classList.remove('expanded'); }
     dy=0;
   }
@@ -3654,9 +3655,9 @@ function photoGroupNormal(pid){
       </div>`;
 }
 function photoFlatAdmin(pid, subHtml){
-  return `<div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
+  return `${photoOf(pid)?`<div class="mitem" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
       <div class="mitem" data-act="paste"><div class="mi">${ICN.copyicon}</div>${t('pastePhoto')}</div>
-      ${photoOf(pid)?`<div class="mitem" data-act="editphoto"><div class="mi">${ICN.photo}</div>${t('editPhotoItem')}</div>`:''}
+      <div class="mitem" data-act="search"><div class="mi">${ICN.search}</div>${t('webSearchPhoto')}</div>
       ${subHtml||''}`;
 }
 /* ---- ベンチ外選手メニュー（タップで表示） ---- */
@@ -4684,7 +4685,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0725e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0725f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4738,7 +4739,7 @@ function wireDrawer(){
   { const up=d.querySelector('#dwUpdate'); if(up) up.onclick=forceUpdateApp; }
   { const bl=d.querySelector('#dwBuild'); if(bl){ let _lpTO=null,_fired=false,_tapN=0,_tapT=0; // 長押し=モード切替(通常⇄ユーザー・管理者→通常)／ユーザーで5連打=管理者PIN
       const cancel=()=>{ if(_lpTO){ clearTimeout(_lpTO); _lpTO=null; } };
-      bl.addEventListener('pointerdown',e=>{ cancel(); _fired=false; _lpTO=setTimeout(()=>{ _lpTO=null; _fired=true; _tapN=0; cycleModeLongPress(); },650); });
+      bl.addEventListener('pointerdown',e=>{ cancel(); _fired=false; _lpTO=setTimeout(()=>{ _lpTO=null; _fired=true; _tapN=0; cycleModeLongPress(); },3000); }); // 長押し3秒でモード切替（誤操作防止）
       bl.addEventListener('pointerup',e=>{ cancel();
         if(_fired){ _fired=false; return; }                 // 長押し確定＝連打として数えない
         const now=Date.now(); if(now-_tapT>1500) _tapN=0; _tapT=now; _tapN++;
