@@ -1448,7 +1448,8 @@ function showcaseBoot(){
     try{
       buildSlots(CLUB_XI[code].form,false); // 予想XIと同じフォーメーション（確定XI適用の前提）
       placeClubSquad(code,dispClub(code)); // クラブ選択と同じ実在編成（確定XI・控え15・第二候補・CB利き足）。メモ消し/国旗は内部で処理済
-      state.showSub=false; if(typeof syncSubBtn==='function')syncSubBtn(); // 第2候補は選定済みだが表示オフ（名前・ポジ・所属だけの簡潔な初見画面に）
+      state.showSub=false; if(typeof syncSubBtn==='function')syncSubBtn(); // 第2候補は選定済みだが表示オフ（2ndボタンで表示）
+      state.hideRoles=true; if(typeof syncLabelBtn==='function')syncLabelBtn(); // ポジション名も初期非表示＝深リンク流入と同じ初見画面（表示切替でON可・2026-07-26ユーザー指示）
       render();
     } finally { demoApplying=false; }
     if(state.demo) showDemoBar(code);
