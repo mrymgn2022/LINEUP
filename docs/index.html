@@ -819,7 +819,7 @@ function roleFromXY(x,y){
 /* =========================================================
    State
    ========================================================= */
-let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,teamId:null,showBench:false}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
+let state={formation:"4-3-3",slots:[],bench:[],photos:{},names:{},memos:{},hideRoles:false,showFlags:true,showSub:true,showMemo:false,flagByLeague:false,excluded:[],reserveAdds:[],reserveOrder:[],loadedClub:null,captain:null,teamName:null,teamInfo:null,teamCond:null,teamId:null,showBench:false}; // names/memos: {安定ID -> 文字列}; showSub/showMemo: 駒下の「第2候補」「メモ」を独立して表示（両方同時に出せる）
 let tokenEls={};
 // 写真なしの駒シルエット＝ラインアートのバスト（頭＋肩の輪郭線）。盤面/ベンチ/ベンチ外/詳細で共通（2026-07-14）
 const SIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M6 21.5C6 16 9 14 12 14C15 14 18 16 18 21.5"/></svg>';
@@ -1359,6 +1359,7 @@ function serializeTeam(){
     names:state.names,memos:state.memos,marks:state.marks,hideRoles:state.hideRoles,showFlags:state.showFlags,showSub:state.showSub,showMemo:state.showMemo,showBench:state.showBench,showMarks:state.showMarks,flagByLeague:state.flagByLeague,loadedClub:state.loadedClub,teamName:state.teamName,teamInfo:state.teamInfo,teamCond:state.teamCond,teamId:state.teamId,
     excluded:(state.excluded||[]).map(pidToKey).filter(k=>k!=null),
     reserveAdds:(state.reserveAdds||[]).map(pidToKey).filter(k=>k!=null),
+    reserveOrder:(state.reserveOrder||[]).map(pidToKey).filter(k=>k!=null), // ベンチ外をユーザーが並べ替えた順
     custom:referencedCustomDefs() };
 }
 // ── スカッド共有リンク ──────────────────────────────────────
@@ -1489,6 +1490,7 @@ function resolveRaw(raw){
       bench:(raw.bench||[]).map(keyToPid).filter(v=>v!=null),
       excluded:(raw.excluded||[]).map(keyToPid).filter(v=>v!=null),
       reserveAdds:(raw.reserveAdds||[]).map(keyToPid).filter(v=>v!=null),
+      reserveOrder:(raw.reserveOrder||[]).map(keyToPid).filter(v=>v!=null),
       captain:keyToPid(raw.captain) });
   }
   // 旧保存移行(2026-07-21): 4-2-3-1のワイドは7/20にLM/RM化。それ以前の保存/共有リンクのLW/RWを復元時に正規化
@@ -1532,6 +1534,7 @@ function applyRaw(saved){
     state.bench=Array.isArray(saved.bench)?saved.bench:[];
     state.excluded=Array.isArray(saved.excluded)?saved.excluded:[];
     state.reserveAdds=Array.isArray(saved.reserveAdds)?saved.reserveAdds:[];
+    state.reserveOrder=Array.isArray(saved.reserveOrder)?saved.reserveOrder:[];
     state.loadedClub=saved.loadedClub||null;
     state.captain=(saved.captain!=null)?saved.captain:null;
     state.teamName=saved.teamName||null;
@@ -2025,6 +2028,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
     }else{ // reserve
       if(z.z==='slot') reserveToSlot(pid,z.i);
       else if(z.z==='benchcard') reserveBenchSwap(pid,z.pid);
+      else if(z.z==='reservecard' && z.pid!==pid) reserveSwap(pid,z.pid); // ベンチ外どうしを入れ替え
       else if(z.z==='bencharea') reserveToBench(pid);
     }
   };
@@ -2588,7 +2592,7 @@ function tapReserveInSwap(targetPid){
   const src=swapSel; swapSel=null;
   if(src.t==='slot'){ reserveToSlot(targetPid,src.i); }        // スタメン⇄ベンチ外
   else if(src.t==='bench'){ reserveBenchSwap(targetPid,src.pid); } // ベンチ⇄ベンチ外
-  else { render(); toast(t('tstSwapCanceled')); } // ベンチ外同士は交代なし
+  else { reserveSwap(src.pid,targetPid); } // ベンチ外どうしを入れ替え（並び順を保持）
 }
 
 /* =========================================================
@@ -3621,7 +3625,26 @@ function reserveAddIds(){ return (state.reserveAdds||[]).filter(pid=>P[pid]&&!in
 function reserveIds(){
   const seen=new Set(),out=[];
   clubOtherIds().concat(reserveAddIds()).forEach(pid=>{ if(!seen.has(pid)){seen.add(pid);out.push(pid);} });
-  return out.sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
+  out.sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
+  // ユーザーが並べ替えた順があればそれを優先（並べ替え済みの選手が先頭・残りは市場価値順で後ろに続く）。
+  // 出入りで面子が変わっても壊れないよう、実在するメンバーだけを拾う。
+  const ord=state.reserveOrder;
+  if(Array.isArray(ord)&&ord.length){
+    const set=new Set(out), head=[];
+    ord.forEach(pid=>{ if(set.has(pid)&&!head.includes(pid)) head.push(pid); });
+    return head.concat(out.filter(pid=>!head.includes(pid)));
+  }
+  return out;
+}
+// ベンチ外どうしの並べ替え（ドラッグ／「この選手を入れ替える」の両方から呼ぶ）。
+// ベンチ外は市場価値順の自動並びなので、入れ替えたら state.reserveOrder に順序を焼き付けて保持する。
+function reserveSwap(aPid,bPid){
+  if(aPid==null||bPid==null||aPid===bPid){ render(); toast(t('tstSwapCanceled')); return; }
+  const cur=reserveIds(), ia=cur.indexOf(aPid), ib=cur.indexOf(bPid);
+  if(ia<0||ib<0){ render(); return; }
+  cur[ia]=bPid; cur[ib]=aPid;
+  state.reserveOrder=cur.slice();
+  render(); save(); toast(t('tstSwapped'));
 }
 /* ---- メニュー用 線画SVGアイコン（絵文字の代わり。stroke=currentColorで色を継承） ---- */
 const _svg=(inner)=>`<svg class="micon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
@@ -4699,7 +4722,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
