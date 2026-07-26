@@ -1590,7 +1590,16 @@ async function loadTeamFromList(id){
   render(); save(); cleanJson=JSON.stringify(serializeTeam());
 }
 // 現在のスカッドが「未保存の変更あり」か（選手が居て、最後の保存/読込から変化している）
-function isDirty(){ if(!state.slots||state.slots.filter(s=>s.pid!=null).length===0) return false; return JSON.stringify(serializeTeam())!==cleanJson; }
+// 「見た目だけの設定」＝盤面の中身ではないので未保存判定から除外する（2026-07-26 ユーザー指示）。
+// 保存には従来どおり含まれる（次回開いた時に同じ見え方で復元される）。ここで外すのは"オレンジのランプを点けるか"の判定だけ。
+const VIEW_ONLY_KEYS=['hideRoles','showFlags','showSub','showMemo','showBench','showMarks','flagByLeague'];
+function squadCore(o){ const c={}; Object.keys(o).filter(k=>VIEW_ONLY_KEYS.indexOf(k)<0).sort().forEach(k=>{c[k]=o[k];}); return c; } // キー順も正規化して比較を安定させる
+function isDirty(){
+  if(!state.slots||state.slots.filter(s=>s.pid!=null).length===0) return false;
+  if(cleanJson==null) return true;
+  let base; try{ base=JSON.parse(cleanJson); }catch(e){ return true; } // '__force_dirty__'等の非JSONは従来どおり「変更あり」
+  return JSON.stringify(squadCore(serializeTeam()))!==JSON.stringify(squadCore(base));
+}
 function deleteTeam(id){ setTeams(getTeams().filter(t=>t.id!==id)); if(state.teamId===id){ state.teamId=null; save(); } }
 function renameTeamInList(id,name){ const teams=getTeams(),i=teams.findIndex(t=>t.id===id); if(i<0)return; teams[i].name=name; if(teams[i].data)teams[i].data.teamName=name; setTeams(teams); if(state.teamId===id){ state.teamName=name; save(); } }
 // 保存済みスカッドの名前を編集（ドロワーのえんぴつマークから）
@@ -4687,7 +4696,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0726d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0726e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
