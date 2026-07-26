@@ -1609,6 +1609,7 @@ function openRenameTeam(id){
 }
 // ハンガーメニューの保存済みスカッド削除：確認してから削除する（誤操作防止）。保存/削除の作法は clearSquad と共通（保存して削除は無し）
 function confirmDeleteTeam(id){
+  closeDrawer(); // ドロワーを閉じてから盤面上に確認を出す（ドロワーの暗幕z:72が確認シートz:60を覆い、確認ボタンが画面外へ押し出されていたため。OK/キャンセルどちらでもドロワーへ戻す）
   openSheet(`
     <h2>${t('deleteTeamTitle')}</h2>
     <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('deleteTeamBody')}</div>
@@ -4686,7 +4687,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0726c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0726d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
