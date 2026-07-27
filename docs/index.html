@@ -3559,11 +3559,13 @@ function playerMatches(p){
   return true;
 }
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
+function ageSortEligible(i){ return +P[i][2]>0; } // 年齢ソートで表示する条件。未登録(0/空/null)は年齢順に意味を持てないため除外（DB内140人・2026-07-27）
 function drawPickList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   // ベンチ追加でも在籍中(起用中/ベンチ)の選手は除外せず表示する（prowHTMLで選択不可にする）
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   const so=pickFilter.sort||'suggest';
+  if(so==='age_desc'||so==='age_asc') pickCurIdx=pickCurIdx.filter(ageSortEligible); // 年齢未登録が「低い順」の先頭に固まるのを防ぐ（高い順も同基準で非表示）
   _iconFloorActive=false; // 手動ピッカーはレジェンド下限を効かせず“素の実力順”で並べる（引退アイコンで一覧を汚さない）
   // ★性能修正: ソートキー(市場価値・適性ランク)を候補ごとに1回だけ事前計算する（デコレート）。
   // 以前は比較のたびに mvScore(=keyForPlayer文字列生成+マップ参照) を呼んでいたため、まっさら盤面(候補2.4万)で
@@ -4741,7 +4743,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7115,6 +7117,17 @@ window.__selftest=function(){
         _pass=(pr.width>0)&&(d<1.5); _msg=_pass?'':('ズレ'+d.toFixed(1)+'px pitch幅'+Math.round(pr.width));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('toast_on_pitch_center',_pass,_msg); }
+    // T55: 年齢ソートは年齢未登録(0/空)の選手を出さない（「低い順」の先頭に未登録が固まる問題の再発防止・2026-07-27）
+    { let _pass=true,_msg='';
+      try{
+        const tmp=P.length; P.push(['__AgeTest','ST',0,'JPN','',0]);      // 年齢0の仮選手（finallyのP.length=snapPLenで消える）
+        const okNo=!ageSortEligible(tmp);                                  // 未登録→対象外
+        const real=P.findIndex((p,i)=>i<tmp&&(+p[2]>0));
+        const okYes=(real>=0)&&ageSortEligible(real);                      // 年齢ありは対象
+        const dbNo=P.slice(0,tmp).filter((p,i)=>!isCustomPid(i)&&!(+p[2]>0)).length; // DB内の未登録数（存在確認のみ）
+        _pass=okNo&&okYes; _msg=_pass?'':('no='+okNo+' yes='+okYes+' db未登録='+dbNo);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('age_sort_excludes_unknown',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
