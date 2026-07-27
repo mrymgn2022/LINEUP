@@ -3399,13 +3399,12 @@ function openPicker(slotIdx,clearAll){
 }
 function pickerHTML(slotIdx,role,title){
   return `
-  <h2>${title||t('place')} <span>${role}</span></h2>
+  <h2>${title||t('place')} <span style="margin-left:0">${role}</span><div class="fchip" id="pickClear" style="margin-left:auto;font-family:'Manrope',system-ui,sans-serif">${t('clearFilters')}</div></h2>
   <div class="controls">
     <input class="search" id="pq" placeholder="${t('searchNameClub')}" autocomplete="off">
-    <div class="filters"><div class="fchip" id="pickClear">${t('clearFilters')}</div></div>
-    <div class="filters" id="posF">${posChips()}</div>
     <div class="filters" id="lgF">${lgChips()}</div>
     <div class="filters" id="clubF" style="display:none"></div>
+    <div class="filters" id="posF">${posChips()}</div>
   </div>
   <div class="list" id="plist"></div>`;
 }
@@ -3539,7 +3538,7 @@ function wirePicker(slotIdx){
   if(lgF) wireLgSelect(lgF, pickFilter, ()=>{pickFilter.club='ALL';syncClubField('clubF',pickFilter);wirePickClub(slotIdx);drawPickList(slotIdx);});
   // 国籍フィルタを挿入（クラブフィルタの前）
   const clubF0=document.getElementById('clubF');
-  if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('beforebegin',natFilterHTML(pickFilter));
+  if(clubF0 && !document.querySelector('[data-natscope]')) clubF0.insertAdjacentHTML('afterend',natFilterHTML(pickFilter)); // 国籍はクラブ欄の下（リーグ→クラブ→国籍の順・2026-07-27レイアウト変更）
   attachNatFilter(document.querySelector('[data-natscope]'),pickFilter,()=>drawPickList(slotIdx));
   wirePickClub(slotIdx);
   syncClubField('clubF',pickFilter); // リーグ指定時のみクラブ欄を表示（新規作成と同じ）
@@ -3560,9 +3559,21 @@ function playerMatches(p){
   return true;
 }
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
+// クリアボタンの状態表示（2026-07-27）: 消すものが無い時は沈黙(減光)、フィルタが1つでも効いたら浮き上がる。
+// 「赤くする」案は不採用＝クリアは即やり直せる操作で破壊色の深刻度に釣り合わず、本物の削除確認の警告力も薄まるため。
+function syncClearBtn(btnId,f,baseSort){
+  const b=document.getElementById(btnId); if(!b) return;
+  f=f||{};
+  const active=!!((f.q&&f.q.trim())||(f.pos&&f.pos!=='ALL')||f.subpos||(f.lg&&f.lg!=='ALL')||(f.club&&f.club!=='ALL')||(f.nat&&f.nat!=='ALL')||(f.sort&&f.sort!==(baseSort||'suggest')));
+  b.style.opacity=active?'1':'.45';
+  b.style.color=active?'var(--ink)':'';
+  b.style.borderColor=active?'var(--mut)':'';
+}
+function syncPickClearBtn(){ syncClearBtn('pickClear',pickFilter,'suggest'); }
 function ageSortEligible(i){ return +P[i][2]>0; } // 年齢ソートで表示する条件。未登録(0/空/null)は年齢順に意味を持てないため除外（DB内140人・2026-07-27）
 function drawPickList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
+  syncPickClearBtn(); // フィルタ変更は必ずここを通る＝クリアボタンの点灯/減光を常に同期
   // ベンチ追加でも在籍中(起用中/ベンチ)の選手は除外せず表示する（prowHTMLで選択不可にする）
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   const so=pickFilter.sort||'suggest';
@@ -3584,7 +3595,9 @@ function drawPickList(slotIdx){
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
   if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
-    list.innerHTML=noMatchHTML('pickClear');return;}
+    list.innerHTML=noMatchHTML('pickClear',true); // 0件＝自作の文脈→新規作成を主ボタンで提示
+    const cb=document.getElementById('nmCreate'); if(cb) cb.onclick=()=>openCreatePlayer(slotIdx);
+    return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
@@ -4039,9 +4052,9 @@ function openSubPicker(slotIdx){
       </div>`:''}
       <div id="transferExtra" style="${hasBench?'display:none;':''}padding-top:6px">
         <input class="search" id="pq" placeholder="${t('searchNameClub')}" autocomplete="off">
-        <div class="filters" id="posF">${posChips()}</div>
         <div class="filters" id="lgF">${lgChips()}</div>
         <div class="filters" id="clubF" style="display:none"></div>
+        <div class="filters" id="posF">${posChips()}</div>
       </div>
       ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?escAttr(shortName(P[cur][0])):"-"}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
     </div>
@@ -4074,6 +4087,11 @@ function openSubPicker(slotIdx){
   drawSub();
 }
 function wireSubPickerFull(slotIdx){
+  // 国籍フィルタを他ピッカーと同じ位置（クラブ欄の下）に用意（モード切替の再初期化でも作り直す＝古い選択表示を残さない）
+  const te=document.getElementById('transferExtra');
+  if(te){ const old=te.querySelector('[data-natscope]'); if(old) old.remove();
+    const cf=document.getElementById('clubF'); if(cf) cf.insertAdjacentHTML('afterend',natFilterHTML(pickFilter));
+    attachNatFilter(te.querySelector('[data-natscope]'),pickFilter,()=>drawSubFull(slotIdx)); }
   const q=document.getElementById('pq');
   if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase();drawSubFull(slotIdx)};
   const posF=document.getElementById('posF');
@@ -4431,19 +4449,18 @@ function openMarket(){
   recordEvent('first_action',true); // ファネル：選手検索も"手を出した"に含む
   mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
   openSheet(`
-    <h2>${t('tipSearch')} <span>${LANG==='en'?P.length+' players':'全'+P.length+'選手'}</span></h2>
+    <h2>${t('tipSearch')} <span style="margin-left:0">${LANG==='en'?P.length+' players':'全'+P.length+'選手'}</span><div class="fchip" id="mClear" style="margin-left:auto;font-family:'Manrope',system-ui,sans-serif">${t('clearFilters')}</div></h2>
     <div class="controls">
       <input class="search" id="mq" placeholder="${t('searchNameClub')}" autocomplete="off">
-      <div class="filters"><div class="fchip" id="mClear">${t('clearFilters')}</div></div>
+      <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
+      <div class="filters" id="mclubF" style="display:none"></div>
+      ${natFilterHTML(mktFilter)}
       <div class="filters" id="msortF">
         <div class="fchip on" data-sort="mv">${t('sortFeatured')}</div>
         <div class="fchip" data-sort="age_desc">${t('sortAgeDesc')}</div>
         <div class="fchip" data-sort="age_asc">${t('sortAgeAsc')}</div>
       </div>
       <div class="filters" id="mposF">${posChips(mktFilter)}</div>
-      <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
-      ${natFilterHTML(mktFilter)}
-      <div class="filters" id="mclubF" style="display:none"></div>
     </div>
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
@@ -4463,6 +4480,7 @@ function wireMktClub(){
 }
 function drawMkt(){
   const list=document.getElementById('mlist');if(!list)return;
+  syncClearBtn('mClear',mktFilter,'mv'); // フィルタ変更のたびにクリアの点灯/減光を同期（既定ソートはmv）
   const f=mktFilter;
   mktCurIdx=P.map((p,i)=>i).filter(i=>{
     if(isCustomPid(i))return false; // カスタム選手は検索/移籍市場に出さない
@@ -4753,7 +4771,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4962,12 +4980,14 @@ function squadMatchHTML(m){
   </div>`;
 }
 // 検索0件を行き止まりにしない：ヒント＋絞り込み解除＋選手リクエスト（mailto）導線
-function noMatchHTML(clearId){
+function noMatchHTML(clearId,withCreate){
   const mail='mailto:support@squadxi.futbol?subject='+encodeURIComponent(t('reqPlayerSubj'))+'&body='+encodeURIComponent(t('reqPlayerBody'));
   const bs='width:auto;margin-top:0;padding:9px 14px;font-size:12.5px;letter-spacing:0;font-family:\'Manrope\',system-ui,sans-serif';
+  // withCreate: 「見つからなかった瞬間」が選手を自作する文脈そのもの→主ボタンで新規作成を出す（呼び出し側で#nmCreateにonclickを配線）
   return '<div class="empty-msg">'+t('noMatch')
     +'<div style="font-size:12px;color:var(--mut);margin-top:8px;line-height:1.8">'+t('noMatchHint')+'</div>'
     +'<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">'
+    +(withCreate?'<button class="bigbtn" id="nmCreate" style="'+bs+'">'+t('createPlayer')+'</button>':'')
     +(clearId&&document.getElementById(clearId)?'<button class="bigbtn ghost" style="'+bs+'" onclick="document.getElementById(\''+clearId+'\').click()">'+t('clearFilters')+'</button>':'')
     +'<a class="bigbtn ghost" style="'+bs+';display:inline-block;text-decoration:none" href="'+mail+'">'+t('reqPlayer')+'</a>'
     +'</div></div>';
@@ -7163,6 +7183,38 @@ window.__selftest=function(){
         _pass=aRsv&&aBadge&&bNo&&bBadge; _msg=_pass?'':('aRsv='+aRsv+' aBadge='+aBadge+' bNo='+bNo+' bBadge='+bBadge);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('reserve_badge_in_picker',_pass,_msg); }
+    // T57: ピッカー新レイアウト（2026-07-27）＝検索→リーグ→クラブ→国籍→(ソート)→ポジション、クリアは見出し内で状態点灯、0件で新規作成
+    { let _pass=true,_msg='';
+      try{
+        const rowKey=el=>el.id||(el.querySelector&&el.querySelector('[data-natscope]')?'nat':(el.getAttribute&&el.getAttribute('data-natscope')!=null?'nat':'row'));
+        // ① 配置ピッカー
+        openPicker(0,true);
+        const o1=[...document.querySelector('.sheet .controls').children].map(rowKey).join(',');
+        const ord1=(o1==='pq,lgF,clubF,nat,psortF,posF');
+        const hdr1=!!(document.getElementById('pickClear')&&document.getElementById('pickClear').closest('h2'));
+        const dim1=(document.getElementById('pickClear').style.opacity==='.45'||document.getElementById('pickClear').style.opacity==='0.45'); // クリア対象なし=減光
+        pickFilter.lg='ED'; drawPickList(0);
+        const lit1=(document.getElementById('pickClear').style.opacity==='1');                    // フィルタ有効=点灯
+        pickFilter.lg='ALL'; pickFilter.q='zzzzq'; drawPickList(0);
+        const create1=!!document.getElementById('nmCreate');                                      // 0件=新規作成ボタン
+        closeSheet();
+        // ② 選手を検索（market）
+        openMarket();
+        const o2=[...document.querySelector('.sheet .controls').children].map(rowKey).join(',');
+        const ord2=(o2==='mq,mlgF,mclubF,nat,msortF,mposF');
+        const hdr2=!!(document.getElementById('mClear')&&document.getElementById('mClear').closest('h2'));
+        closeSheet();
+        // ③ 第2候補（全チームからモードの並び。ベンチありだとベンチモードで開く→トグルで全チーム検索へ切替てから検査）
+        openSubPicker(0);
+        const bm=document.querySelector('#benchModeF [data-bm="transfer"]'); if(bm) bm.click();
+        const te=document.getElementById('transferExtra');
+        const o3=te?[...te.children].map(rowKey).join(','):'';
+        const ord3=(o3==='pq,lgF,clubF,nat,posF');
+        closeSheet();
+        _pass=ord1&&hdr1&&dim1&&lit1&&create1&&ord2&&hdr2&&ord3;
+        _msg=_pass?'':('o1='+o1+' hdr1='+hdr1+' dim='+dim1+' lit='+lit1+' create='+create1+' o2='+o2+' hdr2='+hdr2+' o3='+o3);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('picker_layout_v2',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
