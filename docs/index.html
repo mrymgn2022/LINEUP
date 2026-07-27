@@ -4548,7 +4548,9 @@ function annTitle(a){ return (LANG==='en'&&a&&a.titleEn)?a.titleEn:((a&&a.title)
 function annBody(a){ return (LANG==='en'&&a&&a.bodyEn)?a.bodyEn:((a&&a.body)||''); }
 function latestAnnouncement(){ return (ANNOUNCEMENTS&&ANNOUNCEMENTS.length)?ANNOUNCEMENTS[0]:null; }
 // 新しいお知らせは自動ポップアップを「1回だけ」（表示した時点で既読扱い→再起動で再表示しない）。以後はメニューの未読ドットで気づける。
-function maybeShowAnnouncement(){ try{ const a=latestAnnouncement(); if(!a||!a.id) return; if(lsGet('xi_announce_popped')===a.id) return; lsSet('xi_announce_popped', a.id); openAnnouncement(a); }catch(e){} }
+// 起動時ポップアップは廃止（2026-07-28 ユーザー決定）。お知らせはドロワーの「お知らせ」＋未読赤ドット(announceUnread)のみで伝える。
+// 理由: 初回訪問のショーケースや操作をモーダルが遮っていた（外部レビューの指摘＋7/27の実測で確認）。openAnnouncement/一覧/既読ロジックは温存。
+function maybeShowAnnouncement(){ /* ポップ廃止。呼び出し元(スプラッシュ後)は温存＝将来「重大告知だけポップ」を復活させる時はここに条件を書く */ }
 function announceUnread(){ try{ const a=latestAnnouncement(); return !!(a&&a.id&&lsGet('xi_announce_read')!==a.id); }catch(e){ return false; } }
 // 注目の移籍の未読判定（最新行が変わったら未読）。開いたら既読＝ドット/NEWが消える
 function transferSig(){ try{ const f=FEATURED_TRANSFERS&&FEATURED_TRANSFERS[0]; return f?(f.date+'|'+f.player):''; }catch(e){ return ''; } }
@@ -4781,7 +4783,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727l'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0728a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
