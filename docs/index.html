@@ -471,6 +471,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .prow.inxi{opacity:.4}
 .prow .badge{font-size:9px;color:var(--gold);font-weight:800}
 .prow .badge.benchbadge{color:#58c4ff}
+.prow .badge.rsvbadge{color:var(--mut)} /* ベンチ外＝在籍はしているが控え圏外。金(起用中)/青(ベンチ)より控えめな色 */
 .empty-msg{text-align:center;color:var(--mut);padding:40px 20px;font-size:13px}
 
 /* action menu */
@@ -1044,7 +1045,7 @@ const I18N = {
     sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
-    badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
+    badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
     addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を入れ替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れたいポジションをタップ（11枠が点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
@@ -1123,7 +1124,7 @@ const I18N = {
     sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
     createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
-    badgeInXI:'●In XI', badgeBench:'●Bench', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
+    badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
     addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace this player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap the position to fill (all 11 spots are flashing)', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
@@ -3873,15 +3874,23 @@ function attachNatFilter(scope,f,redraw){
     // 検索欄に自動フォーカスしない（キーボードを勝手に出さない。リーグ選択と挙動を統一）
   };
 }
+// ベンチ外セクションに現に表示されている選手か（ピッカーのバッジ用）。
+// reserveIds()と同じ判定条件（読込クラブの残り[除外を引く]＋手動追加、XI/ベンチ在籍は除く）のソート無し軽量版。
+function onReserveNow(i){
+  if(inXI(i)||state.bench.includes(i)) return false;
+  if((state.reserveAdds||[]).includes(i)) return true;
+  return !!state.loadedClub && P[i][4].trim()===state.loadedClub && !(state.excluded||[]).includes(i);
+}
 function prowHTML(i,hideBench){
   const p=P[i],g=grp(p[1]),already=inXI(i);
   const onBenchNow=state.bench.includes(i);
   const onBench=!already&&!hideBench&&onBenchNow; // チーム外ではなくこのスカッドのベンチにいる選手
+  const onReserve=!already&&!onBenchNow&&onReserveNow(i); // ベンチ外にいる選手＝【ベンチ外】（起用中/ベンチが優先）
   const lock=benchAddMode&&(already||onBenchNow); // ベンチ追加：在籍者は「起用中/ベンチ」表示で選択不可
   return `<div class="prow ${already?'inxi':''}${lock?' locked':''}" ${lock?'':`data-pid="${i}"`}${lock?' style="opacity:.5;pointer-events:none"':''}>
     <div class="pos ${g}">${p[1]}</div>
     <div class="meta">
-      <div class="nm">${escAttr(nameOf(i,false))} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
+      <div class="nm">${escAttr(nameOf(i,false))} ${already?'<span class="badge">'+t('badgeInXI')+'</span>':''}${onBench?'<span class="badge benchbadge">'+t('badgeBench')+'</span>':''}${onReserve?'<span class="badge rsvbadge">'+t('badgeReserve')+'</span>':''}${isCustomPid(i)?'<span class="badge" style="background:rgba(202,255,58,.16);color:var(--lime)">'+t('badgeCustom')+'</span>':''}</div>
       <div class="sub">${flagHTML(p[3])}${p[4]?' · '+escAttr(dispClub(p[4])):''}${p[2]>0?' · '+p[2]+(LANG==='en'?'':'歳'):''}</div>
     </div>
   </div>`;
@@ -4743,7 +4752,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7128,6 +7137,25 @@ window.__selftest=function(){
         _pass=okNo&&okYes; _msg=_pass?'':('no='+okNo+' yes='+okYes+' db未登録='+dbNo);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('age_sort_excludes_unknown',_pass,_msg); }
+    // T56: ピッカーの【ベンチ外】バッジ＝ベンチ外セクション表示中の選手だけに付く（起用中/ベンチが優先・2026-07-27）
+    { let _pass=true,_msg='';
+      try{
+        const _ra=state.reserveAdds, _bch=state.bench, _sl0=state.slots[0]?state.slots[0].pid:null;
+        // XI/ベンチに居ない実在選手を2人拾う
+        const free=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&!inXI(i)&&!state.bench.includes(i)).slice(0,2);
+        if(free.length<2) throw new Error('候補不足');
+        state.reserveAdds=[free[0]];                       // 手動追加＝ベンチ外
+        const aRsv=onReserveNow(free[0])===true;
+        const html=prowHTML(free[0]);
+        const aBadge=html.indexOf(t('badgeReserve'))>=0;   // バッジが出る
+        state.bench=state.bench.concat([free[1]]);
+        const bNo=onReserveNow(free[1])===false;           // ベンチ在籍者は対象外
+        const bHtml=prowHTML(free[1]);
+        const bBadge=bHtml.indexOf(t('badgeReserve'))<0 && bHtml.indexOf(t('badgeBench'))>=0; // ベンチバッジが優先
+        state.reserveAdds=_ra; state.bench=_bch;
+        _pass=aRsv&&aBadge&&bNo&&bBadge; _msg=_pass?'':('aRsv='+aRsv+' aBadge='+aBadge+' bNo='+bNo+' bBadge='+bBadge);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('reserve_badge_in_picker',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
