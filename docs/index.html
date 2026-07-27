@@ -1277,8 +1277,21 @@ function recordEvent(ev,once){
   }catch(e){}
 }
 // スタメン11人が埋まった瞬間を1回だけ記録（renderから毎回呼ばれるが once ガードで1回に丸まる）
+// XI完成バーは「このセッション中に11人へ到達した時」だけ出す（2026-07-27）＝前回作った完成盤面の復元起動では出さない。
+// _xiPrevFilled: 前回render時の配置人数。null=起動直後（復元完成盤面は null→11 で遷移扱いにならずバー無し）。
+// 自動配置・リンク展開の各入口は 0 にリセット＝「このセッションで新しく組んだ」扱いで完成時にバーが出る。
+// ※計測イベント xi_complete は従来どおり復元でも送る（レポートのxiAuto分離が前提にしているため挙動を変えない）。
+let _xiPrevFilled=null;
 function _checkXIComplete(){
-  try{ if(state.demo) return; if(state.slots&&state.slots.length===11&&state.slots.every(s=>s&&s.pid!=null)){ recordEvent('xi_complete',true); maybeShowXiDoneBar(); } }catch(e){}
+  try{
+    if(state.demo) return;
+    const n=(state.slots&&state.slots.length===11)?state.slots.filter(s=>s&&s.pid!=null).length:0;
+    if(n===11){
+      recordEvent('xi_complete',true);
+      if(_xiPrevFilled!=null&&_xiPrevFilled<11) maybeShowXiDoneBar();
+    }
+    _xiPrevFilled=n;
+  }catch(e){}
 }
 // 端末の属性を1回だけ記録（イベント名で表現するので、Worker/DB側の変更は不要）
 //  pwa    … ホーム画面に追加して起動している＝"実質アプリ利用者"。App Storeを出すべきかの最重要判断材料
@@ -4728,7 +4741,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5204,7 +5217,7 @@ function openSharedSquadConfirm(raw){
       <button class="bigbtn" id="ssGo">${t('shOpenGo')}</button>
       <button class="bigbtn ghost" id="ssCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('ssGo').onclick=()=>{ closeSheet(); const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(raw); save(); render(); };
+  document.getElementById('ssGo').onclick=()=>{ closeSheet(); _xiPrevFilled=0; const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(raw); save(); render(); };
   document.getElementById('ssCancel').onclick=()=>{ closeSheet(); };
 }
 function openConfirmSave(proceed,mode){
@@ -5306,6 +5319,7 @@ function clubRow(c){
 // オリジナルチーム作成：チーム名とフォーメーションだけ
 // 指定の選手プール(ids)で、適性ポジション＆市場価値順に自動配置（loadClubと同じロジック）
 function autoFillFrom(ids){
+  _xiPrevFilled=0; // 新しく組む＝完成時にXI完成バーを出す対象（盤面が既に11人でも自動配置は「新規完成」扱い）
   recordEvent('autobuild'); // ファネル：Auto Build（クラブ/国籍でXIを一括生成）が実際に使われた回数。
                             // 「魔法の機能が初見に見つけられていないのでは」という仮説の検証に使う
   const used=new Set(); const savedRole=pickRole;
@@ -5719,6 +5733,7 @@ function applyClubNames(club){
 }
 // クラブの実在編成を現在のフォーメーションに配置（スタメン・控え15・ベンチ外・第二候補）。teamNameは任意の表示名
 function placeClubSquad(club,name){
+  _xiPrevFilled=0; // 新しく組む＝完成時にXI完成バーを出す対象（ショーケースは state.demo ガードで出ない）
   state.flagByLeague=false; // クラブ編成は本人の国籍旗
   state.excluded=[]; state.reserveAdds=[]; // 新しいクラブ編成はベンチ外の除外/追加をリセット
   clearAutoClubMemos(); // 前のチーム（国籍縛り等）で自動入力されたクラブ名メモを持ち越さない
@@ -7067,6 +7082,24 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       finally{ LANG=_lang; }
       ok('lang_free_and_jclub_name',_pass,_msg); }
+    // T53: XI完成バーは「このセッション中に11人へ到達した時」だけ。復元起動（prev=null→11）では出ない（2026-07-27）
+    { let _pass=true,_msg='';
+      try{
+        const _bs=_xiBarShown, _pf=_xiPrevFilled, _bw=_xiBarWaiting, _sl=state.slots, _demo=state.demo, _tid=state.teamId;
+        // 先行テスト(placeClubSquad/hydrateSiteSquad)がバーをDOMに残していることがある→先に掃除してから判定
+        try{ const b0=document.getElementById('xiDoneBar'); if(b0) b0.remove(); }catch(_){}
+        state.demo=false; state.teamId=null;
+        state.slots=Array.from({length:11},()=>({role:'CB',x:50,y:50,pid:0,sub:null}));
+        _xiBarShown=false; _xiBarWaiting=false; _xiPrevFilled=null;
+        _checkXIComplete();                                              // 起動復元相当（prev=null → 11）
+        const bootNo = !_xiBarShown && !document.getElementById('xiDoneBar');
+        _xiPrevFilled=10; _checkXIComplete();                            // 10→11 相当
+        const transYes = _xiBarShown || !!document.getElementById('xiDoneBar');
+        try{ const b=document.getElementById('xiDoneBar'); if(b) b.remove(); }catch(_){}
+        _xiBarShown=_bs; _xiPrevFilled=_pf; _xiBarWaiting=_bw; state.slots=_sl; state.demo=_demo; state.teamId=_tid;
+        _pass=bootNo&&transYes; _msg=_pass?'':('boot='+bootNo+' trans='+transYes);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('xi_bar_session_gate',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -7110,7 +7143,7 @@ window.__selftest=function(){
       try{ _popSrc = sharedRaw.st ? ('site'+((typeof sharedRaw.pg==='string'&&/^[a-z0-9_-]{1,40}$/i.test(sharedRaw.pg))?(':'+sharedRaw.pg):'')) : 'share'; }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
-      if(sharedRaw.st && !unsavedWork){ const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
+      if(sharedRaw.st && !unsavedWork){ _xiPrevFilled=0; const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
     try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
     // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 人気クラブのXIをサンプル表示
