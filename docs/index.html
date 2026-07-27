@@ -138,6 +138,12 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 
 /* ---------- Pitch ---------- */
 .pitchwrap{padding:8px 12px 8px;position:relative}
+/* 整列リセットのフローティングチップ（2026-07-27 案A）: 駒を手動で動かした時だけ盤面右下に出現（右上はFW/RWの定位置なので回避）。
+   Googleマップのコンパスと同じ「既定からずれた時だけ現れて、戻すと消える」文脈出現型。共有画像には写らない（canvasは別描画）。 */
+#resetChip{position:absolute;right:10px;bottom:10px;z-index:30;display:none;align-items:center;gap:5px;padding:7px 11px;border-radius:999px;
+  background:rgba(10,14,12,.8);border:1px solid rgba(202,255,58,.5);color:var(--lime);font-size:11.5px;font-weight:800;cursor:pointer;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 3px 12px rgba(0,0,0,.45);white-space:nowrap}
+#resetChip.on{display:flex}
 .pitch{
   position:relative;width:100%;height:clamp(560px,72vh,610px);border-radius:18px;overflow:hidden;
   background:
@@ -371,7 +377,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 /* PC・タブレット（iPad含む：横幅768px以上かつ高さ600px以上）＝ハンバーガーメニューを左端に常時表示のサイドバーとしてドッキング。
    本体とモーダルはサイドバー分だけ右へ寄せて中央配置。スマホ（縦長・狭い画面）は従来どおりスライド式のまま。 */
 .seowrap{height:0;overflow:hidden} /* モバイルでは非表示（アプリ体験を崩さない） */
-#btnReset{display:none} /* 配置リセットはPC版のみ（2026-07-19復活） */
+#btnReset{display:none} /* ヘッダーの整列リセットはPC版のみ（2026-07-19復活）。スマホは盤面右下の文脈チップ#resetChipが担う（2026-07-27 案A＝駒を動かした時だけ出現。チップは全環境共通で、PCはヘッダーと併存） */
 @media (min-width:768px) and (min-height:600px){
   #btnMenu{display:none!important;}                 /* トグル不要 */
   .dscrim{display:none!important;}                  /* 常時表示なので暗幕なし */
@@ -688,6 +694,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   <div class="scroll" id="scroll">
     <div class="pitchwrap">
       <div class="pitch" id="pitch">
+        <div id="resetChip" role="button" aria-label="整列リセット"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg><span id="resetChipLb">整列リセット</span></div>
         <div class="markings">
           <div class="mk center-line"></div>
           <div class="mk center-circle"></div>
@@ -782,6 +789,8 @@ const FORM={
 };
 const FORMS=Object.keys(FORM);
 let layoutMoved=false; // 駒を手動でドラッグ移動したか。falseなら整列リセットは反応しない（自動配置直後など）
+// 整列リセットチップの表示同期＝layoutMovedが真の時だけ盤面右下に出す（ショーケースdemoでは出さない）。文言は言語追随。
+function syncResetChip(){ try{ const c=document.getElementById('resetChip'); if(!c) return; const on=!!layoutMoved&&!state.demo; c.classList.toggle('on',on); if(on){ const lb=document.getElementById('resetChipLb'); if(lb) lb.textContent=t('tipReset'); } }catch(e){} }
 let cleanJson=null;    // 最後に保存/読込した時点のスカッドJSON。これと現状が違えば「未保存の変更あり」（新規作成/読込時に確認）
 
 /* position grouping for color/filter */
@@ -1717,6 +1726,7 @@ function benchReturn(pid){
 
 function render(){
   _checkXIComplete(); // ファネル：スタメン11人が揃った瞬間を1回だけ記録（onceガードで重複しない）
+  syncResetChip();    // 整列リセットチップ＝手動移動中だけ表示（読込/自動配置/リセットで消える）
   // remove existing tokens
   pitch.querySelectorAll('.tok').forEach(t=>t.remove());
   pitch.classList.toggle('bigname',!!state.hideRoles);
@@ -2228,7 +2238,7 @@ function attachDrag(el,actor){
     }else{
       const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
       const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
-      base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';layoutMoved=true; // 手動移動した
+      base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';layoutMoved=true;syncResetChip(); // 手動移動した→リセットチップを出す（ドラッグはrenderを通らないためここでも同期）
     }
   });
   el.addEventListener('pointerup',e=>{
@@ -4771,7 +4781,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727k'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6359,6 +6369,8 @@ document.getElementById('btnReset').onclick=()=>{
   layoutMoved=false;
   render();save();toast(t('tstResetLayout'));
 };
+// 盤面右下の整列リセットチップ（スマホ含む全環境）＝PCヘッダーのbtnResetと同じ処理を呼ぶ
+{ const rc=document.getElementById('resetChip'); if(rc) rc.onclick=()=>{ document.getElementById('btnReset').onclick(); }; }
 
 // 盤面リセット：配置中の選手・ベンチ・ベンチ外・キャプテン・マーカーを全て外して空のフォーメーションに戻す（保存済みスカッドは消さない）
 function clearSquad(){
@@ -7215,6 +7227,21 @@ window.__selftest=function(){
         _msg=_pass?'':('o1='+o1+' hdr1='+hdr1+' dim='+dim1+' lit='+lit1+' create='+create1+' o2='+o2+' hdr2='+hdr2+' o3='+o3);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('picker_layout_v2',_pass,_msg); }
+    // T58: 整列リセットチップ＝駒を手動移動した時だけ盤面右下に出る（案A・2026-07-27。demo中は出ない・戻すと消える）
+    { let _pass=true,_msg='';
+      try{
+        const _lm=layoutMoved, _demo=state.demo;
+        state.demo=false;
+        layoutMoved=false; syncResetChip();
+        const off1=!document.getElementById('resetChip').classList.contains('on');   // 既定＝非表示
+        layoutMoved=true; syncResetChip();
+        const on1=document.getElementById('resetChip').classList.contains('on');     // 手動移動中＝表示
+        state.demo=true; syncResetChip();
+        const off2=!document.getElementById('resetChip').classList.contains('on');   // ショーケースdemo＝非表示
+        layoutMoved=_lm; state.demo=_demo; syncResetChip();
+        _pass=off1&&on1&&off2; _msg=_pass?'':('off1='+off1+' on1='+on1+' off2='+off2);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('reset_chip_contextual',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
