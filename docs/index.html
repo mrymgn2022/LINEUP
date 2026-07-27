@@ -4475,6 +4475,7 @@ function drawMkt(){
     return true;
   });
   const so=f.sort||'mv';
+  if(so==='age_desc'||so==='age_asc') mktCurIdx=mktCurIdx.filter(ageSortEligible); // 年齢未登録は年齢ソートでは非表示（drawPickListと同基準。ここを忘れて再報告を受けた 2026-07-27）
   _iconFloorActive=false; // 検索一覧もレジェンド下限を効かせず“素の実力順”で並べる
   // ★性能修正: 市場価値順は mvScore を候補ごとに1回だけ事前計算（比較器内で再計算しない）。フィルタ無しの全2.4万件でも即並ぶ。順序は従来と同一。
   if(so==='age_desc') mktCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
@@ -4752,7 +4753,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7126,15 +7127,21 @@ window.__selftest=function(){
         _pass=(pr.width>0)&&(d<1.5); _msg=_pass?'':('ズレ'+d.toFixed(1)+'px pitch幅'+Math.round(pr.width));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('toast_on_pitch_center',_pass,_msg); }
-    // T55: 年齢ソートは年齢未登録(0/空)の選手を出さない（「低い順」の先頭に未登録が固まる問題の再発防止・2026-07-27）
+    // T55: 年齢ソートは年齢未登録(0/空)の選手を出さない。★両ピッカーを実走して混入0を確認
+    //（helper単体テストだけでは drawMkt=チーム外検索側の適用漏れを見逃した実績あり 2026-07-27。年齢ソートは2実装ある）
     { let _pass=true,_msg='';
       try{
-        const tmp=P.length; P.push(['__AgeTest','ST',0,'JPN','',0]);      // 年齢0の仮選手（finallyのP.length=snapPLenで消える）
+        const tmp=P.length; P.push(['__AgeTest','ST',0,'JPN','',0]);      // 年齢0の仮選手＝DBが将来全員年齢ありになってもテストが空振りしない（finallyのP.length=snapPLenで消える）
         const okNo=!ageSortEligible(tmp);                                  // 未登録→対象外
-        const real=P.findIndex((p,i)=>i<tmp&&(+p[2]>0));
-        const okYes=(real>=0)&&ageSortEligible(real);                      // 年齢ありは対象
-        const dbNo=P.slice(0,tmp).filter((p,i)=>!isCustomPid(i)&&!(+p[2]>0)).length; // DB内の未登録数（存在確認のみ）
-        _pass=okNo&&okYes; _msg=_pass?'':('no='+okNo+' yes='+okYes+' db未登録='+dbNo);
+        // ① 配置ピッカー(drawPickList)
+        openPicker(0,true); pickFilter.sort='age_asc'; drawPickList(0);
+        const bad1=pickCurIdx.filter(i=>!(+P[i][2]>0)).length;
+        closeSheet();
+        // ② チーム外の全選手検索(drawMkt)
+        openMarket(); mktFilter.sort='age_asc'; drawMkt();
+        const bad2=mktCurIdx.filter(i=>!(+P[i][2]>0)).length;
+        mktFilter.sort='mv'; closeSheet();
+        _pass=okNo&&(bad1===0)&&(bad2===0); _msg=_pass?'':('no='+okNo+' pick混入='+bad1+' mkt混入='+bad2);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('age_sort_excludes_unknown',_pass,_msg); }
     // T56: ピッカーの【ベンチ外】バッジ＝ベンチ外セクション表示中の選手だけに付く（起用中/ベンチが優先・2026-07-27）
