@@ -4741,7 +4741,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6398,6 +6398,10 @@ document.getElementById('btnMemo').onclick=()=>{
    ========================================================= */
 let tT;const toastEl=document.getElementById('toast');
 function toast(m){
+  // 横位置は盤面(#pitch)の実測中心X（2026-07-27）。CSSの--appcx(.app列の中心)だと、縦スクロールバーが
+  // 盤面列の右側を食う分だけ数px右へずれる。実測なら画面幅/スクロールバー有無に関わらず常に盤面の真下中央。
+  // CSS側の left:--appcx !important に勝つため inline も 'important' 指定（取得失敗時はCSS値のまま＝従来挙動）。
+  try{ const p=document.getElementById('pitch'), r=p&&p.getBoundingClientRect(); if(r&&r.width>0) toastEl.style.setProperty('left',((r.left+r.right)/2)+'px','important'); }catch(e){}
   // 文言変更＝幅変更を遷移無しで確定させてから表示する。translateX(-50%)は自身の幅基準のため、
   // 幅変化がtransition(all)に乗るとiOS Safariで「左にずれて中央に戻る」スライドに見える
   toastEl.style.transition='none'; toastEl.textContent=m; void toastEl.offsetWidth; toastEl.style.transition='';
@@ -7100,6 +7104,17 @@ window.__selftest=function(){
         _pass=bootNo&&transYes; _msg=_pass?'':('boot='+bootNo+' trans='+transYes);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('xi_bar_session_gate',_pass,_msg); }
+    // T54: トーストは盤面(#pitch)の実測中心Xに出る（縦スクロールバーの非対称で--appcxからずれる問題の再発防止・2026-07-27）
+    { let _pass=true,_msg='';
+      try{
+        const t0=document.getElementById('toast'); const _trs=t0.style.transition;
+        t0.style.transition='none'; toast('位置テスト');
+        const tr=t0.getBoundingClientRect(), pr=document.getElementById('pitch').getBoundingClientRect();
+        const d=Math.abs((tr.left+tr.right)/2-(pr.left+pr.right)/2);
+        t0.classList.remove('on'); t0.style.transition=_trs;
+        _pass=(pr.width>0)&&(d<1.5); _msg=_pass?'':('ズレ'+d.toFixed(1)+'px pitch幅'+Math.round(pr.width));
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('toast_on_pitch_center',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
