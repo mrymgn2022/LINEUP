@@ -4449,7 +4449,7 @@ function openMarket(){
   recordEvent('first_action',true); // ファネル：選手検索も"手を出した"に含む
   mktFilter={pos:'ALL',lg:'ALL',club:'ALL',q:'',sort:'mv'};
   openSheet(`
-    <h2>${t('tipSearch')} <span style="margin-left:0">${LANG==='en'?P.length+' players':'全'+P.length+'選手'}</span><div class="fchip" id="mClear" style="margin-left:auto;font-family:'Manrope',system-ui,sans-serif">${t('clearFilters')}</div></h2>
+    <h2>${t('tipSearch')} <div class="fchip" id="mClear" style="margin-left:auto;font-family:'Manrope',system-ui,sans-serif">${t('clearFilters')}</div></h2>
     <div class="controls">
       <input class="search" id="mq" placeholder="${t('searchNameClub')}" autocomplete="off">
       <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
@@ -4771,7 +4771,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0727i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0727j'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
