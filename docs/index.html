@@ -4792,7 +4792,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0728e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0728f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5629,7 +5629,7 @@ function startOriginal(){
   // クラブ欄はリーグ/人気クラブを選んで初めて表示。ALL（全リーグ）では非表示
   const updateClubField=()=>{ const f=document.getElementById('otClubField'); if(!f)return; const show=(chosenLg!=='ALL'); f.style.display=show?'':'none'; if(show){ const cs=document.getElementById('otClub'); if(cs) cs.innerHTML=otClubOptions(chosenLg); } };
   openSheet(`
-    <h2>${t('create')}</h2>
+    <h2>${t('create')}<div class="fchip" id="otClear" style="margin-left:auto;font-family:'Manrope',system-ui,sans-serif">${t('clearConds')}</div></h2>
     <div class="detail">
       <div class="formfield">
         <label>${t('teamName')} <i>${t('optional')}</i></label>
@@ -5641,14 +5641,11 @@ function startOriginal(){
         <select class="search" id="otForm" style="width:100%">${formOpts}</select>
       </div>
       <div class="otsep">${t('autoConds')}</div>
+      <!-- 以下は選手ピッカーと同じ並び（検索→リーグ→クラブ→国籍）。2026-07-28にユーザー指示で統一 -->
       <div class="formfield">
         <label>${t('teamSearch')}</label>
         <input class="search" id="otSearch" placeholder="${t('teamSearchPh')}" autocomplete="off">
         <div id="otSuggest" class="otsuggest"></div>
-      </div>
-      <div class="formfield">
-        <label>${t('natLabel')}</label>
-        ${natFilterHTML(acf)}
       </div>
       <div class="formfield">
         <label>${t('dkLeague')}</label>
@@ -5659,13 +5656,20 @@ function startOriginal(){
         <select class="search" id="otClub" style="width:100%">${otClubOptions(chosenLg)}</select>
         <div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">${t('clubHelp')}</div>
       </div>
-      <div class="filters" style="margin:2px 0 4px"><div class="fchip" id="otClear">${t('clearConds')}</div></div>
+      <div class="formfield">
+        <label>${t('natLabel')}</label>
+        ${natFilterHTML(acf)}
+      </div>
       <button class="bigbtn" id="otStart">${t('autoBuild')}</button>
       <div style="font-size:11px;color:var(--mut);margin:8px 2px 0;line-height:1.6">${t('autoBuildHelp')}</div>
     </div>`);
+  // クリアの点灯/減光もピッカーと同じ作法（条件が1つでも効いている時だけ浮き上がる）
+  const syncOtClear=()=>{ const b=document.getElementById('otClear'); if(!b) return;
+    const on=!!((acf.nat&&acf.nat!=='ALL')||(chosenLg&&chosenLg!=='ALL')||((document.getElementById('otClub')||{}).value));
+    b.style.opacity=on?'1':'.45'; b.style.color=on?'var(--ink)':''; b.style.borderColor=on?'var(--mut)':''; };
   document.getElementById('otForm').onchange=e=>{ chosenForm=e.target.value; formTouched=true; };
   const _otLgEl=document.getElementById('otLg');
-  if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); }); }
+  if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); syncOtClear(); }); }
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
   const otClubLg={};
   P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(c&&!(c in otClubLg)) otClubLg[c]=p[5]; } });
@@ -5683,20 +5687,24 @@ function startOriginal(){
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
     updateClubField();
     const cs=document.getElementById('otClub'); if(cs) cs.value=club;
-    otSearchEl.value=club; otSug.innerHTML='';
+    otSearchEl.value=club; otSug.innerHTML=''; syncOtClear();
   };
-  attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{});
+  attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{ syncOtClear(); });
+  { const _cs=document.getElementById('otClub'); if(_cs) _cs.addEventListener('change',syncOtClear); }
   // 復元時：リーグ/人気クラブ指定があればクラブ欄を表示。前回選んだクラブも復元
   updateClubField();
   const _otClub=document.getElementById('otClub'); if(_otClub&&otLast.club) _otClub.value=otLast.club;
+  syncOtClear(); // 復元した条件を反映して初期表示
   // 自動配置の条件（国籍・リーグ・クラブ）をクリア。チーム名・フォーメーションは保持
   const _otClr=document.getElementById('otClear');
   if(_otClr) _otClr.onclick=()=>{
     acf.nat='ALL'; chosenLg='ALL'; otF.lg='ALL'; otF.expand=null; otF.lgopen=false; otF.lgq='';
     const scope=document.querySelector('[data-natscope]'), chip=scope&&scope.querySelector('[data-natchip]');
-    if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{}); }
+    if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{ syncOtClear(); }); }
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
     const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField();
+    const se=document.getElementById('otSearch'); if(se){ se.value=''; const sg=document.getElementById('otSuggest'); if(sg) sg.innerHTML=''; } // 検索欄も条件の一部＝一緒にクリア
+    syncOtClear();
   };
   document.getElementById('otStart').onclick=()=>{
     const typed=(document.getElementById('otName').value||'').trim();
@@ -7286,6 +7294,25 @@ window.__selftest=function(){
         _msg=_pass?'':('on='+on1+' n='+n1+' off='+off1+' cue='+cueGone+' click='+clickable+' tg='+tgOK+' body='+bodyStill);
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('bench_jump_button',_pass,_msg); }
+    // T60: 新規作成シートもピッカーと同じ規範（スカッド名→フォメ→[条件]検索→リーグ→クラブ→国籍・クリアは見出し右上で状態点灯）2026-07-28
+    { let _pass=true,_msg='';
+      try{
+        const _sl=state.slots.map(s=>s.pid), _b=state.bench, _tid=state.teamId, _cj=cleanJson;
+        state.slots.forEach(s=>{s.pid=null;s.sub=null;}); state.bench=[]; state.teamId=null; cleanJson=null; // 未保存確認を挟ませない
+        newTeamFlow();
+        const rows=[...document.querySelectorAll('.sheet .detail > *')].map(e=>e.id||e.className);
+        const orderOK=rows.slice(0,7).join(',')==='formfield,formfield,otsep,formfield,formfield,otClubField,formfield';
+        const btn=document.getElementById('otClear');
+        const hdrOK=!!(btn&&btn.closest('h2'));                                  // クリアは見出し行
+        const dimOK=(btn.style.opacity==='.45'||btn.style.opacity==='0.45');     // 条件なし＝減光
+        const lgOK=!!document.getElementById('otLg'), clubOK=!!document.getElementById('otClubField');
+        const natAfterClub=rows.indexOf('otClubField')<rows.lastIndexOf('formfield'); // 国籍はクラブより後
+        closeSheet();
+        state.slots.forEach((s,i)=>{s.pid=_sl[i];}); state.bench=_b; state.teamId=_tid; cleanJson=_cj; render();
+        _pass=orderOK&&hdrOK&&dimOK&&lgOK&&clubOK&&natAfterClub;
+        _msg=_pass?'':('order='+rows.slice(0,7).join(',')+' hdr='+hdrOK+' dim='+dimOK+' nat='+natAfterClub);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('newteam_layout_matches_picker',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
