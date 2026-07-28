@@ -15173,6 +15173,7 @@ const P=JSON.parse((`[
 ["Luciano Giménez","ST",26,"🇦🇷 ARG","CA Huracán","AR"],
 ["Santiago Beltrán","GK",21,"🇦🇷 ARG","CA River Plate","AR"],
 ["Ezequiel Centurión","GK",29,"🇦🇷 ARG","CA River Plate","AR"],
+["Ángel Correa","ST",31,"🇦🇷 ARG","CA River Plate","AR"],
 ["Franco Armani","GK",39,"🇦🇷 ARG","CA River Plate","AR"],
 ["Lautaro Rivero","CB",22,"🇦🇷 ARG","CA River Plate","AR"],
 ["Lucas Martínez Quarta","CB",30,"🇦🇷 ARG","CA River Plate","AR"],
