@@ -1041,6 +1041,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
+    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
@@ -1120,6 +1121,7 @@ const I18N = {
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
+    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
@@ -4792,7 +4794,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0729d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0729e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5168,38 +5170,95 @@ function openInfoPage(kind){
 }
 // 使い方：初めての人向けに、3ステップ＋応用＋ボタン説明を視覚的に
 function openHelp(){
-  const step=(n,t,d)=>`<div style="display:flex;gap:11px;margin:0 16px 14px;align-items:flex-start">
+  // 番号つきステップ
+  const step=(n,ti,d)=>`<div style="display:flex;gap:11px;margin:0 16px 14px;align-items:flex-start">
     <div style="flex:0 0 26px;height:26px;border-radius:50%;background:var(--lime);color:#0a0e0c;font-weight:800;font-size:14px;display:grid;place-items:center;line-height:1">${n}</div>
-    <div style="flex:1;min-width:0"><div style="font-weight:800;color:var(--ink);font-size:14px">${t}</div><div style="color:var(--mut);font-size:12.5px;line-height:1.7;margin-top:3px">${d}</div></div></div>`;
-  const leg=(ic,name,desc)=>`<div style="display:flex;align-items:center;gap:11px;margin:0 16px 9px">
-    <div style="flex:0 0 32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;color:var(--ink);font-size:13px;font-weight:800;font-family:'Bebas Neue',sans-serif">${ic}</div>
-    <div style="font-size:12.5px;color:var(--mut);line-height:1.5"><b style="color:var(--ink);font-weight:800">${name}</b>　${desc}</div></div>`;
-  const sec=t=>`<div style="font-size:11px;letter-spacing:1.5px;color:var(--mut);font-weight:800;margin:0 16px 11px">${t}</div>`;
-  const div=`<div style="height:1px;background:var(--line);margin:8px 16px 15px"></div>`;
+    <div style="flex:1;min-width:0"><div style="font-weight:800;color:var(--ink);font-size:14px">${ti}</div><div style="color:var(--mut);font-size:12.5px;line-height:1.7;margin-top:3px">${d}</div></div></div>`;
+  // アイコン1行（アイコンは言語に依存しないので、絵と名前を並べて覚えてもらう）
+  const ic=(icon,name,desc)=>`<div style="display:flex;align-items:center;gap:11px;margin:0 16px 8px">
+    <div style="flex:0 0 34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;color:var(--ink);font-size:13px;font-weight:800">${icon}</div>
+    <div style="flex:1;min-width:0;font-size:12.5px;color:var(--mut);line-height:1.5"><b style="color:var(--ink);font-weight:800">${name}</b>${desc?'<br>'+desc:''}</div></div>`;
+  const sec=ti=>`<div style="font-size:11px;letter-spacing:1.5px;color:var(--mut);font-weight:800;margin:0 16px 11px">${ti}</div>`;
+  const div=`<div style="height:1px;background:var(--line);margin:14px 16px 15px"></div>`;
+  // 文字アイコン（SVGを持たないUI要素はラベルそのものを見せる）
+  const tx=s=>`<span style="font-size:11px;font-weight:800;letter-spacing:.3px">${s}</span>`;
+  const VID='OGbxHh3JGF8';
   openSheet(`
     <h2>${t('help')} <span>${t('helpSub')}</span></h2>
     <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 28px)">
-      <div style="margin:2px 16px 18px;color:var(--ink);font-size:13.5px;line-height:1.85">${t('helpIntro')}</div>
+      <div style="margin:2px 16px 16px;color:var(--ink);font-size:13.5px;line-height:1.85">${t('helpIntro')}</div>
+
+      ${sec(t('helpSecVideo'))}
+      <!-- 軽量ファサード: 開くたびにYouTubeを読み込むとシートが重くなるので、タップで初めてiframeを挿す -->
+      <div id="hlpVid" role="button" tabindex="0" aria-label="${t('helpSecVideo')}"
+        style="margin:0 16px 8px;position:relative;padding-bottom:56.25%;height:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(160deg,#121814,#0a0e0c);cursor:pointer"
+        onclick="this.innerHTML='<iframe src=&quot;https://www.youtube-nocookie.com/embed/${VID}?autoplay=1&quot; title=&quot;Squad XI&quot; allowfullscreen allow=&quot;autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share&quot; referrerpolicy=&quot;strict-origin-when-cross-origin&quot; frameborder=&quot;0&quot; style=&quot;position:absolute;top:0;left:0;width:100%;height:100%;border:0&quot;></iframe>';this.style.background='#000';this.onclick=null;">
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;gap:0">
+          <div style="text-align:center">
+            <div style="width:58px;height:58px;margin:0 auto;border-radius:50%;background:var(--lime);display:grid;place-items:center;box-shadow:0 6px 20px rgba(0,0,0,.45)">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="#0a0e0c" style="margin-left:3px"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div style="margin-top:9px;font-size:12px;font-weight:800;color:var(--ink);letter-spacing:.3px">${t('helpVideoPlay')}</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin:0 16px 4px;font-size:11.5px;color:var(--mut);line-height:1.6">
+        <a href="https://youtu.be/${VID}" target="_blank" rel="noopener" style="color:var(--lime)">${t('helpVideoOpen')}</a></div>
+
+      ${div}
       ${sec(t('helpSec1'))}
       ${step('1',t('helpS1T'),t('helpS1D'))}
       ${step('2',t('helpS2T'),t('helpS2D'))}
       ${step('3',t('helpS3T'),t('helpS3D'))}
+
       ${div}
-      ${sec(t('helpSec2'))}
-      ${step('＋',t('helpS4T'),t('helpS4D'))}
-      ${step('☰',t('helpS5T'),t('helpS5D'))}
-      ${step('<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>',t('tipSearch'),t('helpS6D'))}
-      ${step('✎',t('helpS7T'),t('helpS7D'))}
+      ${sec(t('helpSecPiece'))}
+      <div style="margin:-4px 16px 12px;font-size:12px;color:var(--mut);line-height:1.7">${t('helpPieceLead')}</div>
+      ${ic(ICN.swap,t('swapPlayers'),t('helpDSwap'))}
+      ${ic(ICN.change,t('outsideSwap'),t('helpDChange'))}
+      ${ic(ICN.photo,t('addChangePhoto'),t('helpDPhoto'))}
+      ${ic(ICN.search,t('webSearchPhoto'),t('helpDSearchImg'))}
+      ${ic(ICN.copyicon,t('pastePhoto'),t('helpDPaste'))}
+      ${ic(ICN.crown,t('helpNCaptain'),t('helpDCaptain'))}
+      ${ic(ICN.memo,t('editNote'),t('helpDMemo'))}
+      ${ic(ICN.detail,t('viewDetails'),t('helpDDetail'))}
+      ${ic(ICN.remove,t('helpNRemove'),t('helpDRemove'))}
+
+      ${div}
+      ${sec(t('helpSecTop'))}
+      ${ic(ICN.plus,t('tipNew'),t('helpDNew'))}
+      ${ic('☰',t('tipMenu'),t('helpDMenu'))}
+      ${ic(ICN.search,t('tipSearch'),t('helpDSearch'))}
+      ${ic(ICN.stats,t('tipAnalysis'),t('helpDStats'))}
+      ${ic('⟲',t('tipReset'),t('helpDReset'))}
+      ${ic(tx('POS'),t('tipPos'),'')}
+      ${ic(tx('2nd'),t('tipSub'),t('helpDSub'))}
+      ${ic(tx('BENCH'),t('tipBench'),t('helpDBench'))}
+
+      ${div}
+      ${sec(t('helpSecMenu'))}
+      ${ic(ICN.plus,t('newTeam'),t('helpDNewTeam'))}
+      ${ic(ICN.pencil,t('helpNRename'),'')}
+      ${ic(ICN.trash,t('helpNDelete'),'')}
+      ${ic(ICN.help,t('help'),'')}
+      ${ic(ICN.backup,t('backup'),t('helpDBackup'))}
+      ${ic(ICN.globe,t('helpNLang'),t('helpDLang'))}
+      ${ic(ICN.mail,t('feedback'),'')}
+      ${ic(ICN.lock,t('privacy'),'')}
+      ${ic(ICN.doc,t('terms'),'')}
+
+      ${div}
+      ${sec(t('helpSecBackup'))}
+      ${ic(ICN.download,t('helpNExport'),t('helpDExport'))}
+      ${ic(ICN.upload,t('helpNImport'),t('helpDImport'))}
+      ${ic(ICN.restore,t('helpNRestore'),t('helpDRestore'))}
+
+      ${div}
+      ${sec(t('helpSecGesture'))}
       ${step('↔',t('helpS8T'),t('helpS8D'))}
+      ${step('A',t('helpGNameT'),t('helpGNameD'))}
       ${step('🔗',t('helpS9T'),t('helpS9D'))}
-      ${div}
-      ${sec(t('helpSec3'))}
-      ${leg('☰',t('legMenu'),t('legMenuD'))}
-      ${leg('<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg>',t('tipNew'),t('legNewD'))}
-      ${leg('<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>',t('tipSearch'),t('legSearchD'))}
-      ${leg('⟲',t('tipReset'),t('legResetD'))}
-      ${leg('POS',t('legPos'),t('legPosD'))}
-      ${leg('2nd',t('legSub'),t('legSubD'))}
+
       <div style="margin:16px 16px 0;padding:13px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--mut);font-size:12px;line-height:1.85">
         <b style="color:var(--lime)">${t('helpTipLabel')}</b>　${t('helpTipBody')}</div>
     </div>`);
