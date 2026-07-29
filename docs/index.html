@@ -1041,7 +1041,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
+    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'フォーメーションの右にある4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'今の盤面をスカッドとして保存（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人を全部外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
@@ -1121,7 +1121,7 @@ const I18N = {
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
-    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
+    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpSecToggle:'Display toggles', helpToggleLead:'The four next to Formation. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'Save the current pitch as a squad (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
@@ -4794,7 +4794,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0729f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0729g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5182,6 +5182,10 @@ function openHelp(){
   const div=`<div style="height:1px;background:var(--line);margin:14px 16px 15px"></div>`;
   // 文字アイコン（SVGを持たないUI要素はラベルそのものを見せる）
   const tx=s=>`<span style="font-size:11px;font-weight:800;letter-spacing:.3px">${s}</span>`;
+  // ★実物のボタンからアイコンを取る。ヘルプ用にSVGを書き写すと本体の変更に追随せず、
+  //   実際には無いボタン（旧「＋」など）を載せてしまう（2026-07-29 ユーザー指摘）
+  const ui=(id,fb)=>{ const e=document.getElementById(id); const h=e?e.innerHTML.trim():''; return h||(fb||''); };
+  const uiSel=(sel,fb)=>{ const e=document.querySelector(sel); const h=e?e.innerHTML.trim():''; return h||(fb||''); };
   const VID='OGbxHh3JGF8';
   openSheet(`
     <h2>${t('help')} <span>${t('helpSub')}</span></h2>
@@ -5213,14 +5217,22 @@ function openHelp(){
 
       ${div}
       ${sec(t('helpSecTop'))}
-      ${ic(ICN.plus,t('tipNew'),t('helpDNew'))}
-      ${ic('☰',t('tipMenu'),t('helpDMenu'))}
-      ${ic(ICN.search,t('tipSearch'),t('helpDSearch'))}
+      ${ic(uiSel('#btnFormation .fhex',tx('4-3-3')),t('formation'),t('helpDFormation'))}
+      ${ic(ui('btnMenu','☰'),t('tipMenu'),t('helpDMenu'))}
+      ${ic(ui('btnLoad'),t('tipNew'),t('helpDNew'))}
+      ${ic(ui('btnSave'),t('tipSave'),t('helpDSave'))}
+      ${ic(ui('btnShare'),t('tipShare'),t('helpDShare'))}
+      ${ic(ui('btnMarket'),t('tipSearch'),t('helpDSearch'))}
+      ${ic(ui('btnReset','⟲'),t('tipReset'),t('helpDReset'))}
+      ${ic(ui('btnClear'),t('tipClear'),t('helpDClear'))}
       ${ic(ICN.stats,t('tipAnalysis'),t('helpDStats'))}
-      ${ic('⟲',t('tipReset'),t('helpDReset'))}
-      ${ic(tx('POS'),t('tipPos'),'')}
-      ${ic(tx('2nd'),t('tipSub'),t('helpDSub'))}
-      ${ic(tx('BENCH'),t('tipBench'),t('helpDBench'))}
+      ${div}
+      ${sec(t('helpSecToggle'))}
+      <div style="margin:-4px 16px 12px;font-size:12px;color:var(--mut);line-height:1.7">${t('helpToggleLead')}</div>
+      ${ic(ui('btnLabels',tx('POS')),t('tipPos'),'')}
+      ${ic(ui('btnSubs',tx('2nd')),t('tipSub'),t('helpDSub'))}
+      ${ic(ui('btnMemo'),t('tipMemo'),t('helpDMemoTg'))}
+      ${ic(ui('btnFlags'),t('tipFlags'),'')}
 
       ${div}
       ${sec(t('helpSecPiece'))}
@@ -7385,6 +7397,23 @@ window.__selftest=function(){
         _msg=_pass?'':(_miss.length+'名が日本語表記なし: '+_miss.slice(0,6).join(', '));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('j1_all_have_ja_name',_pass,_msg); }
+    // T62: 使い方ページのボタン一覧が実画面と一致すること。
+    //（2026-07-29 ユーザー指摘「既に使っていない＋がある」。ヘルプにSVGを書き写すと
+    //  本体の変更に追随せず、無いボタンを載せる／あるボタンが抜ける。実DOMと突合する）
+    { let _pass=true,_msg='';
+      try{
+        const _real=new Set();
+        document.querySelectorAll('header [id^=btn], .topbar [id^=btn], .topbar .icon[id]').forEach(e=>_real.add(e.id));
+        const _src=String(openHelp);
+        const _ref=new Set();
+        _src.replace(/ui\('(btn[A-Za-z]+)'/g,(m,id)=>{ _ref.add(id); return m });
+        _src.replace(/uiSel\('#(btn[A-Za-z]+)/g,(m,id)=>{ _ref.add(id); return m });
+        const _miss=[..._real].filter(id=>!_ref.has(id));   // 実在するのにヘルプに無い
+        const _ghost=[..._ref].filter(id=>!_real.has(id));  // ヘルプにあるのに実在しない
+        _pass=(_miss.length===0 && _ghost.length===0 && _real.size>0);
+        _msg=_pass?'':('ヘルプ未掲載:'+_miss.join(',')+' / 実在しない:'+_ghost.join(','));
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('help_buttons_match_ui',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
