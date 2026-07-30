@@ -1480,6 +1480,8 @@ function _showDemoBarNow(code){
     document.body.appendChild(b);
   }catch(e){}
 }
+// ショーケースのクラブ別イベント名。Worker側の検証が /^[a-z_]{1,32}$/ なので英小文字と_だけに畳む（数字・記号・ウムラウト等は_へ）。
+function scEv(club){ var s=String(club||"").toLowerCase().replace(/[^a-z]+/g,"_").replace(/^_+|_+$/g,""); return ("sc_"+s).slice(0,32); }
 function showcaseBoot(){
   try{
     if(typeof CLUB_XI==='undefined') return null;
@@ -4818,7 +4820,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0730d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0730e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7533,6 +7535,23 @@ window.__selftest=function(){
         _msg=_pass?'':_bad.join(' / ');
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('showcase_pool_has_faces',_pass,_msg); }
+    // T66: ショーケースのクラブ別イベント名がWorkerの受入条件を満たすこと（2026-07-30）
+    //  Workerは /^[a-z_]{1,32}$/ で弾く。ここを外すと計測が丸ごと捨てられ、
+    //  「使われていない」と誤読する（＝データが無いのに0件に見える）。名前衝突も集計を混ぜるので検出する。
+    { let _pass=true,_msg='';
+      try{
+        const _pool=SHOWCASE_CLUBS.concat(SHOWCASE_CLUBS_J1);
+        const _bad=[], _seen={}, _dup=[];
+        _pool.forEach(c=>{
+          const ev=scEv(c);
+          if(!/^[a-z_]{1,32}$/.test(ev)) _bad.push(c+'→'+ev);
+          if(_seen[ev]) _dup.push(ev+'='+_seen[ev]+'/'+c);
+          _seen[ev]=c;
+        });
+        _pass=(_bad.length===0 && _dup.length===0 && _pool.length>0);
+        _msg=_pass?'':('不正:'+_bad.join(',')+' 衝突:'+_dup.join(','));
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('showcase_event_names_valid',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -7582,7 +7601,7 @@ window.__selftest=function(){
     // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 人気クラブのXIをサンプル表示
     if(!wasShareLink && !saved && !(state.slots&&state.slots.some(s=>s&&s.pid!=null))){
       const _sc=showcaseBoot();
-      if(_sc){ try{ recordEvent('showcase',true); }catch(e){} }
+      if(_sc){ try{ recordEvent('showcase',true); recordEvent(scEv(_sc),true); }catch(e){} } // 母数(showcase)に加えクラブ別も1回だけ（出し分けの効果測定・2026-07-30）
     }
   }catch(e){}
   // ファネルの分母。_popSrc(流入元)が確定した後に1回だけ送る。
