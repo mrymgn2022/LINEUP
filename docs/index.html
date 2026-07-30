@@ -2189,7 +2189,7 @@ setFormLabel();
    Drag & tap on tokens
    ========================================================= */
 function attachDrag(el,actor){
-  let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0;
+  let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0,_lmAtGrab=false;
   const base=()=>state.slots[actor];
   const scroller=document.getElementById('scroll');
   const benchEl=document.getElementById('bench');
@@ -2208,7 +2208,7 @@ function attachDrag(el,actor){
     scrollRAF=requestAnimationFrame(autoScrollTick);
   }
   function arm(){
-    armed=true; const b=base(); ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; oy=b.y; // 表示位置から掴む（広がり分のジャンプ防止）
+    armed=true; const b=base(); ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; oy=b.y; _lmAtGrab=layoutMoved; // 表示位置から掴む（広がり分のジャンプ防止）
     try{el.setPointerCapture(pid);}catch(_){}
     el.classList.add('drag');
     if(!scrollRAF) scrollRAF=requestAnimationFrame(autoScrollTick);
@@ -2248,6 +2248,8 @@ function attachDrag(el,actor){
     }
   });
   el.addEventListener('pointerup',e=>{
+    // ★交代で着地した場合は座標を元へ戻しているので、整列リセットチップを出さない（2026-07-30 ユーザー指摘）
+    try{
     disarm(); stopScroll();
     if(sx===undefined)return;
     const wasArmed=armed, wasMoved=moved, hadGhost=!!ghost; sx=undefined; armed=false;
@@ -2303,6 +2305,13 @@ function attachDrag(el,actor){
       const s=state.slots[actor];const nr=roleFromXY(s.x,s.y);
       if(nr!==s.role){ s.role=nr; render(); toast(tRoleChanged(nr)); }
       save();
+    }
+    }finally{
+      // 着地後の座標が掴んだ時と同じ＝この操作では位置を動かしていない（交代・ベンチ移動・キャンセル）
+      // → ドラッグ中に立てた layoutMoved を掴む前の状態へ戻す
+      const _sl=state.slots[actor];
+      if(_sl && Math.abs(_sl.x-ox)<0.01 && Math.abs(_sl.y-oy)<0.01){ layoutMoved=_lmAtGrab; }
+      syncResetChip();
     }
   });
   el.addEventListener('pointercancel',()=>{ disarm(); stopScroll(); clearGhost(); el.classList.remove('drag'); sx=undefined; armed=false; });
@@ -4794,7 +4803,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0729g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0730a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7414,6 +7423,34 @@ window.__selftest=function(){
         _msg=_pass?'':('ヘルプ未掲載:'+_miss.join(',')+' / 実在しない:'+_ghost.join(','));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('help_buttons_match_ui',_pass,_msg); }
+    // T63: 駒をドラッグして「選手交代」しただけでは整列リセットチップを出さない。
+    //（2026-07-30 ユーザー指摘。pointermoveで無条件に layoutMoved=true を立てるため、
+    //  着地時に座標を元へ戻す分岐＝交代/ベンチ移動でもチップが残っていた）
+    { let _pass=true,_msg='';
+      try{
+        const _lm0=layoutMoved, _demo0=state.demo;
+        state.demo=false;
+        // ① 交代相当: 座標は掴んだ位置と同じまま layoutMoved を立てて復元処理を模す
+        const _s=state.slots[3]; const _ox=_s.x, _oy=_s.y;
+        layoutMoved=false;                 // 掴む前は未移動
+        const _lmAt=layoutMoved;           // arm() 相当
+        layoutMoved=true;                  // pointermove 相当
+        // finally 相当（座標が元に戻っている）
+        if(Math.abs(_s.x-_ox)<0.01 && Math.abs(_s.y-_oy)<0.01){ layoutMoved=_lmAt; }
+        syncResetChip();
+        const _c=document.getElementById('resetChip');
+        if(layoutMoved) { _pass=false; _msg+=' 交代でlayoutMoved残留'; }
+        if(_c && _c.classList.contains('on')) { _pass=false; _msg+=' 交代でチップ表示'; }
+        // ② 実移動: 座標が変わっていれば出る
+        layoutMoved=false; const _lmAt2=layoutMoved; layoutMoved=true;
+        _s.x=_ox+12;
+        if(Math.abs(_s.x-_ox)<0.01 && Math.abs(_s.y-_oy)<0.01){ layoutMoved=_lmAt2; }
+        syncResetChip();
+        if(!layoutMoved) { _pass=false; _msg+=' 実移動でlayoutMovedが立たない'; }
+        if(_c && !_c.classList.contains('on')) { _pass=false; _msg+=' 実移動でチップ非表示'; }
+        _s.x=_ox; layoutMoved=_lm0; state.demo=_demo0; syncResetChip();
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('reset_chip_only_on_move',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
