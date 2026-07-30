@@ -1300,13 +1300,19 @@ function recordEvent(ev,once){
 // 自動配置・リンク展開の各入口は 0 にリセット＝「このセッションで新しく組んだ」扱いで完成時にバーが出る。
 // ※計測イベント xi_complete は従来どおり復元でも送る（レポートのxiAuto分離が前提にしているため挙動を変えない）。
 let _xiPrevFilled=null;
+let _xiBarOnEdit=false,_xiEditSig=null; // サイト深リンク到着: 到着時はバーを出さず、最初の編成変更で出す（2026-07-30 P0-1）
 function _checkXIComplete(){
   try{
     if(state.demo) return;
     const n=(state.slots&&state.slots.length===11)?state.slots.filter(s=>s&&s.pid!=null).length:0;
     if(n===11){
       recordEvent('xi_complete',true);
-      if(_xiPrevFilled!=null&&_xiPrevFilled<11) maybeShowXiDoneBar();
+      if(_xiPrevFilled!=null&&_xiPrevFilled<11){ _xiBarOnEdit=false; maybeShowXiDoneBar(); }
+      else if(_xiBarOnEdit){ // サイト深リンクの完成盤面: 到着時は面子を基準化するだけ、初めて編成が変わった時にバー（2026-07-30 P0-1）
+        const sig=state.slots.map(s=>s&&s.pid).join(',');
+        if(_xiEditSig==null) _xiEditSig=sig;
+        else if(sig!==_xiEditSig){ _xiBarOnEdit=false; maybeShowXiDoneBar(); }
+      }
     }
     _xiPrevFilled=n;
   }catch(e){}
@@ -1445,6 +1451,7 @@ async function decodeSquadHash(h){ // '#s=...' → 保存形式raw / 該当な�
 // 人気クラブの予想スタメンをサンプル表示する。保存はせず（state.demo）、最初のユーザー操作のsave()で通常盤面として確定。
 // 対象クラブはユーザー指示で差し替え/終了（配列を空にすれば無効化）。W杯終了につき代表→クラブ8チームへ。
 const SHOWCASE_CLUBS=['Real Madrid','Barcelona','Manchester City','Manchester United','Arsenal','Liverpool','Chelsea','Bayern München'];
+const SHOWCASE_CLUBS_J1=['Urawa Red Diamonds','Machida Zelvia','Yokohama F. Marinos','Kashima Antlers','Gamba Osaka']; // 日本語UIのみ欧州と混合（2026-07-30 ユーザー選定）。大前提=XI全員に顔写真（selftest T65が恒久検証）
 let demoApplying=false; // サンプル適用中は save()/toast を抑止する内部フラグ
 function syncDemoBar(){ try{ if(!state.demo){ const b=document.getElementById('demoBar'); if(b) b.remove(); } }catch(e){} }
 function showDemoBar(code){
@@ -1476,7 +1483,8 @@ function _showDemoBarNow(code){
 function showcaseBoot(){
   try{
     if(typeof CLUB_XI==='undefined') return null;
-    const cand=SHOWCASE_CLUBS.filter(c=>CLUB_XI[c]&&CLUB_XI[c].form&&P.filter((p,i)=>!isCustomPid(i)&&p[4].trim()===c).length>=11);
+    const _pool=(LANG==='ja')?SHOWCASE_CLUBS.concat(SHOWCASE_CLUBS_J1):SHOWCASE_CLUBS;
+    const cand=_pool.filter(c=>CLUB_XI[c]&&CLUB_XI[c].form&&P.filter((p,i)=>!isCustomPid(i)&&p[4].trim()===c).length>=11);
     if(!cand.length) return null;
     const code=cand[Math.floor(Math.random()*cand.length)]; // code=クラブ名
     state.demo=true; demoApplying=true;
@@ -4810,7 +4818,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0730c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0730d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5391,7 +5399,7 @@ function openSharedSquadConfirm(raw){
       <button class="bigbtn" id="ssGo">${t('shOpenGo')}</button>
       <button class="bigbtn ghost" id="ssCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('ssGo').onclick=()=>{ closeSheet(); _xiPrevFilled=0; const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(raw); save(); render(); };
+  document.getElementById('ssGo').onclick=()=>{ closeSheet(); if(raw.st){ _xiBarOnEdit=true; _xiEditSig=null; } else { _xiPrevFilled=0; } const r=Object.assign({},raw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(raw); save(); render(); };
   document.getElementById('ssCancel').onclick=()=>{ closeSheet(); };
 }
 function openConfirmSave(proceed,mode){
@@ -7492,6 +7500,39 @@ window.__selftest=function(){
         _s.x=_ox; layoutMoved=_lm0; state.demo=_demo0; syncResetChip();
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('reset_chip_only_on_move',_pass,_msg); }
+    // T64: サイト深リンクの完成盤面は「到着ではバーを出さず、初めて編成が変わった時に出す」（2026-07-30 P0-1）
+    { let _pass=true,_msg='';
+      try{
+        const _bs=_xiBarShown,_pf=_xiPrevFilled,_bw=_xiBarWaiting,_sl=state.slots,_demo=state.demo,_tid=state.teamId,_boe=_xiBarOnEdit,_sg=_xiEditSig;
+        try{ const b0=document.getElementById('xiDoneBar'); if(b0) b0.remove(); }catch(_){}
+        state.demo=false; state.teamId=null;
+        state.slots=Array.from({length:11},(_,i)=>({role:'CB',x:50,y:50,pid:i,sub:null}));
+        _xiBarShown=false; _xiBarWaiting=false; _xiPrevFilled=null; _xiBarOnEdit=true; _xiEditSig=null;
+        _checkXIComplete();                       // 到着＝面子の基準化のみ
+        const arriveNo = !_xiBarShown && !document.getElementById('xiDoneBar');
+        const _t=state.slots[0].pid; state.slots[0].pid=state.slots[1].pid; state.slots[1].pid=_t; // 交代＝編成が変わる
+        _checkXIComplete();
+        const editYes = _xiBarShown || !!document.getElementById('xiDoneBar');
+        try{ const b=document.getElementById('xiDoneBar'); if(b) b.remove(); }catch(_){}
+        _xiBarShown=_bs; _xiPrevFilled=_pf; _xiBarWaiting=_bw; state.slots=_sl; state.demo=_demo; state.teamId=_tid; _xiBarOnEdit=_boe; _xiEditSig=_sg;
+        _pass=arriveNo&&editYes; _msg=_pass?'':('arrive='+arriveNo+' edit='+editYes);
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('xi_bar_on_first_edit',_pass,_msg); }
+    // T65: ショーケース候補（欧州+J1）は全クラブ「XI11人＋全員に顔写真」が大前提（2026-07-30 ユーザー指定）
+    { let _pass=true,_msg='';
+      try{
+        const _pool=SHOWCASE_CLUBS.concat(SHOWCASE_CLUBS_J1);
+        const _bad=[];
+        _pool.forEach(c=>{
+          const e=(typeof CLUB_XI!=='undefined')?CLUB_XI[c]:null;
+          if(!e||!e.keys||e.keys.length!==11){ _bad.push(c+':XI不備'); return; }
+          const miss=e.keys.filter(k=>!(k in FACE));
+          if(miss.length) _bad.push(c+':写真'+miss.length+'枚欠け');
+        });
+        _pass=(_bad.length===0);
+        _msg=_pass?'':_bad.join(' / ');
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('showcase_pool_has_faces',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
@@ -7535,7 +7576,7 @@ window.__selftest=function(){
       try{ _popSrc = sharedRaw.st ? ('site'+((typeof sharedRaw.pg==='string'&&/^[a-z0-9_-]{1,40}$/i.test(sharedRaw.pg))?(':'+sharedRaw.pg):'')) : 'share'; }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
       const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
-      if(sharedRaw.st && !unsavedWork){ _xiPrevFilled=0; const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
+      if(sharedRaw.st && !unsavedWork){ _xiBarOnEdit=true; _xiEditSig=null; const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
     try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
     // ★初回ショーケース: 共有リンク経由でなく、保存データも無い空盤面の初回訪問 → 人気クラブのXIをサンプル表示
