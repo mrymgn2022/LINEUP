@@ -3546,7 +3546,7 @@ function wirePicker(slotIdx){
   const sortF=document.getElementById('psortF');
   if(sortF) sortF.onclick=e=>{
     if(e.target.closest('[data-create]')){ openCreatePlayer(slotIdx); return; }
-    const c=e.target.closest('[data-sort]');if(!c)return;pickFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
+    const c=e.target.closest('[data-sort]');if(!c)return;pickFilter.sort=c.dataset.sort; try{ recordEvent('srt_p_'+String(c.dataset.sort||'').replace(/[^a-z_]/g,'_')); }catch(_){}[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
   const q=document.getElementById('pq');
   if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase();drawPickList(slotIdx)};
   const clr=document.getElementById('pickClear');
@@ -4491,7 +4491,7 @@ function openMarket(){
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
   const _mc=document.getElementById('mClear'); if(_mc)_mc.onclick=()=>openMarket(); // 既定状態で開き直す＝全条件クリア
   document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase();drawMkt()};
-  document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
+  document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort; try{ recordEvent('srt_m_'+String(c.dataset.sort||'').replace(/[^a-z_]/g,'_')); }catch(_){}[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';syncClubField('mclubF',mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
@@ -4810,7 +4810,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0730b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0730c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
