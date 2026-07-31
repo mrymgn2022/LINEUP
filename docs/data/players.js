@@ -6085,7 +6085,7 @@ const P=JSON.parse((`[
 ["Alex Oxlade-Chamberlain","CM",32,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","Celtic","SC"],
 ["Joel Mvuka","RW",23,"🇳🇴 NOR","Celtic","SC"],
 ["Benjamin Nygren","CAM",24,"🇸🇪 SWE","Celtic","SC"],
-["Daizen Maeda","LW",28,"🇯🇵 JPN","Celtic","SC"],
+["Daizen Maeda","LW",28,"🇯🇵 JPN","Ipswich Town","PL"],
 ["Jota","LW",27,"🇵🇹 POR","Celtic","SC"],
 ["Sebastian Tounekti","LW",23,"🇹🇳 TUN","Celtic","SC"],
 ["Michel-Ange Balikwisha","LW",25,"🇨🇩 COD","Celtic","SC"],
