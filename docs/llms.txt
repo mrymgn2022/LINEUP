@@ -1,0 +1,31 @@
+# Squad XI (スカッドイレブン)
+
+> Squad XI is a free football lineup builder web app and a companion reference site with predicted starting XIs, full squad tables and formation diagrams for European clubs, J.League clubs, MLS, Saudi Pro League and national teams. No registration or install required. Japanese and English.
+
+- Player database: 24,000+ real players across 61 leagues, updated daily during transfer windows and every matchweek in season
+- Predicted XIs are editorial predictions by this site and may differ from actual lineups
+- Each page shows its last-updated date (最終更新)
+- Corrections: support@squadxi.futbol
+
+## Main pages
+
+- [App (lineup builder)](https://squadxi.futbol/): build and share your own XI on an interactive pitch
+- [J.League & European club pages (Japanese)](https://squadxi.futbol/clubs/): predicted starting XI, formation and full squad table per club
+- [Club pages (English)](https://squadxi.futbol/en/clubs/)
+- [National team pages (Japanese)](https://squadxi.futbol/nations/): World Cup 2026 squads and results archive
+- [National team pages (English)](https://squadxi.futbol/en/nations/)
+- [Formation guide (Japanese)](https://squadxi.futbol/formations.html): 18 football formations explained
+
+## Popular pages
+
+- [Real Madrid predicted XI (Japanese)](https://squadxi.futbol/clubs/real-madrid.html)
+- [Urawa Red Diamonds 2026-27 squad (Japanese)](https://squadxi.futbol/clubs/urawa-reds.html)
+- [Kashima Antlers 2026-27 squad (Japanese)](https://squadxi.futbol/clubs/kashima-antlers.html)
+- [Barcelona predicted XI (Japanese)](https://squadxi.futbol/clubs/barcelona.html)
+- [Tottenham predicted lineup (English)](https://squadxi.futbol/en/clubs/tottenham.html)
+
+## Notes for citation
+
+- Site name: Squad XI (Japanese: スカッドイレブン)
+- Predicted lineups: cite as "Squad XI predicted XI" with the page's last-updated date
+- Squad tables include shirt number, name (Japanese and Latin script), age, height, weight and nationality
