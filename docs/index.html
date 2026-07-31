@@ -1204,6 +1204,10 @@ const I18N = {
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
 try{ document.documentElement.lang=LANG; }catch(e){} // 起動時の言語を<html lang>へ反映（読み上げ・SEO対応）
 function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)?I18N.ja[k]:k); }
+// 検索0件ビーコンの重複抑制: 描画のたびに飛ぶと1回の検索が十数件に膨らむ（2026-07-31実測: 1端末が同一秒で15件）。
+// 同じ語句での再描画では送らず、語句が変わった時だけ1件送る。
+let _lastNoResQ='';
+function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult'); }
 function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
@@ -2305,7 +2309,7 @@ function attachDrag(el,actor){
       if(d<best){best=d;tj=j;}
     }
     if(tj>=0){
-      const t=state.slots[actor].pid;state.slots[actor].pid=state.slots[tj].pid;state.slots[tj].pid=t;
+      const _swp=state.slots[actor].pid;state.slots[actor].pid=state.slots[tj].pid;state.slots[tj].pid=_swp; // 変数名tは翻訳関数t()を同一ブロックで隠す（2026-08-01修正: 直後のtoast(t(...))が "t is not a function" で落ちていた）
       state.slots[actor].x=ox;state.slots[actor].y=oy;
       render();save();toast(t('tstPosSwapped'));
     }else if(hadGhost){
@@ -3638,7 +3642,7 @@ function drawPickList(slotIdx){
   else if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
-  if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
+  if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
     list.innerHTML=noMatchHTML('pickClear',true); // 0件＝自作の文脈→新規作成を主ボタンで提示
     const cb=document.getElementById('nmCreate'); if(cb) cb.onclick=()=>openCreatePlayer(slotIdx);
     return;}
@@ -4151,7 +4155,7 @@ function drawSubFull(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
-  if(!pickCurIdx.length){ if((pickFilter.q||'').trim()) recordEvent('search_noresult'); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
+  if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
     list.innerHTML=noMatchHTML('pickClear');return;}
   list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
@@ -4545,7 +4549,7 @@ function drawMkt(){
   else { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
     mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 注目順=市場価値の高い順
   _iconFloorActive=true;
-  if(!mktCurIdx.length){ if((mktFilter.q||'').trim()) recordEvent('search_noresult'); // 選手検索でも0件を記録
+  if(!mktCurIdx.length){ noResultOnce(mktFilter.q); // 選手検索でも0件を記録
     list.innerHTML=noMatchHTML('mClear');return;}
   list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
@@ -4836,7 +4840,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0731f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0801a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7599,6 +7603,35 @@ window.__selftest=function(){
         _msg=_pass?'':_bad.join(' / ');
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('bench_gk_and_order',_pass,_msg); }
+
+    // T68: 翻訳関数 t() が変数シャドウで壊れていないか（2026-08-01 実バグ）
+    //  駒の位置入れ替えで `const t=...` が t() を同一ブロックで隠し、直後の toast(t('tstPosSwapped')) が
+    //  "t is not a function" で落ちていた（jse_ln_cdba=行2310 として本番ログに出ていた）。
+    //  同種の再発（t/toast を潰す宣言）を検出する。
+    { let _pass=true,_msg='';
+      try{
+        if(typeof t!=='function') throw new Error('t が関数でない');
+        if(t('tstPosSwapped')===''||t('tstPosSwapped')==null) throw new Error('翻訳が空');
+        // 実際の入れ替え経路を通す（例外が飛べば失敗）
+        buildSlots('4-3-3',false);
+        const _ids=P.map((p,i)=>i).filter(i=>!isCustomPid(i)).slice(0,11);
+        state.slots.forEach((sl,i)=>{ sl.pid=_ids[i]; });
+        const _a=9,_b=10, _p0=state.slots[_a].pid, _p1=state.slots[_b].pid;
+        const _swp=state.slots[_a].pid; state.slots[_a].pid=state.slots[_b].pid; state.slots[_b].pid=_swp;
+        toast(t('tstPosSwapped'));
+        if(!(state.slots[_a].pid===_p1 && state.slots[_b].pid===_p0)) throw new Error('入替が効いていない');
+        // 検索0件ビーコンの重複抑制
+        if(typeof noResultOnce!=='function') throw new Error('noResultOnce が無い');
+        const _orig=window.recordEvent; let _n=0;
+        window.recordEvent=function(ev){ if(ev==='search_noresult') _n++; };
+        _lastNoResQ=''; noResultOnce('zzq'); noResultOnce('zzq'); noResultOnce('zzq');
+        const _same=_n; noResultOnce('yyq'); const _diff=_n; noResultOnce(''); const _empty=_n;
+        window.recordEvent=_orig;
+        if(_same!==1) throw new Error('同一語句で'+_same+'件送信');
+        if(_diff!==2) throw new Error('別語句が送られない');
+        if(_empty!==2) throw new Error('空語句を送信');
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('t_not_shadowed_and_noresult_once',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
