@@ -4836,7 +4836,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0731c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0731d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7582,13 +7582,14 @@ window.__selftest=function(){
         const _clubs=Object.keys(_cnt).filter(c=>_cnt[c]>=16);
         const _bad=[];
         for(const c of _clubs){
-          buildSlots('4-3-3',false); placeClubSquad(c,c);
+          const _cx=(typeof CLUB_XI!=='undefined')?CLUB_XI[c]:null;
+          buildSlots((_cx&&_cx.form)?_cx.form:'4-3-3',false); placeClubSquad(c,c); // ★指定クラブはその形で組む（4-3-3固定だとCLUB_XI分岐に入らず偽陽性が出る）
           if(state.slots.filter(s=>s.pid!=null).length!==11) continue; // 層が薄いクラブは制限対象外
           const _b=state.bench, _gk=_b.filter(p=>P[p][1]==='GK').length;
           const _curated=(typeof CLUB_BENCH!=='undefined'&&CLUB_BENCH[c])?true:false;
           const _srt=_b.slice().sort(benchPosSort);
           if(_b.some((v,i)=>v!==_srt[i])){ _bad.push(c+':未整列'); continue; }
-          if(_curated) continue; // 指定ベンチはGK数を問わない
+          if(_curated){ if(_b.length<CLUB_BENCH[c].length) _bad.push(c+':指定'+CLUB_BENCH[c].length+'人中'+_b.length+'人しか出ない'); continue; } // GK数は問わない（指定が正）が、脱落は検出する
           if(_gk>2){ _bad.push(c+':GK'+_gk); continue; }
           const _squadGK=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][4].trim()===c&&P[i][1]==='GK').length;
           if(_gk===0&&_squadGK>=2) _bad.push(c+':GK0(在籍'+_squadGK+')');
