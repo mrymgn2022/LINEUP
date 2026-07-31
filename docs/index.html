@@ -3369,6 +3369,15 @@ const POSORDER={GK:0,CB:1,RB:2,LB:3,RWB:4,LWB:5,CDM:1,CM:2,CAM:3,RM:4,LM:5,RW:1,
 const POSORDERFULL={GK:0,CB:1,RB:2,LB:3,LWB:4,RWB:5,CDM:6,CM:7,CAM:8,RM:9,LM:10,LW:11,RW:12,ST:13};
 // ベンチ表示用の並び：ポジション順(GK→DF→MF→FW)、同ポジは市場価値の高い順
 function benchPosSort(a,b){ const oa=POSORDERFULL[P[a][1]]??99, ob=POSORDERFULL[P[b][1]]??99; if(oa!==ob) return oa-ob; return mvScore(P[b])-mvScore(P[a]); }
+// ベンチにGKが1人も居ない時、候補プール(市場価値順)のGK最上位を最下位枠と入れ替える＝GK最低1（2026-07-31 ユーザー恒久ルール: 非指定クラブはGK最大2・最低1）。
+// ★CLUB_BENCH等の「ユーザーが指定したベンチ」には適用しない（指定内容がそのまま正）。
+function ensureBenchGK(bench,pool,fullXI){
+  if(!fullXI||!bench.length) return bench;
+  if(bench.some(id=>P[id][1]==='GK')) return bench;
+  const gk=pool.find(id=>P[id][1]==='GK'&&bench.indexOf(id)<0);
+  if(gk!=null) bench[bench.length-1]=gk;
+  return bench;
+}
 // 大枠を押した時に出る細かいポジション（ベンチ追加画面のサブフィルタ）
 const SUBPOS={DF:['CB','RB','LB'],MF:['CDM','CM','CAM'],FW:['ST','LW','RW']};
 function suggestRank(pos){
@@ -4827,7 +4836,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0731b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0731c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5532,7 +5541,7 @@ function autoFillFrom(ids){
     if(P[id][1]==='GK') benchGK++;
     benchSet.add(id);
   }
-  state.bench=[...benchSet].sort(benchPosSort); // 表示はポジション順（選出は市場価値）
+  state.bench=ensureBenchGK([...benchSet],_rest,fullXI).sort(benchPosSort); // 表示はポジション順（選出は市場価値・GK最大2最低1）
   autoAssignSubs(); // 第二候補も初期割当（条件指定の自動配置でも全ポジションに付くように）
 }
 // 配置中の選手のメモ欄へ所属クラブ名を自動入力（国籍縛りチーム用。安定キーで保存）
@@ -5954,7 +5963,7 @@ function placeClubSquad(club,name){
     const cur0=curatedBench(club,used);
     let rest0=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
     if(fullXI0){ let gk=0; rest0=rest0.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
-    state.bench=(cur0||rest0.slice(0,15)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ（MV補充しない）
+    state.bench=(cur0||ensureBenchGK(rest0.slice(0,15),rest0,fullXI0)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ（MV補充しない）。無ければMV上位15人でGK最大2・最低1
     state.loadedClub=club; state.teamName=name||club; state.teamInfo=null;
     state.teamCond=null; state.teamId=null; state.captain=null;
     applyClubNames(club); // 盤面の表示名の上書き（例: Kolo Muani）
@@ -5979,7 +5988,7 @@ function placeClubSquad(club,name){
   const cur=curatedBench(club,used);
   let rest=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
   if(fullXI){ let gk=0; rest=rest.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
-  state.bench=(cur||rest.slice(0,15)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ。無ければ市場価値の上位15人(GK最大2)、表示はポジション順
+  state.bench=(cur||ensureBenchGK(rest.slice(0,15),rest,fullXI)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ。無ければ市場価値の上位15人(GK最大2・最低1)、表示はポジション順
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
@@ -7562,6 +7571,33 @@ window.__selftest=function(){
         _msg=_pass?'':('不正:'+_bad.join(',')+' 衝突:'+_dup.join(','));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('showcase_event_names_valid',_pass,_msg); }
+
+    // T67: ベンチ編成の恒久ルール（2026-07-31 ユーザー指示）
+    //  指定クラブ(CLUB_BENCH)  = 指定どおり。人数もGK数もこちらでは足さない
+    //  非指定クラブ            = 市場価値順で15人、GKは最大2・最低1（スカッドにGKが1人しか居ない場合を除く）
+    //  どちらも表示はポジション順(benchPosSort)
+    { let _pass=true,_msg='';
+      try{
+        const _cnt={}; P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(c)_cnt[c]=(_cnt[c]||0)+1; } });
+        const _clubs=Object.keys(_cnt).filter(c=>_cnt[c]>=16);
+        const _bad=[];
+        for(const c of _clubs){
+          buildSlots('4-3-3',false); placeClubSquad(c,c);
+          if(state.slots.filter(s=>s.pid!=null).length!==11) continue; // 層が薄いクラブは制限対象外
+          const _b=state.bench, _gk=_b.filter(p=>P[p][1]==='GK').length;
+          const _curated=(typeof CLUB_BENCH!=='undefined'&&CLUB_BENCH[c])?true:false;
+          const _srt=_b.slice().sort(benchPosSort);
+          if(_b.some((v,i)=>v!==_srt[i])){ _bad.push(c+':未整列'); continue; }
+          if(_curated) continue; // 指定ベンチはGK数を問わない
+          if(_gk>2){ _bad.push(c+':GK'+_gk); continue; }
+          const _squadGK=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][4].trim()===c&&P[i][1]==='GK').length;
+          if(_gk===0&&_squadGK>=2) _bad.push(c+':GK0(在籍'+_squadGK+')');
+          if(_bad.length>=5) break;
+        }
+        _pass=(_bad.length===0);
+        _msg=_pass?'':_bad.join(' / ');
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      ok('bench_gk_and_order',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
