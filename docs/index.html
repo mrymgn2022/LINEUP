@@ -4104,7 +4104,7 @@ function openSubPicker(slotIdx){
         <div class="filters" id="clubF" style="display:none"></div>
         <div class="filters" id="posF">${posChips()}</div>
       </div>
-      ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?escAttr(shortName(P[cur][0])):"-"}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
+      ${cur!=null?`<div class="bench-badge">${t('curSecond')}<b>${P[cur]?escAttr(nameOf(cur,true)):"-"}</b>　<span data-clearsub="1" style="color:var(--red);cursor:pointer;font-weight:800">${t('release')}</span></div>`:''}
     </div>
     <div class="list" id="plist"></div>`);
   const drawSub=()=>{
@@ -4840,7 +4840,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0801e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0801f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7632,6 +7632,28 @@ window.__selftest=function(){
         if(_empty!==2) throw new Error('空語句を送信');
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('t_not_shadowed_and_noresult_once',_pass,_msg); }
+
+    // T69: 第2候補ピッカーの「現在の第二候補」が日本語名で出るか（2026-08-01 実バグ）
+    //  shortName(P[cur][0]) を直接使っていたため、盤面・駒メニュー・共有画像が日本語なのにここだけローマ字だった。
+    { let _pass=true,_msg='';
+      try{
+        if(LANG==='ja'){
+          let _jp=null;
+          for(let i=0;i<P.length;i++){ if(isCustomPid(i))continue; const _lg=P[i][5];
+            if((_lg==='J1'||_lg==='J2'||_lg==='J3')&&J1JA[pidToKey(i)]){ _jp=i; break; } }
+          if(_jp==null) throw new Error('J1JA該当選手が見つからない');
+          buildSlots('4-3-3',false);
+          state.slots[0].pid=_jp; state.slots[0].sub=_jp;
+          openSubPicker(0);
+          const _b=document.querySelector('.bench-badge b');
+          const _txt=_b?_b.textContent:'';
+          closeSheet();
+          if(!_txt) throw new Error('バッジが描画されない');
+          if(/^[\x20-\x7e]+$/.test(_txt)) throw new Error('ローマ字表示: '+_txt);
+          if(_txt!==nameOf(_jp,true)) throw new Error('nameOf不一致: '+_txt+' / '+nameOf(_jp,true));
+        }
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('subpicker_shows_ja_name',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
