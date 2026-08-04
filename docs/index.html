@@ -131,12 +131,29 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
    新規/保存はドロワー(dwNew/dwSaveBtn)に、検索は空き枠タップに導線があるためヘッダーから撤去。
    要素はDOMに残す（onclick配線・統計ビーコンを一切変えないため）。表示だけ消す。 */
 #btnLoad,#btnSave,#btnMarket{display:none!important}
-#btnShare{width:128px;height:44px;flex:0 0 auto;border:none;border-radius:12px;
+#btnShare{width:96px;height:37px;flex:0 0 auto;border:none;border-radius:11px;
   background:linear-gradient(180deg,#ff5b6e,#e0304a);color:#fff;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  font-weight:800;font-size:14px;letter-spacing:1.5px;font-family:'Manrope',system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  font-weight:800;font-size:13px;letter-spacing:1.2px;font-family:'Manrope',system-ui,sans-serif;
   box-shadow:0 3px 12px rgba(255,91,110,.38),inset 0 1px 0 rgba(255,255,255,.28)}
-#btnShare svg{width:15px;height:15px;flex-shrink:0}
+#btnShare svg{width:13px;height:13px;flex-shrink:0}
+/* ワンタップ自動配置（2026-08-04 ユーザー指示）: SHAREの左隣・ブランド色ライム＝主役機能の看板。
+   サイズはSHAREと同格（37px高）。両ボタンとも44px→37pxへ縮小＝ヘッダーの圧迫感を解消 */
+#btnAutoTop{height:37px;flex:0 0 auto;border:none;border-radius:11px;padding:0 10px;
+  background:linear-gradient(180deg,#d9ff4d,#a9d614);color:#0c1308;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-weight:800;font-size:12.5px;letter-spacing:.02em;font-family:'Manrope',system-ui,sans-serif;cursor:pointer;transition:.15s;
+  box-shadow:0 3px 10px rgba(190,230,60,.25),inset 0 1px 0 rgba(255,255,255,.35)}
+#btnAutoTop:active{transform:scale(.95)}
+#btnAutoTop svg{flex-shrink:0;display:block}
+@media (max-width:359px){ #btnAutoTop span{display:none} #btnAutoTop{padding:0 9px} } /* 狭幅はロゴ優先で文字を隠し稲妻だけ（360pxはラベル込みで収まりを実測済み。320pxはラベル有だとロゴに重なる） */
+/* 自動配置シートのチームグリッド（3列・国旗＋英語クラブ名） */
+.apgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.apcell{height:46px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);
+  font-size:12.5px;font-weight:700;font-family:'Manrope',system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;padding:0 4px;white-space:nowrap;cursor:pointer;transition:.12s}
+.apcell:active{transform:scale(.96);background:var(--panel)}
+.apcell .fi{flex-shrink:0}
 .tbright{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
 .topbar .dispgroup{display:none;margin-left:auto}
 .topbar.open .dispgroup{display:flex}
@@ -715,7 +732,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
     </div>
     <div class="hbtn"><!-- 並び: 新規→共有→検索→整列→削除（破壊的な「盤面を空にする」を右端に隔離し誤タップ防止。2026-07-14） -->
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
-      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg><span>SHARE</span></div>
+      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><button id="btnAutoTop" title="自動配置"><svg viewBox="0 0 24 24" width="13" height="17"><polygon points="12.65 1 6.15 14.2 12 14.2 11.35 23 17.85 9.8 12 9.8 12.65 1" fill="currentColor"/></svg><span>自動配置</span></button><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg><span>SHARE</span></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       
       <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div><!-- btnClear(削除)は topbar 右側へ移動（ヘッダーUI改修 2026-08-04） -->
@@ -1091,6 +1108,7 @@ const I18N = {
     getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
     tipMenu:'メニュー', tipShare:'SNSに共有', tipSave:'スカッドを保存', tipClear:'盤面を空にする', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'配置を整える',
     formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示', tipDisp:'表示切替',
+    tipAuto:'自動配置', autoTopLb:'自動配置', autoSheetSub:'チームを選ぶだけでスタメンが完成します', autoClubs:'クラブ', autoNats:'代表チーム', autoAdv:'詳細設定（リーグ・国籍から選ぶ）', autoAdvSub:'お目当てのチームがない時はこちら', helpDAuto:'人気チームのスタメンをワンタップで自動配置',
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
@@ -1171,6 +1189,7 @@ const I18N = {
     getApp:'Get the app', getAppSoon:'App version (coming soon)',
     tipMenu:'Menu', tipShare:'Share', tipSave:'Save squad', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
     formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags', tipDisp:'Display options',
+    tipAuto:'Auto XI', autoTopLb:'AUTO XI', autoSheetSub:'Tap a team — your starting XI is ready', autoClubs:'CLUBS', autoNats:'NATIONAL TEAMS', autoAdv:'Advanced setup (league / nationality)', autoAdvSub:'Looking for another team? Start here', helpDAuto:'One tap builds a popular team’s XI',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
@@ -1878,6 +1897,7 @@ function applyStaticLang(){
   tset('btnMenu',t('tipMenu'));
   tset('btnSave',t('tipSave')); tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
   tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags')); tset('btnDisp',t('tipDisp'));
+  tset('btnAutoTop',t('tipAuto')); { const alb=document.querySelector('#btnAutoTop span'); if(alb) alb.textContent=t('autoTopLb'); } // ⚡自動配置/AUTO XI（ボタン内ラベルも言語追随）
   const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
   const sb=document.getElementById('statbar'); if(sb){ sb.title=t('tipAnalysis'); const sp=sb.querySelectorAll('span'); if(sp.length) sp[sp.length-1].textContent=t('squadAnalysis'); }
@@ -4611,6 +4631,8 @@ function drawMkt(){
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
 document.getElementById('btnLoad').onclick=()=>newTeamFlow();
+// ヘッダー⚡「自動配置」：人気チームのワンタップ配置（未保存の変更があれば確認してから＝新規作成と同じ作法）
+document.getElementById('btnAutoTop').onclick=()=>guardUnsaved(()=>openAutoSheet());
 
 /* ---------- お知らせ ----------
    ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
@@ -4890,7 +4912,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0804c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5367,6 +5389,7 @@ function openHelp(){
       ${ic(ui('btnMenu','☰'),t('tipMenu'),t('helpDMenu'))}
       ${ic(ui('btnLoad'),t('tipNew'),t('helpDNew'))}
       ${ic(ui('btnSave'),t('tipSave'),t('helpDSave'))}
+      ${ic(ui('btnAutoTop',tx('⚡')),t('tipAuto'),t('helpDAuto'))}
       ${ic(ui('btnShare'),t('tipShare'),t('helpDShare'))}
       ${ic(ui('btnMarket'),t('tipSearch'),t('helpDSearch'))}
       ${ic(ui('btnReset','⟲'),t('tipReset'),t('helpDReset'))}
@@ -6000,6 +6023,66 @@ function startOriginal(){
     const few=filled<11?(LANG==='en'?' (fewer than 11 match)':'（条件に合う選手が11人未満）'):'';
     toast(tAutoPlaced(name,filled,few));
   };
+}
+// ── ワンタップ自動配置（2026-08-04 ヘッダー⚡ボタン）──────────────────────
+// 自動配置が最大の売りなのに使われていない、が課題。自動配置したいチームは大抵決まっている前提で、
+// 人気チームを最初から並べてタップ即編成にする。クラブ表記は日英とも英語（ユーザー指定）。
+// 代表は日本語UI=日本代表/イングランド/スペイン、英語UI=イングランド/スペイン/アルゼンチン（日本の代わり）。
+// 行の形＝[CLUB_XIキー, 表示名, 旗の国コード]。キーの実在は selftest T73 が常時検証。
+const AUTO_TEAMS_CLUBS=[
+  ['Arsenal','Arsenal','ENG'],['Manchester City','Man City','ENG'],['Manchester United','Man Utd','ENG'],
+  ['Chelsea','Chelsea','ENG'],['Liverpool','Liverpool','ENG'],['Tottenham','Tottenham','ENG'],
+  ['Barcelona','Barcelona','ESP'],['Real Madrid','Real Madrid','ESP'],['Atlético Madrid','Atletico','ESP'],
+  ['Paris Saint-Germain','PSG','FRA'],['Bayern München','Bayern','GER'],['Borussia Dortmund','Dortmund','GER'],
+  ['Juventus','Juventus','ITA'],['Napoli','Napoli','ITA'],['Inter','Inter','ITA'],['AC Milan','Milan','ITA'],['AS Roma','Roma','ITA']];
+function autoTeamsNats(){ return LANG==='en'
+  ? [['ENG','England'],['ESP','Spain'],['ARG','Argentina']]
+  : [['JPN','日本代表'],['ENG','イングランド'],['ESP','スペイン']]; }
+function _apSlug(s){ return 'ap_'+String(s).toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_+|_+$/g,'').slice(0,29); } // worker検証互換(a-z_・32字以内)
+function openAutoSheet(){
+  recordEvent('first_action',true); recordEvent('auto_sheet',true); // ファネル：⚡ボタンが開かれたか（1セッション1回）
+  const cell=(attr,flag,label)=>`<button class="apcell" ${attr}>${flagHTML(flag)}<span>${label}</span></button>`;
+  const clubs=AUTO_TEAMS_CLUBS.map(c=>cell(`data-apclub="${escAttr(c[0])}"`,c[2],c[1])).join('');
+  const nats=autoTeamsNats().map(n=>cell(`data-apnat="${n[0]}"`,n[0],n[1])).join('');
+  openSheet(`
+    <h2>${t('autoTopLb')}</h2>
+    <div style="padding:2px 16px calc(env(safe-area-inset-bottom) + 20px)">
+      <div style="color:var(--mut);font-size:12.5px;margin:-2px 0 12px">${t('autoSheetSub')}</div>
+      <div style="color:var(--mut);font-size:11.5px;letter-spacing:.06em;margin:0 2px 8px">${t('autoClubs')}</div>
+      <div class="apgrid">${clubs}</div>
+      <div style="color:var(--mut);font-size:11.5px;letter-spacing:.06em;margin:16px 2px 8px">${t('autoNats')}</div>
+      <div class="apgrid">${nats}</div>
+      <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:14px">
+        <button id="apAdv" style="width:100%;height:48px;border:1px solid var(--line);border-radius:12px;background:transparent;color:var(--lime);font-size:14px;font-weight:800;font-family:'Manrope',system-ui,sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--lime)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          ${t('autoAdv')}</button>
+        <div style="color:var(--mut);font-size:11px;text-align:center;margin-top:8px">${t('autoAdvSub')}</div>
+      </div>
+    </div>`);
+  body.querySelectorAll('[data-apclub]').forEach(b=>{ b.onclick=()=>applyAutoClub(b.dataset.apclub); });
+  body.querySelectorAll('[data-apnat]').forEach(b=>{ b.onclick=()=>applyAutoNat(b.dataset.apnat); });
+  const adv=document.getElementById('apAdv'); if(adv) adv.onclick=()=>startOriginal(); // 既存の新規作成画面へ（openSheetが中身を差し替える＝閉じてから開く2段にしない）
+}
+// クラブをその確定XI（CLUB_XI/CLUB_BENCH/CLUB_NAMES・第2候補つき）で即配置。新規作成のクラブ単独指定と同じ経路
+function applyAutoClub(club){
+  recordEvent(_apSlug(club)); // どのチームが人気か（ap_arsenal 等・タップごと加算）
+  const cxf=(typeof CLUB_XI!=='undefined')?CLUB_XI[club]:null;
+  const form=(cxf&&cxf.form)||state.formation||'4-3-3';
+  state.flagByLeague=false;
+  buildSlots(form,false);
+  placeClubSquad(club,dispClub(club)); // excluded/reserveのリセット・確定XI・控え・表示名上書きまで内部で実施
+  setFormLabel(); closeSheet(); render(); save();
+  const filled=state.slots.filter(s=>s.pid!=null).length;
+  toast(tPlacedCount(dispClub(club),filled));
+}
+// 代表を招集26人＋予想XI（autoFillNationality）で即配置。新規作成の国籍単独指定と同じ経路
+function applyAutoNat(code){
+  recordEvent(_apSlug('nt_'+code));
+  const fxn=(typeof WC_XI!=='undefined'&&wcModeOn())?WC_XI[code]:null;
+  const form=(fxn&&fxn.form)||state.formation||'4-3-3';
+  autoFillNationality(code,form,null); // closeSheet/render/save/トーストまで内部で実施
+  clearAutoClubMemos(); fillClubMemos(); state.showMemo=true; syncMemoBtn(); state.flagByLeague=true; // 国籍編成の定番後処理（所属クラブ名メモ＋リーグ旗）
+  render(); save();
 }
 function escAttr(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 // CLUB_BENCH に定義があるクラブは、その控えを**そのまま**使う（used に取り込む）。定義が無ければ null＝従来動作。
@@ -7834,6 +7917,33 @@ window.__selftest=function(){
         tb.classList.toggle('open',was);
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('header_share_and_collapse',_pass,_msg); }
+
+    // T73: ワンタップ自動配置（2026-08-04）: 定義クラブがCLUB_XIに実在／シートの中身と言語ゲート
+    //（JA=クラブ17+日本代表/イングランド/スペイン、EN=クラブ17+イングランド/スペイン/アルゼンチン）／実配置で11人
+    { let _pass=true,_msg='';
+      try{
+        const el=id=>document.getElementById(id);
+        if(getComputedStyle(el('btnAutoTop')).display==='none') throw new Error('⚡ボタンが見えない');
+        if(typeof el('btnAutoTop').onclick!=='function') throw new Error('⚡ボタンの配線なし');
+        const _missing=AUTO_TEAMS_CLUBS.filter(c=>!CLUB_XI[c[0]]).map(c=>c[0]); // クラブ改名・削除で腐ったら即検出
+        if(_missing.length) throw new Error('CLUB_XIに無い: '+_missing.join(','));
+        const _lang0=LANG;
+        LANG='ja'; openAutoSheet();
+        if(body.querySelectorAll('[data-apclub]').length!==17) throw new Error('クラブが17でない');
+        let _n=[...body.querySelectorAll('[data-apnat]')].map(b=>b.dataset.apnat);
+        if(_n.join(',')!=='JPN,ENG,ESP') throw new Error('JA代表がJPN,ENG,ESPでない: '+_n.join(','));
+        closeSheet();
+        LANG='en'; openAutoSheet();
+        _n=[...body.querySelectorAll('[data-apnat]')].map(b=>b.dataset.apnat);
+        if(_n.join(',')!=='ENG,ESP,ARG') throw new Error('EN代表がENG,ESP,ARGでない: '+_n.join(','));
+        closeSheet(); LANG=_lang0;
+        applyAutoClub('Arsenal'); // 実タップ相当（クラブ）
+        if(state.formation!==CLUB_XI['Arsenal'].form) throw new Error('フォメがCLUB_XIと不一致');
+        if(state.slots.filter(s=>s.pid!=null).length!==11) throw new Error('クラブで11人配置されない');
+        applyAutoNat('ARG'); // 実タップ相当（代表・EN限定のアルゼンチンも11人組めること）
+        if(state.slots.filter(s=>s.pid!=null).length!==11) throw new Error('ARGが11人にならない');
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('one_tap_autoplace',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
