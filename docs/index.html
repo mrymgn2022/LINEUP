@@ -1123,7 +1123,7 @@ const I18N = {
     total:'合計', starters:'スタメン', subsWord:'控え', benchEmpty:'控え選手がいません。<b>＋</b> から追加できます。クラブで自動編成すると控えも自動で入ります。',
     place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
     posAll:'全部', allLeagues:'全リーグ', popClubs:'人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
-    sortSuggest:'おすすめ順', sortPop:'人気順', sortFeatured:'注目順', sortAgeDesc:'年齢 高い順', sortAgeAsc:'年齢 低い順',
+    sortSuggest:'おすすめ順', sortPop:'人気順',
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
@@ -1205,7 +1205,7 @@ const I18N = {
     total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-building by club fills the bench too.',
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
     posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
-    sortSuggest:'Suggested', sortPop:'Popular', sortFeatured:'Featured', sortAgeDesc:'Oldest first', sortAgeAsc:'Youngest first',
+    sortSuggest:'Suggested', sortPop:'Popular',
     createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
@@ -3630,9 +3630,10 @@ function syncClubField(id, f){
   if(show){ c.style.display=''; c.innerHTML=clubSelectHTML(f); }
   else { c.style.display='none'; c.innerHTML=''; if(f.club!=='ALL') f.club='ALL'; }
 }
-// ソート切替チップ（おすすめ順/年齢↓↑）。drawPickList系ピッカーで使用
+// ソート切替チップ（おすすめ順/人気順）。drawPickList系ピッカーで使用
+// 年齢ソート(高い順/低い順)は2026-08-04削除: srt_*計測6日間で利用0件＋整数年齢のみの比較で同年齢内が無秩序に見える構造欠陥（ユーザー決定）
 function sortChips(f=pickFilter){
-  const opts=[['suggest',t('sortSuggest')],['pop',t('sortPop')],['age_desc',t('sortAgeDesc')],['age_asc',t('sortAgeAsc')]];
+  const opts=[['suggest',t('sortSuggest')],['pop',t('sortPop')]];
   return opts.map(o=>`<div class="fchip ${(f.sort||'suggest')===o[0]?'on':''}" data-sort="${o[0]}">${o[1]}</div>`).join('')
     +`<div class="fchip" data-create style="margin-left:auto;border-color:var(--lime);color:var(--lime)">${t('createPlayer')}</div>`;
 }
@@ -3692,14 +3693,12 @@ function syncClearBtn(btnId,f,baseSort){
   b.style.borderColor=active?'var(--mut)':'';
 }
 function syncPickClearBtn(){ syncClearBtn('pickClear',pickFilter,'suggest'); }
-function ageSortEligible(i){ return +P[i][2]>0; } // 年齢ソートで表示する条件。未登録(0/空/null)は年齢順に意味を持てないため除外（DB内140人・2026-07-27）
 function drawPickList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   syncPickClearBtn(); // フィルタ変更は必ずここを通る＝クリアボタンの点灯/減光を常に同期
   // ベンチ追加でも在籍中(起用中/ベンチ)の選手は除外せず表示する（prowHTMLで選択不可にする）
   pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
   const so=pickFilter.sort||'suggest';
-  if(so==='age_desc'||so==='age_asc') pickCurIdx=pickCurIdx.filter(ageSortEligible); // 年齢未登録が「低い順」の先頭に固まるのを防ぐ（高い順も同基準で非表示）
   _iconFloorActive=false; // 手動ピッカーはレジェンド下限を効かせず“素の実力順”で並べる（引退アイコンで一覧を汚さない）
   // ★性能修正: ソートキー(市場価値・適性ランク)を候補ごとに1回だけ事前計算する（デコレート）。
   // 以前は比較のたびに mvScore(=keyForPlayer文字列生成+マップ参照) を呼んでいたため、まっさら盤面(候補2.4万)で
@@ -3711,9 +3710,7 @@ function drawPickList(slotIdx){
   for(const i of pickCurIdx){ const p=P[i]; if(_needScore)_sc[i]=mvScore(p); if(_useRank)_rk[i]=suggestRank(p[1]); }
   _iconFloorActive=true;
   const _cm=i=> (_club && P[i][4].trim()===_club) ? 1 : 0; // 自チーム(読込クラブ)一致を優先
-  if(so==='age_desc') pickCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
-  else if(so==='age_asc') pickCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
-  else if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
+  if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
   if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
@@ -4577,18 +4574,12 @@ function openMarket(){
       <div class="filters" id="mlgF">${lgChips(mktFilter)}</div>
       <div class="filters" id="mclubF" style="display:none"></div>
       ${natFilterHTML(mktFilter)}
-      <div class="filters" id="msortF">
-        <div class="fchip on" data-sort="mv">${t('sortFeatured')}</div>
-        <div class="fchip" data-sort="age_desc">${t('sortAgeDesc')}</div>
-        <div class="fchip" data-sort="age_asc">${t('sortAgeAsc')}</div>
-      </div>
-      <div class="filters" id="mposF">${posChips(mktFilter)}</div>
+      <div class="filters" id="mposF">${posChips(mktFilter)}</div><!-- ソート行は2026-08-04撤去: 年齢ソート削除で「注目順」1個だけになり切替対象が無いため（並びは常に市場価値順） -->
     </div>
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
   const _mc=document.getElementById('mClear'); if(_mc)_mc.onclick=()=>openMarket(); // 既定状態で開き直す＝全条件クリア
   document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase();drawMkt()};
-  document.getElementById('msortF').onclick=e=>{const c=e.target.closest('[data-sort]');if(!c)return;mktFilter.sort=c.dataset.sort; try{ recordEvent('srt_m_'+String(c.dataset.sort||'').replace(/[^a-z_]/g,'_')); }catch(_){}[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';syncClubField('mclubF',mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
@@ -4614,14 +4605,10 @@ function drawMkt(){
     if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
     return true;
   });
-  const so=f.sort||'mv';
-  if(so==='age_desc'||so==='age_asc') mktCurIdx=mktCurIdx.filter(ageSortEligible); // 年齢未登録は年齢ソートでは非表示（drawPickListと同基準。ここを忘れて再報告を受けた 2026-07-27）
   _iconFloorActive=false; // 検索一覧もレジェンド下限を効かせず“素の実力順”で並べる
   // ★性能修正: 市場価値順は mvScore を候補ごとに1回だけ事前計算（比較器内で再計算しない）。フィルタ無しの全2.4万件でも即並ぶ。順序は従来と同一。
-  if(so==='age_desc') mktCurIdx.sort((a,b)=>P[b][2]-P[a][2]);
-  else if(so==='age_asc') mktCurIdx.sort((a,b)=>P[a][2]-P[b][2]);
-  else { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
-    mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 注目順=市場価値の高い順
+  { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
+    mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 並びは常に市場価値の高い順（年齢ソートは2026-08-04削除）
   _iconFloorActive=true;
   if(!mktCurIdx.length){ noResultOnce(mktFilter.q); // 選手検索でも0件を記録
     list.innerHTML=noMatchHTML('mClear');return;}
@@ -4935,7 +4922,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0804g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7579,23 +7566,19 @@ window.__selftest=function(){
         _pass=(pr.width>0)&&(d<1.5); _msg=_pass?'':('ズレ'+d.toFixed(1)+'px pitch幅'+Math.round(pr.width));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('toast_on_pitch_center',_pass,_msg); }
-    // T55: 年齢ソートは年齢未登録(0/空)の選手を出さない。★両ピッカーを実走して混入0を確認
-    //（helper単体テストだけでは drawMkt=チーム外検索側の適用漏れを見逃した実績あり 2026-07-27。年齢ソートは2実装ある）
+    // T55(改 2026-08-04): 年齢ソートは削除済み（srt_*計測6日間で利用0件＋整数年齢比較の構造欠陥・ユーザー決定）。
+    // 残骸・復活を検出する（チップ/単独ソート行/helper/i18nのどれかが戻ったら落ちる）
     { let _pass=true,_msg='';
       try{
-        const tmp=P.length; P.push(['__AgeTest','ST',0,'JPN','',0]);      // 年齢0の仮選手＝DBが将来全員年齢ありになってもテストが空振りしない（finallyのP.length=snapPLenで消える）
-        const okNo=!ageSortEligible(tmp);                                  // 未登録→対象外
-        // ① 配置ピッカー(drawPickList)
-        openPicker(0,true); pickFilter.sort='age_asc'; drawPickList(0);
-        const bad1=pickCurIdx.filter(i=>!(+P[i][2]>0)).length;
+        if(/data-sort="age_(desc|asc)"/.test(sortChips())) throw new Error('配置ピッカーに年齢チップが残存');
+        openMarket();
+        if(body.querySelector('[data-sort="age_desc"],[data-sort="age_asc"]')) throw new Error('チーム外検索に年齢チップが残存');
+        if(document.getElementById('msortF')) throw new Error('チーム外検索に単独ソート行が残存（切替対象なし）');
         closeSheet();
-        // ② チーム外の全選手検索(drawMkt)
-        openMarket(); mktFilter.sort='age_asc'; drawMkt();
-        const bad2=mktCurIdx.filter(i=>!(+P[i][2]>0)).length;
-        mktFilter.sort='mv'; closeSheet();
-        _pass=okNo&&(bad1===0)&&(bad2===0); _msg=_pass?'':('no='+okNo+' pick混入='+bad1+' mkt混入='+bad2);
-      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
-      ok('age_sort_excludes_unknown',_pass,_msg); }
+        if(typeof window.ageSortEligible==='function') throw new Error('ageSortEligibleが残存');
+        if(I18N.ja.sortAgeDesc||I18N.en.sortAgeDesc||I18N.ja.sortAgeAsc||I18N.en.sortAgeAsc) throw new Error('i18nに年齢ソート文言が残存');
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('age_sort_removed',_pass,_msg); }
     // T56: ピッカーの【ベンチ外】バッジ＝ベンチ外セクション表示中の選手だけに付く（起用中/ベンチが優先・2026-07-27）
     { let _pass=true,_msg='';
       try{
@@ -7633,7 +7616,7 @@ window.__selftest=function(){
         // ② 選手を検索（market）
         openMarket();
         const o2=[...document.querySelector('.sheet .controls').children].map(rowKey).join(',');
-        const ord2=(o2==='mq,mlgF,mclubF,nat,msortF,mposF');
+        const ord2=(o2==='mq,mlgF,mclubF,nat,mposF'); // 2026-08-04: msortFは撤去（年齢ソート削除で「注目順」単独になり切替対象なし）
         const hdr2=!!(document.getElementById('mClear')&&document.getElementById('mClear').closest('h2'));
         closeSheet();
         // ③ 第2候補（全チームからモードの並び。ベンチありだとベンチモードで開く→トグルで全チーム検索へ切替てから検査）
