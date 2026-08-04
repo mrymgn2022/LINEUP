@@ -4928,7 +4928,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0805a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0805b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5893,6 +5893,7 @@ function autoFillNationality(code,form,name){
       // ベンチ外: 招集26人の外にユーザーが手動で加えた選手（WC_XI[code].extra）。並びは reserveIds が GK→ST 順に整える（2026-07-31）
       state.reserveAdds=(fx.extra||[]).map(keyToPid).filter(v=>v!=null&&!used.has(v)&&!state.bench.includes(v));
       state.reserveOrder=[];
+      recordEvent('autobuild'); // ★計上漏れ修正(2026-08-05): 予想XI/保存盤面の直接貼り経路。プール経路はautoFillFrom内で計上済み＝二重計上なし
     }else{
       autoFillFrom(pool); // 招集26人プール内で従来ロジック（適性×市場価値）
     }
@@ -6032,6 +6033,7 @@ function startOriginal(){
       if(cxf&&cxf.form&&!formTouched) chosenForm=cxf.form; // メンバーサイト掲載クラブ: フォメ未変更なら予想XIと同じフォーメーションを採用
       buildSlots(chosenForm,false);
       placeClubSquad(chosenClub,name);
+      recordEvent('autobuild'); // ★計上漏れ修正(2026-08-05): クラブ単独指定は確定XI直接貼り(またはplaceClubSquad内のインライン選定)でautoFillFromを通らない
       setFormLabel(); closeSheet(); render(); save();
       const filled=state.slots.filter(s=>s.pid!=null).length;
       const clabel=typed?(typed+(LANG==='en'?' ('+dispClub(chosenClub)+')':'（'+dispClub(chosenClub)+'）')):dispClub(chosenClub);
@@ -6126,6 +6128,7 @@ function applyAutoClub(club){
   state.flagByLeague=false;
   buildSlots(form,false);
   placeClubSquad(club,dispClub(club)); // excluded/reserveのリセット・確定XI・控え・表示名上書きまで内部で実施
+  recordEvent('autobuild'); // ★計上漏れ修正(2026-08-05): 確定XI直接貼り経路はautoFillFromを通らずautobuildが飛んでいなかった。ap_*(チーム別)とは並存
   setFormLabel(); closeSheet(); render(); save();
   const filled=state.slots.filter(s=>s.pid!=null).length;
   toast(tPlacedCount(dispClub(club),filled));
@@ -8059,6 +8062,24 @@ window.__selftest=function(){
         if(!I18N.ja.tryAutoXi||!I18N.en.tryAutoXi) throw new Error('tryAutoXiのi18n欠落');
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('audit_fixes_2026_08_04',_pass,_msg); }
+
+    // T76: autobuild計上の全経路検証（2026-08-05 計上漏れ修正の恒久ガード）。
+    // 確定XI直接貼り経路(⚡クラブ/⚡代表/新規作成クラブ単独)はautoFillFromを通らず、autobuildが
+    // 一度も飛んでいなかった＝「自動配置の利用」を過小集計していた（ユーザー指摘）。
+    // recordEventを一時差し替えて実際の発火回数を数える: ⚡クラブ=1回/代表(確定XI)=1回/ショーケース(デモ)=0回(汚染禁止)
+    { let _pass=true,_msg=''; const _re=window.recordEvent;
+      try{
+        let _n=0; window.recordEvent=function(ev){ if(ev==='autobuild') _n++; };
+        applyAutoClub('Arsenal'); const _a=_n;
+        _n=0; autoFillNationality('JPN', WC_XI['JPN'].form, null); const _b=_n;
+        _n=0; showcaseBoot(); const _c=_n;
+        window.recordEvent=_re;
+        if(_a!==1) throw new Error('⚡クラブで'+_a+'回（1回のはず）');
+        if(_b!==1) throw new Error('代表・確定XI経路で'+_b+'回（1回のはず）');
+        if(_c!==0) throw new Error('ショーケースで'+_c+'回（デモは計上禁止）');
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      finally{ try{ window.recordEvent=_re; }catch(e){} }
+      ok('autobuild_all_paths',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
