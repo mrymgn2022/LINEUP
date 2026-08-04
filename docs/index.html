@@ -1104,7 +1104,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'右端の「◀」から開く4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'今の盤面をスカッドとして保存（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人を全部外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpDDisp:'POS・2nd・メモ・国旗の4つをまとめて開く／しまう', helpSoon:'新しい画面に合わせて、使い方ページを作り直しています。<br>もう少しだけお待ちください。', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
+    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'主なボタンと機能', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'右端の「◀」から開く4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'メニューの「現在のスカッドを保存」から（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人を全部外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'空いている枠をタップすると選手検索が開く', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'駒を動かすと盤面右下に出る「整列リセット」で既定位置へ', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpDDisp:'POS・2nd・メモ・国旗の4つをまとめて開く／しまう', helpSoon:'新しい画面に合わせて、使い方ページを作り直しています。<br>もう少しだけお待ちください。', helpSecMenu:'メニューの中身', helpDNewTeam:'盤面を作り直す。クラブ・国籍・リーグからの自動配置もここから', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
@@ -1159,9 +1159,9 @@ const I18N = {
     editDisplayName:'表示名を編集', origName:'元の名前：', renameHelp:'長い名前の短縮や愛称に変更できます。<br>空のまま保存すると元の名前に戻ります。', save:'保存', resetToOrig:'元の名前に戻す', renameTeamTitle:'スカッド名を編集',
     memoPh:'例）怪我明け / 売却候補 / 新加入', deleteNote:'メモを削除',
     helpSub:'はじめての方へ', helpIntro:'サッカーの<b>スタメン11人</b>を自由に作って、<b>画像にしてシェア</b>できるアプリです。まずは3ステップ。',
-    helpSec1:'かんたん3ステップ', helpS1T:'フォーメーションを選ぶ', helpS1D:'画面上の「フォーメーション」ボタンから 4-3-3 などを選びます。',
-    helpS2T:'選手を配置する', helpS2D:'空いている駒をタップ → 選手を選びます。名前・ポジション・国籍・リーグ・クラブで絞り込み検索できます。',
-    helpS3T:'画像でシェア', helpS3D:'右上の共有ボタンで画像を作成 → X・Instagram に投稿、保存もできます。',
+    helpSec1:'かんたん3ステップ', helpS1T:'チームを選んで自動配置', helpS1D:'上部の⚡「自動配置」からアーセナルや日本代表などをワンタップ。自分で組むなら、メニューの「スカッドを新規作成」からフォーメーションを選べます。',
+    helpS2T:'選手を入れ替える', helpS2D:'駒をタップするとメニュー、空いている枠をタップすると選手検索が開きます。名前・ポジション・国籍・リーグ・クラブで絞り込めます。',
+    helpS3T:'画像でシェア', helpS3D:'右上の「SHARE」で画像を作成 → X・Instagram に投稿、保存もできます。',
     helpSec2:'もっと使いこなす', helpS4T:'まとめて自動配置', helpS4D:'右上の ＋ から、クラブ・国籍・リーグを選ぶと11人を自動配置。「レアル」「日本代表」なども一発。',
     helpS5T:'スカッドを保存・切り替え', helpS5D:'メニューで保存（最大10スカッド）。作ったスカッドの切り替えもここから。',
     helpS6D:'全選手を注目順などで一覧。誰がいるか眺めたり、そのまま起用できます。',
@@ -1186,7 +1186,7 @@ const I18N = {
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
-    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpSecToggle:'Display toggles', helpToggleLead:'The four behind the ◀ button on the right. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'Save the current pitch as a squad (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpDDisp:'Open or tuck away the four display toggles', helpSoon:'We&#39;re rebuilding this guide for the new look.<br>Coming soon.', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
+    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons & features', helpSecToggle:'Display toggles', helpToggleLead:'The four behind the ◀ button on the right. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'From “Save current squad” in the menu (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDMenu:'Save, switch and all pages', helpDSearch:'Tap any empty spot to open player search', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Move a player, then tap “Reset layout” (bottom-right of the pitch)', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpDDisp:'Open or tuck away the four display toggles', helpSoon:'We&#39;re rebuilding this guide for the new look.<br>Coming soon.', helpSecMenu:'Inside the menu', helpDNewTeam:'Start over — auto-place by club, nation or league from here', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
@@ -1241,9 +1241,9 @@ const I18N = {
     editDisplayName:'Edit display name', origName:'Original name: ', renameHelp:'Shorten a long name or use a nickname.<br>Save empty to revert to the original.', save:'Save', resetToOrig:'Reset to original', renameTeamTitle:'Edit squad name',
     memoPh:'e.g. Back from injury / Up for sale / New signing', deleteNote:'Delete note',
     helpSub:'Getting started', helpIntro:'Build your own <b>starting XI</b> and <b>share it as an image</b>. Just three steps to begin.',
-    helpSec1:'3 easy steps', helpS1T:'Pick a formation', helpS1D:'Tap the “Formation” button at the top and choose 4-3-3, and so on.',
-    helpS2T:'Place players', helpS2D:'Tap an empty spot → pick a player. Filter by name, position, nationality, league or club.',
-    helpS3T:'Share as an image', helpS3D:'Use the share button (top-right) to create an image → post to X or Instagram, or save it.',
+    helpSec1:'3 easy steps', helpS1T:'Pick a team — auto-placed', helpS1D:'Tap ⚡ AUTO XI at the top and load Arsenal, England and more in one tap. Prefer to build your own? Use “Create a squad” in the menu and pick a formation.',
+    helpS2T:'Swap players', helpS2D:'Tap a player for its menu, or tap an empty spot to search. Filter by name, position, nationality, league or club.',
+    helpS3T:'Share as an image', helpS3D:'Tap SHARE (top-right) to create an image → post to X or Instagram, or save it.',
     helpSec2:'Go further', helpS4T:'Auto-build in one tap', helpS4D:'From ＋ (top-right), pick a club, nationality or league to auto-place 11 players — “Real Madrid”, “Japan” and more in one tap.',
     helpS5T:'Save & switch squads', helpS5D:'Save from the menu (up to 10 squads). Switch between your squads there too.',
     helpS6D:'Browse all players and more. See who’s available and add them straight in.',
@@ -4922,7 +4922,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0804h'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5373,7 +5373,7 @@ function openHelp(){
   // ★2026-08-04 ヘッダーUI改修に伴い全面改稿中＝カミングスーン表示（ユーザー指示）。
   //   旧本文は下にそのまま温存（リニューアル時の下敷き。T62のヘルプ⇔実UI照合の参照先も残る）。
   //   改稿が済んだら HELP_SOON を false に戻すだけで復帰する。
-  const HELP_SOON=true;
+  const HELP_SOON=false; // 2026-08-04 全面改稿済み（⚡自動配置の新導線に合わせて3ステップ/ボタン一覧/隠しボタンの実導線を書き直し）
   if(HELP_SOON){
     openSheet(`
       <h2>${t('help')}</h2>
@@ -5400,14 +5400,16 @@ function openHelp(){
   const tx=s=>`<span style="font-size:11px;font-weight:800;letter-spacing:.3px">${s}</span>`;
   // ★実物のボタンからアイコンを取る。ヘルプ用にSVGを書き写すと本体の変更に追随せず、
   //   実際には無いボタン（旧「＋」など）を載せてしまう（2026-07-29 ユーザー指摘）
-  const ui=(id,fb)=>{ const e=document.getElementById(id); const h=e?e.innerHTML.trim():''; return h||(fb||''); };
+  const ui=(id,fb)=>{ const e=document.getElementById(id); let h=e?e.innerHTML.trim():''; h=h.replace(/<span[\s\S]*?<\/span>/g,'').trim(); return h||(fb||''); }; // 文字ラベル(SHARE/自動配置のspan)は34px枠にあふれるため除去しアイコンだけ見せる（2026-08-04）
   const uiSel=(sel,fb)=>{ const e=document.querySelector(sel); const h=e?e.innerHTML.trim():''; return h||(fb||''); };
   const VID='OGbxHh3JGF8';
+  const HELP_VIDEO=false; // 2026-08-04: 既存動画は旧UIのため一時非表示。UI凍結後に撮り直したらtrueに戻す（枠・文言は温存）
   openSheet(`
     <h2>${t('help')} <span>${t('helpSub')}</span></h2>
     <div style="padding-bottom:calc(env(safe-area-inset-bottom) + 28px)">
       <div style="margin:2px 16px 16px;color:var(--ink);font-size:13.5px;line-height:1.85">${t('helpIntro')}</div>
 
+      ${HELP_VIDEO?`
       ${sec(t('helpSecVideo'))}
       <!-- 軽量ファサード: 開くたびにYouTubeを読み込むとシートが重くなるので、タップで初めてiframeを挿す -->
       <div id="hlpVid" role="button" tabindex="0" aria-label="${t('helpSecVideo')}"
@@ -5425,7 +5427,7 @@ function openHelp(){
       <div style="margin:0 16px 4px;font-size:11.5px;color:var(--mut);line-height:1.6">
         <a href="https://youtu.be/${VID}" target="_blank" rel="noopener" style="color:var(--lime)">${t('helpVideoOpen')}</a></div>
 
-      ${div}
+      ${div}`:''}
       ${sec(t('helpSec1'))}
       ${step('1',t('helpS1T'),t('helpS1D'))}
       ${step('2',t('helpS2T'),t('helpS2D'))}
@@ -5433,16 +5435,12 @@ function openHelp(){
 
       ${div}
       ${sec(t('helpSecTop'))}
-      ${ic(uiSel('#btnFormation .fhex',tx('4-3-3')),t('formation'),t('helpDFormation'))}
       ${ic(ui('btnMenu','☰'),t('tipMenu'),t('helpDMenu'))}
-      ${ic(ui('btnLoad'),t('tipNew'),t('helpDNew'))}
-      ${ic(ui('btnSave'),t('tipSave'),t('helpDSave'))}
       ${ic(ui('btnAutoTop',tx('⚡')),t('tipAuto'),t('helpDAuto'))}
       ${ic(ui('btnShare'),t('tipShare'),t('helpDShare'))}
-      ${ic(ui('btnMarket'),t('tipSearch'),t('helpDSearch'))}
-      ${ic(ui('btnReset','⟲'),t('tipReset'),t('helpDReset'))}
+      ${ic(uiSel('#btnFormation .fhex',tx('4-3-3')),t('formation'),t('helpDFormation'))}
       ${ic(ui('btnClear'),t('tipClear'),t('helpDClear'))}
-      ${ic(ICN.stats,t('tipAnalysis'),t('helpDStats'))}
+      ${ic(ICN.stats,t('tipAnalysis'),t('helpDStats'))}<!-- 2026-08-04: ヘッダーから消えた新規作成/保存/検索/整列の4タイルは削除（実在しないボタンを載せない・ユーザー指摘）。保存→メニューの中身、検索/整列→ボタンのない操作 へ移設 -->
       ${div}
       ${sec(t('helpSecToggle'))}
       <div style="margin:-4px 16px 12px;font-size:12px;color:var(--mut);line-height:1.7">${t('helpToggleLead')}</div>
@@ -5468,6 +5466,7 @@ function openHelp(){
       ${div}
       ${sec(t('helpSecMenu'))}
       ${ic(ICN.plus,t('newTeam'),t('helpDNewTeam'))}
+      ${ic(ui('btnSave'),t('tipSave'),t('helpDSave'))}
       ${ic(ICN.pencil,t('helpNRename'),'')}
       ${ic(ICN.trash,t('helpNDelete'),'')}
       ${ic(ICN.help,t('help'),'')}
@@ -5486,6 +5485,8 @@ function openHelp(){
       ${div}
       ${sec(t('helpSecGesture'))}
       ${step('↔',t('helpS8T'),t('helpS8D'))}
+      ${step('🔍',t('tipSearch'),t('helpDSearch'))}
+      ${step('⟲',t('tipReset'),t('helpDReset'))}
       ${step('A',t('helpGNameT'),t('helpGNameD'))}
       ${step('🔗',t('helpS9T'),t('helpS9D'))}
 
@@ -7706,13 +7707,16 @@ window.__selftest=function(){
     { let _pass=true,_msg='';
       try{
         const _real=new Set();
-        document.querySelectorAll('header [id^=btn], .topbar [id^=btn], .topbar .icon[id]').forEach(e=>_real.add(e.id));
+        // 2026-08-04: 「見えているボタン」だけを掲載義務の対象にする。ヘッダーUI改修で display:none の旧ボタン
+        // (btnLoad/btnSave/btnMarket/btnReset)が残っており、非表示ボタンをヘルプに載せると
+        // 「探しても見つからないボタン」になる（ユーザー指摘）。逆にアイコンの流用(ui('btnSave')等)はIDが実在すれば許す。
+        document.querySelectorAll('header [id^=btn], .topbar [id^=btn], .topbar .icon[id]').forEach(e=>{ if(getComputedStyle(e).display!=='none') _real.add(e.id); });
         const _src=String(openHelp);
         const _ref=new Set();
         _src.replace(/ui\('(btn[A-Za-z]+)'/g,(m,id)=>{ _ref.add(id); return m });
         _src.replace(/uiSel\('#(btn[A-Za-z]+)/g,(m,id)=>{ _ref.add(id); return m });
-        const _miss=[..._real].filter(id=>!_ref.has(id));   // 実在するのにヘルプに無い
-        const _ghost=[..._ref].filter(id=>!_real.has(id));  // ヘルプにあるのに実在しない
+        const _miss=[..._real].filter(id=>!_ref.has(id));   // 見えているのにヘルプに無い
+        const _ghost=[..._ref].filter(id=>!document.getElementById(id));  // ヘルプにあるのにDOMに全く無い（隠しボタンのアイコン流用は許容）
         _pass=(_miss.length===0 && _ghost.length===0 && _real.size>0);
         _msg=_pass?'':('ヘルプ未掲載:'+_miss.join(',')+' / 実在しない:'+_ghost.join(','));
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
