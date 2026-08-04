@@ -127,6 +127,23 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .formbtn .caret{color:var(--mut);font-size:10px;margin-left:2px;flex-shrink:0}
 .formbtn:active{transform:scale(.99);background:var(--panel2)}
 .dispgroup{display:flex;gap:6px;flex-shrink:0}
+/* ── ヘッダーUI改修（2026-08-04 ユーザー指示）: 上段=SHAREのみ／表示トグルは折りたたみ ──
+   新規/保存はドロワー(dwNew/dwSaveBtn)に、検索は空き枠タップに導線があるためヘッダーから撤去。
+   要素はDOMに残す（onclick配線・統計ビーコンを一切変えないため）。表示だけ消す。 */
+#btnLoad,#btnSave,#btnMarket{display:none!important}
+#btnShare{width:128px;height:44px;flex:0 0 auto;border:none;border-radius:12px;
+  background:linear-gradient(180deg,#ff5b6e,#e0304a);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:800;font-size:14px;letter-spacing:1.5px;font-family:'Manrope',system-ui,sans-serif;
+  box-shadow:0 3px 12px rgba(255,91,110,.38),inset 0 1px 0 rgba(255,255,255,.28)}
+#btnShare svg{width:15px;height:15px;flex-shrink:0}
+.tbright{margin-left:auto;display:flex;gap:8px;flex-shrink:0}
+.topbar .dispgroup{display:none;margin-left:auto}
+.topbar.open .dispgroup{display:flex}
+.topbar.open .tbright{margin-left:0}
+.topbar.open #btnClear{display:none} /* 390pxでは4トグル+削除が同居できない＝開いている間だけ退避 */
+#btnDisp svg{transition:transform .15s}
+.topbar.open #btnDisp svg{transform:scaleX(-1)}
 /* フォーメーション選択ピッカー */
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 10px}
 .fcard{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:9px 8px 7px;cursor:pointer;transition:.12s;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -407,7 +424,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   .drawer .dwdiv{margin:5px 0;}
   .drawer .dwfoot{padding:9px 16px calc(env(safe-area-inset-bottom) + 9px);}
   .pastebanner{ left:312px; }                       /* 常設サイドバー(300px)を避けて本体列に合わせる */
-  #btnReset{display:grid}
+  /* #btnReset のPC再表示はヘッダーUI改修(2026-08-04)で廃止。整列は全環境 #resetChip が担う（配線は温存＝resetChipがonclickを呼ぶ） */
   .seowrap{height:auto;overflow:visible;margin-left:max(300px, calc(50vw - 130px));max-width:560px;padding:6px 0 8px} /* アプリ列と同じ位置に正規表示 */
   .seowrap .seofoot a{color:#9fb8a8}
 }
@@ -683,10 +700,10 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
     </div>
     <div class="hbtn"><!-- 並び: 新規→共有→検索→整列→削除（破壊的な「盤面を空にする」を右端に隔離し誤タップ防止。2026-07-14） -->
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
-      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg></div>
+      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg><span>SHARE</span></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       
-      <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div><div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
+      <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div><!-- btnClear(削除)は topbar 右側へ移動（ヘッダーUI改修 2026-08-04） -->
     </div>
   </header>
 
@@ -697,6 +714,10 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
       <div class="icon subtog" id="btnSubs" title="第2候補 表示/非表示">2nd</div>
       <div class="icon" id="btnMemo" title="メモ 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8.5" y1="8" x2="15.5" y2="8"/><line x1="8.5" y1="12" x2="15.5" y2="12"/><line x1="8.5" y1="16" x2="13" y2="16"/></svg></div>
       <div class="icon" id="btnFlags" title="国旗 表示/非表示"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6c3-2.4 6 2.4 9 0s6-2.4 9 0v9.2c-3 2.4-6-2.4-9 0s-6 2.4-9 0Z"/><path d="M12 6v9.2" stroke-width="1.4" opacity=".5"/></svg></div>
+    </div>
+    <div class="tbright"><!-- ヘッダーUI改修 2026-08-04: 削除は右端隔離のまま2段目へ。矢印で表示トグル4つを開閉 -->
+      <div class="icon" id="btnClear" title="盤面をリセット" aria-label="盤面をリセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6.5 7l1 12.5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1L18 7"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div>
+      <div class="icon" id="btnDisp" title="表示切替" aria-label="表示切替" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14 6 8 12 14 18"/></svg></div>
     </div>
   </div>
 
@@ -1044,7 +1065,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'フォーメーションの右にある4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'今の盤面をスカッドとして保存（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人を全部外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
+    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し）', helpGNameT:'表示名を変える', helpGNameD:'駒の名前を長押しすると、短縮名や愛称に変更できます（例: Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'23,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'画面まわりのボタン', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'右端の「◀」から開く4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'今の盤面をスカッドとして保存（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人を全部外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDNew:'クラブ・国籍・リーグから11人を自動配置', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'全選手を一覧から探す', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'動かした駒を既定の位置へ戻す', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpDDisp:'POS・2nd・メモ・国旗の4つをまとめて開く／しまう', helpSecMenu:'メニューの中身', helpDNewTeam:'今の盤面を空にして作り直す', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
@@ -1054,7 +1075,7 @@ const I18N = {
     tstLoaded:'スカッドを読み込みました', tstDeleted:'削除しました', tstOverwritten:'上書き保存しました', tstSaved:'スカッドを保存しました', appSoon:'アプリ版は近日公開予定です',
     getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
     tipMenu:'メニュー', tipShare:'SNSに共有', tipSave:'スカッドを保存', tipClear:'盤面を空にする', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'配置を整える',
-    formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示',
+    formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示', tipDisp:'表示切替',
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
@@ -1124,7 +1145,7 @@ const I18N = {
     saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
   },
   en: {
-    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpSecToggle:'Display toggles', helpToggleLead:'The four next to Formation. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'Save the current pitch as a squad (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
+    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Gestures (drag & long-press)', helpGNameT:'Change the display name', helpGNameD:'Long-press a name on the pitch to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens this menu. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 23,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons around the screen', helpSecToggle:'Display toggles', helpToggleLead:'The four behind the ◀ button on the right. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'Save the current pitch as a squad (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDNew:'Auto-place 11 players by club, nation or league', helpDMenu:'Save, switch and all pages', helpDSearch:'Browse every player', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Snap moved players back to default spots', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpDDisp:'Open or tuck away the four display toggles', helpSecMenu:'Inside the menu', helpDNewTeam:'Clear the pitch and start over', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current team', overwrite:'Overwrite this team',
@@ -1134,7 +1155,7 @@ const I18N = {
     tstLoaded:'Squad loaded', tstDeleted:'Deleted', tstOverwritten:'Squad updated', tstSaved:'Squad saved', appSoon:'The app version is coming soon',
     getApp:'Get the app', getAppSoon:'App version (coming soon)',
     tipMenu:'Menu', tipShare:'Share', tipSave:'Save squad', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
-    formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags',
+    formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags', tipDisp:'Display options',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
@@ -1841,7 +1862,7 @@ function applyStaticLang(){
   const tset=(id,tip)=>{ const el=document.getElementById(id); if(el){ el.title=tip; el.setAttribute('aria-label',tip); el.setAttribute('role','button'); if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0'); } };
   tset('btnMenu',t('tipMenu'));
   tset('btnSave',t('tipSave')); tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
-  tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags'));
+  tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags')); tset('btnDisp',t('tipDisp'));
   const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
   const sb=document.getElementById('statbar'); if(sb){ sb.title=t('tipAnalysis'); const sp=sb.querySelectorAll('span'); if(sp.length) sp[sp.length-1].textContent=t('squadAnalysis'); }
@@ -4854,7 +4875,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0803d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5323,6 +5344,7 @@ function openHelp(){
       ${div}
       ${sec(t('helpSecToggle'))}
       <div style="margin:-4px 16px 12px;font-size:12px;color:var(--mut);line-height:1.7">${t('helpToggleLead')}</div>
+      ${ic(ui('btnDisp',tx('◀')),t('tipDisp'),t('helpDDisp'))}
       ${ic(ui('btnLabels',tx('POS')),t('tipPos'),'')}
       ${ic(ui('btnSubs',tx('2nd')),t('tipSub'),t('helpDSub'))}
       ${ic(ui('btnMemo'),t('tipMemo'),t('helpDMemoTg'))}
@@ -6608,6 +6630,13 @@ function clearSquad(){
   document.getElementById('clrCancel').onclick=()=>closeSheet();
 }
 document.getElementById('btnClear').onclick=clearSquad;
+// 表示トグル(POS/2nd/メモ/旗)の折りたたみ（ヘッダーUI改修 2026-08-04）。開閉は端末に記憶（xi_tbopen）
+{ const tb=document.querySelector('.topbar'), ar=document.getElementById('btnDisp');
+  if(tb&&ar){
+    const apply=o=>{ tb.classList.toggle('open',o); ar.setAttribute('aria-expanded',o?'true':'false'); };
+    apply(lsGet('xi_tbopen')==='1');
+    ar.onclick=()=>{ const o=!tb.classList.contains('open'); apply(o); lsSet('xi_tbopen',o?'1':'0'); };
+  } }
 
 // ポジション名 表示/非表示トグル（名前だけ表示にすると選手名が大きくなる）
 function syncLabelBtn(){ const b=document.getElementById('btnLabels'); if(b){ const on=!state.hideRoles; b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); } } // ポジション表示中に点灯
@@ -7746,6 +7775,33 @@ window.__selftest=function(){
         if(_bad.length) throw new Error(_bad.slice(0,3).join(' / '));
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('wc_exact_board',_pass,_msg); }
+
+    // T72: ヘッダーUI改修（2026-08-04）: 上段=SHAREのみ／表示トグル折りたたみ／既存の配線と統計が無傷か
+    { let _pass=true,_msg='';
+      try{
+        const el=id=>document.getElementById(id);
+        const disp=id=>getComputedStyle(el(id)).display;
+        // 旧アイコンは非表示だがDOMと配線は生きている（統計・機能を変えないための要）
+        ['btnLoad','btnSave','btnMarket','btnReset'].forEach(id=>{
+          if(disp(id)!=='none') throw new Error(id+'が見えている');
+          if(typeof el(id).onclick!=='function') throw new Error(id+'の配線が死んだ'); });
+        if(disp('btnShare')==='none') throw new Error('SHAREが見えない');
+        if(!/SHARE/.test(el('btnShare').textContent)) throw new Error('SHAREラベル欠落');
+        if(typeof el('btnShare').onclick!=='function') throw new Error('shareの配線が死んだ');
+        if(typeof el('btnClear').onclick!=='function') throw new Error('削除の配線が死んだ');
+        const tb=document.querySelector('.topbar'), ar=el('btnDisp'), dg=document.querySelector('.topbar .dispgroup');
+        if(!tb||!ar||!dg) throw new Error('折りたたみDOM欠落');
+        if(!tb.contains(el('btnClear'))) throw new Error('削除がtopbarに居ない');
+        const was=tb.classList.contains('open');
+        tb.classList.remove('open');
+        if(getComputedStyle(dg).display!=='none') throw new Error('閉時にトグルが見えている');
+        if(disp('btnClear')==='none') throw new Error('閉時に削除が見えない');
+        tb.classList.add('open');
+        if(getComputedStyle(dg).display==='none') throw new Error('開時にトグルが出ない');
+        if(disp('btnClear')!=='none') throw new Error('開時に削除が退避しない');
+        tb.classList.toggle('open',was);
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('header_share_and_collapse',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
