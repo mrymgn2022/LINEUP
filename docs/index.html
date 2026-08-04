@@ -1116,7 +1116,7 @@ const I18N = {
     tipMenu:'メニュー', tipShare:'SNSに共有', tipSave:'スカッドを保存', tipClear:'盤面を空にする', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'配置を整える',
     formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示', tipDisp:'表示切替',
     tipAuto:'自動配置', autoTopLb:'自動配置', autoSheetSub:'チームを選ぶだけでスタメンが完成します', autoClubs:'クラブ', autoNats:'代表チーム', autoAdv:'詳細設定（リーグ・国籍から選ぶ）', autoAdvSub:'お目当てのチームがない時はこちら', helpDAuto:'人気チームのスタメンをワンタップで自動配置',
-    updReady:'新しいバージョンがあります', updNow:'更新',
+    updReady:'新しいバージョンがあります', updNow:'更新', tryAutoXi:'自動配置を試す',
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
     bench:'ベンチ', reserves:'ベンチ外', tapMenuDrag:'タップでメニュー・長押しでドラッグ', dragToBench:'長押しでベンチへドラッグ',
@@ -1198,7 +1198,7 @@ const I18N = {
     tipMenu:'Menu', tipShare:'Share', tipSave:'Save squad', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
     formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags', tipDisp:'Display options',
     tipAuto:'Auto XI', autoTopLb:'AUTO XI', autoSheetSub:'Tap a team — your starting XI is ready', autoClubs:'CLUBS', autoNats:'NATIONAL TEAMS', autoAdv:'Advanced setup (league / nationality)', autoAdvSub:'Looking for another team? Start here', helpDAuto:'One tap builds a popular team’s XI',
-    updReady:'A new version is available', updNow:'Update',
+    updReady:'A new version is available', updNow:'Update', tryAutoXi:'Try Auto XI',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
@@ -1544,7 +1544,9 @@ function _showDemoBarNow(code){
     if(!state.demo) return; // 待っている間にユーザーが操作してデモ解除済みなら出さない
     const old=document.getElementById('demoBar'); if(old) old.remove();
     const b=document.createElement('div'); b.id='demoBar';
-    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:58px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
+    // 位置は topbar(フォーメーション行)の直下を実測（2026-08-04監査: ヘッダー2段化で固定top:58pxが操作列を覆っていた）
+    let top=58; try{ const tb=document.querySelector('.topbar'); if(tb){ const r=tb.getBoundingClientRect(); if(r.bottom>0) top=Math.round(r.bottom)+6; } }catch(e){}
+    b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:'+top+'px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
     const nm=dispClub(code);
     b.innerHTML='<span style="overflow:hidden;text-overflow:ellipsis">'+(LANG==='en'?('Sample: '+nm+' predicted XI — edit freely!'):('サンプル: '+nm+'の予想スタメン｜自由に編集できます'))+'</span><button style="all:unset;cursor:pointer;font-size:15px;padding:0 3px;color:#caff3a">×</button>';
     b.querySelector('button').onclick=()=>b.remove();
@@ -2732,7 +2734,9 @@ const scrim=document.getElementById('scrim'),sheet=document.getElementById('shee
 // iOS PWAで「window.openから戻った直後に開くオーバーレイの遷移アニメ」がコンポジタごと固まる症状の対策（復帰4秒間 or 明示フラグ）。
 let _visReturnAt=0,_forceNoAnimSheet=false,_sheetLockUntil=0; // _sheetLockUntil: この時刻までスクリム/下スワイプで閉じない(PIN画面が連打の余韻タップで即消えるのを防ぐ)。openSheet毎に0へ戻し、openAdminPinだけ再設定。OK/キャンセルは直接closeSheetで通す
 function _noAnimNow(){ const f=_forceNoAnimSheet||(Date.now()-_visReturnAt<4000); _forceNoAnimSheet=false; return f; }
-function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0;body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
+function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0;
+  try{ const xb=document.getElementById('xiDoneBar'); if(xb) xb.remove(); }catch(e){} // XI完成バー(z:340)はシート(z:60)より上に描画され共有シート等に二重CTAで被る(2026-08-04監査)。オーバーレイを開いた時点で役目終了＝撤去
+  body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
   const na=_noAnimNow(); if(na){ sheet.style.transition='none'; scrim.style.transition='none'; }
   sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');
   if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
@@ -4647,6 +4651,11 @@ document.getElementById('btnAutoTop').onclick=()=>guardUnsaved(()=>openAutoSheet
    ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
    メニュー「お知らせ」で過去分も全件閲覧できる。空配列ならポップアップ無し。body は \n で改行可。 */
 const ANNOUNCEMENTS = [
+  { id:'2026-08-04-auto-xi', date:'2026/8/4',
+    title:'⚡ ワンタップ自動配置が登場！', titleEn:'⚡ One-tap Auto XI is here!',
+    body:'画面上部の⚡「自動配置」ボタンから、アーセナル、レアル・マドリード、バイエルンなど人気20チームのスタメンをワンタップで呼び出せるようになりました。チームを選ぶだけでスタメン・ベンチ・顔写真まで一気に完成します。',
+    bodyEn:'Tap the new ⚡ AUTO XI button at the top to load a popular team’s starting XI in one tap — Arsenal, Real Madrid, Bayern and more. Lineup, bench and player photos, all set instantly.',
+    action:'autoxi' },
   { id:'2026-07-19-spain-champion', date:'2026/7/19', title:'🇪🇸 スペインが優勝！', titleEn:'🇪🇸 Spain are champions!', body:'スペインがアルゼンチンを1-0で破って2010年以来2回目の優勝を果たしました。おめでとうございます。', bodyEn:'Spain beat Argentina 1-0 to become champions for the second time, their first title since 2010. Congratulations!' }, { id:'2026-07-01-welcome', date:'2026/7/1',
     title:'Squad XI へようこそ ⚽', titleEn:'Welcome to Squad XI ⚽',
     body:'はじめての方は、下の「使い方を見る」から基本の流れ（フォーメーション → 選手を配置 → 画像でシェア）を確認できます。メニューの「使い方」からいつでも見られます。',
@@ -4676,11 +4685,12 @@ function openAnnouncement(a){
   w.innerHTML=`<div class="anncard">
     <div class="annhead"><div class="anndate">${escAttr(a.date||t('announcements'))}</div><div class="anntitle">${escAttr(annTitle(a))}</div></div>
     <div class="annbody">${escAttr(annBody(a))}</div>
-    <div class="annbtns">${a.action==='help'?'<button class="bigbtn" id="annHelp">'+t('seeHowTo')+'</button>':''}<button class="bigbtn ${a.action==='help'?'ghost':''}" id="annLater">${t('close')}</button></div>
+    <div class="annbtns">${a.action==='help'?'<button class="bigbtn" id="annHelp">'+t('seeHowTo')+'</button>':''}${a.action==='autoxi'?'<button class="bigbtn" id="annAuto">'+t('tryAutoXi')+'</button>':''}<button class="bigbtn ${a.action?'ghost':''}" id="annLater">${t('close')}</button></div>
   </div>`;
   w.classList.add('show'); requestAnimationFrame(()=>w.classList.add('on'));
   document.getElementById('annLater').onclick=closeAnnouncement; // 自動表示は1回だけ（maybeShowAnnouncementで既読管理）
   const _ah=document.getElementById('annHelp'); if(_ah) _ah.onclick=()=>{ closeAnnouncement(); setTimeout(()=>{ try{ openInfoPage('help'); }catch(e){} },180); }; // 「使い方を見る」→使い方ページへ
+  const _aa=document.getElementById('annAuto'); if(_aa) _aa.onclick=()=>{ closeAnnouncement(); setTimeout(()=>{ try{ openAutoSheet(); }catch(e){} },180); }; // 「自動配置を試す」→⚡シートへ直行（告知から機能への最短導線）
 }
 function closeAnnouncement(){ const w=document.getElementById('annwrap'); if(!w)return; w.classList.remove('on'); setTimeout(()=>{ w.classList.remove('show'); w.innerHTML=''; },260); }
 // メニュー「お知らせ」：過去のお知らせを新しい順に一覧表示
@@ -4881,6 +4891,7 @@ let _resetDrawerGesture=null; // initDrawerGestures がジェスチャ状態リ�
 // PWAでOSが左端スワイプを横取りして pointerup が来ず、ジェスチャが固着した場合でも、開閉のたびに必ず自己修復する。
 function _drawerClearInline(){ try{ const d=document.getElementById('drawer'), sc=document.getElementById('dscrim'); if(d){ d.style.transition=''; d.style.transform=''; } if(sc){ sc.style.transition=''; sc.style.opacity=''; } }catch(e){} }
 function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline();
+  try{ const xb=document.getElementById('xiDoneBar'); if(xb) xb.remove(); }catch(e){} // シートと同じ理由（ドロワーz:73より上に被る）
   const dw=document.getElementById('drawer'), ds=document.getElementById('dscrim');
   const na=(Date.now()-_visReturnAt<4000); if(na){ dw.style.transition='none'; ds.style.transition='none'; } // 復帰直後は無アニメ（openSheetと同じ対策）
   ds.classList.add('on'); dw.classList.add('on');
@@ -4896,8 +4907,11 @@ function isWebVersion(){
   }catch(e){ return true; }
 }
 // App Store / Google Play バッジ（Web版のみ表示。URL未設定なら「近日公開」＝クリックでトースト）
+// 2026-08-04 ユーザー指示: リリースまで「近日公開」の死にバッジは出さない（押せないボタンは信頼を削る）。
+// APPSTORE_URL / PLAYSTORE_URL のどちらかを設定すれば自動で復活する＝コードはこのまま温存。
 function storeBadgesHTML(){
   if(!isWebVersion()) return '';
+  if(!APPSTORE_URL && !PLAYSTORE_URL) return ''; // 実URLが無い間は丸ごと非表示
   const soon = !APPSTORE_URL && !PLAYSTORE_URL;
   const badge=(kind,url)=>{
     const ios = kind==='ios';
@@ -4921,7 +4935,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0804f'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804g'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8027,6 +8041,31 @@ window.__selftest=function(){
         bar.remove(); _updBarShown=false;
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('force_update_decision',_pass,_msg); }
+
+    // T75: 2026-08-04 UI監査の修正: XI完成バーはオーバーレイ表示で消える／デモバーは操作列を覆わない／
+    //      死にストアバッジ非表示／⚡告知が最新お知らせ
+    { let _pass=true,_msg='';
+      try{
+        const mkBar=()=>{ const d=document.createElement('div'); d.id='xiDoneBar'; document.body.appendChild(d); return d; };
+        mkBar(); openSheet('<h2>t75</h2>');
+        if(document.getElementById('xiDoneBar')) throw new Error('シートを開いてもXI完成バーが残る');
+        closeSheet();
+        mkBar(); openDrawer();
+        const _left=!!document.getElementById('xiDoneBar');
+        closeDrawer();
+        if(_left) throw new Error('ドロワーを開いてもXI完成バーが残る');
+        const _demo0=state.demo;
+        state.demo=true; _showDemoBarNow('Arsenal');
+        const db=document.getElementById('demoBar');
+        if(!db) throw new Error('デモバーが出ない');
+        const tbb=document.querySelector('.topbar').getBoundingClientRect().bottom;
+        if(parseFloat(db.style.top)<tbb-1) throw new Error('デモバーがフォーメーション行を覆う位置にある');
+        db.remove(); state.demo=_demo0;
+        if(!APPSTORE_URL&&!PLAYSTORE_URL&&storeBadgesHTML()!=='') throw new Error('URL未設定なのにストアバッジが出る');
+        if(!ANNOUNCEMENTS.length||ANNOUNCEMENTS[0].action!=='autoxi') throw new Error('⚡告知が最新お知らせでない');
+        if(!I18N.ja.tryAutoXi||!I18N.en.tryAutoXi) throw new Error('tryAutoXiのi18n欠落');
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('audit_fixes_2026_08_04',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
