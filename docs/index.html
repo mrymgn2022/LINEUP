@@ -117,13 +117,13 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 /* ---------- Formation bar (集約版) ---------- */
 .topbar{display:flex;gap:8px;align-items:stretch;padding:4px 14px 10px;flex-shrink:0}
 .formbtn{
-  flex:1;min-width:0;display:flex;align-items:center;gap:4px;
+  flex:0 0 auto;min-width:0;display:flex;align-items:center;gap:4px; /* 2026-08-04: 中身に合わせた小箱（flex:1の横伸ばしを廃止） */
   padding:8px 7px;border-radius:12px;border:1px solid var(--line);background:var(--panel);
   color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;transition:.12s;white-space:nowrap;overflow:hidden;
 }
 .formbtn .fhex{color:var(--lime);font-size:12px;flex-shrink:0}
 .formbtn .flabel{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.formbtn b{font-family:'Bebas Neue';font-size:13px;letter-spacing:0;color:var(--lime);flex-shrink:0;margin-left:auto;padding-left:4px}
+.formbtn b{font-family:'Bebas Neue';font-size:13px;letter-spacing:0;color:var(--lime);flex-shrink:0;margin-left:0;padding-left:7px} /* 2026-08-04: 数字はラベル直後に左詰め（margin-left:auto廃止） */
 .formbtn .caret{color:var(--mut);font-size:10px;margin-left:2px;flex-shrink:0}
 .formbtn:active{transform:scale(.99);background:var(--panel2)}
 .dispgroup{display:flex;gap:6px;flex-shrink:0}
@@ -141,7 +141,22 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .topbar .dispgroup{display:none;margin-left:auto}
 .topbar.open .dispgroup{display:flex}
 .topbar.open .tbright{margin-left:0}
-.topbar.open #btnClear{display:none} /* 390pxでは4トグル+削除が同居できない＝開いている間だけ退避 */
+/* 開いている間もゴミ箱は残す（2026-08-04 ユーザー指示）。フォーメーション箱が「⬡ 数字」だけの
+   小箱になるので幅が入る。開時はラベルを消し、間隔を少し詰めて狭い端末でも収める。 */
+.topbar.open .formbtn .flabel{display:none}
+.topbar.open{gap:6px}
+.topbar.open .dispgroup{gap:5px}
+.topbar.open .tbright{gap:6px}
+@media (max-width:379px){
+  .topbar.open .icon{width:33px}
+  .topbar.open .formbtn{padding:8px 5px}
+}
+@media (max-width:349px){
+  .topbar.open{padding-left:8px;padding-right:8px;gap:4px}
+  .topbar.open .icon{width:30px}
+  .topbar.open .dispgroup{gap:4px}
+  .topbar.open .tbright{gap:4px}
+}
 #btnDisp svg{transition:transform .15s}
 .topbar.open #btnDisp svg{transform:scaleX(-1)}
 /* フォーメーション選択ピッカー */
@@ -4875,7 +4890,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0804b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0804c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7814,7 +7829,8 @@ window.__selftest=function(){
         if(disp('btnClear')==='none') throw new Error('閉時に削除が見えない');
         tb.classList.add('open');
         if(getComputedStyle(dg).display==='none') throw new Error('開時にトグルが出ない');
-        if(disp('btnClear')!=='none') throw new Error('開時に削除が退避しない');
+        if(disp('btnClear')==='none') throw new Error('開時に削除が消えている'); // 2026-08-04: ゴミ箱は開いても残す（ユーザー指示）
+        if(getComputedStyle(document.querySelector('.topbar .formbtn .flabel')).display!=='none') throw new Error('開時にフォーメーションのラベルが残っている');
         tb.classList.toggle('open',was);
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('header_share_and_collapse',_pass,_msg); }
