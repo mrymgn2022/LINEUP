@@ -4744,7 +4744,7 @@ const FEATURED_SQUADS=[
 //   1) 新しく加える移籍は配列の先頭に { date, player, nat, from, to, fee } を追加
 //   2) 前回追加分の isNew を外す（NEW! は最新更新分だけに付く）
 //   3) nat=選手の国籍コード(FIキー: POR/ESP/ENG/SCO/BRA…)。from/to のクラブ名は TR_CLUB_NAT に国コードを足すと国旗が出る
-//   4) クラブ名・金額・日付は fotmob 表記。移籍金なし/無所属は fee:'フリー'（赤丸斜線で表示）
+//   4) クラブ名・金額・日付は fotmob 表記。移籍金なしは fee:'フリー'（通常表示）。赤丸斜線は from/to の「フリー」(退団・無所属)だけ（2026-08-05 ユーザー指示）
 //   ※ to が「フリー」= fotmob で「Free agent」（退団・移籍先未定）。実移籍先が決まれば差し替える。
 const FEATURED_TRANSFERS=[
   { date:'8/4', player:'Carl Rushworth', nat:'ENG', from:'Brighton', to:'Coventry', fee:'€2570万', isNew:true },
@@ -4929,7 +4929,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0805c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0805d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5046,7 +5046,14 @@ const TR_CLUB_NAT={'Dortmund':'GER','Barcelona':'ESP','Nottm Forest':'ENG','Hull
   'Real Madrid':'ESP','Milan':'ITA','Como':'ITA','Chelsea':'ENG','Reims':'FRA','Newcastle':'ENG',
   'Elche':'ESP','FC Porto':'POR','Benfica':'POR','Burnley':'ENG','Feyenoord':'NED','Man United':'ENG',
   'Man City':'ENG','Beşiktaş':'TUR','Villarreal':'ESP','Juventus':'ITA','Marseille':'FRA','Torino':'ITA',
-  'Napoli':'ITA','RB Leipzig':'GER','Club Brugge':'BEL','Venezia':'ITA','Sporting CP':'POR','Freiburg':'GER','Aston Villa':'ENG','Sassuolo':'ITA','Leeds':'ENG','Fiorentina':'ITA','Schalke 04':'GER','Al-Ahli':'KSA'
+  'Napoli':'ITA','RB Leipzig':'GER','Club Brugge':'BEL','Venezia':'ITA','Sporting CP':'POR','Freiburg':'GER','Aston Villa':'ENG','Sassuolo':'ITA','Leeds':'ENG','Fiorentina':'ITA','Schalke 04':'GER','Al-Ahli':'KSA',
+  // 2026-08-05 一括補完(ユーザー指摘「一部に国旗がない」→全from/toを辞書と突合したら48クラブ欠けていた)。以後の追記漏れはselftest T77が検出
+  'Al Hilal':'KSA','Atalanta':'ITA','Atlético Madrid':'ESP','Auxerre':'FRA','Bayern':'GER','Bournemouth':'ENG','Braga':'POR','Brentford':'ENG',
+  'Cagliari':'ITA','Columbus Crew':'USA','Coventry':'ENG','Crystal Palace':'ENG','Everton':'ENG','FC Utrecht':'NED','Famalicão':'POR','Fenerbahçe':'TUR',
+  'Frankfurt':'GER','Fulham':'ENG','Genk':'BEL','Hoffenheim':'GER','Krasnodar':'RUS','Lazio':'ITA','Lens':'FRA','Levante':'ESP',
+  "M'gladbach":'GER','Middlesbrough':'ENG','Monaco':'FRA','NEC Nijmegen':'NED','Nantes':'FRA','New England':'USA','PSG':'FRA','PSV':'NED',
+  'Real Betis':'ESP','Real Sociedad':'ESP','Rennes':'FRA','River Plate':'ARG','Roma':'ITA','Sampdoria':'ITA','Sanfrecce Hiroshima':'JPN','Sevilla':'ESP',
+  'Strasbourg':'FRA','Sunderland':'ENG','Tigres':'MEX','Toulouse':'FRA','Troyes':'FRA','Udinese':'ITA','West Ham':'ENG','Wolfsburg':'GER'
 };
 // フリー（移籍金なし／無所属）＝赤丸に斜線のマーク＋「フリー」
 const _ICN_FREE='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#e5484d" stroke-width="2.2" style="flex:0 0 auto;vertical-align:-1px"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
@@ -5073,7 +5080,7 @@ function transferCardHTML(it){
       : `${flagHTML(TR_CLUB_NAT[club]||'')}<span style="overflow-wrap:anywhere">${escAttr(club)}</span>`;
     return `<span style="${base}">${inner}</span>`;
   };
-  const feeHTML = it.fee==='フリー' ? trFreeCell() : escAttr(trFeeText(it.fee));
+  const feeHTML = escAttr(trFeeText(it.fee)); // 2026-08-05 ユーザー指示: 移籍金欄の「フリー」は赤字にしない(通常表示)。赤丸斜線は退団・無所属(from/toの「フリー」)だけに残す
   return `<div style="background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin:0 16px 10px">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
       <span style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--mut)">${escAttr(it.date||'')}</span>
@@ -8081,6 +8088,17 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       finally{ try{ window.recordEvent=_re; }catch(e){} }
       ok('autobuild_all_paths',_pass,_msg); }
+
+    // T77: 注目移籍の国旗が全行で解決できること（2026-08-05 ユーザー指摘: 48クラブがTR_CLUB_NAT辞書から漏れて旗なしだった）。
+    // from/to（「フリー」以外）が TR_CLUB_NAT→FI まで引けなければ落ちる＝今後の追記漏れ・国コード誤りを即検出
+    { let _pass=true,_msg='';
+      try{
+        const miss=[];
+        FEATURED_TRANSFERS.forEach(f=>['from','to'].forEach(k=>{ const c=f[k]; if(!c||c==='フリー') return; const n=TR_CLUB_NAT[c]; if(!n||!FI[n]) miss.push(c+(n?('→'+n+'旗なし'):'')); }));
+        const uniq=[...new Set(miss)];
+        if(uniq.length) throw new Error('旗が引けない: '+uniq.slice(0,6).join(', ')+(uniq.length>6?' 他'+(uniq.length-6)+'件':''));
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      ok('transfer_flags_complete',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
