@@ -1281,7 +1281,9 @@ function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)
 // 検索0件ビーコンの重複抑制: 描画のたびに飛ぶと1回の検索が十数件に膨らむ（2026-07-31実測: 1端末が同一秒で15件）。
 // 同じ語句での再描画では送らず、語句が変わった時だけ1件送る。
 let _lastNoResQ='';
-function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult'); }
+// 検索して0件だった語句をワーカーへ送る（2026-08-06）。「何を探して見つからなかったか」＝追加すべき選手/チームの直接シグナル。
+// 送るのはこのイベントの時だけ（recordEventの第3引数）。ワーカー側も search_noresult 以外のqは捨てる。
+function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult',false,q.slice(0,40)); }
 function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
@@ -1364,12 +1366,14 @@ function recordSquadSave(){
 // 「サイト経由(完成XIを見た人)」と「直接来た人(空のピッチを見た人)」を分離して分析できる。
 // once=true は1セッション（1ページロード）に1回だけ送る。localhost/収集オフ端末は _popBlocked() で遮断。
 const _evSent=new Set();
-function recordEvent(ev,once){
+function recordEvent(ev,once,q){
   try{
     if(!POP_ENDPOINT||_popBlocked()||!ev) return;
     if(once){ if(_evSent.has(ev)) return; _evSent.add(ev); }
+    const payload={did:_deviceId(),kind:'event',ev:ev,src:_popSrc,lang:LANG};
+    if(q) payload.q=String(q).slice(0,40); // 検索0件の語句のみ（呼び出し側が明示した時だけ載る）
     fetch(POP_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({did:_deviceId(),kind:'event',ev:ev,src:_popSrc,lang:LANG}),keepalive:true}).catch(()=>{});
+      body:JSON.stringify(payload),keepalive:true}).catch(()=>{});
   }catch(e){}
 }
 // スタメン11人が埋まった瞬間を1回だけ記録（renderから毎回呼ばれるが once ガードで1回に丸まる）
@@ -4936,7 +4940,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0805i'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0806a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
