@@ -2153,6 +2153,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   // タップ＝click（タッチで確実に発火）。ドラッグ後のclickは抑制
   el.addEventListener('click',()=>{
     if(didDrag){ didDrag=false; return; }
+    recordEvent('first_action',true); // ★計上漏れ修正(2026-08-05): ベンチ/ベンチ外のタップも"手を出した"。未計上だとベンチだけ触った人がバウンス扱いになる
     if(mktBenchSwap!=null){ if(pool==='bench') benchSwapMarket(pid); return; } // ベンチ交代モード：控えタップで交代
     if(swapSel){ pool==='bench'?tapBenchInSwap(pid):tapReserveInSwap(pid); }
     else { pool==='bench'?openBenchMenu(pid):openReserveMenu(pid); }
@@ -4928,7 +4929,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0805b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0805c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
