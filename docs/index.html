@@ -4664,9 +4664,11 @@ document.getElementById('btnAutoTop').onclick=()=>{
   if(isDirty()) recordEvent('auto_blocked');   // 未保存確認で足止めされた回数（本来ほぼ0のはず＝増えたら摩擦の兆候）
   guardUnsaved(()=>openAutoSheet(),'auto');
 };
-// 「おすすめ」バッジは⚡未経験の端末にだけ出す（2026-08-06 案A・ユーザー承認）。一度シートを開いたら以後非表示。
-// 常駐させない理由: 数日で景色になり効果が消える＋リピーターにはノイズ。効果判定=auto_sheet到着比の前後比較（可逆）。
-function syncApBadge(){ try{ const b=document.getElementById('apBadge'); if(b) b.style.display=lsGet('xi_ap_badge_done')?'none':''; }catch(e){} }
+// 「おすすめ」バッジ（2026-08-06 案A）。当初は「一度開いたら消える」だったが、同日ユーザー指示で
+// **当面つきっぱなし**に変更（AP_BADGE_ALWAYS=true）。falseに戻せば「⚡未経験の端末だけに表示」へ復帰。
+// xi_ap_badge_done（開いた事実）は常時表示中も記録し続ける＝将来消える仕様に戻した瞬間から既読が効く。
+let AP_BADGE_ALWAYS=true;
+function syncApBadge(){ try{ const b=document.getElementById('apBadge'); if(b) b.style.display=(AP_BADGE_ALWAYS||!lsGet('xi_ap_badge_done'))?'':'none'; }catch(e){} }
 syncApBadge();
 
 /* ---------- お知らせ ----------
@@ -4963,7 +4965,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0806d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0806e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8232,19 +8234,25 @@ window.__selftest=function(){
         if(!albl) throw new Error('ラベルspan(.albl)が無い＝狭幅ルールの対象が消えた');
         if(!bdg||bdg.parentNode!==btn) throw new Error('バッジ(#apBadge)がボタン内に無い');
         if(getComputedStyle(btn).position!=='relative') throw new Error('ボタンがposition:relativeでない（バッジが迷子になる）');
-        // 出し分け: キー無し=表示 / キー有り=非表示
-        try{ localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
-        syncApBadge();
-        if(getComputedStyle(bdg).display==='none') throw new Error('未経験端末なのにバッジが出ない');
+        // 現行仕様(2026-08-06ユーザー指示): AP_BADGE_ALWAYS=true＝つきっぱなし。キーが立っていても表示。
+        if(AP_BADGE_ALWAYS!==true) throw new Error('AP_BADGE_ALWAYSがtrueでない（当面つきっぱなしの合意と不一致）');
         try{ localStorage.setItem('xi_ap_badge_done','1'); }catch(e){}
         syncApBadge();
-        if(getComputedStyle(bdg).display!=='none') throw new Error('経験済み端末でバッジが消えない');
-        // 実挙動: openAutoSheet がキーを立てる
+        if(getComputedStyle(bdg).display==='none') throw new Error('常時表示のはずが経験済み端末で消えている');
+        // 実挙動: openAutoSheet はキーを立て続ける（将来「消える仕様」へ戻した瞬間から既読が効くように）
         try{ localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
-        syncApBadge();
         openAutoSheet(); closeSheet();
-        if(lsGet('xi_ap_badge_done')!=='1') throw new Error('シートを開いてもキーが立たない');
-        if(getComputedStyle(bdg).display!=='none') throw new Error('シートを開いた後もバッジが残る');
+        if(lsGet('xi_ap_badge_done')!=='1') throw new Error('シートを開いてもキーが立たない（復帰用の記録が死んだ）');
+        if(getComputedStyle(bdg).display==='none') throw new Error('常時表示のはずがシートを開いた後に消えた');
+        // 休眠中の復帰経路: AP_BADGE_ALWAYS=false に戻すと「一度開いたら消える」が生きていること
+        AP_BADGE_ALWAYS=false;
+        try{
+          syncApBadge();
+          if(getComputedStyle(bdg).display!=='none') throw new Error('フラグをfalseに戻しても既読キーで消えない（復帰経路が腐った）');
+          try{ localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
+          syncApBadge();
+          if(getComputedStyle(bdg).display==='none') throw new Error('フラグfalse+未経験なのにバッジが出ない');
+        } finally { AP_BADGE_ALWAYS=true; syncApBadge(); }
         // i18n: ラベル書換がバッジを壊さない・バッジ文言が辞書と一致
         applyStaticLang();
         if(bdg.textContent!==t('autoBadge')) throw new Error('バッジ文言が辞書と不一致: '+bdg.textContent);
