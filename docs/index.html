@@ -139,14 +139,20 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 #btnShare svg{width:13px;height:13px;flex-shrink:0}
 /* ワンタップ自動配置（2026-08-04 ユーザー指示）: SHAREの左隣・ブランド色ライム＝主役機能の看板。
    サイズはSHAREと同格（37px高）。両ボタンとも44px→37pxへ縮小＝ヘッダーの圧迫感を解消 */
-#btnAutoTop{height:37px;flex:0 0 auto;border:none;border-radius:11px;padding:0 10px;
+#btnAutoTop{position:relative;height:37px;flex:0 0 auto;border:none;border-radius:11px;padding:0 10px;
   background:linear-gradient(180deg,#d9ff4d,#a9d614);color:#0c1308;
   display:flex;align-items:center;justify-content:center;gap:4px;
   font-weight:800;font-size:12.5px;letter-spacing:.02em;font-family:'Manrope',system-ui,sans-serif;cursor:pointer;transition:.15s;
   box-shadow:0 3px 10px rgba(190,230,60,.25),inset 0 1px 0 rgba(255,255,255,.35)}
 #btnAutoTop:active{transform:scale(.95)}
 #btnAutoTop svg{flex-shrink:0;display:block}
-@media (max-width:359px){ #btnAutoTop span{display:none} #btnAutoTop{padding:0 9px} } /* 狭幅はロゴ優先で文字を隠し稲妻だけ（360pxはラベル込みで収まりを実測済み。320pxはラベル有だとロゴに重なる） */
+/* 「おすすめ」バッジ（2026-08-06 案A・ユーザー承認）。⚡未経験の端末にだけ出す＝一度開いたら消える(xi_ap_badge_done)。
+   縁取りはヘッダー背景色(--bg)＝ボタンから浮いて見える。pointer-events:noneでタップはボタンに素通し。
+   headerはpadding上10px+overflow指定なしなので上7pxのはみ出しは切れない(実測済) */
+#apBadge{position:absolute;top:-7px;right:-6px;background:#ff3b30;color:#fff;font-size:9px;font-weight:800;
+  letter-spacing:.3px;padding:2px 6px;border-radius:8px;border:1.5px solid var(--bg);line-height:1.25;
+  white-space:nowrap;pointer-events:none;z-index:2;font-family:inherit}
+@media (max-width:359px){ #btnAutoTop .albl{display:none} #btnAutoTop{padding:0 9px} } /* 狭幅はロゴ優先で文字を隠し稲妻だけ（360pxはラベル込みで収まりを実測済み。320pxはラベル有だとロゴに重なる）。バッジ(#apBadge)は狭幅でも残す */
 /* 自動配置シートのチームグリッド（3列・国旗＋英語クラブ名） */
 .apgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .apcell{height:46px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);
@@ -746,7 +752,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
     </div>
     <div class="hbtn"><!-- 並び: 新規→共有→検索→整列→削除（破壊的な「盤面を空にする」を右端に隔離し誤タップ防止。2026-07-14） -->
       <div class="icon" id="btnLoad" title="新規作成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="12" y1="12.5" x2="12" y2="17.5"/><line x1="9.5" y1="15" x2="14.5" y2="15"/></svg></div>
-      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><button id="btnAutoTop" title="自動配置"><svg viewBox="0 0 24 24" width="13" height="17"><polygon points="12.65 1 6.15 14.2 12 14.2 11.35 23 17.85 9.8 12 9.8 12.65 1" fill="currentColor"/></svg><span>自動配置</span></button><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg><span>SHARE</span></div>
+      <div class="icon" id="btnSave" title="スカッドを保存"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg></div><button id="btnAutoTop" title="自動配置"><svg viewBox="0 0 24 24" width="13" height="17"><polygon points="12.65 1 6.15 14.2 12 14.2 11.35 23 17.85 9.8 12 9.8 12.65 1" fill="currentColor"/></svg><span class="albl">自動配置</span><span id="apBadge">おすすめ</span></button><div class="icon" id="btnShare" title="SNSに共有"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="10.7" x2="15.4" y2="6.3"/><line x1="8.6" y1="13.3" x2="15.4" y2="17.7"/></svg><span>SHARE</span></div>
       <div class="icon" id="btnMarket" title="選手を検索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg></div>
       
       <div class="icon" id="btnReset" title="整列リセット"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg></div><!-- btnClear(削除)は topbar 右側へ移動（ヘッダーUI改修 2026-08-04） -->
@@ -1122,7 +1128,7 @@ const I18N = {
     getApp:'アプリ版をダウンロード', getAppSoon:'アプリ版（近日公開）',
     tipMenu:'メニュー', tipShare:'SNSに共有', tipSave:'スカッドを保存', tipClear:'盤面を空にする', tipNew:'新規作成', tipSearch:'選手を検索', tipReset:'配置を整える',
     formation:'フォーメーション', fmChange:'フォーメーション変更', tipPos:'ポジション名 表示/非表示', tipSub:'第2候補 表示/非表示', tipMemo:'メモ 表示/非表示', tipFlags:'国旗 表示/非表示', tipDisp:'表示切替',
-    tipAuto:'自動配置', autoTopLb:'自動配置', autoSheetSub:'チームを選ぶだけでスタメンが完成します', autoClubs:'クラブ', autoNats:'代表チーム', autoAdv:'詳細設定（リーグ・国籍から選ぶ）', autoAdvSub:'お目当てのチームがない時はこちら', helpDAuto:'人気チームのスタメンをワンタップで自動配置',
+    tipAuto:'自動配置', autoTopLb:'自動配置', autoBadge:'おすすめ', autoSheetSub:'チームを選ぶだけでスタメンが完成します', autoClubs:'クラブ', autoNats:'代表チーム', autoAdv:'詳細設定（リーグ・国籍から選ぶ）', autoAdvSub:'お目当てのチームがない時はこちら', helpDAuto:'人気チームのスタメンをワンタップで自動配置',
     updReady:'新しいバージョンがあります', updNow:'更新', tryAutoXi:'自動配置を試す',
     hint:'空きの◯をタップして選手を配置 ／ 配置後はドラッグで微調整・重ねると入れ替え',
     squadAnalysis:'スカッド詳細分析', tipAnalysis:'タップでスカッド詳細分析', scrollBench:'▾ 下にスクロールでベンチ ▾', skip:'タップしてスキップ',
@@ -1204,7 +1210,7 @@ const I18N = {
     getApp:'Get the app', getAppSoon:'App version (coming soon)',
     tipMenu:'Menu', tipShare:'Share', tipSave:'Save squad', tipClear:'Clear the board', tipNew:'New squad', tipSearch:'Search players', tipReset:'Reset layout',
     formation:'Formation', fmChange:'Change formation', tipPos:'Toggle position labels', tipSub:'Toggle second choice', tipMemo:'Toggle notes', tipFlags:'Toggle flags', tipDisp:'Display options',
-    tipAuto:'Auto XI', autoTopLb:'AUTO XI', autoSheetSub:'Tap a team — your starting XI is ready', autoClubs:'CLUBS', autoNats:'NATIONAL TEAMS', autoAdv:'Advanced setup (league / nationality)', autoAdvSub:'Looking for another team? Start here', helpDAuto:'One tap builds a popular team’s XI',
+    tipAuto:'Auto XI', autoTopLb:'AUTO XI', autoBadge:'TRY IT', autoSheetSub:'Tap a team — your starting XI is ready', autoClubs:'CLUBS', autoNats:'NATIONAL TEAMS', autoAdv:'Advanced setup (league / nationality)', autoAdvSub:'Looking for another team? Start here', helpDAuto:'One tap builds a popular team’s XI',
     updReady:'A new version is available', updNow:'Update', tryAutoXi:'Try Auto XI',
     hint:'Tap an empty spot to add a player · drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
@@ -1924,7 +1930,8 @@ function applyStaticLang(){
   tset('btnMenu',t('tipMenu'));
   tset('btnSave',t('tipSave')); tset('btnShare',t('tipShare')); tset('btnClear',t('tipClear')); tset('btnLoad',t('tipNew')); tset('btnMarket',t('tipSearch')); tset('btnReset',t('tipReset'));
   tset('btnLabels',t('tipPos')); tset('btnSubs',t('tipSub')); tset('btnMemo',t('tipMemo')); tset('btnFlags',t('tipFlags')); tset('btnDisp',t('tipDisp'));
-  tset('btnAutoTop',t('tipAuto')); { const alb=document.querySelector('#btnAutoTop span'); if(alb) alb.textContent=t('autoTopLb'); } // ⚡自動配置/AUTO XI（ボタン内ラベルも言語追随）
+  tset('btnAutoTop',t('tipAuto')); { const alb=document.querySelector('#btnAutoTop .albl'); if(alb) alb.textContent=t('autoTopLb'); } // ⚡自動配置/AUTO XI（ボタン内ラベルも言語追随）
+  { const ab=document.getElementById('apBadge'); if(ab) ab.textContent=t('autoBadge'); } // 「おすすめ/TRY IT」バッジも言語追随（.alblと別spanなので取り違えない）
   const fl=document.querySelector('#btnFormation .flabel'); if(fl) fl.textContent=t('formation');
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
   const sb=document.getElementById('statbar'); if(sb){ sb.title=t('tipAnalysis'); const sp=sb.querySelectorAll('span'); if(sp.length) sp[sp.length-1].textContent=t('squadAnalysis'); }
@@ -4657,6 +4664,10 @@ document.getElementById('btnAutoTop').onclick=()=>{
   if(isDirty()) recordEvent('auto_blocked');   // 未保存確認で足止めされた回数（本来ほぼ0のはず＝増えたら摩擦の兆候）
   guardUnsaved(()=>openAutoSheet(),'auto');
 };
+// 「おすすめ」バッジは⚡未経験の端末にだけ出す（2026-08-06 案A・ユーザー承認）。一度シートを開いたら以後非表示。
+// 常駐させない理由: 数日で景色になり効果が消える＋リピーターにはノイズ。効果判定=auto_sheet到着比の前後比較（可逆）。
+function syncApBadge(){ try{ const b=document.getElementById('apBadge'); if(b) b.style.display=lsGet('xi_ap_badge_done')?'none':''; }catch(e){} }
+syncApBadge();
 
 /* ---------- お知らせ ----------
    ANNOUNCEMENTS の先頭が最新＝起動時ポップアップ対象。更新時は先頭に { id, date, title, body } を追加（id は必ずユニークに）。
@@ -4952,7 +4963,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0806c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0806d'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6160,6 +6171,7 @@ function autoTeamsNats(){ return LANG==='en'
 function _apSlug(s){ return 'ap_'+String(s).toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_+|_+$/g,'').slice(0,29); } // worker検証互換(a-z_・32字以内)
 function openAutoSheet(){
   recordEvent('first_action',true); recordEvent('auto_sheet',true); // ファネル：⚡ボタンが開かれたか（1セッション1回）
+  try{ lsSet('xi_ap_badge_done','1'); if(typeof syncApBadge==='function') syncApBadge(); }catch(e){} // 「おすすめ」バッジは一度開いたら消す
   const cell=(attr,flag,label)=>`<button class="apcell" ${attr}>${flagHTML(flag)}<span>${label}</span></button>`;
   const clubs=AUTO_TEAMS_CLUBS.map(c=>cell(`data-apclub="${escAttr(c[0])}"`,c[2],c[1])).join('');
   const nats=autoTeamsNats().map(n=>cell(`data-apnat="${n[0]}"`,n[0],n[1])).join('');
@@ -7040,7 +7052,7 @@ window.__selftest=function(){
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
   // スナップショット（非破壊復元のため）
   const snapState=JSON.parse(JSON.stringify(state)); const snapPLen=P.length;
-  let snapLS_s=null,snapLS_p=null; try{ snapLS_s=localStorage.getItem('xi_state_v2'); snapLS_p=localStorage.getItem('xi_photos_v2'); }catch(e){}
+  let snapLS_s=null,snapLS_p=null,snapLS_b=null; try{ snapLS_s=localStorage.getItem('xi_state_v2'); snapLS_p=localStorage.getItem('xi_photos_v2'); snapLS_b=localStorage.getItem('xi_ap_badge_done'); }catch(e){} // _bはT73/T78が実openAutoSheetを呼びバッジ既読キーを立ててしまうため
   try{
     // T1: 全フォーメーションが11枠で構築できる
     let allForm=true; for(const fk of FORMS){ buildSlots(fk,false); if(state.slots.length!==11||state.slots.some(s=>!s.role)){allForm=false;break;} }
@@ -8208,12 +8220,46 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); try{ closeSheet(); }catch(_){} }
       finally{ window.recordEvent=_re78; }
       ok('autoplace_reachable_on_first_visit',_pass,_msg); }
+
+    // T79: ⚡「おすすめ」バッジ（2026-08-06 案A）: 構造・出し分け・一度開いたら消える・i18n非破壊 の4点。
+    // 特に「.albl と #apBadge の取り違え」を毎回検証する＝狭幅の #btnAutoTop .albl{display:none} が
+    // バッジまで消したり、applyStaticLang のラベル書換がバッジ文言を上書きする回帰を防ぐ。
+    { let _pass=true,_msg=''; const _re79=window.recordEvent;
+      try{
+        window.recordEvent=function(){};
+        const btn=document.getElementById('btnAutoTop');
+        const albl=btn?btn.querySelector('.albl'):null, bdg=document.getElementById('apBadge');
+        if(!albl) throw new Error('ラベルspan(.albl)が無い＝狭幅ルールの対象が消えた');
+        if(!bdg||bdg.parentNode!==btn) throw new Error('バッジ(#apBadge)がボタン内に無い');
+        if(getComputedStyle(btn).position!=='relative') throw new Error('ボタンがposition:relativeでない（バッジが迷子になる）');
+        // 出し分け: キー無し=表示 / キー有り=非表示
+        try{ localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
+        syncApBadge();
+        if(getComputedStyle(bdg).display==='none') throw new Error('未経験端末なのにバッジが出ない');
+        try{ localStorage.setItem('xi_ap_badge_done','1'); }catch(e){}
+        syncApBadge();
+        if(getComputedStyle(bdg).display!=='none') throw new Error('経験済み端末でバッジが消えない');
+        // 実挙動: openAutoSheet がキーを立てる
+        try{ localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
+        syncApBadge();
+        openAutoSheet(); closeSheet();
+        if(lsGet('xi_ap_badge_done')!=='1') throw new Error('シートを開いてもキーが立たない');
+        if(getComputedStyle(bdg).display!=='none') throw new Error('シートを開いた後もバッジが残る');
+        // i18n: ラベル書換がバッジを壊さない・バッジ文言が辞書と一致
+        applyStaticLang();
+        if(bdg.textContent!==t('autoBadge')) throw new Error('バッジ文言が辞書と不一致: '+bdg.textContent);
+        if(albl.textContent!==t('autoTopLb')) throw new Error('ラベル文言が辞書と不一致: '+albl.textContent);
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); try{ closeSheet(); }catch(_){} }
+      finally{ window.recordEvent=_re79; }
+      ok('autoplace_badge',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
     try{ Object.keys(snapState).forEach(k=>{ state[k]=snapState[k]; }); }catch(e){}
     try{ if(snapLS_s!=null)localStorage.setItem('xi_state_v2',snapLS_s); else localStorage.removeItem('xi_state_v2');
-         if(snapLS_p!=null)localStorage.setItem('xi_photos_v2',snapLS_p); else localStorage.removeItem('xi_photos_v2'); }catch(e){}
+         if(snapLS_p!=null)localStorage.setItem('xi_photos_v2',snapLS_p); else localStorage.removeItem('xi_photos_v2');
+         if(snapLS_b!=null)localStorage.setItem('xi_ap_badge_done',snapLS_b); else localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
+    try{ if(typeof syncApBadge==='function') syncApBadge(); }catch(e){} // バッジ表示もキー復元後の状態に同期
     try{ _keyMap=null; computeSquadDups(); render(); }catch(e){}
     window.__inSelftest=false;
   }
