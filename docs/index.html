@@ -4952,7 +4952,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0806b'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0806c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -4974,17 +4974,48 @@ async function forceUpdateApp(){
 let _userTouched=false;
 addEventListener('pointerdown',function(){ _userTouched=true; },{capture:true,once:true});
 addEventListener('keydown',function(){ _userTouched=true; },{capture:true,once:true});
-function _swRecentReload(){ try{ const ts=+sessionStorage.getItem('xi_sw_reload')||0; return (Date.now()-ts)<20000; }catch(e){ return false; } }
-function _swAutoReloads(){ try{ return +sessionStorage.getItem('xi_sw_reload_n')||0; }catch(e){ return 0; } }
+// ── 記録層（2026-08-06 fail-closed化）──
+// 旧実装は「20秒ガード」と「3回上限」の両方が sessionStorage だけを見ており、しかも例外時に
+// false / 0（＝踏んでよい）を返していた。つまり storage が死んだ端末では保険が2つ同時に外れ、
+// 歯止めなしでリロードし得た。保険の依存先が同じでは保険にならない。
+// 対策 = (1)記録先を session（タブ単位）＋ local（端末単位・10分で失効）の二段にする
+//        (2)踏む前に「書いて読み戻す」実測を行い、記録できない環境では自動リロードを一切しない
+// 判断の原則を「記録が無い＝まだ踏んでいない」から「記録できない＝踏まない」へ。
+const _SW_LS_TTL=600000; // localStorage側の失効時間(10分)。無期限だと「生涯3回」で自動更新が永久に来なくなる
+function _swGet(k){
+  try{ const v=sessionStorage.getItem(k); if(v!=null) return v; }catch(e){}
+  try{ const raw=localStorage.getItem('xi_ls_'+k); if(raw!=null){
+         const i=raw.indexOf('|'); if(i>0){
+           const at=+raw.slice(0,i)||0;
+           if(Date.now()-at<=_SW_LS_TTL) return raw.slice(i+1);
+           try{ localStorage.removeItem('xi_ls_'+k); }catch(_){}       // 失効ぶんは掃除する
+         } } }catch(e){}
+  return null;
+}
+function _swSet(k,v){
+  try{ sessionStorage.setItem(k,v); }catch(e){}
+  try{ localStorage.setItem('xi_ls_'+k, Date.now()+'|'+v); }catch(e){}
+}
+// 記録できるかを実測する（書いて読み戻す）。プライベートブラウズやアプリ内ブラウザでは
+// setItem が例外を投げたり、書けても保持されないことがあるため、読み戻しまで見る。
+function _swCanRecord(){
+  const probe='xi_sw_probe';
+  try{ sessionStorage.setItem(probe,'1'); const ok=sessionStorage.getItem(probe)==='1'; sessionStorage.removeItem(probe); if(ok) return true; }catch(e){}
+  try{ localStorage.setItem(probe,'1'); const ok=localStorage.getItem(probe)==='1'; localStorage.removeItem(probe); if(ok) return true; }catch(e){}
+  return false;
+}
+function _swRecentReload(){ const ts=+_swGet('xi_sw_reload')||0; return (Date.now()-ts)<20000; }
+function _swAutoReloads(){ return +_swGet('xi_sw_reload_n')||0; }
 // isAuto=true（自動リロード）の時だけ回数を数える。バナーの「更新」タップは明示操作なので上限に数えない
 function _swDoReload(isAuto){
   try{ autoSaveDraft(); }catch(e){}
-  try{ sessionStorage.setItem('xi_sw_reload',String(Date.now()));
-       if(isAuto) sessionStorage.setItem('xi_sw_reload_n',String(_swAutoReloads()+1)); }catch(e){}
+  _swSet('xi_sw_reload',String(Date.now()));
+  if(isAuto) _swSet('xi_sw_reload_n',String(_swAutoReloads()+1));
   location.reload();
 }
 function _swUpdateDecision(hash){ // 判定だけを純関数化（selftest T74が全分岐を検証）
   const h=(hash!=null)?hash:location.hash;
+  if(!_swCanRecord()) return 'banner'; // 踏んだ事実を残せない＝次回止める術がない。更新手段はバナーで残る
   return (_swRecentReload()||_swAutoReloads()>=3||_userTouched||/(^|[#&])s=/.test(h))?'banner':'reload';
 }
 let _updBarShown=false;
@@ -8039,11 +8070,14 @@ window.__selftest=function(){
     //（実際のSW交代は headless の別試験で検証。ここでは判定ロジックが腐っていないかを毎回見る）
     { let _pass=true,_msg='';
       try{
-        ['_swOnUpdateReady','_swUpdateDecision','_swDoReload','_swShowUpdateBar','_swRecentReload'].forEach(fn=>{
+        ['_swOnUpdateReady','_swUpdateDecision','_swDoReload','_swShowUpdateBar','_swRecentReload','_swCanRecord','_swGet','_swSet'].forEach(fn=>{
           if(typeof window[fn]!=='function'&&typeof eval(fn)!=='function') throw new Error(fn+'が無い'); });
-        const _touch0=_userTouched; let _ss0=null,_ssn0=null;
+        const _touch0=_userTouched; let _ss0=null,_ssn0=null,_ls0=null,_lsn0=null;
         try{ _ss0=sessionStorage.getItem('xi_sw_reload'); _ssn0=sessionStorage.getItem('xi_sw_reload_n'); }catch(e){}
+        try{ _ls0=localStorage.getItem('xi_ls_xi_sw_reload'); _lsn0=localStorage.getItem('xi_ls_xi_sw_reload_n'); }catch(e){}
+        // ★記録層が二段(session+local)になったので両方消す。片方だけだと _swGet が生きている方を拾って偽陽性/偽陰性になる
         try{ sessionStorage.removeItem('xi_sw_reload'); sessionStorage.removeItem('xi_sw_reload_n'); }catch(e){}
+        try{ localStorage.removeItem('xi_ls_xi_sw_reload'); localStorage.removeItem('xi_ls_xi_sw_reload_n'); }catch(e){}
         _userTouched=false;
         if(_swUpdateDecision('')!=='reload') throw new Error('初期状態でreloadにならない');
         if(_swUpdateDecision('#s=abc')!=='banner') throw new Error('共有リンク展開中にreloadしてしまう');
@@ -8056,8 +8090,25 @@ window.__selftest=function(){
         if(_swUpdateDecision('')!=='banner') throw new Error('累計3回後も自動リロード（回数上限が死んだ）');
         try{ sessionStorage.setItem('xi_sw_reload_n','2'); }catch(e){}
         if(_swUpdateDecision('')!=='reload') throw new Error('累計2回でリロード不可（上限が厳しすぎ）');
+        // ★fail-closed（2026-08-06）: 記録できない端末では自動リロードしない。
+        //   旧実装は例外時に「直近なし・0回目」を返し、20秒ガードと3回上限が同時に外れていた
+        //   （保険が2つとも同じ sessionStorage 依存＝保険になっていなかった）。
+        try{ sessionStorage.removeItem('xi_sw_reload'); sessionStorage.removeItem('xi_sw_reload_n'); }catch(e){}
+        try{ localStorage.removeItem('xi_ls_xi_sw_reload'); localStorage.removeItem('xi_ls_xi_sw_reload_n'); }catch(e){}
+        if(_swUpdateDecision('')!=='reload') throw new Error('記録できる状態なのにreloadにならない');
+        { const _cr=window._swCanRecord; window._swCanRecord=function(){ return false; }; // storage不能を模す
+          let _d=null; try{ _d=_swUpdateDecision(''); } finally { window._swCanRecord=_cr; }
+          if(_d!=='banner') throw new Error('記録できない端末で自動リロードしてしまう（fail-openに戻った）'); }
+        // localStorage側だけに記録が残っている場合も上限が効くこと（タブを開き直しても止まる）
+        try{ localStorage.setItem('xi_ls_xi_sw_reload_n', Date.now()+'|3'); }catch(e){}
+        if(_swUpdateDecision('')!=='banner') throw new Error('localStorage側の回数が無視される（タブ再作成で上限が消える）');
+        // 失効した記録は無視されること（無期限だと生涯3回で自動更新が永久に来なくなる）
+        try{ localStorage.setItem('xi_ls_xi_sw_reload_n', (Date.now()-_SW_LS_TTL-1000)+'|3'); }catch(e){}
+        if(_swUpdateDecision('')!=='reload') throw new Error('失効済みの回数が残り続ける（10分TTLが効いていない）');
         try{ if(_ss0!=null) sessionStorage.setItem('xi_sw_reload',_ss0); else sessionStorage.removeItem('xi_sw_reload');
              if(_ssn0!=null) sessionStorage.setItem('xi_sw_reload_n',_ssn0); else sessionStorage.removeItem('xi_sw_reload_n'); }catch(e){}
+        try{ if(_ls0!=null) localStorage.setItem('xi_ls_xi_sw_reload',_ls0); else localStorage.removeItem('xi_ls_xi_sw_reload');
+             if(_lsn0!=null) localStorage.setItem('xi_ls_xi_sw_reload_n',_lsn0); else localStorage.removeItem('xi_ls_xi_sw_reload_n'); }catch(e){}
         _userTouched=_touch0;
         // バナー実生成: 文言i18n・更新ボタン・二重生成なし
         _swShowUpdateBar();
