@@ -611,6 +611,13 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .hint{position:absolute;left:50%;top:46%;transform:translateX(-50%);text-align:center;color:rgba(255,255,255,.5);font-size:12px;pointer-events:none;width:80%}
 
 /* ---------- Load more sentinel ---------- */
+/* 検索0件の救済（もしかして）の注記。「何が起きたか」を必ず言う＝黙って別の語で検索しない */
+.rescue-note{
+  margin:2px 2px 8px;padding:8px 10px;border-radius:9px;
+  background:rgba(217,255,77,.07);border:1px solid rgba(217,255,77,.22);
+  color:var(--ink);font-size:11.5px;line-height:1.65;
+}
+.rescue-note b{color:var(--lime);font-weight:700}
 .loadmore{
   text-align:center;color:var(--mut);font-size:11px;letter-spacing:1.5px;
   padding:14px 8px 6px;opacity:.8;
@@ -1137,7 +1144,7 @@ const I18N = {
     place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
     posAll:'全部', allLeagues:'全リーグ', popClubs:'人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
     sortSuggest:'おすすめ順', sortPop:'人気順',
-    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
+    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', rescueA:'「', rescueB:'」では見つからなかったため、「', rescueC:'」の検索結果を表示しています', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
     addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を入れ替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
@@ -1219,7 +1226,7 @@ const I18N = {
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
     posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
     sortSuggest:'Suggested', sortPop:'Popular',
-    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
+    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
     addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace this player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
@@ -3705,6 +3712,40 @@ function playerMatches(p){
   if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
   return true;
 }
+// ── 検索0件の救済「もしかして」（2026-08-07・本番データ由来）──
+// 8/6の検索0件2件は、いずれも末尾1文字のタイポだけで0件になっていた:
+//   "diomam"→(m誤り) / "でぃおまんて"→(て誤り)。DBには Diomande が5人いる＝居るのに出せていなかった。
+// 対策= 0件のとき末尾を1〜2文字削って再検索し、当たったらその結果を出す。何をしたかは必ず画面に明示する。
+// かなクエリは既存の かな→ローマ字照合(jaNameHit) をそのまま通るので、この1機構で日本語入力・英字入力の両方に効く。
+// 削り幅を2文字まで・残り3文字以上に限定するのは、"ronaldinho jr"→"ron" のように短い断片まで落ちて
+// 無関係な大量ヒットを出すのを防ぐため（タイポは通常1文字。2文字までを許容の上限とする）。
+const RESCUE_MAX_TRIM=2, RESCUE_MIN_LEN=3;
+let _rescuedFrom=null,_rescuedTo=null; // 直近の描画で救済したか（null=していない）。注記の表示にだけ使う
+let _lastRescueQ='';
+function rescuedOnce(q){ if(!q||q===_lastRescueQ) return; _lastRescueQ=q; recordEvent('search_rescued'); } // 語句は送らない（見つかった＝DB追加のシグナルではない）
+// f=フィルタ状態(pickFilter/mktFilter) / rebuild=候補配列を作り直す関数。
+// 見つかれば候補配列を返す（f.q は呼び出し前の値に必ず戻す＝入力欄と状態が食い違わない）。
+function trySearchRescue(f,rebuild){
+  _rescuedFrom=null; _rescuedTo=null;
+  const q0=(f&&f.q||'').trim();
+  if(!q0||q0.length<=RESCUE_MIN_LEN) return null;
+  let out=null;
+  try{
+    for(let n=1;n<=RESCUE_MAX_TRIM;n++){
+      const q=q0.slice(0,q0.length-n);
+      if(q.length<RESCUE_MIN_LEN) break;
+      f.q=q;
+      const idx=rebuild();
+      if(idx&&idx.length){ _rescuedFrom=q0; _rescuedTo=q; out=idx; break; }
+    }
+  } finally { f.q=q0; } // 例外が出ても元の語に戻す
+  if(out) rescuedOnce(q0);
+  return out;
+}
+function rescueNoteHTML(){
+  if(!_rescuedFrom) return '';
+  return '<div class="rescue-note">'+t('rescueA')+escAttr(_rescuedFrom)+t('rescueB')+'<b>'+escAttr(_rescuedTo)+'</b>'+t('rescueC')+'</div>'; // 検索語をそのまま描くのでエスケープ必須
+}
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
 // クリアボタンの状態表示（2026-07-27）: 消すものが無い時は沈黙(減光)、フィルタが1つでも効いたら浮き上がる。
 // 「赤くする」案は不採用＝クリアは即やり直せる操作で破壊色の深刻度に釣り合わず、本物の削除確認の警告力も薄まるため。
@@ -3721,7 +3762,11 @@ function drawPickList(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
   syncPickClearBtn(); // フィルタ変更は必ずここを通る＝クリアボタンの点灯/減光を常に同期
   // ベンチ追加でも在籍中(起用中/ベンチ)の選手は除外せず表示する（prowHTMLで選択不可にする）
-  pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
+  const _buildPick=()=>P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
+  _rescuedFrom=_rescuedTo=null; // ★描画のたびに必ず落とす。前回の救済の注記が次の検索に残るため（実UI検証で発見）
+  pickCurIdx=_buildPick();
+  // 0件なら末尾を削って救済（並べ替えの前に確定させる＝以降の処理は従来のまま動く）
+  if(!pickCurIdx.length){ const _r=trySearchRescue(pickFilter,_buildPick); if(_r) pickCurIdx=_r; }
   const so=pickFilter.sort||'suggest';
   _iconFloorActive=false; // 手動ピッカーはレジェンド下限を効かせず“素の実力順”で並べる（引退アイコンで一覧を汚さない）
   // ★性能修正: ソートキー(市場価値・適性ランク)を候補ごとに1回だけ事前計算する（デコレート）。
@@ -3741,7 +3786,7 @@ function drawPickList(slotIdx){
     list.innerHTML=noMatchHTML('pickClear',true); // 0件＝自作の文脈→新規作成を主ボタンで提示
     const cb=document.getElementById('nmCreate'); if(cb) cb.onclick=()=>openCreatePlayer(slotIdx);
     return;}
-  list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  list.innerHTML=rescueNoteHTML()+pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
@@ -4248,11 +4293,14 @@ function wireSubPickerFull(slotIdx){
 }
 function drawSubFull(slotIdx){
   const list=document.getElementById('plist');if(!list)return;
-  pickCurIdx=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
+  const _buildSub=()=>P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
+  _rescuedFrom=_rescuedTo=null; // 前回の救済の注記を持ち越さない
+  pickCurIdx=_buildSub();
+  if(!pickCurIdx.length){ const _r=trySearchRescue(pickFilter,_buildSub); if(_r) pickCurIdx=_r; } // 0件は末尾を削って救済
   sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
   if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
     list.innerHTML=noMatchHTML('pickClear');return;}
-  list.innerHTML=pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  list.innerHTML=rescueNoteHTML()+pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
@@ -4619,7 +4667,7 @@ function drawMkt(){
   const list=document.getElementById('mlist');if(!list)return;
   syncClearBtn('mClear',mktFilter,'mv'); // フィルタ変更のたびにクリアの点灯/減光を同期（既定ソートはmv）
   const f=mktFilter;
-  mktCurIdx=P.map((p,i)=>i).filter(i=>{
+  const _buildMkt=()=>P.map((p,i)=>i).filter(i=>{
     if(isCustomPid(i))return false; // カスタム選手は検索/移籍市場に出さない
     const p=P[i];
     if(!inLgFilter(p,f.lg))return false;
@@ -4629,6 +4677,9 @@ function drawMkt(){
     if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
     return true;
   });
+  _rescuedFrom=_rescuedTo=null; // 前回の救済の注記を持ち越さない
+  mktCurIdx=_buildMkt();
+  if(!mktCurIdx.length){ const _r=trySearchRescue(f,_buildMkt); if(_r) mktCurIdx=_r; } // 0件は末尾を削って救済
   _iconFloorActive=false; // 検索一覧もレジェンド下限を効かせず“素の実力順”で並べる
   // ★性能修正: 市場価値順は mvScore を候補ごとに1回だけ事前計算（比較器内で再計算しない）。フィルタ無しの全2.4万件でも即並ぶ。順序は従来と同一。
   { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
@@ -4636,7 +4687,7 @@ function drawMkt(){
   _iconFloorActive=true;
   if(!mktCurIdx.length){ noResultOnce(mktFilter.q); // 選手検索でも0件を記録
     list.innerHTML=noMatchHTML('mClear');return;}
-  list.innerHTML=mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
+  list.innerHTML=rescueNoteHTML()+mktCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
   if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,mktCurIdx.length);
   list.onscroll=()=>{
@@ -4965,7 +5016,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0806e'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0807a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8260,6 +8311,57 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); try{ closeSheet(); }catch(_){} }
       finally{ window.recordEvent=_re79; }
       ok('autoplace_badge',_pass,_msg); }
+
+    // T80: 検索0件の救済「もしかして」（2026-08-07）。
+    // フィクスチャは本番で実際に0件になった2件そのもの: "diomam"(英字) / "でぃおまんて"(かな)。
+    // 「実際に起きた失敗」を恒久テストに固定しておく＝同じ取りこぼしを二度と出さない。
+    { let _pass=true,_msg=''; const _re80=window.recordEvent; const _q0=pickFilter.q,_lg0=pickFilter.lg,_pos0=pickFilter.pos,_club0=pickFilter.club,_nat0=pickFilter.nat;
+      try{
+        window.recordEvent=function(){};
+        if(typeof trySearchRescue!=='function'||typeof rescueNoteHTML!=='function') throw new Error('救済ヘルパーが無い');
+        // 素の照合器で「削った語なら本当に居る」ことを先に確認（テストが実装に依存しすぎないように）
+        const hit=q=>P.some((p,i)=>!isCustomPid(i)&&(deaccLower(p[0]).includes(q)||jaNameHit(p,q)));
+        if(!hit('dioma')) throw new Error('前提崩れ: dioma がDBに居ない');
+        if(hit('diomam')) throw new Error('前提崩れ: diomam が素で当たる（フィクスチャとして無効）');
+        // 救済の実走: 絞り込みは全解除して名前だけで判定する
+        const run=q=>{ pickFilter.lg='ALL'; pickFilter.pos='ALL'; pickFilter.club='ALL'; pickFilter.nat='ALL'; pickFilter.q=q;
+          const b=()=>P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&playerMatches(P[i]));
+          return { first:b(), rescued:trySearchRescue(pickFilter,b) }; };
+        let r=run('diomam');
+        if(r.first.length) throw new Error('diomam が素で0件にならない');
+        if(!r.rescued||!r.rescued.length) throw new Error('diomam が救済されない（本番8/6の取りこぼし再発）');
+        if(_rescuedFrom!=='diomam'||_rescuedTo!=='dioma') throw new Error('救済の記録が不正: '+_rescuedFrom+'→'+_rescuedTo);
+        if(pickFilter.q!=='diomam') throw new Error('救済後にフィルタのqが戻っていない（入力欄と状態が食い違う）');
+        if(rescueNoteHTML().indexOf('dioma')<0) throw new Error('注記に置換後の語が出ない（黙って別の語で検索している）');
+        r=run('でぃおまんて');
+        if(r.first.length) throw new Error('でぃおまんて が素で0件にならない');
+        if(!r.rescued||!r.rescued.length) throw new Error('かなクエリが救済されない');
+        if(_rescuedTo!=='でぃおまん') throw new Error('かなの削り先が不正: '+_rescuedTo);
+        // 正常系は救済に触れない
+        r=run('みとま');
+        if(!r.first.length) throw new Error('前提崩れ: みとま が0件');
+        // 削り幅の上限(2文字)と下限(3文字)
+        r=run('diomammm'); // 3文字余分→2文字削っても diomam のままで0件＝救済しない
+        if(r.rescued) throw new Error('3文字以上の乖離まで救済してしまう（上限2文字が効いていない）');
+        r=run('zzzz');
+        if(r.rescued) throw new Error('存在しない語を救済してしまった');
+        if(rescueNoteHTML()!=='') throw new Error('救済していないのに注記が出る');
+        r=run('zz');
+        if(r.rescued) throw new Error('下限3文字を割る語まで削っている');
+        // ★注記の持ち越し検査（2026-08-07 実UI検証で発見したバグ）。
+        // 救済した直後にヒットする語を打つと、_rescuedFrom が落ちずに前回の注記が残っていた。
+        // 描画関数を実走させて「救済→ヒット」の順で注記が消えることを見る（変数直読みでは再発を捕まえられない）。
+        { const _sheetOpen=!!document.getElementById('plist');
+          if(_sheetOpen){
+            pickFilter.lg='ALL'; pickFilter.pos='ALL'; pickFilter.club='ALL'; pickFilter.nat='ALL';
+            pickFilter.q='diomam'; drawPickList(0);
+            if(!document.querySelector('#plist .rescue-note')) throw new Error('救済したのに注記が出ない(実描画)');
+            pickFilter.q='mitoma'; drawPickList(0);
+            if(document.querySelector('#plist .rescue-note')) throw new Error('前回の救済の注記が次の検索に残る(実描画)');
+          } }
+      }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+      finally{ window.recordEvent=_re80; pickFilter.q=_q0; pickFilter.lg=_lg0; pickFilter.pos=_pos0; pickFilter.club=_club0; pickFilter.nat=_nat0; _rescuedFrom=null; _rescuedTo=null; _lastRescueQ=''; }
+      ok('search_rescue',_pass,_msg); }
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
