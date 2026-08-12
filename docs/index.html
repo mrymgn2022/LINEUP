@@ -1154,7 +1154,7 @@ const I18N = {
     place:'選手を配置', benchAddTitle:'ベンチに追加', searchName:'選手名を検索…', searchNameClub:'選手名・クラブで検索…', clearFilters:'× 検索条件をクリア',
     posAll:'全部', allLeagues:'全リーグ', popClubs:'人気クラブ', lgSearchPh:'国名・リーグ名で検索（日本語・英語可）', allClubs:'全クラブ',
     sortSuggest:'おすすめ順', sortPop:'人気順',
-    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', rescueA:'「', rescueB:'」では見つからなかったため、「', rescueC:'」の検索結果を表示しています', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
+    createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', rescueA:'「', rescueB:'」では見つからなかったため、「', rescueC:'」の検索結果を表示しています',rescueTok:'」を短縮名とみなして検索しました', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',
     changePlayer:'選手を変更', secondChoice:'第二候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第二候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
     addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を入れ替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
@@ -1236,7 +1236,7 @@ const I18N = {
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
     posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
     sortSuggest:'Suggested', sortPop:'Popular',
-    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
+    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead',rescueTok:'” — matched as a short name', reqPlayer:'Request a player', shCustomize:'Customize image', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
     addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace this player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
@@ -3719,7 +3719,7 @@ function playerMatches(p){
   else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
   if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
   if(pickFilter.nat&&pickFilter.nat!=='ALL'&&natCode(p)!==pickFilter.nat)return false;
-  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)||tokPrefixHit(p[0],pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
   return true;
 }
 // ── 検索0件の救済「もしかして」（2026-08-07・本番データ由来）──
@@ -3729,14 +3729,36 @@ function playerMatches(p){
 // かなクエリは既存の かな→ローマ字照合(jaNameHit) をそのまま通るので、この1機構で日本語入力・英字入力の両方に効く。
 // 削り幅を2文字まで・残り3文字以上に限定するのは、"ronaldinho jr"→"ron" のように短い断片まで落ちて
 // 無関係な大量ヒットを出すのを防ぐため（タイポは通常1文字。2文字までを許容の上限とする）。
+// ── 短縮名・通称の救済（2026-08-12・本番データ由来）─────────────────────
+// 8/11に "maxi beier" が0件で終わった。DBには Maximilian Beier が居る（しかも本人が見ていた
+// ドルトムントの選手）。サッカーは短縮名の文化が強く、Maxi/Gigi/Kev/Cris/Dani は「間違い」ではなく
+// 正しい呼び方。つまりユーザーは正しく打っているのに当たらない＝製品側の欠陥。
+// 末尾削りの救済(RESCUE_MAX_TRIM)は効かない。問題が語の中間にあるため（maxi→maximilian）。
+// → クエリを空白で割り、各トークンが名前のいずれかのトークンの前方一致なら当てる。
+//    "maxi beier" → maxi⊂maximilian かつ beier==beier → HIT
+// 誤爆を抑える条件（この4つが揃わないと発動しない）:
+//   (1) 通常検索が0件のときだけ（救済経路なので既にそう）
+//   (2) 2トークン以上（1語は通常の部分一致で足りている）
+//   (3) 各トークン2文字以上（"a b" で全員ヒットするのを防ぐ）
+//   (4) 全トークンが一致（部分的な一致では出さない）
+// ★既存の検索結果は1件も変わらない（0件のときにしか通らないため退行リスクなし）。
+let _tokPrefix=false; // 救済中だけ true。通常検索では常に false＝挙動不変
+function tokPrefixHit(name,q){
+  if(!_tokPrefix||!q) return false;
+  const qt=String(q).trim().split(/\s+/).filter(Boolean);
+  if(qt.length<2) return false;                 // (2)
+  if(qt.some(t=>t.length<2)) return false;      // (3)
+  const nt=deaccLower(name).split(/[\s.'\-]+/).filter(Boolean);
+  return qt.every(t=>nt.some(n=>n.startsWith(t))); // (4)
+}
 const RESCUE_MAX_TRIM=2, RESCUE_MIN_LEN=3;
-let _rescuedFrom=null,_rescuedTo=null; // 直近の描画で救済したか（null=していない）。注記の表示にだけ使う
+let _rescuedFrom=null,_rescuedTo=null,_rescueKind=''; // 直近の描画で救済したか（null=していない）。注記の表示にだけ使う
 let _lastRescueQ='';
 function rescuedOnce(q){ if(!q||q===_lastRescueQ) return; _lastRescueQ=q; recordEvent('search_rescued'); } // 語句は送らない（見つかった＝DB追加のシグナルではない）
 // f=フィルタ状態(pickFilter/mktFilter) / rebuild=候補配列を作り直す関数。
 // 見つかれば候補配列を返す（f.q は呼び出し前の値に必ず戻す＝入力欄と状態が食い違わない）。
 function trySearchRescue(f,rebuild){
-  _rescuedFrom=null; _rescuedTo=null;
+  _rescuedFrom=null; _rescuedTo=null; _rescueKind='';
   const q0=(f&&f.q||'').trim();
   if(!q0||q0.length<=RESCUE_MIN_LEN) return null;
   let out=null;
@@ -3746,14 +3768,22 @@ function trySearchRescue(f,rebuild){
       if(q.length<RESCUE_MIN_LEN) break;
       f.q=q;
       const idx=rebuild();
-      if(idx&&idx.length){ _rescuedFrom=q0; _rescuedTo=q; out=idx; break; }
+      if(idx&&idx.length){ _rescuedFrom=q0; _rescuedTo=q; _rescueKind='trim'; out=idx; break; }
     }
   } finally { f.q=q0; } // 例外が出ても元の語に戻す
+  // 末尾削りで駄目なら、短縮名として当てにいく（"maxi beier"→Maximilian Beier）
+  if(!out){
+    _tokPrefix=true;
+    try{ const idx=rebuild(); if(idx&&idx.length){ _rescuedFrom=q0; _rescuedTo=''; _rescueKind='tok'; out=idx; } }
+    finally{ _tokPrefix=false; }
+  }
   if(out) rescuedOnce(q0);
   return out;
 }
 function rescueNoteHTML(){
   if(!_rescuedFrom) return '';
+  // 短縮名で当てた場合は「〇〇→△△」ではないので別文言（同じ語を2回出すと意味が通らない）
+  if(_rescueKind==='tok') return '<div class="rescue-note">'+t('rescueA')+escAttr(_rescuedFrom)+t('rescueTok')+'</div>';
   return '<div class="rescue-note">'+t('rescueA')+escAttr(_rescuedFrom)+t('rescueB')+'<b>'+escAttr(_rescuedTo)+'</b>'+t('rescueC')+'</div>'; // 検索語をそのまま描くのでエスケープ必須
 }
 function inXI(pid){return state.slots.some(s=>s.pid===pid)}
@@ -4697,7 +4727,7 @@ function drawMkt(){
     if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
     if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
     if(f.nat&&f.nat!=='ALL'&&natCode(p)!==f.nat)return false;
-    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)||tokPrefixHit(p[0],f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
     return true;
   });
   _rescuedFrom=_rescuedTo=null; // 前回の救済の注記を持ち越さない
@@ -5057,7 +5087,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0810c'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0812a'; // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8449,6 +8479,33 @@ window.__selftest=function(){
         if(jaNameHit(P[mb],'mbappe')) throw new Error('英字クエリでjaNameHitが真になる（経路が混ざった）');
       }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
       ok('foreign_kana_search',_pass,_msg); }
+  // T82: 短縮名・通称の救済（2026-08-12新設）。"maxi beier" → Maximilian Beier
+  //  8/11に実ユーザーが maxi beier / maxi bei / maxi beie と3通り打って全部0件だった。
+  //  (a) 通常検索では当たらないこと＝挙動を変えていない (b) 救済モードでは当たること
+  //  (c) 誤爆条件（1トークン/1文字/部分一致）では発動しないこと を固定する。
+  { let _pass=true,_msg='';
+    try{
+      const bi=P.findIndex((p,i)=>!isCustomPid(i)&&keyForPlayer(p)==='Maximilian Beier|GER');
+      if(bi<0) throw new Error('検証前提: Maximilian Beier がDBに居ない');
+      const nm=P[bi][0];
+      // (a) 通常時（_tokPrefix=false）は従来どおり当たらない＝既存の検索結果は不変
+      if(tokPrefixHit(nm,'maxi beier')) throw new Error('救済モードでないのに短縮名が当たる（挙動が変わっている）');
+      if(deaccLower(nm).includes('maxi beier')) throw new Error('検証前提: includes で当たってしまう');
+      _tokPrefix=true;
+      try{
+        // (b) 救済モードでは当たる
+        if(!tokPrefixHit(nm,'maxi beier')) throw new Error('救済モードでも短縮名が当たらない');
+        if(!tokPrefixHit('Cristiano Ronaldo','cris ronaldo')) throw new Error('cris ronaldo が当たらない');
+        // (c) 誤爆条件では発動しない
+        if(tokPrefixHit(nm,'maxi')) throw new Error('1トークンで発動している');
+        if(tokPrefixHit(nm,'m b')) throw new Error('1文字トークンで発動している');
+        if(tokPrefixHit(nm,'maxi zzzz')) throw new Error('一部しか一致しないのに発動している');
+        if(tokPrefixHit(nm,'eier beier')) throw new Error('前方一致でない断片で発動している');
+      } finally { _tokPrefix=false; }
+      if(tokPrefixHit(nm,'maxi beier')) throw new Error('救済後にフラグが戻っていない');
+    }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+    ok('short_name_rescue',_pass,_msg); }
+
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
     try{ P.length=snapPLen; }catch(e){}
