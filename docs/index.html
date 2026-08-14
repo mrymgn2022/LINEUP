@@ -5104,7 +5104,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0814b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0814c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6618,9 +6618,9 @@ async function buildShareCanvas(){
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
   const REF=compact?(fmtC==='feed'?(_cb?340:400):(_cb?300:440)):405; // feedベンチ無しは駒を約15%小さく/sqベンチ無しは横いっぱいピッチ用に駒を控えめ(縦が詰まりやすい=R59・実レンダで被り無し確認)                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
-  let kk=(pw/REF)*((showBench||compact)?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
+  const kk=(pw/REF)*((showBench||compact)?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
   const m=v=>Math.round(v*kk);                             // 盤面px → 共有画像px
-  let R=m(25);                                           // 盤面 .disc 半径25
+  const R=m(25);                                           // 盤面 .disc 半径25
   const tokX=s=>px+(s.x/100)*pw;
   const filledSlots=state.slots.filter(s=>s.pid!=null);
   // 駒中心から下方向のラベル伸び（盤面実測のベースライン：役職+22 / 名前+36 / メモ+53 / 第2候補は+15刻み。disc縁基準）
@@ -6631,7 +6631,11 @@ async function buildShareCanvas(){
   let ph; if(compact&&!_cb){ ph=(fmtC==='feed'?1350:1080)-py-26; } else { ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); } // feed(4:5)/sq(1:1)ベンチ非表示は縦横フレームを使い切る(左右デッドスペース廃止・競合並み)
   const yRaw=s=>py+(1-(s.y/100))*ph;                       // 盤面と同座標系: y大=前線(上) / y小=GK(下)
   // 盤面の liftBottomLabels と同じ思想: 下端からはみ出すラベル分だけその駒を上へ。上端は駒半径分を確保。
-  const yAdj=new Map(); // 配置は縦被りソルバー（pass1直前）が決める(2026-08-14)。旧: ここで下端リフト+上端クランプのみ
+  const yAdj=new Map();
+  filledSlots.forEach(s=>{ let cy=yRaw(s);
+    const over=cy+dropOf(s)-(py+ph-m(6)); if(over>0)cy-=over;
+    const topLim=py+R+m(6); if(cy<topLim)cy=topLim;
+    yAdj.set(s,Math.round(cy)); });
   const pitchBottom=py+ph;
   const tokY=s=>yAdj.get(s);
   const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,15):[]; // ベンチ最大15人（非表示時は載せない）
@@ -6697,57 +6701,6 @@ async function buildShareCanvas(){
     const url='squadxi.futbol', wUrl=x.measureText(url).width;
     x.fillStyle='rgba(234,255,240,.85)'; x.fillText(url,px+pw-pad-wUrl,py+ph-pad);
     x.restore(); })();
-  // ==== 縦被りソルバー（2026-08-14・ユーザー承認）====================================
-  // 「下段の駒円盤の上端 ≧ 上段の駒のラベル下端」を横方向に届き得る全ペアで保証する。
-  // 4:5/1:1(compact)は縦を使い切る方向へ段を再配分し、入らない場合だけ駒スケールkkを二分探索で縮小（REF定数の手調整を廃止）。
-  // auto/story(非compact=サイト盤面画像もここ)は既存配置を維持し、違反ペアがある時のみ矯正＝従来画像は不変。
-  // 検証: __shareAudit()（全布陣×表示オプション×フォーマット網羅の交差ゼロ判定）/ selftest T84 が恒久ゲート。
-  if(filledSlots.length){
-    const mmS=(v,sc)=>Math.round(v*kk*sc);
-    const dropS=(s,sc)=>{ const Rp=mmS(25,sc); let d=state.hideRoles?(Rp+mmS(23,sc)):(Rp+mmS(36,sc)); let inf=Rp+(state.hideRoles?mmS(37,sc):mmS(57,sc)),ln=0; if(state.showMemo&&dispMemo(s.pid))ln++; if(state.showSub&&s.sub!=null&&P[s.sub])ln++; if(ln)d=Math.max(d,inf+(ln-1)*mmS(15,sc)); return d; };
-    const _mx=document.createElement('canvas').getContext('2d');
-    const hwF=(s,sc)=>{ let w=0; _mx.font='700 '+mmS(8,sc)+'px Manrope,sans-serif'; w=_mx.measureText(squadShortName(s.pid)).width;
-      _mx.font='700 '+mmS(6,sc)+'px Manrope,sans-serif';
-      if(state.showMemo){ const t=dispMemo(s.pid); if(t){ const tw=_mx.measureText(t).width+mmS(18,sc); if(tw>w)w=tw; } }
-      if(state.showSub&&s.sub!=null&&P[s.sub]){ const tw=_mx.measureText(squadShortName(s.sub)).width; if(tw>w)w=tw; }
-      return w/2; };
-    const byK=new Map();
-    filledSlots.forEach(s=>{ const k=Math.round(yRaw(s)); if(!byK.has(k))byK.set(k,[]); byK.get(k).push(s); });
-    const levels=[...byK.entries()].sort((a,b)=>b[0]-a[0]).map(e=>({raw:e[0],toks:e[1]}));
-    const place=(sc,stretch)=>{
-      const Rp=mmS(25,sc), eps=Math.max(4,mmS(4,sc)), desc=mmS(11,sc);
-      const bottomClamp=py+ph-mmS(6,sc)-Math.max.apply(null,levels[0].toks.map(s=>dropS(s,sc)));
-      const topClamp=py+Rp+mmS(6,sc);
-      const rb=levels[0].raw, rt=levels[levels.length-1].raw;
-      const pos=[]; let okA=true;
-      for(let j=0;j<levels.length;j++){
-        let pj=(stretch&&rb!==rt) ? (bottomClamp-((rb-levels[j].raw)/(rb-rt))*(bottomClamp-topClamp))
-                                  : Math.min(Math.max(levels[j].raw,topClamp),bottomClamp);
-        if(j>0) pj=Math.min(pj,pos[j-1]-eps);
-        for(let i=0;i<j;i++){
-          let need=0;
-          const nameTopOff=Rp+mmS(state.hideRoles?23:36,sc)-Math.round(0.82*mmS(state.hideRoles?16:13,sc));
-          for(const u of levels[j].toks){ const hf=hwF(u,sc), hw=hf+mmS(10,sc)+Rp+mmS(4,sc), dp=dropS(u,sc)+desc+Rp;
-            for(const l of levels[i].toks){ const dx=Math.abs((u.x-l.x)/100*pw);
-              if(dx<hw) need=Math.max(need,dp);
-              if(dx<Rp*2+mmS(3,sc)) need=Math.max(need,Rp*2+mmS(3,sc));
-              // 斜めのラベル×ラベル終端弁: 床値フォントでもラベル同士が横に届く場合のみ、上段ラベル下端≦下段の名前上端を要求
-              if(dx<hf+hwF(l,sc)+mmS(12,sc)) need=Math.max(need,dropS(u,sc)+desc-nameTopOff+mmS(2,sc)); } }
-          if(need>0) pj=Math.min(pj,pos[i]-need);
-        }
-        if(pj<topClamp-0.5) okA=false;
-        pos.push(pj);
-      }
-      return {ok:okA,pos:pos};
-    };
-    const doStretch=compact;
-    let sc=1, res=place(1,doStretch);
-    if(!res.ok){ let lo=0.4,hi=1; for(let t2=0;t2<12;t2++){ const mid=(lo+hi)/2; if(place(mid,doStretch).ok)lo=mid; else hi=mid; } sc=lo; res=place(sc,doStretch); }
-    if(sc<1){ kk*=sc; R=m(25); }
-    levels.forEach((L,j)=>L.toks.forEach(s=>yAdj.set(s,Math.round(res.pos[j]))));
-  }
-  // ==== ソルバーここまで ====================================
-
   // トークン描画：名前は省略せず全文表示。サイズは全員で統一（盤面のようにバラつかせない）
   const maxName=m(state.hideRoles?16:13), minName=m(8); // 盤面の名前フォント(13/bigname16)を基準に
   // pass1: 各駒の位置・表示名・国旗を測る
@@ -6765,55 +6718,16 @@ async function buildShareCanvas(){
         for(let j=0;j<info.length;j++){ const o=info[j]; if(o===a)continue; if(Math.abs(o.fy-a.fy)<m(18)){ const wa=widthAt(a,U),wo=widthAt(o,U); if(wa<=0||wo<=0)continue; if((wa+wo)/2+m(3)>Math.abs(a.fx-o.fx)){ ok=false; break; } } } }
       if(ok) return U; } return lo; };
   // 名前サイズは全員一律（盤面のように統一）。「全員を同じサイズUで描いたとき、同一行の隣同士が被らない最大のU」を採用。
-  let uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
+  const uniName=info.length?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; const fw=it.fImg?Math.round(Math.round(U*0.82)*4/3)+m(3):0; return x.measureText(it.full).width+fw; },maxName,minName):maxName;
   const subText=it=>{ const s=it.s; let t=''; if(state.showMemo){const mm=dispMemo(s.pid); if(mm&&mm.length>t.length)t=mm;} if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub); if(sn.length>t.length)t=sn;} return t; };
   // メモ前の旗は memoFlagCode(pid) で選手ごとに判定（代表=リーグ国／自由編成=リーグ国／他=なし）
-  let uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; let w=0;
+  const uniSub=info.some(it=>subText(it))?findUni((it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; let w=0;
       if(state.showMemo){const mm=dispMemo(it.s.pid); if(mm){ let mw=x.measureText(mm).width; if(memoFlagCode(it.s.pid)) mw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(mw>w)w=mw; }}
       if(state.showSub&&it.s.sub!=null&&P[it.s.sub]){const sw=x.measureText(squadShortName(it.s.sub)).width; if(sw>w)w=sw;}
       return w; },m(10),m(6)):m(10);
-  // ★斜め被りの追い込み（2026-08-14・__shareAuditで発見）: 段差のある隣の駒の「名前×メモ/2nd」「2nd×メモ」は
-  //  findUniの同一行判定(|dfy|<m18)に入らず素通りしていた。uniName確定後、斜め帯(1px..m52)の全ペアが
-  //  クリアになるまでuniSubを追加縮小する。床値でも残る病的ケースはソルバーの終端弁（床値幅の縦押し）が受ける。
-  { const nmW=o=>{ x.font='700 '+uniName+'px Manrope,sans-serif'; const fw=o.fImg?Math.round(Math.round(uniName*0.82)*4/3)+m(3):0; return x.measureText(o.full).width+fw; };
-    const slW=(it,U)=>{ x.font='700 '+U+'px Manrope,sans-serif'; let w=0;
-      if(state.showMemo){ const t=dispMemo(it.s.pid); if(t){ let tw=x.measureText(t).width; const fc=memoFlagCode(it.s.pid); if(fc&&FI[fc])tw+=Math.round(Math.round(U*0.82)*4/3)+m(3); if(tw>w)w=tw; } }
-      if(state.showSub&&it.s.sub!=null&&P[it.s.sub]){ const tw=x.measureText(squadShortName(it.s.sub)).width; if(tw>w)w=tw; }
-      return w; };
-    // ★uniName×uniSubの連動探索(2026-08-14): 名前×2nd/メモの斜め被りは片方のフォントだけでは解けないことがある
-    //  （名前が大きいままだと2ndを床まで縮めても届く）。名前を1pxずつ下げながら、各段で2nd/メモ側の成立を試す。
-    //  床値ペアで届かないことはソルバー（縦押しの終端弁）が保証しているので必ず解が見つかる。
-    const bh2=(t1,b1,t2,b2)=>t1<b2-1&&t2<b1-1;
-    const lineTop=a=>a.fy+R+(state.hideRoles?m(37):m(57));
-    const nmWU=(o,UN)=>{ x.font='700 '+UN+'px Manrope,sans-serif'; const fw=o.fImg?Math.round(Math.round(UN*0.82)*4/3)+m(3):0; return x.measureText(o.full).width+fw; };
-    const nameOK=(UN)=>{ for(let i=0;i<info.length;i++){ const a=info[i]; const wa=nmWU(a,UN);
-        const at=a.fy+R+(state.hideRoles?m(23):m(36))-0.82*UN, ab=at+1.05*UN;
-        for(let j=0;j<info.length;j++){ if(i===j)continue; const o=info[j]; const dx=Math.abs(a.fx-o.fx);
-          if(bh2(at,ab,o.fy-R,o.fy+R)&&wa/2+R+m(2)>dx) return false;
-          if(Math.abs(a.fy-o.fy)>1){ const ot=o.fy+R+(state.hideRoles?m(23):m(36))-0.82*UN;
-            if(bh2(at,ab,ot,ot+1.05*UN)&&(wa+nmWU(o,UN))/2+m(3)>dx) return false; } } }
-      return true; };
-    const subOK=(UN,US)=>{ for(let i=0;i<info.length;i++){ const a=info[i]; const wa=slW(a,US); if(wa<=0)continue;
-        const lt=lineTop(a)-0.82*US, lb=lineTop(a)+m(15)+0.3*US;
-        for(let j=0;j<info.length;j++){ if(i===j)continue; const o=info[j]; const dx=Math.abs(a.fx-o.fx);
-          if(bh2(lt,lb,o.fy-R,o.fy+R)&&wa/2+R+m(2)>dx) return false;
-          const ont=o.fy+R+(state.hideRoles?m(23):m(36))-0.82*UN;
-          if(bh2(lt,lb,ont,ont+1.05*UN)&&(wa+nmWU(o,UN))/2+m(3)>dx) return false;
-          if(Math.abs(a.fy-o.fy)>1){ const olt=lineTop(o)-0.82*US, olb=lineTop(o)+m(15)+0.3*US;
-            if(bh2(lt,lb,olt,olb)&&(wa+slW(o,US))/2+m(3)>dx) return false; } } }
-      return true; };
-    { let found=false;
-      for(let UN=uniName;UN>=minName&&!found;UN--){
-        if(!nameOK(UN)) continue;
-        for(let US=Math.min(uniSub,Math.max(m(6),UN));US>=m(6);US--){ if(subOK(UN,US)){ uniName=UN; uniSub=US; found=true; break; } }
-      }
-      if(!found){ uniName=minName; uniSub=m(6); }
-    }
-  }
   // 盤面の二重text-shadow（0 1px 3px ＋ 0 0 4px）を2回描きで再現。1回描きだと文字が平板に見え盤面と差が出る
   const dsText=(txt,tx,ty)=>{ x.shadowColor='rgba(0,0,0,.95)'; x.shadowBlur=m(4); x.shadowOffsetX=0; x.shadowOffsetY=0; x.fillText(txt,tx,ty); x.shadowBlur=m(3); x.shadowOffsetY=m(1); x.fillText(txt,tx,ty); x.shadowColor='transparent'; x.shadowBlur=0; x.shadowOffsetY=0; };
-  const __boxes=(window.__collectShareBoxes?[]:null);
-  info.forEach((it,__bi)=>{
+  info.forEach(it=>{
     const s=it.s, p=P[s.pid], fx=it.fx, fy=it.fy;
     x.beginPath();x.arc(fx,fy,R,0,7);x.fillStyle='#10160f';x.fill();
     x.textAlign='center';
@@ -6830,7 +6744,6 @@ async function buildShareCanvas(){
       drawSilhouette(x,fx,fy,R);
     }
     x.lineWidth=m(2.5);x.strokeStyle=roleCol(s.role);x.beginPath();x.arc(fx,fy,R,0,7);x.stroke();
-    if(__boxes)__boxes.push({t:__bi,k:'disc',x:fx-R,y:fy-R,w:R*2,h:R*2});
     // キャプテン
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+m(7),fy-R+m(7),m(8),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+m(9)+'px Manrope,sans-serif';x.fillText('C',fx-R+m(7),fy-R+m(10));}
     // 負傷・カード（showMarksオフなら共有画像には出さない）。カード=右上 / 負傷=右下、キャプテン(左上)と併存
@@ -6844,7 +6757,6 @@ async function buildShareCanvas(){
         x.fillStyle='#e5384d'; const a=m(6),b=m(2.2); x.fillRect(ix-a/2,iy-b/2,a,b); x.fillRect(ix-b/2,iy-a/2,b,a); } }
     // 盤面と同じ順：ポジション(役職)→名前→メモ→第2候補。まず役職を駒の直下に（盤面: role12px, 縁から+12）
     if(!state.hideRoles){ x.textAlign='center';x.fillStyle=roleCol(s.role);x.font=m(12)+'px "Bebas Neue",Manrope,sans-serif';x.letterSpacing=m(1)+'px';x.fillText(s.role,fx,fy+R+m(22));x.letterSpacing='0px'; } // 役職は盤面同様 Bebas Neue
-    if(__boxes&&!state.hideRoles){const _rw=x.measureText(s.role).width+m(6);__boxes.push({t:__bi,k:'role',x:fx-_rw/2,y:fy+R+m(10),w:_rw,h:m(14)});}
     // 名前（＋国旗）：全員一律サイズ。役職の下に詰めて表示
     const sz=uniName;
     x.font='700 '+sz+'px Manrope,sans-serif';
@@ -6860,7 +6772,6 @@ async function buildShareCanvas(){
     }
     x.fillStyle='#eafff0';
     dsText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY); // 盤面と同じ二重影で描画
-    if(__boxes)__boxes.push({t:__bi,k:'name',x:startX,y:nameBaseY-sz*0.82,w:totalW,h:sz*1.04});
     x.textAlign='center';
     // 駒下：メモ→第2候補の順（両方ONなら2行）。盤面と同じ文字影を付与
     let infoY=fy+R+(state.hideRoles?m(37):m(57));
@@ -6870,14 +6781,11 @@ async function buildShareCanvas(){
         const _sc=x.shadowColor; x.shadowColor='transparent'; x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); x.shadowColor=_sc;
         x.textAlign='left'; dsText(mt,sx0+fw+gp,infoY); x.textAlign='center';
       } else { dsText(mt,fx,infoY); }
-      if(__boxes){const _mt2=dispMemo(s.pid);let _mw=x.measureText(_mt2).width;const _mfc2=memoFlagCode(s.pid);if(_mfc2&&FI[_mfc2])_mw+=Math.round(Math.round(uniSub*0.82)*4/3)+m(3);__boxes.push({t:__bi,k:'memo',x:fx-_mw/2,y:infoY-uniSub*0.82,w:_mw,h:uniSub*1.05});}
       infoY+=m(15); }}
     if(state.showSub&&s.sub!=null&&P[s.sub]){const sn=squadShortName(s.sub);x.fillStyle='#ffc46b';x.font='700 '+uniSub+'px Manrope,sans-serif';dsText(sn,fx,infoY);}
-    if(__boxes&&state.showSub&&s.sub!=null&&P[s.sub]){const _sw=x.measureText(squadShortName(s.sub)).width;__boxes.push({t:__bi,k:'sub',x:fx-_sw/2,y:infoY-uniSub*0.82,w:_sw,h:uniSub*1.05});}
     x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
   });
-  if(__boxes) window.__shareBoxes=__boxes;
   // ベンチ（控え。最大15人をグリッド表示）
   if(compact&&benchPids.length){ // 右のベンチ縦列（枠の余白を情報で埋める）
     const colX=px+pw+22, colW=W-colX-26;
@@ -7177,28 +7085,6 @@ function toast(m){
   toastEl.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>toastEl.classList.remove('on'),1900);
 }
 
-/* ==== 共有画像の被り監査（2026-08-14）====
-   window.__collectShareBoxes=true で buildShareCanvas を焼くと window.__shareBoxes に全要素の矩形が入る。
-   __shareCollisions()=直近レンダの交差一覧 / __shareAudit()=全布陣×表示オプション×フォーマットの網羅監査（状態を汚すので実行後リロード前提） */
-window.__shareCollisions=function(){ const b=window.__shareBoxes||[]; const out=[];
-  for(let i=0;i<b.length;i++){ for(let j=i+1;j<b.length;j++){ const a=b[i],c=b[j]; if(a.t===c.t)continue;
-    const ov=Math.min(a.x+a.w,c.x+c.w)-Math.max(a.x,c.x), oh=Math.min(a.y+a.h,c.y+c.h)-Math.max(a.y,c.y);
-    if(ov>1.5&&oh>1.5) out.push('#'+a.t+a.k+'x#'+c.t+c.k+'('+Math.round(ov)+'x'+Math.round(oh)+')'); } }
-  return out; };
-window.__shareAudit=async function(){
-  const out=[]; const pids=[]; for(let i=0;i<P.length&&pids.length<22;i++){ if(P[i]&&P[i][0]) pids.push(i); }
-  for(const f of FORMS){ for(const opt of [[0,0,1],[0,0,0],[1,0,1],[0,1,1],[1,1,1],[1,1,0],[1,0,0]]){ for(const fmt of ['feed','sq','story','auto']){
-    buildSlots(f,false);
-    state.slots.forEach((s,i)=>{ s.pid=pids[i]; s.sub=opt[0]?pids[i+11]:null; });
-    state.bench=[]; state.captain=null; state.showBench=false; state.shareFmt=fmt;
-    state.showSub=!!opt[0]; state.showMemo=!!opt[1]; state.hideRoles=!!opt[2];
-    state.memos={}; if(opt[1]) state.slots.forEach(s=>{ state.memos[pidToKey(s.pid)]='HGrown 2026-27'; });
-    window.__collectShareBoxes=true; await buildShareCanvas(); window.__collectShareBoxes=false;
-    const c=window.__shareCollisions(); if(c.length) out.push(f+'/'+fmt+'/sub'+opt[0]+'memo'+opt[1]+'rolesShown'+(opt[2]?0:1)+': '+c.length+' '+c[0]);
-  } } }
-  return out.length?out:['ALL CLEAR'];
-};
-
 /* =========================================================
    開発用スモークテスト（隠し機能・ユーザーには非表示）
    コンソール/プレビューから __selftest() を実行 → 主要フローを総点検し
@@ -7314,7 +7200,7 @@ Object.assign(BIRTH,{"Przemysław Płacheta|POL":"1998-03-23","Jack Neeley|USA":
 Object.assign(HEIGHT,{"Przemysław Płacheta|POL":178,"Jack Neeley|USA":185,"Exon Arzú|HON":175,"Fricio Caicedo|ECU":195,"Santi Morales|USA":170,"Adem Sipic|USA":185,"Wilson Harris|USA":180,"Neil Pierre|USA":201,"Luka Jovanovic|AUS":179,"Or Blorian|ISR":188,"Richard Chukwu|CAN":183});
 Object.assign(FOOT,{"Przemysław Płacheta|POL":"左","Fricio Caicedo|ECU":"左","Santi Morales|USA":"右","Neil Pierre|USA":"右","Luka Jovanovic|AUS":"右","Richard Chukwu|CAN":"左"});
 Object.assign(MV,{"Przemysław Płacheta|POL":1000,"Jack Neeley|USA":50,"Exon Arzú|HON":150,"Santi Morales|USA":125,"Adem Sipic|USA":75,"Wilson Harris|USA":600,"Neil Pierre|USA":350,"Luka Jovanovic|AUS":1200,"Or Blorian|ISR":2000});
-window.__selftest=async function(){
+window.__selftest=function(){
   window.__inSelftest=true; // テスト中はレンダー副作用（共有誘導トースト等）を抑止
   const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
@@ -8665,24 +8551,6 @@ window.__selftest=async function(){
       if(chips!==RQ.length+1) throw new Error('チップ数不一致: '+chips+'≠'+(RQ.length+1));
     }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
     ok('rail_quickstart',_pass,_msg); }
-  // T84 share_no_overlap: 共有画像の縦被り——最多段フォメ×役職+2nd+メモ×1:1で全要素の交差ゼロを機械判定（2026-08-14ソルバーの恒久ゲート）
-  { let _pass=true,_msg='';
-    try{
-      let worst=FORMS[0],maxB=0;
-      for(const f of FORMS){ buildSlots(f,false); const ys=new Set(state.slots.map(s=>Math.round(s.y))); if(ys.size>maxB){maxB=ys.size;worst=f;} }
-      buildSlots(worst,false);
-      const pids=[]; for(let i=0;i<P.length&&pids.length<22;i++){ if(P[i]&&P[i][0]) pids.push(i); }
-      state.slots.forEach((s,i)=>{ s.pid=pids[i]; s.sub=pids[i+11]; });
-      state.bench=[]; state.captain=null; state.showSub=true; state.showMemo=true; state.hideRoles=false; state.showBench=false; state.shareFmt='sq';
-      state.memos={}; state.slots.forEach(s=>{ state.memos[pidToKey(s.pid)]='HGrown 2026-27'; });
-      window.__collectShareBoxes=true;
-      await buildShareCanvas();
-      window.__collectShareBoxes=false;
-      const cols=window.__shareCollisions();
-      if(cols.length) throw new Error(worst+'で交差'+cols.length+'件: '+cols.slice(0,3).join(' / '));
-    }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
-    ok('share_no_overlap',_pass,_msg); }
-
 
 
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
