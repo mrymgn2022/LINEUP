@@ -5114,7 +5114,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0815c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0815d'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6753,7 +6753,7 @@ async function buildShareCanvas(){
       // 写真なしは頭の形のシルエット（イニシャルは入れない）
       drawSilhouette(x,fx,fy,R);
     }
-    x.lineWidth=m(2.5);x.strokeStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(fx,fy,R,0,7);x.stroke(); // 枠取りはポジション色をやめ単色白（2026-08-15ユーザー決定・文字色のroleColは温存）
+    // 顔写真のリング描画は廃止（2026-08-15ユーザー決定=枠なし。地の円が2px大きく残るので輪郭は保たれる。文字色のroleColは温存）
     // キャプテン
     if(state.captain===s.pid){x.beginPath();x.arc(fx-R+m(7),fy-R+m(7),m(8),0,7);x.fillStyle='#ffd166';x.fill();x.fillStyle='#0a0e0c';x.font='800 '+m(9)+'px Manrope,sans-serif';x.fillText('C',fx-R+m(7),fy-R+m(10));}
     // 負傷・カード（showMarksオフなら共有画像には出さない）。カード=右上 / 負傷=右下、キャプテン(左上)と併存
@@ -6810,7 +6810,7 @@ async function buildShareCanvas(){
       const im=photoImgs[pid];
       if(im){ x.save();x.beginPath();x.arc(acx,cyc,rAv-2,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,acx-(rAv-2),cyc-(rAv-2),(rAv-2)*2,(rAv-2)*2);x.restore(); }
       else { drawSilhouette(x,acx,cyc,rAv); }
-      x.lineWidth=3;x.strokeStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(acx,cyc,rAv,0,7);x.stroke();
+      // リング廃止(枠なし 2026-08-15)
       const tx0=acx+rAv+10, maxW=colX+colW-tx0;
       x.textAlign='left';x.textBaseline='middle';
       x.fillStyle='#eafff0';x.font='800 '+(fmtC==='feed'?21:24)+'px Manrope,sans-serif';
@@ -6831,7 +6831,7 @@ async function buildShareCanvas(){
       const im=photoImgs[pid];
       if(im){ x.save();x.beginPath();x.arc(acx,cyc,r-3,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,acx-(r-3),cyc-(r-3),(r-3)*2,(r-3)*2);x.restore(); }
       else { drawSilhouette(x,acx,cyc,r); }
-      x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(acx,cyc,r,0,7);x.stroke();
+      // リング廃止(枠なし 2026-08-15)
       const tx0=acx+r+16, maxW=cellW-(tx0-cx0)-14;
       x.textAlign='left';x.textBaseline='middle';
       x.fillStyle='#eafff0';x.font='800 26px Manrope,sans-serif';
