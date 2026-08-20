@@ -2318,6 +2318,21 @@ setFormLabel();
 /* =========================================================
    Drag & tap on tokens
    ========================================================= */
+// ドロップ先スロットの判定（交代の当たり判定）。px,py は「ドラッグ中の駒の中心」の画面座標を渡す。
+// ★指の位置を渡してはいけない（2026-08-20のバグ）。掴んだ場所によって指は中心から最大40px近くずれ、
+//   視覚的に重なっていても不成立になる。半径46pxは円盤(50px)が重なって見える範囲とほぼ一致する。
+const SLOT_SNAP_PX=46;
+function dropTargetSlot(actor,px,py,rect){
+  let tj=-1,best=SLOT_SNAP_PX;
+  for(let j=0;j<state.slots.length;j++){
+    if(j===actor)continue;
+    const cx=rect.left+state.slots[j].x/100*rect.width;
+    const cy=rect.top+(100-state.slots[j].y)/100*rect.height;
+    const d=Math.hypot(px-cx,py-cy);
+    if(d<best){best=d;tj=j;}
+  }
+  return tj;
+}
 function attachDrag(el,actor){
   let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0,_lmAtGrab=false;
   const base=()=>state.slots[actor];
@@ -2375,6 +2390,10 @@ function attachDrag(el,actor){
       const nx=clamp(ox+(e.clientX-sx)/rect.width*100,3,97);
       const ny=clamp(oy-(e.clientY-sy)/rect.height*100,3,97);
       base().x=nx;base().y=ny;el.style.left=nx+'%';el.style.top=(100-ny)+'%';layoutMoved=true;syncResetChip(); // 手動移動した→リセットチップを出す（ドラッグはrenderを通らないためここでも同期）
+      // 交代先を光らせる（2026-08-20追加）。どこまで寄せれば入れ替わるかが分からず、
+      // 交代させたつもりが真横に置かれる誤操作が起きていた。判定と同じ関数で光らせる＝見た目と結果が必ず一致する。
+      const _pr=pitch.getBoundingClientRect();
+      highlightSlot(dropTargetSlot(actor,_pr.left+nx/100*_pr.width,_pr.top+(100-ny)/100*_pr.height,_pr));
     }
   });
   el.addEventListener('pointerup',e=>{
@@ -2383,7 +2402,7 @@ function attachDrag(el,actor){
     disarm(); stopScroll();
     if(sx===undefined)return;
     const wasArmed=armed, wasMoved=moved, hadGhost=!!ghost; sx=undefined; armed=false;
-    el.classList.remove('drag'); clearGhost();
+    el.classList.remove('drag'); clearGhost(); highlightSlot(-1);   // 交代先ハイライトを必ず消す
     try{el.releasePointerCapture(pid);}catch(_){}
     if(!wasMoved){ onSlotTap(actor); return; }   // タップ（長押しのみ含む）→ メニュー
     if(!wasArmed) return;                         // 長押し前に動いた＝スクロール、何もしない
@@ -2416,14 +2435,14 @@ function attachDrag(el,actor){
       return;
     }
     rect=pitch.getBoundingClientRect();   // 自動スクロール後のズレを補正
-    let tj=-1,best=46;
-    for(let j=0;j<state.slots.length;j++){
-      if(j===actor)continue;
-      const cx=rect.left+state.slots[j].x/100*rect.width;
-      const cy=rect.top+(100-state.slots[j].y)/100*rect.height;
-      const d=Math.hypot(e.clientX-cx,e.clientY-cy);
-      if(d<best){best=d;tj=j;}
-    }
+    // ★2026-08-20 修正（ユーザー報告・スマホで頻発）: 交代の当たり判定を「指の位置」から「ドラッグ中の駒の中心」へ。
+    //   駒(.tok)は80x78で、座標アンカーは駒の中心＝円盤の中心より14px下。指は掴んだ場所によって
+    //   中心から最大40px近くずれるため、円盤が相手に重なって見えていても「指→相手の中心」が46pxを超え、
+    //   交代が成立せずに駒が相手の真横へ置き去りになっていた（実測: 駒間30pxでも指は58pxで不成立）。
+    //   ゴースト中（ピッチ外へ運ぶ操作）は駒の座標を更新していないため、従来どおり指の位置で判定する。
+    const _hx = hadGhost ? e.clientX : rect.left+state.slots[actor].x/100*rect.width;
+    const _hy = hadGhost ? e.clientY : rect.top+(100-state.slots[actor].y)/100*rect.height;
+    const tj=dropTargetSlot(actor,_hx,_hy,rect);
     if(tj>=0){
       const _swp=state.slots[actor].pid;state.slots[actor].pid=state.slots[tj].pid;state.slots[tj].pid=_swp; // 変数名tは翻訳関数t()を同一ブロックで隠す（2026-08-01修正: 直後のtoast(t(...))が "t is not a function" で落ちていた）
       state.slots[actor].x=ox;state.slots[actor].y=oy;
@@ -2444,7 +2463,7 @@ function attachDrag(el,actor){
       syncResetChip();
     }
   });
-  el.addEventListener('pointercancel',()=>{ disarm(); stopScroll(); clearGhost(); el.classList.remove('drag'); sx=undefined; armed=false; });
+  el.addEventListener('pointercancel',()=>{ disarm(); stopScroll(); clearGhost(); highlightSlot(-1); el.classList.remove('drag'); sx=undefined; armed=false; });
 }
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 
@@ -5119,7 +5138,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0820a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0820b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8631,6 +8650,38 @@ window.__selftest=function(){
       if(gate({v:2,slots:raw.slots})) throw new Error('v<3を受け入れてしまう（ゲートが緩い）');
     }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
     ok('share_payload_accepted',_pass,_msg); }
+
+  // T87 drag_swap_hittest: スタメン同士のドラッグ交代が「駒の中心」で判定されること
+  // 2026-08-20 実バグ: 判定が指の位置だったため、円盤が相手に重なって見えていても交代が成立せず、
+  // 駒が相手の真横に置き去りになっていた（スマホで頻発・ユーザー報告）。実測で駒間30px/指58pxで不成立を再現。
+  { let _pass=true,_msg='';
+    try{
+      const rect={left:0,top:0,width:400,height:600};
+      const _bk=state.slots.map(s=>({x:s.x,y:s.y}));
+      try{
+        // 検査対象の2駒だけを横に並べ（間隔0.2*400=80px＝実機のスロット間隔に近い）、
+        // 他の駒は判定に混ざらないよう遠くへ退避する（退避しないと近傍の別スロットを拾ってしまう）
+        state.slots.forEach(s=>{ s.x=5; s.y=5; });
+        state.slots[0].x=40; state.slots[0].y=50;
+        state.slots[1].x=60; state.slots[1].y=50;
+        const cen=(i)=>({x:rect.left+state.slots[i].x/100*rect.width, y:rect.top+(100-state.slots[i].y)/100*rect.height});
+        const c0=cen(0), c1=cen(1);
+        // (a) 駒の中心をぴったり重ねた → 相手スロットを返す
+        if(dropTargetSlot(0,c1.x,c1.y,rect)!==1) throw new Error('中心一致で相手を検出できない');
+        // (b) 円盤が重なる程度(30px)まで寄せた → 交代が成立する（これが今回直したケース）
+        if(dropTargetSlot(0,c1.x-30,c1.y,rect)!==1) throw new Error('30pxの重なりで交代が成立しない');
+        // (c) 指のズレ相当(58px)は、駒の中心として渡せば不成立でよい＝閾値そのものは緩めていない
+        if(dropTargetSlot(0,c1.x-58,c1.y,rect)!==-1) throw new Error('58px離れでも成立してしまう＝閾値が緩すぎる');
+        // (d) 自分自身は対象外
+        if(dropTargetSlot(0,c0.x,c0.y,rect)!==-1) throw new Error('自スロットを検出してしまう');
+        // (e) 呼び出し側が「指」ではなく「駒の中心」を渡していること（回帰の本丸）
+        const src=String(attachDrag);
+        if(!/dropTargetSlot\(actor,_hx,_hy,rect\)/.test(src)) throw new Error('pointerupがdropTargetSlotを使っていない');
+        if(!/_hx\s*=\s*hadGhost\s*\?\s*e\.clientX\s*:\s*rect\.left\+state\.slots\[actor\]\.x/.test(src)) throw new Error('駒の中心を渡していない（指の位置に戻っている）');
+        if(/Math\.hypot\(e\.clientX-cx/.test(src)) throw new Error('旧実装（指で判定）が残っている');
+      } finally { state.slots.forEach((s,i)=>{ if(_bk[i]){ s.x=_bk[i].x; s.y=_bk[i].y; } }); }
+    }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+    ok('drag_swap_hittest',_pass,_msg); }
 
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
