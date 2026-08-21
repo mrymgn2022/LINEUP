@@ -5138,7 +5138,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0821b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0821c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6913,9 +6913,6 @@ function openShareFallback(imgUrl,shareText,file){
         <button class="snsbtn x" id="shX"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.2 2H21l-6.4 7.3L22 22h-6.3l-4.9-6.4L4.9 22H2l6.8-7.8L2 2h6.4l4.5 5.9L18.2 2Zm-1.1 18h1.7L7 3.8H5.2L17.1 20Z"/></svg>${t('shareOnX')}</button>
         <button class="snsbtn ig" id="shIG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>Instagram</button>
       </div>
-      <button class="bigbtn" id="shDl">${t('saveImage')}</button>
-      <button class="bigbtn ghost" id="shLink">${t('shareLinkBtn')}</button>
-
       <button class="bigbtn ghost" id="shCustom" style="font-family:'Manrope',system-ui,sans-serif;font-size:13.5px;letter-spacing:0;padding:11px">${t('shCustomize')} ▾</button>
       <div id="shCustomBody" style="display:none;padding-top:8px">
       <div class="dispgroup" id="shToggles" style="justify-content:center;margin:0 0 10px">
@@ -6934,6 +6931,8 @@ function openShareFallback(imgUrl,shareText,file){
       </div>
       <div class="formfield" style="margin:0 16px 8px"><input class="search" id="shName" maxlength="24" placeholder="${escAttr(t('teamName'))}" value="${escAttr(teamDisplayName()||'')}" autocomplete="off"></div>
       </div>
+      <button class="bigbtn" id="shDl">${t('saveImage')}</button>
+      <button class="bigbtn ghost" id="shLink">${t('shareLinkBtn')}</button>
     </div>`);
   // 盤面右上と同じ表示トグル。押すと盤面ボタンと同じ処理を実行→プレビューを再生成
   const syncTg=()=>{ const m={btnLabels:!state.hideRoles,btnSubs:state.showSub,btnMemo:state.showMemo,btnFlags:state.showFlags,bench:state.showBench!==false}; document.querySelectorAll('#shToggles [data-tg]').forEach(b=>b.classList.toggle('on',!!m[b.dataset.tg])); };
