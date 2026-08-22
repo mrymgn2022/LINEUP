@@ -1307,7 +1307,7 @@ let _lastNoResQ='';
 // 検索して0件だった語句をワーカーへ送る（2026-08-06）。「何を探して見つからなかったか」＝追加すべき選手/チームの直接シグナル。
 // 送るのはこのイベントの時だけ（recordEventの第3引数）。ワーカー側も search_noresult 以外のqは捨てる。
 function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult',false,q.slice(0,40)); }
-function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } }
+function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ recordEvent('lang_switch',true); }catch(e){} try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } } // lang_switch=利用者の明示切替のみ(自動判定はここを通らない)。LANG更新後に送るので lang 欄=切替先(2026-08-22)
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
 // トースト用：選手名・ポジション等を差し込む言語別フレーズ
@@ -1428,12 +1428,19 @@ function _checkXIComplete(){
 // 本当の「ホーム画面追加」の瞬間（2026-08-14追加。従来のpwaは"standalone起動"の検知であって追加の瞬間ではない＝日次レポートの誤解の原因だった）
 // Android Chrome系のみ発火。iOSは追加イベントが存在しないため検知不能（standalone初観測で代替視する）。
 try{ window.addEventListener("appinstalled",function(){ try{ recordEvent("pwa_install",true); }catch(e){} }); }catch(e){}
+//  os_*   … 端末OS(2026-08-22追加)。iOS申請の判断材料(モバイルの何割がiPhoneか)。UA文字列は送らず3分類だけ。
+//           iPadOS13+はUAがMac名乗りのため isIOSDevice と同じ「Mac+タッチ」判定を併用。
+function _osSlug(ua,touch){ try{ ua=String(ua||''); if(/iP(hone|od|ad)/.test(ua)||(/Macintosh|Mac OS X/.test(ua)&&touch)) return 'os_ios'; if(/Android/i.test(ua)) return 'os_android'; }catch(e){} return 'os_other'; }
+//  fm_*   … フォーメーション変更(2026-08-22追加)。worker検証が英小文字と_のみ(数字不可)のため '4-2-3-1'→'fm_ecdb' と
+//           数字をa-jへ符号化(0→a … 9→j。jse_ln_と同じ規則)。レポート生成器 FmDecode が復号する。数字が無ければ空文字=送らない。
+function _fmSlug(f){ try{ var d=String(f||'').replace(/[^0-9]/g,''); if(!d) return ''; return ('fm_'+d.replace(/[0-9]/g,function(c){ return 'abcdefghij'[+c]; })).slice(0,32); }catch(e){ return ''; } }
 function recordDeviceTraits(){
   try{
     const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
     if(standalone) recordEvent('pwa',true);
     const mob=(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches)||window.innerWidth<768;
     recordEvent(mob?'mobile':'desktop',true);
+    recordEvent(_osSlug(navigator.userAgent,('ontouchend' in document)),true);
   }catch(e){}
 }
 // JSエラーの検知（1セッション1回）。今まで完全に無かったため、特定ブラウザだけでアプリが壊れていても
@@ -2304,7 +2311,7 @@ function openFormationPicker(){
   body.querySelector('.fgrid').onclick=e=>{
     const c=e.target.closest('[data-f]'); if(!c)return;
     const f=c.dataset.f;
-    if(f!==state.formation){ buildSlots(f,true); setFormLabel(); render(); save(); closeSheet(); toast(tFormChanged(f)); return; }
+    if(f!==state.formation){ recordEvent(_fmSlug(f),true); buildSlots(f,true); setFormLabel(); render(); save(); closeSheet(); toast(tFormChanged(f)); return; } // fm_*=どのフォーメーションが選ばれるかの計測(2026-08-22・1セッションにつき各1回)
     // 同じフォーメーションの再選択＝配置を既定に整える（手動移動のリセット動線。ボタンの無いスマホでも使える）
     closeSheet();
     if(layoutMoved){ const ff=FORM[state.formation]; state.slots.forEach((s,i)=>{s.role=ff[i][0];s.x=ff[i][1];s.y=ff[i][2];}); spreadRowsEven(); layoutMoved=false; render(); save(); toast(t('tstResetLayout')); }
@@ -2676,6 +2683,7 @@ function savePhotoCrop(img,sx,sy,cropSize){
   try{ ctx.drawImage(img,sx,sy,src,src,0,0,S,S); uri=c.toDataURL('image/jpeg',0.82); }catch(e){ uri=null; }
   if(!uri||uri.length<64){ closeSheet(); toast(t('tstPhotoFail')); return; }
   state.photos[photoTarget]=uri;
+  recordEvent('photo_add',true); // 機能利用の計測(2026-08-22)。画像も選手名も送らない・1セッション1回
   photoTarget=null;
   closeSheet();render();
   // ユーザー視点モードは出荷FACE固定＝盤面に出ないので、成功と誤解させずに理由を伝える
@@ -4566,6 +4574,7 @@ function openCreatePlayer(slotIdx){
     const htV=parseInt(document.getElementById('cpHt').value,10);
     const c={ name, pos:selPos, nat, age:(ageV>0?ageV:0), club:document.getElementById('cpClub').value.trim(), league:'', height:(htV>0?htV:0), foot:selFoot };
     const pid=addCustomPlayer(c);
+    recordEvent('custom_add',true); // 機能利用の計測(2026-08-22)。入力内容は送らない・1セッション1回
     // 退避した文脈で判定（openSheetがグローバルを消すため。優先順は従来と同じ: onPick→スロット→ベンチ）
     if(_ctxOnPick){ _ctxOnPick(pid); }
     else if(slotIdx>=0){ assign(slotIdx,pid); }
@@ -5138,7 +5147,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0821c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0822a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8681,6 +8690,37 @@ window.__selftest=function(){
       } finally { state.slots.forEach((s,i)=>{ if(_bk[i]){ s.x=_bk[i].x; s.y=_bk[i].y; } }); }
     }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
     ok('drag_swap_hittest',_pass,_msg); }
+
+  // T88 beacons_v2: 2026-08-22追加の計測(OS / フォーメーション / 写真追加 / カスタム選手 / 言語切替)が壊れていないこと
+  // (a)(b)は純関数の出力を固定値で検査、(c)は発火箇所がソースに残っているか(削除・リネームの回帰検知)。
+  // 実送信は localhost/管理者では _popBlocked で止まるため、ここでは送らない(本番では zz_ 端末で /raw 読み返し検証)。
+  { let _pass=true,_msg='';
+    try{
+      // (a) OS判定: UAは送らず3分類だけ。iPadOS13+は「Mac名乗り+タッチ」でiOS
+      if(_osSlug('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15',true)!=='os_ios') throw new Error('iPhoneがos_iosにならない');
+      if(_osSlug('Mozilla/5.0 (iPad; CPU OS 12_0 like Mac OS X) AppleWebKit/605.1.15',true)!=='os_ios') throw new Error('iPad(旧UA)がos_iosにならない');
+      if(_osSlug('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',true)!=='os_ios') throw new Error('iPadOS(Mac名乗り+タッチ)がos_iosにならない');
+      if(_osSlug('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',false)!=='os_other') throw new Error('Mac(非タッチ)がos_otherにならない');
+      if(_osSlug('Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120',true)!=='os_android') throw new Error('Androidがos_androidにならない');
+      if(_osSlug('Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120',false)!=='os_other') throw new Error('Windowsがos_otherにならない');
+      if(_osSlug(undefined,false)!=='os_other') throw new Error('UA不明がos_otherにならない');
+      // (b) フォーメーション符号化: 全FORMSがworker検証(^[a-z_]{1,32}$)を通り、互いに衝突せず、復号可能(a-jのみ)
+      const _seen={};
+      FORMS.forEach(function(f){ const s=_fmSlug(f); if(!/^fm_[a-j]{2,8}$/.test(s)) throw new Error('符号化が不正: '+f+'→'+s); if(_seen[s]) throw new Error('符号の衝突: '+f+' と '+_seen[s]); _seen[s]=f; });
+      if(_fmSlug('4-2-3-1')!=='fm_ecdb') throw new Error('4-2-3-1 が fm_ecdb にならない(0→a…9→j)');
+      if(_fmSlug('4-1-2-1-2')!=='fm_ebcbc') throw new Error('4-1-2-1-2 が fm_ebcbc にならない');
+      if(_fmSlug('3-5-2')!=='fm_dfc') throw new Error('3-5-2 が fm_dfc にならない');
+      if(_fmSlug('')!=='' || _fmSlug(null)!=='' || _fmSlug('abc')!=='') throw new Error('数字の無い入力が空文字(=送らない)にならない');
+      // (c) 発火箇所がソースに残っていること
+      if(!/recordEvent\(_osSlug\(navigator\.userAgent/.test(String(recordDeviceTraits))) throw new Error('OS計測が recordDeviceTraits から消えた');
+      if(!/recordEvent\('lang_switch',true\)/.test(String(setLang))) throw new Error('lang_switch が setLang から消えた');
+      if(!/recordEvent\('photo_add',true\)/.test(String(savePhotoCrop))) throw new Error('photo_add が savePhotoCrop から消えた');
+      if(!/recordEvent\('custom_add',true\)/.test(String(openCreatePlayer))) throw new Error('custom_add が openCreatePlayer から消えた');
+      if(!/recordEvent\(_fmSlug\(f\),true\)/.test(String(openFormationPicker))) throw new Error('fm_ 計測が openFormationPicker から消えた');
+      // (d) 既存イベント名と衝突しない(once ガードは名前単位)
+      ['os_ios','os_android','os_other','lang_switch','photo_add','custom_add'].forEach(function(n){ if(!/^[a-z_]{1,32}$/.test(n)) throw new Error('worker検証に通らない名前: '+n); });
+    }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+    ok('beacons_v2',_pass,_msg); }
 
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
