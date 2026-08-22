@@ -3759,7 +3759,7 @@ function playerMatches(p){
   else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
   if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
   if(pickFilter.nat&&pickFilter.nat!=='ALL'&&natCode(p)!==pickFilter.nat)return false;
-  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)||tokPrefixHit(p[0],pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)||tokPrefixHit(p[0],pickFilter.q,p)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
   return true;
 }
 // ── 検索0件の救済「もしかして」（2026-08-07・本番データ由来）──
@@ -3783,13 +3783,22 @@ function playerMatches(p){
 //   (4) 全トークンが一致（部分的な一致では出さない）
 // ★既存の検索結果は1件も変わらない（0件のときにしか通らないため退行リスクなし）。
 let _tokPrefix=false; // 救済中だけ true。通常検索では常に false＝挙動不変
-function tokPrefixHit(name,q){
+// ── 韓国人選手のローマ字表記ゆれ（2026-08-23・本番データ由来）──
+// 8/22に "oh hyun" が9回0件だった。探していたのは Hyeon-gyu Oh（ベシクタシュ）。韓国語のローマ字は
+// Hyun/Hyeon・Sung/Seong・Jung/Jeong・Woo/U・Kyu/Gyu のように綴りが割れ、前方一致(tokPrefixHit)も効かない。
+// → 救済モードのとき、KOR選手に限って両側の音節綴りを同じ形に畳んでから前方一致する。
+//   順序固定: 語頭の有声→無声(g→k,b→p,d→t,j→ch)、sh→s、oi/oe→we、母音 eo/eu/oo/ou→u、ee→i、ae→e、語頭 wu→u。
+//   KOR以外の選手には一切掛けない＝既存の検索結果は1件も変わらない（0件時・KOR限定の二重ガード）。
+function korCanon(t){ return String(t).replace(/^g/,'k').replace(/^b/,'p').replace(/^d/,'t').replace(/^j/,'ch').replace(/sh/g,'s').replace(/o[ie]/g,'we').replace(/eo|eu|oo|ou/g,'u').replace(/ee/g,'i').replace(/ae/g,'e').replace(/^wu/,'u'); }
+function tokPrefixHit(name,q,p){
   if(!_tokPrefix||!q) return false;
   const qt=String(q).trim().split(/\s+/).filter(Boolean);
   if(qt.length<2) return false;                 // (2)
   if(qt.some(t=>t.length<2)) return false;      // (3)
   const nt=deaccLower(name).split(/[\s.'\-]+/).filter(Boolean);
-  return qt.every(t=>nt.some(n=>n.startsWith(t))); // (4)
+  if(qt.every(t=>nt.some(n=>n.startsWith(t)))) return true; // (4)
+  if(p&&natCode(p)==='KOR'){ const nk=nt.map(korCanon), qk=qt.map(korCanon); return qk.every(t=>nk.some(n=>n.startsWith(t))); } // 韓国人のみ表記ゆれを畳んで再判定
+  return false;
 }
 const RESCUE_MAX_TRIM=2, RESCUE_MIN_LEN=3;
 let _rescuedFrom=null,_rescuedTo=null,_rescueKind=''; // 直近の描画で救済したか（null=していない）。注記の表示にだけ使う
@@ -4086,7 +4095,10 @@ function retranslateAutoNames(next){
 // 検索クエリ/対象の正規化：小文字化＋ひらがな→カタカナ（「ぶらじる」でも「ブラジル」にヒット）
 function natNorm(s){ return (s||'').toLowerCase().replace(/[ぁ-ゖ]/g,ch=>String.fromCharCode(ch.charCodeAt(0)+0x60)); }
 // 発音記号を畳む（João→joao, São→sao, Atlético→atletico 等）。検索をローマ字でもヒットさせる。
-function deaccent(s){ return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'')
+// ★2026-08-23 NFKCを先に通す: 全角英数字(ｋ/ｍ/ｖ)・全角スペース・半角カナ(ﾑﾊﾞｯﾍﾟ)を半角英数/全角カナへ正規化。
+//   8/22の検索0件99回のうち大半が日本語IMEの全角モードで打った1〜2文字(「ｋ」「けｎ」)＝製品側の穴だった。
+//   名前側にも同じ関数が掛かるがASCII/ラテン名にNFKCは無変化＝既存の一致は不変（T89で固定）。
+function deaccent(s){ return (s||'').normalize('NFKC').normalize('NFD').replace(/[̀-ͯ]/g,'')
   .replace(/ø/g,'o').replace(/Ø/g,'O').replace(/ł/g,'l').replace(/Ł/g,'L').replace(/đ/g,'d').replace(/Đ/g,'D')
   .replace(/ı/g,'i').replace(/İ/g,'I').replace(/ß/g,'ss').replace(/æ/g,'ae').replace(/Æ/g,'AE').replace(/œ/g,'oe').replace(/Œ/g,'OE')
   .replace(/ð/g,'d').replace(/Ð/g,'D').replace(/þ/g,'th').replace(/Þ/g,'Th').normalize('NFC'); } // NFCで再合成（NFD分解された濁点カナを戻す。ガンバ/レッズ等の検索不一致バグ修正）
@@ -4773,7 +4785,7 @@ function drawMkt(){
     if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
     if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
     if(f.nat&&f.nat!=='ALL'&&natCode(p)!==f.nat)return false;
-    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)||tokPrefixHit(p[0],f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)||tokPrefixHit(p[0],f.q,p)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
     return true;
   });
   _rescuedFrom=_rescuedTo=null; // 前回の救済の注記を持ち越さない
@@ -5147,7 +5159,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0823a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0823b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -8721,6 +8733,47 @@ window.__selftest=function(){
       ['os_ios','os_android','os_other','lang_switch','photo_add','custom_add'].forEach(function(n){ if(!/^[a-z_]{1,32}$/.test(n)) throw new Error('worker検証に通らない名前: '+n); });
     }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
     ok('beacons_v2',_pass,_msg); }
+
+  // T89 search_nfkc_korean: 8/22の検索0件99回から直した2点を固定する（2026-08-23）
+  //  (a) 全角英数/全角スペース/半角カナがNFKCで畳まれる（「ｋ」→k、ﾑﾊﾞｯﾍﾟ→ムバッペ）。ラテン名は無変化
+  //  (b) 救済モードでKOR選手だけ表記ゆれを畳む（"oh hyun"→Hyeon-gyu Oh）。KOR以外・通常検索・フラグ復帰は不変
+  { let _pass=true,_msg='';
+    try{
+      if(deaccent('ｋ')!=='k') throw new Error('全角ｋがkにならない');
+      if(deaccent('ｍｂａｐｐé').toLowerCase()!=='mbappe') throw new Error('全角英字+アクセントが畳めない: '+deaccent('ｍｂａｐｐé'));
+      if(deaccent('ｏｈ　ｈｙｕｎ')!=='oh hyun') throw new Error('全角スペースが半角にならない');
+      if(deaccent('ﾑﾊﾞｯﾍﾟ')!=='ムバッペ') throw new Error('半角カナが全角カナにならない: '+deaccent('ﾑﾊﾞｯﾍﾟ'));
+      if(deaccent('João Cancelo')!=='Joao Cancelo'||deaccent('Kylian Mbappé')!=='Kylian Mbappe') throw new Error('ラテン名の畳み込みが変わった');
+      if(deaccent('ガンバ大阪')!=='ガンバ大阪') throw new Error('濁点カナが壊れた: '+deaccent('ガンバ大阪'));
+      if(!(deaccLower('ｍｂａｐｐｅ')==='mbappe')) throw new Error('deaccLowerがNFKCを通っていない');
+      // korCanon の単体
+      const kc=[['hyeon','hyun'],['seong','sung'],['jeong','chung'],['jung','chung'],['woo','u'],['gyu','kyu'],['kyu','kyu'],['yeong','yung'],['young','yung'],['lee','li'],['tae','te']];
+      kc.forEach(function(x){ if(korCanon(x[0])!==x[1]) throw new Error('korCanon('+x[0]+')='+korCanon(x[0])+' 期待'+x[1]); });
+      if(korCanon('choi')!==korCanon('choe')) throw new Error('Choi/Choe が一致しない');
+      const oi=P.findIndex((p,i)=>!isCustomPid(i)&&keyForPlayer(p)==='Hyeon-gyu Oh|KOR');
+      if(oi<0) throw new Error('検証前提: Hyeon-gyu Oh がDBに居ない');
+      const op=P[oi], onm=op[0];
+      const bi=P.findIndex((p,i)=>!isCustomPid(i)&&keyForPlayer(p)==='Maximilian Beier|GER');
+      if(bi<0) throw new Error('検証前提: Maximilian Beier がDBに居ない');
+      // 通常検索(フラグoff)では当たらない＝挙動不変
+      if(tokPrefixHit(onm,'oh hyun',op)) throw new Error('救済モードでないのに当たる');
+      _tokPrefix=true;
+      try{
+        if(!tokPrefixHit(onm,'oh hyun',op)) throw new Error('oh hyun が Hyeon-gyu Oh に当たらない');
+        if(!tokPrefixHit(onm,'hyun gyu oh',op)) throw new Error('hyun gyu oh が当たらない');
+        if(!tokPrefixHit(onm,'oh hyeon',op)) throw new Error('従来の前方一致が壊れた');
+        if(tokPrefixHit(onm,'oh hyun')) throw new Error('p無し(従来呼び出し)で表記ゆれが効いている');
+        if(tokPrefixHit(onm,'oh',op)) throw new Error('1トークンで発動している');
+        if(tokPrefixHit(onm,'oh zzzz',op)) throw new Error('一部不一致で発動している');
+        // KOR以外には掛けない: ドイツ人に韓国式の畳み込みで当てに行かない
+        if(tokPrefixHit(P[bi][0],'maximilian beier',P[bi])!==true) throw new Error('従来の短縮名救済が壊れた');
+        if(tokPrefixHit('Jeong Smith','jung smith',P[bi])) throw new Error('KOR以外に表記ゆれ畳みが掛かっている');
+      } finally { _tokPrefix=false; }
+      if(tokPrefixHit(onm,'oh hyun',op)) throw new Error('救済後にフラグが戻っていない');
+      // 呼び出し側が p を渡していること（渡し忘れると表記ゆれ救済が無効化される）
+      if(!/tokPrefixHit\(p\[0\],pickFilter\.q,p\)/.test(String(playerMatches))) throw new Error('playerMatches が p を渡していない');
+    }catch(e){ _pass=false; _msg=String(e&&e.message||e); }
+    ok('search_nfkc_korean',_pass,_msg); }
 
   }catch(e){ R.push({name:'EXCEPTION',ok:false,msg:String(e&&e.stack||e)}); }
   finally{
