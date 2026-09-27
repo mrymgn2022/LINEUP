@@ -1335,7 +1335,7 @@ let _lastNoResQ='';
 // 検索して0件だった語句をワーカーへ送る（2026-08-06）。「何を探して見つからなかったか」＝追加すべき選手/チームの直接シグナル。
 // 送るのはこのイベントの時だけ（recordEventの第3引数）。ワーカー側も search_noresult 以外のqは捨てる。
 function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult',false,q.slice(0,40)); }
-function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ recordEvent('lang_switch',true); }catch(e){} try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ openDrawer(); }catch(e){} } } // lang_switch=利用者の明示切替のみ(自動判定はここを通らない)。LANG更新後に送るので lang 欄=切替先(2026-08-22)
+function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ recordEvent('lang_switch',true); }catch(e){} try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ const db=document.getElementById('demoBar'); if(db&&db.dataset.code) _showDemoBarNow(db.dataset.code); }catch(e){} try{ openDrawer(); }catch(e){} } } // lang_switch=利用者の明示切替のみ(自動判定はここを通らない)。LANG更新後に送るので lang 欄=切替先(2026-08-22)
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
 // トースト用：選手名・ポジション等を差し込む言語別フレーズ
@@ -1615,7 +1615,7 @@ function _showDemoBarNow(code){
   try{
     if(!state.demo) return; // 待っている間にユーザーが操作してデモ解除済みなら出さない
     const old=document.getElementById('demoBar'); if(old) old.remove();
-    const b=document.createElement('div'); b.id='demoBar';
+    const b=document.createElement('div'); b.id='demoBar'; b.dataset.code=code;
     // 位置は topbar(フォーメーション行)の直下を実測（2026-08-04監査: ヘッダー2段化で固定top:58pxが操作列を覆っていた）
     let top=58; try{ const tb=document.querySelector('.topbar'); if(tb){ const r=tb.getBoundingClientRect(); if(r.bottom>0) top=Math.round(r.bottom)+6; } }catch(e){}
     b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:'+top+'px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
@@ -5210,7 +5210,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0927i'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0928a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -6030,6 +6030,9 @@ function autoFillFrom(ids){
 // クラブ名の短縮（代表編成時の「メモ＝所属クラブ」表示でのみ使用。実データ P[][4] や検索・国旗には不使用）。
 // まず慣用短縮表、無ければ接頭/接尾のクラブ種別語(FC/AC/SL/CP…)だけ機械的に除去。
 const CLUB_SHORT={
+  // 2026-09-28 メモ監査で追加（冗長・紛らわしい表記の短縮。LAFCが「Los Angeles」だとギャラクシーと区別できなかった）
+  'Los Angeles FC':'LAFC','Los Angeles Galaxy':'LA Galaxy','Club Estudiantes de La Plata':'Estudiantes','AA Argentinos Juniors':'Argentinos Jrs',
+  'Deportivo Guadalajara':'Chivas','Excelsior Rotterdam':'Excelsior','Vancouver Whitecaps FC':'Vancouver','Sheffield Wednesday':'Sheffield Wed',
   // ドイツ（都市名・愛称へ）
   'Bayern München':'Bayern','FC Bayern München':'Bayern','Borussia Dortmund':'Dortmund',
   'Bayer 04 Leverkusen':'Leverkusen','Bayer Leverkusen':'Leverkusen','Eintracht Frankfurt':'Frankfurt',
@@ -6119,12 +6122,25 @@ const JCITY_EN={
   'Vanraure Hachinohe':'Hachinohe','Vegalta Sendai':'Sendai','Ventforet Kofu':'Kofu','Vissel Kobe':'Kobe',
   'Zweigen Kanazawa':'Kanazawa'
 };
-function shortClub(name){ const n=(name||'').trim(); if(!n) return n;
+function shortClub(name){ const n=(name||'').trim(); if(!n) return n; if(n==='Without Club') return ''; // 2026-09-28: 無所属は英語のままメモに出ていた→出さない
   if(LANG==='ja'&&CLUB_JA[n]) return CLUB_JA[n];
   if(LANG==='en'&&JCITY_EN[n]) return JCITY_EN[n]; // 英語Jリーグ＝都市名（共有都市は除外＝従来通り）
   return shortClubRomaji(n); }
 // ローマ字クラブ名の短縮（言語非依存。自動クラブメモの判定比較にも使う）
 function shortClubRomaji(name){
+  const n=(name||'').trim(); if(!n) return n;
+  if(CLUB_SHORT[n]) return CLUB_SHORT[n];
+  let s=n;
+  s=s.replace(/^(1\.\s?FC|1\.\s?FSV|FC|AFC|AC|AS|SSC|SS|SL|SC|SV|SG|SpVgg|SSV|FSV|TSV|VfB|VfL|TSG|BSC|RB|RC|RCD|CD|CA|CF|UD|SD|US|UC|OGC|LOSC|KAA|KRC|GNK|HNK|NK|FK|AA|SK|CS)\s+/,''); // 接頭の種別語
+  s=s.replace(/^\d{2,4}\s+/,'');                                                                  // 接頭の番号（"07 Elversberg" 等）
+  s=s.replace(/\s+\d{2,4}$/,'');                                                                  // 末尾の創設年（98 / 1912 等）
+  s=s.replace(/\s*\([^)]*\)$/,'');                                                            // 末尾の括弧注記（"(UAE)" "(Junin)" 等・2026-09-28）
+  s=s.replace(/\s+(Calcio|Balompié|Football Club|Foot|FC|CF|CP|SC|AC|SAD|SK|JK|KV|VV|HSC|FK)$/,''); // 接尾の種別語
+  s=s.trim();
+  return s.length>=3 ? s : n; // 削り過ぎは元に戻す
+}
+// 旧版（2026-09-28以前）の短縮。保存済みスカッドの自動メモを「自動」と認識し続けるためだけに残す
+function _shortClubRomajiV1(name){
   const n=(name||'').trim(); if(!n) return n;
   if(CLUB_SHORT[n]) return CLUB_SHORT[n];
   let s=n;
@@ -6144,13 +6160,13 @@ function isAutoClubMemo(v){
   if(!_autoMemoForms){
     _autoMemoForms=new Set(); const seen=new Set();
     for(const p of P){ const c=(p&&p[4]||'').trim(); if(!c||seen.has(c))continue; seen.add(c);
-      _autoMemoForms.add(c); if(CLUB_JA[c])_autoMemoForms.add(CLUB_JA[c]); _autoMemoForms.add(shortClubRomaji(c)); _autoMemoForms.add(shortClub(c)); }
+      _autoMemoForms.add(c); if(CLUB_JA[c])_autoMemoForms.add(CLUB_JA[c]); _autoMemoForms.add(shortClubRomaji(c)); _autoMemoForms.add(_shortClubRomajiV1(c)); _autoMemoForms.add(shortClub(c)); }
   }
   return _autoMemoForms.has(v);
 }
 function fillClubMemos(){
   if(!state.memos)state.memos={};
-  const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); if(club) state.memos[pidToKey(pid)]=shortClub(club); };
+  const set=pid=>{ if(pid==null||!P[pid])return; const club=(P[pid][4]||'').trim(); const v=club?shortClub(club):''; if(v) state.memos[pidToKey(pid)]=v; };
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
@@ -6161,7 +6177,7 @@ function autoFillClubMemosForNat(){
   if(!state.flagByLeague && !jl) return;
   if(!state.memos) state.memos={};
   const set=pid=>{ if(pid==null||!P[pid])return; const k=pidToKey(pid); const club=(P[pid][4]||'').trim(); if(!club)return;
-    const cur=state.memos[k]; if(cur===undefined||isAutoClubMemo(cur)) state.memos[k]=shortClub(club); }; // 未設定 or 自動クラブメモ（移籍前の旧クラブ名も含む）のみ現在の所属・言語の表記へ。手入力メモは保持
+    const cur=state.memos[k]; if(cur===undefined||isAutoClubMemo(cur)){ const v=shortClub(club); if(v) state.memos[k]=v; else delete state.memos[k]; } }; // 未設定 or 自動クラブメモ（移籍前の旧クラブ名も含む）のみ現在の所属・言語の表記へ。手入力メモは保持
   state.slots.forEach(s=>{ set(s.pid); set(s.sub); });
   (state.bench||[]).forEach(set);
 }
