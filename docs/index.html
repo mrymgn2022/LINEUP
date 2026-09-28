@@ -1116,7 +1116,10 @@ function squadShortName(pid){
   return shortName(P[pid][0]);
 }
 // 選手メモ（安定IDキー。駒下に表示する自由テキスト）
-function memoOf(pid){ if(pid==null||!P[pid])return ''; return (state.memos&&state.memos[pidToKey(pid)])||''; }
+// 2026-09-28 ユーザー指示: 代表で自動入力された「所属クラブ名メモ」は、クラブ（アーセナル等）を見ている時は出さない。
+// 国籍/リーグ縛り（代表・J選抜）のチームでだけ意味を持つメモなので、それ以外の文脈では自動メモを伏せる（手入力メモはそのまま）。
+function natMemoContext(){ const tc=state.teamCond; return !!state.flagByLeague || !!(tc&&((tc.nat&&tc.nat!=='ALL')||tc.lg==='J1'||tc.lg==='J2'||tc.lg==='J3')); }
+function memoOf(pid){ if(pid==null||!P[pid])return ''; const m=(state.memos&&state.memos[pidToKey(pid)])||''; if(m&&!natMemoContext()&&isAutoClubMemo(m)) return ''; return m; }
 // まっさらビルド（クラブ読込も自動編成条件も無い自由編成）か。クラブ編成では所属＝自明なので出さない
 function freeBuildMode(){ return !state.loadedClub && !state.teamCond; }
 // 表示用メモ：ユーザーメモ優先。まっさらビルドではメモ未設定の選手に所属クラブ名を動的表示（state.memosには保存しない）
@@ -5210,7 +5213,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0928a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0928b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -7134,7 +7137,7 @@ function clearSquad(){
   const doClear=()=>{
     state.slots.forEach(s=>{ s.pid=null; s.sub=null; });
     state.bench=[]; if(state.reserveAdds)state.reserveAdds=[]; if(state.excluded)state.excluded=[];
-    state.captain=null; state.marks={}; state.teamId=null; layoutMoved=false;
+    state.captain=null; state.marks={}; state.teamId=null; layoutMoved=false; clearAutoClubMemos();
     state.teamCond=null; state.loadedClub=null; state.flagByLeague=false; // 検索条件（国籍/リーグ/クラブ）と国籍旗モードもリセット
     state.teamName=null; state.teamInfo=null; // 左上のチーム名タグも消す（盤面だけ消えて名前が残る不整合の解消）
     state.showMemo=true; syncMemoBtn(); // リセット後は自由編成＝所属クラブをメモ位置に自動表示
@@ -7353,6 +7356,11 @@ window.__selftest=function(){
     const argIds=state.slots.filter(s=>s.pid!=null).map(s=>s.pid);
     fillClubMemos();
     ok('nat_club_memos',argIds.every(pid=>memoOf(pid)===shortClub((P[pid][4]||'').trim())),'国籍編成のクラブメモ（短縮表示）不一致');
+    // T5b(2026-09-28): 代表で付いたクラブ名メモを残したままクラブ文脈にしても表示しない（イングランド→アーセナルでサカに「Arsenal」が出た）
+    { const _fbl=state.flagByLeague,_tc=state.teamCond,_lc=state.loadedClub; const _p=argIds[0]; const _auto=(state.memos||{})[pidToKey(_p)]||'';
+      state.flagByLeague=false; state.teamCond=null; state.loadedClub=(P[_p][4]||'').trim();
+      ok('club_ctx_hides_nat_memo',!!_auto && dispMemo(_p)==='','クラブ表示で代表時の所属クラブ名メモが出る: '+dispMemo(_p)+' (auto='+_auto+')');
+      state.flagByLeague=_fbl; state.teamCond=_tc; state.loadedClub=_lc; }
     state.flagByLeague=true;
     ok('nat_league_flag',argIds.every(pid=>{ const c=LGNAT[P[pid][5]]; return c?dispNatCode(pid)===c:dispNatCode(pid)===natCode(P[pid]); }),'リーグ国旗の解決不一致');
     computeSquadDups();
