@@ -77,19 +77,23 @@
 <ul>
   <li>A randomly generated, anonymous device identifier (a random token that cannot identify you personally)</li>
   <li>Information identifying the players included in that squad (player name and country code)</li>
-  <li>Your search term, only when a player search returns no results (so we can find out which players or teams to add; up to 40 characters. Search terms that return results are never sent)</li>
+  <li>Your search term, only when a player search returns no results, or when it returns no results and we automatically shorten it to show matches (so we can find out which players, teams or common abbreviations to add; up to 40 characters. Search terms that return results normally are never sent)</li>
 </ul>
 <p>This information contains <strong>no personally identifying information whatsoever</strong>, such as your name, email address, phone number, location, or your device&rsquo;s contacts or photos. It is used solely to compile, on an anonymous basis, which players are most often selected, in order to power rankings and improve the Service.</p>
 
 <h3>(3) Information recorded automatically when you access the Service</h3>
 <p>When the Service is displayed or communicates over the network, information such as your IP address, the date and time of access, and your environment (browser and OS type, etc.) may be recorded as standard access logs on our hosting providers&rsquo; servers. This information is used only to the extent necessary to prevent misuse and to operate the Service reliably.</p>
 
+<h3>(4) Information sent when a share link is created</h3>
+<p>When you open the screen for sharing a squad, we send the squad&rsquo;s contents to our server and store them in order to issue a short share URL. This includes the formation, the players you placed (starting XI, bench and reserves), second choices, the team name, the display names and memos you entered, players you added yourself, and display settings. Player photos are never sent.</p>
+<p>Anyone who knows the issued URL can view these contents, so please do not put personal information such as names or contact details in memos or display names. Only the part of the on-device information in Section 2(1) that is needed to issue the share link is sent.</p>
+
 <h2>3. Disclosure to third parties and use of external services</h2>
 <p>Except where required by law, we do not sell or disclose the information we collect to third parties. We use the following external services to operate the Service.</p>
 <table>
   <tr><th>Provider</th><th>Role</th><th>Information handled</th></tr>
   <tr><td>GitHub, Inc. (GitHub Pages)</td><td>Delivery and hosting of the Service (web pages)</td><td>Access logs (IP address, etc.)</td></tr>
-  <tr><td>Cloudflare, Inc. (Workers / D1)</td><td>Receiving, storing, and compiling anonymous usage statistics</td><td>Anonymous device identifier, player identifying information, access logs</td></tr>
+  <tr><td>Cloudflare, Inc. (Workers / D1)</td><td>Receiving, storing, and compiling anonymous usage statistics; issuing and storing share links</td><td>Anonymous device identifier, player identifying information, search terms (Section 2(2)), share link contents (Section 2(4)), access logs</td></tr>
   <tr><td>Cloudflare, Inc. (Web Analytics)</td><td>Anonymous, cookie-less measurement of site usage (page views, performance, etc.)</td><td>Access logs (IP address, pages viewed, browser/OS type, etc.); no cookies or cross-site identifiers are used</td></tr>
   <tr><td>Apple / Google (when distributed as an app)</td><td>Distribution through app stores</td><td>Handled in accordance with each company&rsquo;s privacy policy</td></tr>
 </table>
@@ -107,6 +111,7 @@
 <ul>
   <li>Information stored on your device (Section 2(1)): retained until you delete it within the Service, delete the app, or clear your browser&rsquo;s stored data. You can erase it yourself at any time.</li>
   <li>Anonymous usage statistics (Section 2(2)): retained as statistical data for as long as necessary for compilation and analysis.</li>
+  <li>Share link contents (Section 2(4)): retained without a fixed period so that the link keeps working. To request deletion, contact us with the shared URL.</li>
 </ul>
 
 <h2>7. Security</h2>
