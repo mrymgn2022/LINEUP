@@ -915,6 +915,8 @@ let cleanJson=null;    // 最後に保存/読込した時点のスカッドJSON�
 const GRP={GK:"gk",RB:"df",LB:"df",CB:"df",RWB:"df",LWB:"df",CDM:"mf",CM:"mf",CAM:"mf",RM:"mf",LM:"mf",DM:"mf",AM:"mf",RW:"fw",LW:"fw",ST:"fw",CF:"fw"};
 function grp(pos){return GRP[pos]||"mf"}
 
+// ドラッグ後のポジション名: 判定帯の境目をまたいだ時だけ変える（既定配置の座標は帯の中心にあるとは限らない＝同じ帯の中で動かしただけなら元のまま 2026-09-29 監査B1）
+function dragRole(role,ox,oy,x,y){ const nr=roleFromXY(x,y); return (nr!==role&&nr!==roleFromXY(ox,oy))?nr:role; }
 /* ピッチ座標(x:0-100左→右, y:0自陣→100敵陣)からポジション名を推定 */
 function roleFromXY(x,y){
   if(y<15) return 'GK';
@@ -2539,7 +2541,7 @@ function attachDrag(el,actor){
     }else{
       const s=state.slots[actor];
       if(Math.abs(s.x-ox)<4&&Math.abs(s.y-oy)<4){ render(); save(); return; } /* 微調整は位置を保つ・ポジション名だけ変えない */ // 元の位置へ戻しただけ＝ポジション名は変えない（既定レイアウトの座標はroleFromXYの境界をまたぐことがある）
-      const nr=roleFromXY(s.x,s.y);
+      const nr=dragRole(s.role,ox,oy,s.x,s.y);
       if(nr!==s.role){ s.role=nr; render(); toast(tRoleChanged(nr)); }
       save();
     }
@@ -5309,7 +5311,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929j'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929k'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7896,6 +7898,16 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e.message||e); }
       finally{ autoSig=_as; cleanJson=_cj; state.demo=_dm; state.teamId=_tid; state.captain=_cap; if(_restore) _restore(); }
       ok('auto_untouched_no_prompt',_pass,_msg); }
+    // T30e: 既定配置の駒を同じ判定帯の中で動かしてもポジション名が化けない／帯をまたげば変わる（2026-09-29 監査B1: CB→CDM・CM→CAM）
+    { let _pass=true,_msg=''; try{
+        let bad=[];
+        Object.keys(FORM).forEach(k=>{ buildSlots(k,false); state.slots.forEach(s=>{
+          [[6,0],[-6,0],[0,3],[0,-3]].forEach(d=>{ const x=Math.max(0,Math.min(100,s.x+d[0])), y=Math.max(0,Math.min(100,s.y+d[1]));
+            if(roleFromXY(x,y)===roleFromXY(s.x,s.y) && dragRole(s.role,s.x,s.y,x,y)!==s.role) bad.push(k+':'+s.role); }); }); });
+        if(bad.length) throw new Error('同じ帯の中で化けた: '+[...new Set(bad)].slice(0,6).join(','));
+        if(dragRole('CB',50,40,50,80)!=='ST') throw new Error('帯をまたいでも変わらない');
+      }catch(e){ _pass=false; _msg=String(e.message||e); }
+      ok('drag_role_zone_crossing',_pass,_msg); }
 
     // T30: CB利き足ルール（確定XIの無い自動配置で左CB=左利き優先。アーセナルの確定XIを一時的に外して検査）
     //      確定XI(CLUB_XI)はユーザーの盤面どおり＝最適化しない（2026-09-28）→ T30b
