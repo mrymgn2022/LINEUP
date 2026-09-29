@@ -1197,6 +1197,7 @@ function idbTimeout(p,ms){ return Promise.race([p,new Promise((_,rej)=>setTimeou
 function idbSet(k,v){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),15000); }
 function idbGet(k){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readonly'); const rq=tx.objectStore('kv').get(k); rq.onsuccess=()=>{ db.close(); res(rq.result); }; rq.onerror=()=>{ db.close(); rej(rq.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),4000); }
 function idbDel(k){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').delete(k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),8000); }
+let _restoring=false; // バックアップ復元中（再読込まで保存しない＝復元前の盤面で上書きしない 2026-10-01 監査D-3）
 let _orphanPhotos={}; // 今のDBで解決できない選手の写真（他スカッドのカスタム選手・退団選手など）。保存時に捨てない
 let _photosJson=null; // 最後に保存/読込した写真JSON（バックアップのls欠落時フォールバック）
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
@@ -1251,7 +1252,7 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの主力選手で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う主力選手を適性ポジションへ自動配置します。何も選ばなければ、全選手の中から主力選手で自動配置します。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', saveAndAuto:'保存して自動配置', skipAndAuto:'保存せず自動配置', clearTitle:'盤面を空にする', clearBody:'盤面の選手をすべて外します（保存済みのスカッドは消えません）。<br>※保存していない盤面は元に戻せません。', clearConfirm:'空にする', saveAndDelete:'保存してから空にする', tstCleared:'盤面を空にしました',tstShareImgFail:'画像を作れませんでした。もう一度お試しください',undo:'元に戻す',tstUndone:'元に戻しました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'ドラッグで移動、ピンチ／スライダーで拡大して、円に入る範囲を決めてください。', cropZoom:'拡大', cropSet:'この位置で設定', deletePhotoBtn:'写真を削除（標準の表示に戻す）', tstPhotoDeleted:'写真を削除しました。標準の表示に戻ります', modeToNormal:'通常モードに戻しました', modeToUser:'ユーザーモード（統計オフ・ユーザー視点）', modeToAdmin:'管理者モードにしました', adminPinTitle:'管理者PINを入力', pinNg:'PINが違います', pastePhoto:'コピーした画像を貼り付け', tstPasteNoImage:'クリップボードに画像がありません。画像を長押し→「コピー」してからもう一度', tstPasteFail:'この環境では貼り付けを使えません。「写真を追加」から選んでください', pasteBoxTitle:'画像を貼り付け', pasteBoxHelp:'下の枠を長押しして「ペースト」を選ぶと、コピーした画像を取り込めます。', pasteBoxPh:'ここを長押し →「ペースト」', tstPasteBoxNoImage:'画像が貼り付けられませんでした。先に画像を長押し→「コピー」してください',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', saveAndAuto:'保存して自動配置', skipAndAuto:'保存せず自動配置', clearTitle:'盤面を空にする', clearBody:'盤面の選手をすべて外します（保存済みのスカッドは消えません）。<br>※保存していない盤面は元に戻せません。', clearConfirm:'空にする',deleteConfirm:'削除する', saveAndDelete:'保存してから空にする', tstCleared:'盤面を空にしました',tstShareImgFail:'画像を作れませんでした。もう一度お試しください',undo:'元に戻す',tstUndone:'元に戻しました', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'ドラッグで移動、ピンチ／スライダーで拡大して、円に入る範囲を決めてください。', cropZoom:'拡大', cropSet:'この位置で設定', deletePhotoBtn:'写真を削除（標準の表示に戻す）', tstPhotoDeleted:'写真を削除しました。標準の表示に戻ります', modeToNormal:'通常モードに戻しました', modeToUser:'ユーザーモード（統計オフ・ユーザー視点）', modeToAdmin:'管理者モードにしました', adminPinTitle:'管理者PINを入力', pinNg:'PINが違います', pastePhoto:'コピーした画像を貼り付け', tstPasteNoImage:'クリップボードに画像がありません。画像を長押し→「コピー」してからもう一度', tstPasteFail:'この環境では貼り付けを使えません。「写真を追加」から選んでください', pasteBoxTitle:'画像を貼り付け', pasteBoxHelp:'下の枠を長押しして「ペースト」を選ぶと、コピーした画像を取り込めます。', pasteBoxPh:'ここを長押し →「ペースト」', tstPasteBoxNoImage:'画像が貼り付けられませんでした。先に画像を長押し→「コピー」してください',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田 太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
@@ -1333,7 +1334,7 @@ const I18N = {
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves) as-is — this takes priority over nationality and league. Otherwise the top players in that league are placed automatically.',
     clearConds:'× Clear conditions', autoBuild:'Auto-fill →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions. Pick nothing to auto-place top players from the whole database.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', saveAndAuto:'Save and auto-pick', skipAndAuto:'Auto-pick without saving', clearTitle:'Clear the board', clearBody:'This removes every player from the board (saved squads are not affected).<br>Note: an unsaved board can’t be restored.', clearConfirm:'Clear', saveAndDelete:'Save, then clear', tstCleared:'Board cleared',tstShareImgFail:'Couldn’t create the image. Please try again.',undo:'Undo',tstUndone:'Undone', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag to move, pinch or use the slider to zoom, then set the area inside the circle.', cropZoom:'Zoom', cropSet:'Use this position', deletePhotoBtn:'Remove photo (restore default)', tstPhotoDeleted:'Photo removed - restored to default', modeToNormal:'Back to normal mode', modeToUser:'User mode (stats off)', modeToAdmin:'Admin mode on', adminPinTitle:'Enter admin PIN', pinNg:'Wrong PIN', pastePhoto:'Paste a copied image', tstPasteNoImage:'No image on the clipboard. Copy an image first, then try again.', tstPasteFail:'Paste isn’t available here — use “Add photo” instead.', pasteBoxTitle:'Paste an image', pasteBoxHelp:'Long-press the box below and choose “Paste” to import the copied image.', pasteBoxPh:'Long-press here → “Paste”', tstPasteBoxNoImage:'No image was pasted. Copy an image first (long-press → Copy).',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', saveAndAuto:'Save and auto-pick', skipAndAuto:'Auto-pick without saving', clearTitle:'Clear the board', clearBody:'This removes every player from the board (saved squads are not affected).<br>Note: an unsaved board can’t be restored.', clearConfirm:'Clear',deleteConfirm:'Delete', saveAndDelete:'Save, then clear', tstCleared:'Board cleared',tstShareImgFail:'Couldn’t create the image. Please try again.',undo:'Undo',tstUndone:'Undone', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag to move, pinch or use the slider to zoom, then set the area inside the circle.', cropZoom:'Zoom', cropSet:'Use this position', deletePhotoBtn:'Remove photo (restore default)', tstPhotoDeleted:'Photo removed - restored to default', modeToNormal:'Back to normal mode', modeToUser:'User mode (stats off)', modeToAdmin:'Admin mode on', adminPinTitle:'Enter admin PIN', pinNg:'Wrong PIN', pastePhoto:'Paste a copied image', tstPasteNoImage:'No image on the clipboard. Copy an image first, then try again.', tstPasteFail:'Paste isn’t available here — use “Add photo” instead.', pasteBoxTitle:'Paste an image', pasteBoxHelp:'Long-press the box below and choose “Paste” to import the copied image.', pasteBoxPh:'Long-press here → “Paste”', tstPasteBoxNoImage:'No image was pasted. Copy an image first (long-press → Copy).',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
@@ -1699,7 +1700,7 @@ function showcaseBoot(){
   }catch(e){ try{ state.demo=false; demoApplying=false; }catch(_){} return null; }
 }
 async function save(){
-  if(demoApplying) return;                       // ショーケース適用中は永続化しない
+  if(demoApplying||_restoring) return;           // ショーケース適用中・バックアップ復元中は永続化しない
   if(state.demo){ state.demo=false; syncDemoBar(); } // 最初のユーザー操作でサンプル盤面を通常盤面として確定
   const data=serializeTeam();
   const json=JSON.stringify(data);
@@ -1727,6 +1728,7 @@ function resolveRaw(raw){
   if(raw.v>=3){
     if(Array.isArray(raw.custom)) raw.custom.forEach(injectCustomDef); // このスカッドのカスタム選手をPへ復元（キー解決の前に）
     _keyMap=null; buildKeyMap();
+    try{ for(const k in _orphanPhotos){ const i=keyToPid(k); if(i!=null){ if(!state.photos) state.photos={}; if(state.photos[i]==null) state.photos[i]=_orphanPhotos[k]; delete _orphanPhotos[k]; } } }catch(e){} // 起動時に解決できなかった写真（他スカッドの自作選手）を、解決できた時点で戻す（2026-10-01 監査C-3）
     { const _miss=(raw.slots||[]).filter(s=>s&&s.pid!=null&&keyToPid(s.pid)==null).length+(raw.bench||[]).filter(k=>k!=null&&keyToPid(k)==null).length;
       if(_miss) setTimeout(()=>{ try{ toast(LANG==='en'?(_miss+' player(s) could not be found after a data update and were left out.'):('データ更新で見つからない選手が'+_miss+'人いたため、外して表示しています')); }catch(e){} },2600); }
     raw=Object.assign({},raw,{
@@ -1885,7 +1887,7 @@ function confirmDeleteTeam(id){
     <h2>${t('deleteTeamTitle')}</h2>
     <div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${(()=>{ const _tm=getTeams().find(x=>x.id===id); return _tm&&_tm.name?'<b>'+escAttr(_tm.name)+'</b><br>':''; })()}${t('deleteTeamBody')}</div>
     <div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px">
-      <button class="bigbtn" id="dtOk">${t('clearConfirm')}</button>
+      <button class="bigbtn" id="dtOk">${t('deleteConfirm')}</button>
       <button class="bigbtn ghost" id="dtCancel">${t('cancel')}</button>
     </div>`);
   document.getElementById('dtOk').onclick=()=>{ deleteTeam(id); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstDeleted')); };
@@ -1893,7 +1895,7 @@ function confirmDeleteTeam(id){
 }
 // アプリ/画面を閉じる時に「作業中の下書き」だけ同期保存（一覧には足さない）。
 // → 再起動時は最後のスカッドが復元される。保存一覧は手動保存したものだけにしておく（散らからない）。
-function autoSaveDraft(){ try{ if(typeof state!=='undefined'&&state.slots&&!state.demo/*ショーケース（サンプル盤面）は下書き保存しない*/){ lsSet('xi_state_v2', JSON.stringify(serializeTeam())); } }catch(e){} }
+function autoSaveDraft(){ try{ if(typeof state!=='undefined'&&state.slots&&!state.demo&&!_restoring/*ショーケース（サンプル盤面）は下書き保存しない*/){ lsSet('xi_state_v2', JSON.stringify(serializeTeam())); } }catch(e){} }
 
 /* =========================================================
    Rendering
@@ -3898,7 +3900,7 @@ function wirePickClub(slotIdx){
 }
 // ---- 名前検索の追加照合（2026-09-29 監査P1）。既存の一致（部分一致・日本語名・救済）はそのままに、取りこぼしだけ拾う ----
 // 海外クラブのカタカナ（検索専用。表示名は変えない）
-const CLUB_KANA={'Real Madrid':['レアル・マドリード','レアル'],'Barcelona':['バルセロナ','バルサ'],'Atlético Madrid':['アトレティコ・マドリード','アトレティコ'],'Real Sociedad':['レアル・ソシエダ'],'Real Betis':['ベティス'],'Sevilla FC':['セビージャ','セビリア'],'Villarreal CF':['ビジャレアル'],
+const CLUB_KANA={'Real Madrid':['レアル・マドリード','レアル'],'Barcelona':['バルセロナ','バルサ'],'Atlético Madrid':['アトレティコ・マドリード','アトレティコ'],'Real Sociedad':['レアル・ソシエダ'],'Real Betis':['ベティス'],'Sevilla':['セビージャ','セビリア'],'Villarreal':['ビジャレアル'],
  'Arsenal':['アーセナル'],'Chelsea':['チェルシー'],'Liverpool':['リバプール','リヴァプール'],'Manchester City':['マンチェスター・シティ','マンシティ','マンＣ','マンc'],'Manchester United':['マンチェスター・ユナイテッド','マンユナイテッド','マンＵ','マンu'],'Tottenham':['トッテナム','スパーズ'],'Newcastle United':['ニューカッスル'],'Aston Villa':['アストン・ヴィラ','アストン・ビラ'],'Brighton':['ブライトン'],'West Ham United':['ウェストハム'],'Everton':['エバートン','エヴァートン'],
  'Bayern München':['バイエルン・ミュンヘン','バイエルン'],'Borussia Dortmund':['ボルシア・ドルトムント','ドルトムント'],'Bayer Leverkusen':['レバークーゼン','レヴァークーゼン'],'RB Leipzig':['ライプツィヒ'],'Eintracht Frankfurt':['フランクフルト'],'VfB Stuttgart':['シュツットガルト'],
  'Paris Saint-Germain':['パリ・サンジェルマン','パリサンジェルマン'],'Marseille':['マルセイユ'],'Juventus':['ユベントス','ユヴェントス','ユーベ'],'Inter':['インテル'],'AC Milan':['ミラン'],'Napoli':['ナポリ'],'AS Roma':['ローマ'],'Lazio':['ラツィオ'],'Atalanta':['アタランタ'],'Como':['コモ'],
@@ -4538,7 +4540,7 @@ function openBenchMenu(pid){
     if(a==='photo') pickPhoto(pid);
     if(a==='search') searchPlayerWeb(pid);
     if(a==='paste') pastePhoto(pid);
-    if(a==='unbench'){ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast(t('tstBenchRemoved')); }
+    if(a==='unbench'){ snapUndo(); state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); keepInReserve(pid); closeSheet();render();save();toastUndo(tToReserve(squadShortName(pid))); } // 消さずにベンチ外へ・取り消し可（2026-10-01 監査B-2）
   };
 }
 
@@ -4715,7 +4717,8 @@ function replaceBenchPlayer(oldPid,newPid){
   const idx=state.bench.indexOf(oldPid);
   if(idx>=0) state.bench[idx]=newPid; else if(!state.bench.includes(newPid)) state.bench.push(newPid);
   state.slots.forEach(s=>{ if(s.sub===oldPid)s.sub=null; }); // 外れた選手の第2候補参照を解消
-  closeSheet();render();save();toast(tSwapArrow(shortName(P[oldPid][0]),shortName(P[newPid][0])));
+  keepInReserve(oldPid); // 外れた控えはベンチ外へ（代表・自由編成・自作の選手が消えていた 2026-10-01 監査B-2）
+  closeSheet();render();save();toast(tSwapArrow(squadShortName(oldPid),squadShortName(newPid)));
 }
 function openBenchSwap(oldPid){ openOutsideSwap(t('outsideSwap'),newPid=>replaceBenchPlayer(oldPid,newPid)); }
 // ベンチ外は読込クラブの控え（自動算出）。本当の置き換え＝元の選手を除外リストへ（一覧から消す）＋選んだ選手をベンチへ
@@ -4927,7 +4930,7 @@ function openDetail(pid,slotIdx){
   if($('dRemove'))$('dRemove').onclick=()=>{snapUndo();const out=state.slots[slotIdx].pid;state.slots[slotIdx].pid=null;benchReturn(out);closeSheet();render();save();toastUndo(t('tstRemoved'));};
   if($('dAdd'))$('dAdd').onclick=()=>startMarketPlace(pid);
   if($('dBench'))$('dBench').onclick=()=>startMarketBench(pid);
-  if($('dUnbench'))$('dUnbench').onclick=()=>{ state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); closeSheet();render();save();toast(t('tstBenchRemoved')); };
+  if($('dUnbench'))$('dUnbench').onclick=()=>{ snapUndo(); state.bench=state.bench.filter(x=>x!==pid); state.slots.forEach(s=>{if(s.sub===pid)s.sub=null;}); keepInReserve(pid); closeSheet();render();save();toastUndo(tToReserve(squadShortName(pid))); }; // 消さずにベンチ外へ（監査B-2）
 }
 function addToXI(pid){
   // 同グループの空きを優先、なければ最初の空き
@@ -4964,6 +4967,7 @@ function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; 
   if(idx>=0) state.bench[idx]=pid;             // タップした控えと“同じ位置”で入れ替え（末尾に飛ばさない）
   else state.bench.push(pid);
   state.slots.forEach(s=>{ if(s.sub===targetPid)s.sub=null; });
+  keepInReserve(targetPid); // 外れた控えはベンチ外へ（監査B-2）
   render(); save(); toast(tSwapArrow(squadShortName(targetPid),squadShortName(pid))); }
 
 /* =========================================================
@@ -5385,7 +5389,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001h'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001i'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -5808,6 +5812,7 @@ function restoreFromBackupText(text){
   document.getElementById('rstOk').onclick=async()=>{ // 2026-09-29: 写真はIndexedDBへ書き戻す（旧実装は写真が localStorage に入り切らないと全部消えるのに「復元しました」と出ていた）
     const bad=keys.filter(k=>{ const v=j.data[k]; if(typeof v!=='string') return true; try{ JSON.parse(v); return false; }catch(e){ return true; } });
     if(bad.length){ toast(t('tstReadFail')); return; } // 中身が壊れていたら何も書き換えない
+    _restoring=true; // ここから再読込まで、自動保存で復元内容を上書きしない（監査D-3）
     const fails=[];
     for(const k of keys){ const v=j.data[k];
       if(k==='xi_photos_v2'){ let ok=false; try{ ok=await idbSet(k,v); }catch(e){} if(ok){ try{ localStorage.removeItem(k); }catch(e){} } else { ok=lsSet(k,v); } if(!ok) fails.push(k); }
@@ -6127,7 +6132,7 @@ function openDeleteList(opts){ opts=opts||{};
     const rows = teams.length ? teams.map(tm=>`<div class="dwteam" style="margin:4px 16px" data-del2="${tm.id}"><div class="tn">${escAttr(shortTeamName(tm.name)||t('myTeam'))}<small>${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div><div class="dwtrash">${ICN.remove}</div></div>`).join('') : '<div class="dwempty" style="padding:18px">'+t('noSavedTeams')+'</div>';
     openSheet(`<h2>${t('deleteSaved')} <span>${teams.length}/${FREE_TEAM_LIMIT}</span></h2><div style="font-size:12px;color:var(--mut);margin:0 16px 12px">${t('deleteSavedHint')}</div><div style="padding-bottom:calc(env(safe-area-inset-bottom) + 20px)">${rows}</div>`);
     document.querySelectorAll('[data-del2]').forEach(el=>el.onclick=()=>{ const id=el.dataset.del2; // 削除前に確認（drawerの削除と同じ作法。誤タップ防止）
-      openSheet(`<h2>${t('deleteTeamTitle')}</h2><div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${t('deleteTeamBody')}</div><div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px"><button class="bigbtn" id="dl2Ok">${t('clearConfirm')}</button><button class="bigbtn ghost" id="dl2Cancel">${t('cancel')}</button></div>`);
+      openSheet(`<h2>${t('deleteTeamTitle')}</h2><div style="margin:2px 16px 18px;color:var(--ink);font-size:14px;line-height:1.85">${(()=>{ const _tm=getTeams().find(x=>x.id===id); return _tm&&_tm.name?'<b>'+escAttr(_tm.name)+'</b><br>':''; })()}${t('deleteTeamBody')}</div><div style="padding:0 16px calc(env(safe-area-inset-bottom) + 22px);display:flex;flex-direction:column;gap:10px"><button class="bigbtn" id="dl2Ok">${t('deleteConfirm')}</button><button class="bigbtn ghost" id="dl2Cancel">${t('cancel')}</button></div>`);
       document.getElementById('dl2Ok').onclick=()=>{ deleteTeam(id); toast(t('tstDeleted')); if(opts.pending && getTeams().length<teamCap()){ closeSheet(); opts.pending(); } else render(); };
       document.getElementById('dl2Cancel').onclick=()=>{ render(); }; });
   };
@@ -8031,6 +8036,21 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e.message||e); }
       finally{ swapSel=_sw; try{ closeSheet(); }catch(e){} try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} }
       ok('team_search_blank_league_and_swap_lock',_pass,_msg); }
+    // T30h: ベンチから外した・交代で外れた選手はスカッドに残る（代表・自由編成で消えていた 2026-10-01 監査B-2）／カタカナ辞書のクラブ名はすべてDBに実在（監査C-4: Sevilla FC 表記で0件）
+    { let _pass=true,_msg=''; const _snap=JSON.stringify(serializeTeam()), _u0=_undo;
+      try{
+        autoFillNationality('JPN','4-2-3-1','日本');
+        const b=state.bench[0]; if(b==null) throw new Error('検証前提: ベンチが空');
+        state.bench=state.bench.filter(x=>x!==b); keepInReserve(b);
+        if(!reserveIds().includes(b)) throw new Error('ベンチから外した選手がベンチ外に居ない');
+        const old=state.bench[0], outsider=P.findIndex((p,i)=>!isCustomPid(i)&&natCode(p)!=='JPN'&&!inXI(i));
+        replaceBenchPlayer(old,outsider);
+        if(!reserveIds().includes(old)) throw new Error('交代で外れた控えが消えた');
+        const clubs=new Set(P.map(p=>p[4].trim())); const miss=Object.keys(CLUB_KANA).filter(c=>!clubs.has(c));
+        if(miss.length) throw new Error('CLUB_KANAのクラブ名がDBに無い: '+miss.slice(0,4).join(','));
+      }catch(e){ _pass=false; _msg=String(e.message||e); }
+      finally{ _undo=_u0; try{ closeSheet(); }catch(e){} try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} }
+      ok('bench_remove_keeps_player_and_club_kana',_pass,_msg); }
 
     // T30: CB利き足ルール（確定XIの無い自動配置で左CB=左利き優先。アーセナルの確定XIを一時的に外して検査）
     //      確定XI(CLUB_XI)はユーザーの盤面どおり＝最適化しない（2026-09-28）→ T30b
