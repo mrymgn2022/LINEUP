@@ -5350,7 +5350,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930j'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930k'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6491,10 +6491,22 @@ function startOriginal(){
   if(otSearchEl) otSearchEl.oninput=()=>{
     const q=deaccent(otSearchEl.value.trim()).toLowerCase();
     if(!q){ otSug.innerHTML=''; return; }
-    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)).slice(0,12);
-    otSug.innerHTML=ms.length?ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(dispClub(c))}</div>`).join(''):'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
+    const qk=natNorm(q).replace(/[\s　・＝=･]+/g,''), jaQ=/[^\x00-\x7f]/.test(q);
+    const kanaHit=c=>jaQ&&qk.length>=2&&(CLUB_KANA[c]||[]).some(a=>natNorm(a).replace(/[\s　・＝=･]+/g,'').includes(qk)); // 海外クラブのカタカナ・ひらがな（2026-09-30 監査A35）
+    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)||kanaHit(c)).slice(0,12);
+    // 代表チームも候補に（国籍条件にセットする）。日本語名・読み・英語名・コードで引く
+    const nats=[...natsInData()].filter(c=>natNorm(NATJA[c]||'').includes(natNorm(q))||natNorm(NATYOMI[c]||'').includes(natNorm(q))||deaccent(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase()===q).slice(0,4);
+    const natRows=nats.map(c=>`<div class="otsug" data-otnat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span> ${escAttr(natDisp(c))}${LANG==='en'?' (national team)':'代表'}</div>`).join('');
+    const clubRows=ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(dispClub(c))}</div>`).join('');
+    otSug.innerHTML=(natRows||clubRows)?natRows+clubRows:'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
   };
   if(otSug) otSug.onclick=e=>{
+    const dn=e.target.closest('[data-otnat]');
+    if(dn){ const code=dn.dataset.otnat; acf.nat=code; otF.lg='ALL'; otF.expand=null; otF.lgopen=false; chosenLg='ALL';
+      const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
+      updateClubField(); const cs=document.getElementById('otClub'); if(cs) cs.value='';
+      const sc=document.querySelector('[data-natscope]'), ch=sc&&sc.querySelector('[data-natchip]'); if(ch){ ch.outerHTML=natChipHTML(acf); attachNatFilter(sc,acf,()=>{ syncOtClear(); }); }
+      otSearchEl.value=natDisp(code); otSug.innerHTML=''; syncOtClear(); return; } // 代表＝国籍条件で自動配置
     const d=e.target.closest('[data-club]'); if(!d)return;
     const club=d.dataset.club; otF.lg=otClubLg[club]||'ALL'; otF.expand=lgExpandFor(otF.lg); otF.lgopen=false; chosenLg=otF.lg;
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
