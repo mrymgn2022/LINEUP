@@ -4097,7 +4097,7 @@ function addPlayerToReserve(pid){
 function clubOtherIds(){
   if(!state.loadedClub) return [];
   const ex=state.excluded||[];
-  return P.map((p,i)=>i).filter(i=>P[i][4].trim()===state.loadedClub&&!inXI(i)&&!state.bench.includes(i)&&!ex.includes(i))
+  return P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][4].trim()===state.loadedClub&&!inXI(i)&&!state.bench.includes(i)&&!ex.includes(i)) // 自作選手はクラブ控えに混ぜない（別スカッドで作った同じクラブ名の選手が紛れ込んでいた 2026-09-30 監査C17）。このスカッドのベンチ外に置いた自作選手は reserveAdds で出る
           .sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
 }
 // 手動でベンチ外に加えたチーム外の選手（XI/ベンチに居ない分だけ表示）
@@ -4707,6 +4707,7 @@ function injectCustomDef(c){ // Pの末尾へ追加（indexは不変＝既存の
   const _nat=/^[A-Z]{3}$/.test(String(c.nat||''))?c.nat:'XXX';
   const p=[cleanTxt(c.name,40)||'?',_pos,Math.max(0,Math.min(60,parseInt(c.age,10)||0)),'🏳 '+_nat,cleanTxt(c.club,40),cleanTxt(c.league,12)];
   p[6]=(typeof c.uid==='string'&&/^[A-Za-z0-9_-]{1,40}$/.test(c.uid))?c.uid:('c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)); // カスタム固有ID：同名・同国籍でも別人として保存/復元できる（TRUMP×10問題の恒久対策）
+  for(let i=customBaseLen;i<P.length;i++){ if(P[i]&&P[i][6]===p[6]){ P[i]=p; const k0=pkey(p); { const _h=parseInt(c.height,10); if(_h>100&&_h<250) HEIGHT[k0]=_h; } if(c.foot&&['右','左','両'].includes(c.foot)) FOOT[k0]=c.foot; _keyMap=null; return i; } } // 同じ自作選手（uid一致）は1人のまま（読込のたびに重複追加されていた 2026-09-30 監査D26）
   P.push(p);
   const k=pkey(p);
   { const _h=parseInt(c.height,10); if(_h>100&&_h<250) HEIGHT[k]=_h; }
@@ -5346,7 +5347,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
