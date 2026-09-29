@@ -3802,7 +3802,7 @@ function wirePicker(slotIdx){
     if(e.target.closest('[data-create]')){ openCreatePlayer(slotIdx); return; }
     const c=e.target.closest('[data-sort]');if(!c)return;pickFilter.sort=c.dataset.sort; try{ recordEvent('srt_p_'+String(c.dataset.sort||'').replace(/[^a-z_]/g,'_')); }catch(_){}[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawPickList(slotIdx);};
   const q=document.getElementById('pq');
-  if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase().replace(/\s+/g,' ').trim();drawPickList(slotIdx)};
+  if(q) q.oninput=()=>{pickFilter.q=normQuery(q.value);drawPickList(slotIdx)};
   const clr=document.getElementById('pickClear');
   if(clr) clr.onclick=()=>{ if(pickReopen)pickReopen(); }; // 既定状態で開き直す＝全条件クリア
 
@@ -3828,13 +3828,51 @@ function wirePickClub(slotIdx){
   if(!clubF)return;
   clubF.onchange=()=>{const sel=clubF.querySelector('select');if(sel){pickFilter.club=sel.value||'ALL';drawPickList(slotIdx);}}; // プルダウン選択で絞り込み（コンテナ委譲＝再描画後も有効）
 }
+// ---- 名前検索の追加照合（2026-09-29 監査P1）。既存の一致（部分一致・日本語名・救済）はそのままに、取りこぼしだけ拾う ----
+// 海外クラブのカタカナ（検索専用。表示名は変えない）
+const CLUB_KANA={'Real Madrid':['レアル・マドリード','レアル'],'Barcelona':['バルセロナ','バルサ'],'Atlético Madrid':['アトレティコ・マドリード','アトレティコ'],'Real Sociedad':['レアル・ソシエダ'],'Real Betis':['ベティス'],'Sevilla FC':['セビージャ','セビリア'],'Villarreal CF':['ビジャレアル'],
+ 'Arsenal':['アーセナル'],'Chelsea':['チェルシー'],'Liverpool':['リバプール','リヴァプール'],'Manchester City':['マンチェスター・シティ','マンシティ','マンＣ','マンc'],'Manchester United':['マンチェスター・ユナイテッド','マンユナイテッド','マンＵ','マンu'],'Tottenham':['トッテナム','スパーズ'],'Newcastle United':['ニューカッスル'],'Aston Villa':['アストン・ヴィラ','アストン・ビラ'],'Brighton':['ブライトン'],'West Ham United':['ウェストハム'],'Everton':['エバートン','エヴァートン'],
+ 'Bayern München':['バイエルン・ミュンヘン','バイエルン'],'Borussia Dortmund':['ボルシア・ドルトムント','ドルトムント'],'Bayer Leverkusen':['レバークーゼン','レヴァークーゼン'],'RB Leipzig':['ライプツィヒ'],'Eintracht Frankfurt':['フランクフルト'],'VfB Stuttgart':['シュツットガルト'],
+ 'Paris Saint-Germain':['パリ・サンジェルマン','パリサンジェルマン'],'Marseille':['マルセイユ'],'Juventus':['ユベントス','ユヴェントス','ユーベ'],'Inter':['インテル'],'AC Milan':['ミラン'],'Napoli':['ナポリ'],'AS Roma':['ローマ'],'Lazio':['ラツィオ'],'Atalanta':['アタランタ'],'Como':['コモ'],
+ 'Al-Hilal SFC':['アル・ヒラル'],'Al-Nassr FC':['アル・ナスル'],'Al-Ittihad Club':['アル・イテハド','アル・イッティハド'],'Al-Ahli SFC':['アル・アハリ'],'Galatasaray':['ガラタサライ'],'Fenerbahce':['フェネルバフチェ'],'SL Benfica':['ベンフィカ'],'FC Porto':['ポルト'],'Sporting CP':['スポルティング'],
+ 'Ajax Amsterdam':['アヤックス'],'PSV Eindhoven':['PSV'],'Feyenoord Rotterdam':['フェイエノールト'],'Celtic':['セルティック'],'Inter Miami CF':['インテル・マイアミ','マイアミ']};
+// 通称・略称（入力全体がこれに一致した時だけ読み替える）
+const QUERY_ALIAS={'psg':'paris saint-germain','man utd':'manchester united','man united':'manchester united','man city':'manchester city','spurs':'tottenham','barca':'barcelona','juve':'juventus','bvb':'borussia dortmund','atleti':'atletico madrid','cr7':'cristiano ronaldo','kdb':'kevin de bruyne','vini jr':'vinicius junior','neymar jr':'neymar'};
+function normQuery(v){ const q=deaccent(v).toLowerCase().replace(/[‘’ʼ`]/g,"'").replace(/\s+/g,' ').trim(); return QUERY_ALIAS[q]||q; }
+// 旧字体・異体字をそろえる（髙橋⇄高橋・冨安⇄富安 等。辞書と入力の両側に掛ける）
+const ITAIJI={'髙':'高','﨑':'崎','嵜':'崎','邉':'辺','邊':'辺','齋':'斎','齊':'斉','澤':'沢','濵':'浜','濱':'浜','櫻':'桜','嶋':'島','冨':'富','德':'徳','廣':'広','國':'国','瀨':'瀬','槇':'槙','眞':'真','龍':'竜','隆':'隆','晴':'晴','淸':'清','增':'増','惠':'恵','檜':'桧','實':'実','藏':'蔵','條':'条','壽':'寿','榮':'栄','靜':'静','圓':'円','禮':'礼','塚':'塚','﨔':'欅'};
+function itaijiFold(s){ return String(s).replace(/[髙﨑嵜邉邊齋齊澤濵濱櫻嶋冨德廣國瀨槇眞龍淸增惠檜實藏條壽榮靜圓禮﨔]/g,c=>ITAIJI[c]||c); }
+function germanFold(s){ return s.replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u'); }
+function extraNameHit(p,q){
+  if(!q) return false;
+  const nm=deaccLower(p[0]);
+  // (1) 記号・空白・ドイツ語式綴りの違いを畳んで比較（n'golo/ngolo・de bruyne/debruyne・o'reilly・mueller/muller・st pauli）。短い入力には掛けない
+  const qc=q.replace(/[^a-z0-9]/g,'');
+  if(qc.length>=4){ const nc=nm.replace(/[^a-z0-9]/g,''); if(nc.includes(qc)||germanFold(nc).includes(germanFold(qc))) return true;
+    const cc=deaccLower(p[4]).replace(/[^a-z0-9]/g,''); if(cc.includes(qc)) return true; }
+  // (2) 語順・ハイフン違い（son heung-min / heungmin son / kim min-jae / mitoma kaoru）。各語が名前のどれかの語と完全一致した時だけ
+  if(q.indexOf(' ')>0){ const qt=q.split(' ').map(t=>t.replace(/[^a-z0-9]/g,'')).filter(Boolean);
+    if(qt.length>=2&&qt.every(t=>t.length>=2)){ const parts=nm.split(/\s+/); const nt=new Set(); parts.forEach(w=>{ nt.add(w.replace(/[^a-z0-9]/g,'')); w.split(/[.'\-]+/).forEach(x=>{ if(x) nt.add(x); }); });
+      if(qt.every(t=>nt.has(t))) return true; } }
+  // (3) 海外クラブのカタカナ（ひらがな入力も可）
+  if(/[^\x00-\x7f]/.test(q)){ const qk=hira2kata(q).replace(/[\s　・＝=･]+/g,''); if(qk.length>=2){ const al=CLUB_KANA[p[4].trim()]; if(al&&al.some(a=>a.replace(/[\s　・＝=･]+/g,'').toLowerCase().includes(qk.toLowerCase()))) return true;
+      const cj=(CLUB_JA[p[4].trim()]||'').replace(/[\s　・＝=･]+/g,''); if(cj&&cj.includes(qk)) return true; } }
+  return false;
+}
+// 一致の質（並び順用）: 0=名前の語の頭から一致 1=名前のどこかに一致 2=クラブ名だけ一致
+function matchQuality(p,q){ if(!q) return 0; const nm=deaccLower(p[0]);
+  if(nm.startsWith(q)||nm.split(/[\s.'\-]+/).some(t=>t.startsWith(q))) return 0;
+  const c=p[4].trim(); const clubOnly=(deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)||((CLUB_KANA[c]||[]).length&&/[^\x00-\x7f]/.test(q)&&extraNameHit([c,'','','',c],q)));
+  if(nm.includes(q)||(/[^\x00-\x7f]/.test(q)&&jaNameHit(p,q))||(!clubOnly&&extraNameHit(p,q))) return 1;
+  return clubOnly?2:1; }
+function qualitySort(ids,q){ const r=new Map(); ids.forEach((i,k)=>r.set(i,matchQuality(P[i],q)*1e6+k)); return ids.slice().sort((a,b)=>r.get(a)-r.get(b)); } // 並び済みの順を保ったまま一致の質でまとめる
 function playerMatches(p){
   if(!inLgFilter(p,pickFilter.lg))return false;
   if(pickFilter.subpos){ if(p[1]!==pickFilter.subpos)return false; }
   else if(pickFilter.pos!=='ALL'&&grp(p[1]).toUpperCase()!==pickFilter.pos)return false;
   if(pickFilter.club!=='ALL'&&p[4].trim()!==pickFilter.club)return false;
   if(pickFilter.nat&&pickFilter.nat!=='ALL'&&natCode(p)!==pickFilter.nat)return false;
-  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)||tokPrefixHit(p[0],pickFilter.q,p)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+  if(pickFilter.q&&!(deaccLower(p[0]).includes(pickFilter.q)||deaccLower(p[4]).includes(pickFilter.q)||(CLUB_JA[p[4].trim()]||'').includes(pickFilter.q)||jaNameHit(p,pickFilter.q)||tokPrefixHit(p[0],pickFilter.q,p)||extraNameHit(p,pickFilter.q)))return false; // 発音記号を畳んで一致（João←joao 等）。日本語UIは漢字/カナ・日本語クラブ名でもヒット
   return true;
 }
 // ── 検索0件の救済「もしかして」（2026-08-07・本番データ由来）──
@@ -3967,6 +4005,7 @@ function drawPickList(slotIdx){
   if(so==='pop') pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // 人気順（内部指標で降順）
   else if(_useRank) pickCurIdx.sort((a,b)=> (_rk[a]-_rk[b]) || (_cm(b)-_cm(a)) || (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // スロット押下：適性→自チーム→市場価値→年齢（旧suggestSortと同順）
   else pickCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); // ポジション指定なし(ベンチ等)：市場価値の高い順
+  if(pickFilter.q) pickCurIdx=qualitySort(pickCurIdx,pickFilter.q); // 検索語がある時は一致の質を先に（名前の頭一致→名前のどこか→クラブ名だけ）2026-09-29
   if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
     list.innerHTML=noMatchHTML('pickClear',true); // 0件＝自作の文脈→新規作成を主ボタンで提示
     const cb=document.getElementById('nmCreate'); if(cb) cb.onclick=()=>openCreatePlayer(slotIdx);
@@ -4219,7 +4258,7 @@ function kana2romaji(k){ let r='',i=0;
 function jaNameHit(p,q){ if(!q||!/[^\x00-\x7f]/.test(q)) return false;
   // 区切り記号は両側から落として比べる。辞書は「キリアン・ムバッペ」「ルイス＝スケリー」の形だが、
   // 実際の検索は姓だけ/区切りなしが多い（ムバッペ / ルイススケリー）＝ここを揃えないと当たらない。
-  const sep=s=>String(s).replace(/[\s　・＝=･]+/g,'');
+  const sep=s=>itaijiFold(String(s).replace(/[\s　・＝=･]+/g,''));
   const qk=sep(hira2kata(q));
   const k=keyForPlayer(p), j=sep(J1JA[k]||JAOV[k]||'');
   if(j&&j.includes(qk)) return true;
@@ -4239,7 +4278,8 @@ function jaNameHit(p,q){ if(!q||!/[^\x00-\x7f]/.test(q)) return false;
   const nm=deaccLower(p[0]).replace(/m(?=[bmp])/g,'n');
   const nmA=nm.replace(/[\s.'-]+/g,''), nmB=nm.split(/[\s.'-]+/).reverse().join(''); // 語順両対応（よしだまや=姓名/まや よしだ=名姓）
   const qr2=qr.replace(/ou/g,'o').replace(/uu/g,'u').replace(/oo/g,'o');
-  return nmA.includes(qr)||nmA.includes(qr2)||nmB.includes(qr)||nmB.includes(qr2); }
+  const tk=nm.split(/[\s.'-]+/).filter(Boolean); const st=s=>tk.some(t=>t.startsWith(s))||nmA.startsWith(s)||nmB.startsWith(s); // 語の頭から（2026-09-29: 語をまたぐ誤ヒット防止）
+  return st(qr)||st(qr2); }
 // FIFA男子ランキング上位20（先頭表示用）
 const NAT_TOP=['ARG','FRA','ESP','ENG','BRA','POR','NED','BEL','ITA','GER','CRO','MAR','COL','URU','USA','MEX','SUI','SEN','DEN','JPN'];
 function natCode(p){ return p[3].trim().split(' ').pop(); }
@@ -4484,7 +4524,7 @@ function wireSubPickerFull(slotIdx){
     const cf=document.getElementById('clubF'); if(cf) cf.insertAdjacentHTML('afterend',natFilterHTML(pickFilter));
     attachNatFilter(te.querySelector('[data-natscope]'),pickFilter,()=>drawSubFull(slotIdx)); }
   const q=document.getElementById('pq');
-  if(q) q.oninput=()=>{pickFilter.q=deaccent(q.value).toLowerCase().replace(/\s+/g,' ').trim();drawSubFull(slotIdx)};
+  if(q) q.oninput=()=>{pickFilter.q=normQuery(q.value);drawSubFull(slotIdx)};
   const posF=document.getElementById('posF');
   if(posF) posF.onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;pickFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawSubFull(slotIdx)};
   const lgF=document.getElementById('lgF');
@@ -4862,7 +4902,7 @@ function openMarket(){
     <div class="list" id="mlist"></div>`);
   attachNatFilter(document.querySelector('[data-natscope]'),mktFilter,drawMkt);
   const _mc=document.getElementById('mClear'); if(_mc)_mc.onclick=()=>openMarket(); // 既定状態で開き直す＝全条件クリア
-  document.getElementById('mq').oninput=e=>{mktFilter.q=deaccent(e.target.value).toLowerCase().replace(/\s+/g,' ').trim();drawMkt()};
+  document.getElementById('mq').oninput=e=>{mktFilter.q=normQuery(e.target.value);drawMkt()};
   document.getElementById('mposF').onclick=e=>{const c=e.target.closest('[data-pos]');if(!c)return;mktFilter.pos=c.dataset.pos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');drawMkt()};
   wireLgSelect(document.getElementById('mlgF'), mktFilter, ()=>{mktFilter.club='ALL';syncClubField('mclubF',mktFilter);wireMktClub();drawMkt();});
   wireMktClub();
@@ -4885,7 +4925,7 @@ function drawMkt(){
     if(f.pos!=='ALL'&&grp(p[1]).toUpperCase()!==f.pos)return false;
     if(f.club!=='ALL'&&p[4].trim()!==f.club)return false;
     if(f.nat&&f.nat!=='ALL'&&natCode(p)!==f.nat)return false;
-    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)||tokPrefixHit(p[0],f.q,p)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
+    if(f.q&&!(deaccLower(p[0]).includes(f.q)||deaccLower(p[4]).includes(f.q)||(CLUB_JA[p[4].trim()]||'').includes(f.q)||jaNameHit(p,f.q)||tokPrefixHit(p[0],f.q,p)||extraNameHit(p,f.q)))return false; // 発音記号を畳んで一致。日本語UIは漢字/カナ・日本語クラブ名でもヒット
     return true;
   });
   _rescuedFrom=_rescuedTo=null; // 前回の救済の注記を持ち越さない
@@ -4894,7 +4934,8 @@ function drawMkt(){
   _iconFloorActive=false; // 検索一覧もレジェンド下限を効かせず“素の実力順”で並べる
   // ★性能修正: 市場価値順は mvScore を候補ごとに1回だけ事前計算（比較器内で再計算しない）。フィルタ無しの全2.4万件でも即並ぶ。順序は従来と同一。
   { const _sc=new Float64Array(P.length); for(const i of mktCurIdx) _sc[i]=mvScore(P[i]);
-    mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); } // 並びは常に市場価値の高い順（年齢ソートは2026-08-04削除）
+    mktCurIdx.sort((a,b)=> (_sc[b]-_sc[a]) || (P[b][2]-P[a][2])); }
+  if(mktFilter.q) mktCurIdx=qualitySort(mktCurIdx,mktFilter.q); // 一致の質を先に（2026-09-29） // 並びは常に市場価値の高い順（年齢ソートは2026-08-04削除）
   _iconFloorActive=true;
   if(!mktCurIdx.length){ noResultOnce(mktFilter.q); // 選手検索でも0件を記録
     list.innerHTML=noMatchHTML('mClear');return;}
@@ -5260,7 +5301,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929f'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929g'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
