@@ -5390,7 +5390,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001d'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001e'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6871,6 +6871,7 @@ function preloadFlags(){
   if(!state.showFlags) return Promise.resolve({});
   const codes=new Set();
   state.slots.forEach(s=>{ if(s.pid==null)return; const fi=FI[dispNatCode(s.pid)]; if(fi)codes.add(fi); const mfc=memoFlagCode(s.pid); if(mfc&&FI[mfc])codes.add(FI[mfc]); }); // メモ用のリーグ国旗もプリロード
+  (state.bench||[]).forEach(pid=>{ if(pid==null||inXI(pid)) return; const fi=FI[dispNatCode(pid)]; if(fi)codes.add(fi); }); // 共有画像のベンチ（下段）にも国旗を出す（2026-10-01）
   return Promise.all([...codes].map(fi=>new Promise(res=>{
     const im=new Image(); im.crossOrigin='anonymous';
     im.onload=()=>res([fi,im]); im.onerror=()=>res(null);
@@ -6942,16 +6943,19 @@ async function buildShareCanvas(){
   // レイアウト寸法を先に決めて、画像の高さをベンチ人数に応じて動的に確保
   const tn=teamDisplayName();
   const fmtC=state.shareFmt||'feed'; const compact=(fmtC==='feed'||fmtC==='sq'); // 4:5/1:1=枠を使い切る専用レイアウト
-  let headBottom=compact?96:120;
-  if(tn){ headBottom=compact?150:210; if(!compact&&state.teamInfo&&state.teamInfo.slogan) headBottom=260; }
+  let headBottom=compact?96:120; // チーム名はヘッダー行（ロゴとフォーメーションの間）に置く＝ピッチを上へ広げる（2026-10-01 ユーザー決定）
+  if(tn&&!compact&&state.teamInfo&&state.teamInfo.slogan) headBottom=160;
   // 余白圧縮ポリシー：上部は「ヘッダー実体+24px」に追従（旧: 最低270px固定の予約领域）。左右は30px。
   // ピッチ内の配置・駒間はすべて kk=pw/REF 比例なので、左右余白の縮小＝全要素の等倍拡大（レイアウト不変）。
-  const _cb=(state.showBench!==false); // compactのベンチ有無
+  const _benchN=(state.showBench!==false)?state.bench.filter(pid=>!inXI(pid)).slice(0,BENCH_MAX).length:0;
+  const _cb=false; // ベンチは下段の横一列（B案 2026-10-01）＝右列を作らずピッチは横いっぱい
+  const _stripRoles=!state.hideRoles; // ベンチの既定は名前だけ。POS表示ONのときだけポジションも
+  const STRIP_R=(fmtC==='sq'?34:40), STRIP_H=_benchN?(36+STRIP_R*2+30+(_stripRoles?20:0)+10):0; // 見出し＋顔＋名前(＋ポジション)＋余白
   const pw=compact?(fmtC==='feed'?(_cb?770:(W-60)):(_cb?618:(W-60))):(W-60); // compact: ベンチ列ぶん狭める(ベンチ無しなら横いっぱい=4:5/1:1とも)
   const px=(compact&&!_cb)?Math.round((W-pw)/2):30, py=headBottom+24; // ベンチ無しcompactは中央寄せ
   const showBench=state.showBench!==false;                 // 共有画像にベンチ（控え）を載せるか
   // 盤面(スカッド作成)を忠実に拡大再現：駒・フォント・間隔は盤面CSS実測値×kk。kk=共有ピッチ幅/盤面基準幅。
-  const REF=compact?(fmtC==='feed'?(_cb?340:400):(_cb?300:440)):405; // feedベンチ無しは駒を約15%小さく/sqベンチ無しは横いっぱいピッチ用に駒を控えめ(縦が詰まりやすい=R59・実レンダで被り無し確認)                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
+  const REF=compact?(_benchN?(fmtC==='feed'?450:545):(fmtC==='feed'?400:440)):405; // 下段にベンチがある時はピッチが横長になる分だけ駒を控えめに // feedベンチ無しは駒を約15%小さく/sqベンチ無しは横いっぱいピッチ用に駒を控えめ(縦が詰まりやすい=R59・実レンダで被り無し確認)                                           // 盤面ピッチ幅の基準（mobile想定）。盤面実測: disc R25 / role12 / name13 / memo・sub10
   const kk=(pw/REF)*((showBench||compact)?1:1.1);                     // ベンチ非表示は少し拡大して画像全体に
   const m=v=>Math.round(v*kk);                             // 盤面px → 共有画像px
   const R=m(25);                                           // 盤面 .disc 半径25
@@ -6962,7 +6966,7 @@ async function buildShareCanvas(){
   // 盤面の等倍投影（2026-07-18）: 盤面と同じ y% をそのままピッチへ投影する。
   // 旧実装は「yが近い駒を行に統合→等間隔配置」でフォメの奥行き（CB段差・中盤の高低・手動ドラッグ）が消えていた。
   const PASPECT=1.42;                                      // 盤面ピッチの縦横比（405:575前後）を踏襲
-  let ph; if(compact&&!_cb){ ph=(fmtC==='feed'?1350:1080)-py-26; } else { ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); } // feed(4:5)/sq(1:1)ベンチ非表示は縦横フレームを使い切る(左右デッドスペース廃止・競合並み)
+  let ph; if(compact&&!_cb){ ph=(fmtC==='feed'?1350:1080)-py-26-(_benchN?STRIP_H+14:0); } else { ph=Math.round(pw*PASPECT*((showBench||compact)?1:1.05)); } // feed(4:5)/sq(1:1)ベンチ非表示は縦横フレームを使い切る(左右デッドスペース廃止・競合並み)
   const yRaw=s=>py+(1-(s.y/100))*ph;                       // 盤面と同座標系: y大=前線(上) / y小=GK(下)
   // 盤面の liftBottomLabels と同じ思想: 下端からはみ出すラベル分だけその駒を上へ。上端は駒半径分を確保。
   const yAdj=new Map();
@@ -6973,10 +6977,8 @@ async function buildShareCanvas(){
   const pitchBottom=py+ph;
   const tokY=s=>yAdj.get(s);
   const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,BENCH_MAX):[]; // ベンチ最大15人（非表示時は載せない）
-  const bCols=3, bRowH=98, bHeadH=70, bGap=44;
-  const bRows=Math.ceil(benchPids.length/bCols);
-  const benchH=benchPids.length?(bHeadH+bRows*bRowH):0;
-  const benchTop=pitchBottom+(benchPids.length?bGap:0);
+  const benchH=benchPids.length?STRIP_H:0;            // ベンチは下段の横一列（全形式共通）
+  const benchTop=pitchBottom+(benchPids.length?14:0);
   const footH=28; // 下端の小さな余白のみ（"made with"のフッター行は廃止＝ピッチ内右下のSQUAD XIロゴに一本化）
   const H=compact?(fmtC==='feed'?1350:1080):Math.round(benchTop+benchH+footH);
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
@@ -6993,14 +6995,15 @@ async function buildShareCanvas(){
   x.textAlign='right';x.font='800 42px "Bebas Neue",Manrope,sans-serif';x.fillStyle='#7d9389';
   x.fillText(state.formation,W-56,82);x.textAlign='left';
   // チーム名：中央に大きく（ヒーロー表示）
-  if(tn){
-    x.textAlign='center';
-    const maxTW=compact?(pw-40):(W-110); let ts=compact?46:66; x.font='800 '+ts+'px Manrope,sans-serif';
-    while(ts>34 && x.measureText(tn).width>maxTW){ ts-=2; x.font='800 '+ts+'px Manrope,sans-serif'; }
+  if(tn){ // チーム名はヘッダー行の中央（ロゴとフォーメーションの間）へ（2026-10-01 ユーザー決定: 上へ上げてピッチを大きく）
+    x.font='800 44px Manrope,sans-serif'; const _lEdge=56+x.measureText('Squad XI').width+28;
+    x.font='800 42px "Bebas Neue",Manrope,sans-serif'; const _rEdge=W-56-x.measureText(state.formation).width-28;
+    const maxTW=Math.max(120,2*Math.min(W/2-_lEdge,_rEdge-W/2));
+    x.textAlign='center'; let ts=46; x.font='800 '+ts+'px Manrope,sans-serif';
+    while(ts>28 && x.measureText(tn).width>maxTW){ ts-=2; x.font='800 '+ts+'px Manrope,sans-serif'; }
+    x.fillStyle=accent; x.fillText(fitCanvasText(x,tn,maxTW),W/2,84);
     const hasSlogan=!!(state.teamInfo&&state.teamInfo.slogan);
-    const nameY=compact?156:(hasSlogan?172:190); // compactはピッチ上端(py=174)より上に収める
-    x.fillStyle=accent; x.fillText(fitCanvasText(x,tn,maxTW),compact?(px+pw/2):(W/2),nameY); // compactはピッチ中心に合わせる
-    if(hasSlogan&&!compact){ x.font='600 26px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,W/2,nameY+42); } // compactはスローガン非表示(高さ予算外)
+    if(hasSlogan&&!compact){ x.font='600 24px Manrope,sans-serif';x.fillStyle='#7d9389';x.fillText(state.teamInfo.slogan,W/2,126); }
     x.textAlign='left';
   }
   // 芝のストライプ
@@ -7119,50 +7122,24 @@ async function buildShareCanvas(){
     x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
   });
-  // ベンチ（控え。最大15人をグリッド表示）
-  if(compact&&benchPids.length){ // 右のベンチ縦列（枠の余白を情報で埋める）
-    const colX=px+pw+22, colW=W-colX-26;
-    x.textAlign='left'; x.textBaseline='alphabetic';
-    x.fillStyle=accent; x.font='800 '+(fmtC==='feed'?26:30)+'px "Bebas Neue",Manrope,sans-serif';
-    x.fillText('BENCH ('+benchPids.length+')',colX,py+26);
-    const listTop=py+44, rowH=Math.min(84,Math.floor((H-listTop-24)/Math.max(benchPids.length,1)));
-    const rAv=Math.min(Math.floor(rowH/2)-4,(fmtC==='feed'?24:27));
-    benchPids.forEach((pid,i)=>{
-      const p=P[pid]; const cyc=listTop+i*rowH+rowH/2; const acx=colX+rAv+2;
-      x.beginPath();x.arc(acx,cyc,rAv,0,7);x.fillStyle='#10160f';x.fill();
+  // ベンチ（控え）＝ピッチの下に横一列（B案 2026-10-01 ユーザー決定）。既定は顔＋名前、POS表示ONならポジション、国旗ONなら国旗も
+  if(benchPids.length){
+    const top=benchTop, n=benchPids.length, cw=(W-60)/BENCH_MAX, x0=30+((W-60)-cw*n)/2, r=STRIP_R;
+    x.textAlign='left'; x.textBaseline='alphabetic'; x.fillStyle=accent; x.font='800 26px "Bebas Neue",Manrope,sans-serif';
+    x.fillText('BENCH',30,top+22);
+    const nf=state.showFlags?(fmtC==='sq'?14:16):(fmtC==='sq'?16:18); // 国旗つきは名前が切れないよう少し小さく
+    benchPids.forEach((pid,i)=>{ const p=P[pid]; const cx0=x0+cw*i+cw/2, cyc=top+36+r;
+      x.beginPath();x.arc(cx0,cyc,r,0,7);x.fillStyle='#10160f';x.fill();
       const im=photoImgs[pid];
-      if(im){ x.save();x.beginPath();x.arc(acx,cyc,rAv-2,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,acx-(rAv-2),cyc-(rAv-2),(rAv-2)*2,(rAv-2)*2);x.restore(); }
-      else { drawSilhouette(x,acx,cyc,rAv); }
-      // リング廃止(枠なし 2026-08-15)
-      const tx0=acx+rAv+10, maxW=colX+colW-tx0;
-      x.textAlign='left';x.textBaseline='middle';
-      x.fillStyle='#eafff0';x.font='800 '+(fmtC==='feed'?21:24)+'px Manrope,sans-serif';
-      x.fillText(fitCanvasText(x,squadShortName(pid),maxW),tx0,cyc-9);
-      x.fillStyle=roleCol(p[1]);x.font='700 '+(fmtC==='feed'?15:17)+'px Manrope,sans-serif';
-      x.fillText(p[1],tx0,cyc+13);
-      x.textBaseline='alphabetic';
+      if(im){ x.save();x.beginPath();x.arc(cx0,cyc,r-2,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,cx0-(r-2),cyc-(r-2),(r-2)*2,(r-2)*2);x.restore(); } else { drawSilhouette(x,cx0,cyc,r); }
+      x.textBaseline='alphabetic'; x.font='800 '+nf+'px Manrope,sans-serif';
+      const fImg=state.showFlags?flagImgs[FI[dispNatCode(pid)]]:null, fh=Math.round(nf*0.8), fw=Math.round(fh*4/3), gp=4;
+      const nm=fitCanvasText(x,squadShortName(pid),cw-8-(fImg?fw+gp:0)), tw=x.measureText(nm).width, tot=tw+(fImg?fw+gp:0), sx0=cx0-tot/2, ny=cyc+r+26;
+      if(fImg){ try{ x.drawImage(fImg,sx0,ny-nf*0.34-fh/2,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,ny-nf*0.34-fh/2,fw,fh); }catch(e){} }
+      x.textAlign='left'; x.fillStyle='#eafff0'; x.fillText(nm,sx0+(fImg?fw+gp:0),ny);
+      if(_stripRoles){ x.textAlign='center'; x.fillStyle=roleCol(p[1]); x.font='700 '+(fmtC==='sq'?13:14)+'px Manrope,sans-serif'; x.fillText(p[1],cx0,ny+19); }
     });
-  } else if(benchPids.length){
-    x.textAlign='left';x.textBaseline='alphabetic';
-    x.fillStyle=accent;x.font='800 34px "Bebas Neue",Manrope,sans-serif';
-    x.fillText((LANG==='en'?'SUBSTITUTES (':'SUBSTITUTES  ベンチ (')+benchPids.length+')',px+10,benchTop+40);
-    const gridTop=benchTop+bHeadH, cellW=pw/bCols;
-    benchPids.forEach((pid,i)=>{
-      const p=P[pid]; const col=i%bCols, row=Math.floor(i/bCols);
-      const cx0=px+col*cellW, cyc=gridTop+row*bRowH+bRowH/2, r=28, acx=cx0+40;
-      x.beginPath();x.arc(acx,cyc,r,0,7);x.fillStyle='#10160f';x.fill();
-      const im=photoImgs[pid];
-      if(im){ x.save();x.beginPath();x.arc(acx,cyc,r-3,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,acx-(r-3),cyc-(r-3),(r-3)*2,(r-3)*2);x.restore(); }
-      else { drawSilhouette(x,acx,cyc,r); }
-      // リング廃止(枠なし 2026-08-15)
-      const tx0=acx+r+16, maxW=cellW-(tx0-cx0)-14;
-      x.textAlign='left';x.textBaseline='middle';
-      x.fillStyle='#eafff0';x.font='800 26px Manrope,sans-serif';
-      x.fillText(fitCanvasText(x,squadShortName(pid),maxW),tx0,cyc-11);
-      x.fillStyle=roleCol(p[1]);x.font='700 19px Manrope,sans-serif';
-      x.fillText(p[1],tx0,cyc+16);
-      x.textBaseline='alphabetic';
-    });
+    x.textAlign='left';
   }
   // フッター行は廃止（ピッチ内右下のSQUAD XIロゴが常時入るため二重ブランディングだった）。footH=28は純粋な下端余白。
   // SNS向けフォーマット：選んだ比率(1:1/4:5/9:16)のキャンバスへ中央配置（はみ出し防止＝contain）。'auto'は内容なりの高さのまま。
