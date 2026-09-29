@@ -2036,6 +2036,7 @@ function syncWideDock(onlyOnChange){
   }catch(e){}
 }
 window.addEventListener('resize',()=>{ syncWideDock(true); }); // 最大化・ウィンドウ変形に追従
+let _rsT=null; window.addEventListener('resize',()=>{ clearTimeout(_rsT); _rsT=setTimeout(()=>{ try{ if(document.querySelector('#pitch .tok.drag')) return; spreadFlanks(); liftBottomLabels(); }catch(e){} },200); }); // 回転・幅変更で名前の広げ表示と下端の持ち上げを測り直す（ピクセル依存 2026-09-30 監査B34）
 try{ const _mqDock=window.matchMedia('(min-width:768px) and (min-height:600px)'); // resizeが来ない環境（ズーム変更等）の保険
   if(_mqDock.addEventListener) _mqDock.addEventListener('change',()=>syncWideDock(true));
   else if(_mqDock.addListener) _mqDock.addListener(()=>syncWideDock(true)); }catch(e){}
@@ -5350,7 +5351,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930k'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930l'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6612,7 +6613,7 @@ const AUTO_TEAMS_CLUBS=[
   ['Juventus','Juventus','ITA'],['Napoli','Napoli','ITA'],['Inter','Inter','ITA'],['AC Milan','Milan','ITA'],['AS Roma','Roma','ITA']];
 function autoTeamsNats(){ return LANG==='en'
   ? [['ENG','England'],['ESP','Spain'],['ARG','Argentina']]
-  : [['JPN','日本代表'],['ENG','イングランド'],['ESP','スペイン']]; }
+  : [['JPN','日本'],['ENG','イングランド'],['ESP','スペイン']]; } // 見出しが「代表チーム」なので国名だけに揃える（2026-09-30 監査A36）
 function _apSlug(s){ return 'ap_'+String(s).toLowerCase().replace(/[^a-z]+/g,'_').replace(/^_+|_+$/g,'').slice(0,29); } // worker検証互換(a-z_・32字以内)
 function openAutoSheet(){
   recordEvent('first_action',true); recordEvent('auto_sheet',true); // ファネル：⚡ボタンが開かれたか（1セッション1回）
