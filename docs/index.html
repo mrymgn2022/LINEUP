@@ -4887,7 +4887,7 @@ function openDetail(pid,slotIdx){
         <div class="dcell"><div class="dk">${t('dkHeight')}</div><div class="dv">${heightOf(p)?heightOf(p)+'<small style="font-size:13px"> cm</small>':(metaEditable(p,'h')?`<input id="umH" type="number" inputmode="numeric" aria-label="${t('dkHeight')}" class="umin" placeholder="cm" min="140" max="220">`:'<span style="font-size:17px;color:var(--mut)">–</span>')}</div></div>
         <div class="dcell"><div class="dk">${t('dkFoot')}</div><div class="dv" style="font-size:18px">${footOf(p)?footLabel(p):(metaEditable(p,'f')?`<select id="umF" aria-label="${t('dkFoot')}" class="umin"><option value="">${LANG==='en'?'—':'—'}</option><option value="右">${LANG==='en'?'Right':'右足'}</option><option value="左">${LANG==='en'?'Left':'左足'}</option><option value="両">${LANG==='en'?'Both':'両足'}</option></select>`:'<span style="font-size:17px;color:var(--mut)">–</span>')}</div></div>
         <div class="dcell"><div class="dk">${t('dkLeague')}</div><div class="dv" style="font-size:17px">${p[5]?lgName(p[5]):'<span style="font-size:17px;color:var(--mut)">–</span>'}</div></div>
-        <div class="dcell"><div class="dk">${t('dkNat')}</div><div class="dv" style="font-size:17px">${flagHTML(p[3])}</div></div>
+        <div class="dcell"><div class="dk">${t('dkNat')}</div><div class="dv" style="font-size:17px">${flagHTML(p[3])} <span style="font-size:14px;font-weight:700">${escAttr(natDisp(natCode(p)))}</span></div></div>
       </div>
       ${(metaEditable(p,'h')||metaEditable(p,'f')||metaEditable(p,'dob'))?`<p class="note" style="margin:2px 2px 10px">${LANG==='en'?'Blank fields (–) can be filled in — saved on this device only.':'空欄（–）の項目はあなたが入力できます（この端末にのみ保存）。'}</p>`:''}
       ${actions}
@@ -5366,7 +5366,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930u'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930v'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6531,7 +6531,7 @@ function startOriginal(){
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
     updateClubField();
     const cs=document.getElementById('otClub'); if(cs) cs.value=club;
-    otPickedClub=club; otSearchEl.value=club; otSug.innerHTML=''; syncOtClear();
+    otPickedClub=club; otSearchEl.value=dispClub(club); otSug.innerHTML=''; syncOtClear();
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{ syncOtClear(); });
   { const _cs=document.getElementById('otClub'); if(_cs) _cs.addEventListener('change',syncOtClear); }
