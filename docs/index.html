@@ -5390,7 +5390,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001e'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001f'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7122,22 +7122,26 @@ async function buildShareCanvas(){
     x.shadowColor='transparent';x.shadowBlur=0;x.shadowOffsetY=0; // 影をリセット（駒・国旗には付けない）
     x.textAlign='left';
   });
-  // ベンチ（控え）＝ピッチの下に横一列（B案 2026-10-01 ユーザー決定）。既定は顔＋名前、POS表示ONならポジション、国旗ONなら国旗も
+  // ベンチ（控え）＝ピッチの下に横一列（B案 2026-10-01 ユーザー決定）。既定は顔＋名前、POS表示ONならポジション
+  //   名前が切れないよう（案4 2026-10-01）: 国旗は顔写真の右下バッジ／1人分の幅は名前の実測幅に合わせて配分し、余りは均等な隙間に
   if(benchPids.length){
-    const top=benchTop, n=benchPids.length, cw=(W-60)/BENCH_MAX, x0=30+((W-60)-cw*n)/2, r=STRIP_R;
+    const top=benchTop, n=benchPids.length, r=STRIP_R, nf=(fmtC==='sq'?16:18);
     x.textAlign='left'; x.textBaseline='alphabetic'; x.fillStyle=accent; x.font='800 26px "Bebas Neue",Manrope,sans-serif';
     x.fillText('BENCH',30,top+22);
-    const nf=state.showFlags?(fmtC==='sq'?14:16):(fmtC==='sq'?16:18); // 国旗つきは名前が切れないよう少し小さく
-    benchPids.forEach((pid,i)=>{ const p=P[pid]; const cx0=x0+cw*i+cw/2, cyc=top+36+r;
+    x.font='800 '+nf+'px Manrope,sans-serif';
+    const names=benchPids.map(pid=>squadShortName(pid));
+    const need=names.map(nm=>Math.max(r*2+10,x.measureText(nm).width+10));
+    const avail=W-60, tot=need.reduce((a,b)=>a+b,0), sc=tot>avail?avail/tot:1, gap=tot<avail?(avail-tot)/n:0;
+    const cellW=need.map(v=>v*sc+gap); let acc=30; const cellX=cellW.map(w=>{ const c=acc+w/2; acc+=w; return c; });
+    benchPids.forEach((pid,i)=>{ const p=P[pid]; const cx0=cellX[i], cyc=top+36+r;
       x.beginPath();x.arc(cx0,cyc,r,0,7);x.fillStyle='#10160f';x.fill();
       const im=photoImgs[pid];
       if(im){ x.save();x.beginPath();x.arc(cx0,cyc,r-2,0,7);x.clip();const side=Math.min(im.width,im.height);const sx=(im.width-side)/2,sy=(im.height-side)/2;x.drawImage(im,sx,sy,side,side,cx0-(r-2),cyc-(r-2),(r-2)*2,(r-2)*2);x.restore(); } else { drawSilhouette(x,cx0,cyc,r); }
-      x.textBaseline='alphabetic'; x.font='800 '+nf+'px Manrope,sans-serif';
-      const fImg=state.showFlags?flagImgs[FI[dispNatCode(pid)]]:null, fh=Math.round(nf*0.8), fw=Math.round(fh*4/3), gp=4;
-      const nm=fitCanvasText(x,squadShortName(pid),cw-8-(fImg?fw+gp:0)), tw=x.measureText(nm).width, tot=tw+(fImg?fw+gp:0), sx0=cx0-tot/2, ny=cyc+r+26;
-      if(fImg){ try{ x.drawImage(fImg,sx0,ny-nf*0.34-fh/2,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,ny-nf*0.34-fh/2,fw,fh); }catch(e){} }
-      x.textAlign='left'; x.fillStyle='#eafff0'; x.fillText(nm,sx0+(fImg?fw+gp:0),ny);
-      if(_stripRoles){ x.textAlign='center'; x.fillStyle=roleCol(p[1]); x.font='700 '+(fmtC==='sq'?13:14)+'px Manrope,sans-serif'; x.fillText(p[1],cx0,ny+19); }
+      const fImg=state.showFlags?flagImgs[FI[dispNatCode(pid)]]:null;
+      if(fImg){ const bw=Math.round(r*0.62), bh=Math.round(bw*3/4), bx=cx0+r*0.72-bw/2, by=cyc+r*0.72-bh/2; try{ x.fillStyle='#0a0e0c'; x.fillRect(bx-2,by-2,bw+4,bh+4); x.drawImage(fImg,bx,by,bw,bh); }catch(e){} } // 国旗は顔写真の右下バッジ
+      x.textBaseline='alphabetic'; x.textAlign='center'; x.font='800 '+nf+'px Manrope,sans-serif'; x.fillStyle='#eafff0';
+      const ny=cyc+r+26; x.fillText(fitCanvasText(x,names[i],cellW[i]-6),cx0,ny);
+      if(_stripRoles){ x.fillStyle=roleCol(p[1]); x.font='700 '+(fmtC==='sq'?13:14)+'px Manrope,sans-serif'; x.fillText(p[1],cx0,ny+19); }
     });
     x.textAlign='left';
   }
