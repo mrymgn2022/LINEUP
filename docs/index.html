@@ -3798,14 +3798,14 @@ function wireLgSelect(container, f, onChange){
 function lgExpandFor(code){ for(const [jp,codes] of LGGROUP){ if(codes.length>1 && codes.includes(code)) return jp; } return null; }
 function clubChips(f=pickFilter){
   const mem=lgMembers(f.lg);
-  const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
+  const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort((a,b)=>a.localeCompare(b)); // アクセント付き（Atlético等）も自然な順に（2026-09-29 監査C31）
   return `<div class="fchip ${f.club==='ALL'?'on':''}" data-club="ALL">${t('allClubs')}</div>`+
     clubs.map(c=>`<div class="fchip ${f.club===c?'on':''}" data-club="${escAttr(c)}">${escAttr(dispClub(c))}</div>`).join('');
 }
 // クラブ選択プルダウン（チーム作成以外のピッカー用。横並びチップ→<select>）。リーグ選択後に絞り込みやすく。
 function clubSelectHTML(f=pickFilter){
   const mem=lgMembers(f.lg);
-  const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort();
+  const clubs=[...new Set(P.filter((p,i)=>!isCustomPid(i)&&(!mem||mem.includes(p[5]))).map(p=>p[4].trim()))].sort((a,b)=>a.localeCompare(b)); // アクセント付き（Atlético等）も自然な順に（2026-09-29 監査C31）
   const o=(v,label,sel)=>`<option value="${escAttr(v)}"${sel?' selected':''}>${escAttr(label)}</option>`;
   return `<select class="search clubsel" style="flex:1 0 100%">`+o('ALL',t('allClubs'),(f.club||'ALL')==='ALL')+clubs.map(c=>o(c,dispClub(c),f.club===c)).join('')+`</select>`;
 }
@@ -4322,10 +4322,13 @@ const LGNAT={PL:'ENG',LL:'ESP',SA:'ITA',BL:'GER',L1:'FRA',ED:'NED',PT:'POR',TR:'
 function dispNatCode(pid){ const p=P[pid]; if(!p)return ''; if(state.flagByLeague){ const c=LGNAT[p[5]]; if(c)return c; } return natCode(p); }
 function flagHTMLForPid(pid){ return flagHTML(dispNatCode(pid)); }
 function natsInData(){ const s=new Set(); for(let i=0;i<P.length;i++){ if(isCustomPid(i))continue; const c=natCode(P[i]); if(c)s.add(c); } return s; }
+// 漢字を含む国名の読み（ひらがなで国籍を探せるように 2026-09-29 監査C29）
+const NATYOMI={JPN:'にほん にっぽん',KOR:'かんこく',CHN:'ちゅうごく',PRK:'きたちょうせん',NIR:'きたあいるらんど',USA:'あめりかがっしゅうこく',RSA:'みなみあふりか',EQG:'せきどうぎにあ',CTA:'ちゅうおうあふりかきょうわこく',COD:'こんごみんしゅきょうわこく',CGO:'こんごきょうわこく',DOM:'どみにかきょうわこく',FRO:'ふぇろーしょとう',GUF:'ふらんすりょうぎあな',MKD:'きたまけどにあ',SSD:'みなみすーだん',UAE:'あらぶしゅちょうこくれんぽう',HKG:'ほんこん',TLS:'ひがしちもーる'};
 function natOptionsHTML(q){
   const present=natsInData(); q=(q||'').trim().toLowerCase(); const qk=natNorm(q);
   // 日本語名（かな正規化）・英語名・コードのいずれかにヒットすれば一致（例: "Japan"でも"日本"でも"JPN"でもOK）
-  const m=c=>!q||natNorm(NATJA[c]||'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase().includes(q);
+  const qa=deaccent(q).toLowerCase();
+  const m=c=>!q||natNorm(NATJA[c]||'').includes(qk)||natNorm(NATYOMI[c]||'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||deaccent(NATNAME[c]||'').toLowerCase().includes(qa)||c.toLowerCase().includes(q);
   const top=NAT_TOP.filter(c=>present.has(c)&&m(c));
   const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=> LANG==='en' ? (NATNAME[a]||a).localeCompare(NATNAME[b]||b) : natJa(a).localeCompare(natJa(b),'ja'));
   const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${natDisp(c)}</span></div>`;
@@ -5339,7 +5342,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929t'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929v'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
