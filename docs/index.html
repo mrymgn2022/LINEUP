@@ -1220,7 +1220,7 @@ const I18N = {
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
     tstMaxBench:'ベンチは最大15人です', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
-    tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした',tstPhotoHeic:'この形式（HEIC）は読み込めません。スクリーンショットかJPEG/PNGの画像でお試しください',tstMemoOnEmpty:'メモ表示をONにしました（メモはまだありません。駒をタップ→「メモを編集」）', tstPhotoHiddenUser:'保存しました（ユーザーモードのため盤面には表示されません。版数を長押しで通常モードへ）', swapPrompt:'入れ替える相手をタップ（ベンチ・ベンチ外も可）',
+    tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした',tstPhotoDelFail:'写真を消しましたが、端末への保存に失敗しました（次に開くと戻る場合があります）',tstPhotoHeic:'この形式（HEIC）は読み込めません。スクリーンショットかJPEG/PNGの画像でお試しください',tstMemoOnEmpty:'メモ表示をONにしました（メモはまだありません。駒をタップ→「メモを編集」）', tstPhotoHiddenUser:'保存しました（ユーザーモードのため盤面には表示されません。版数を長押しで通常モードへ）', swapPrompt:'入れ替える相手をタップ（ベンチ・ベンチ外も可）',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
     tstSubCleared:'第2候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
     tstNameUpdated:'表示名を更新しました',tstNameReset:'元の名前に戻しました', tstMemoSaved:'メモを保存しました', tstMemoDeleted:'メモを削除しました', tstXIFull:'スタメンが11人埋まっています。誰かを外してください', tstCanceled:'キャンセルしました',
@@ -1302,7 +1302,7 @@ const I18N = {
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
     tstMaxBench:'The bench is full (max 15).', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
-    tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image',tstPhotoHeic:'HEIC images can’t be read. Try a screenshot or a JPEG/PNG image.',tstMemoOnEmpty:'Notes are on (no notes yet — tap a player → Edit note)', tstPhotoHiddenUser:'Saved — but hidden on the board in user mode. Long-press the version number to return to normal mode.', swapPrompt:'Tap who to swap with (bench & reserves too)',
+    tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image',tstPhotoDelFail:'Photo removed, but saving to this device failed (it may come back next time).',tstPhotoHeic:'HEIC images can’t be read. Try a screenshot or a JPEG/PNG image.',tstMemoOnEmpty:'Notes are on (no notes yet — tap a player → Edit note)', tstPhotoHiddenUser:'Saved — but hidden on the board in user mode. Long-press the version number to return to normal mode.', swapPrompt:'Tap who to swap with (bench & reserves too)',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
     tstNameUpdated:'Display name updated',tstNameReset:'Back to the original name', tstMemoSaved:'Note saved', tstMemoDeleted:'Note deleted', tstXIFull:'The XI already has 11. Remove someone first.', tstCanceled:'Canceled',
@@ -2855,14 +2855,14 @@ function openPhotoCrop(img){
     zoomTo(cs*(e.deltaY>0?1.08:0.925),(e.clientX-r.left)*(D/r.width),(e.clientY-r.top)*(D/r.height)); },{passive:false});
   slider.addEventListener('input',()=>{ zoomTo(fit*100/Math.max(100,Math.min(400,+slider.value||100)),D/2,D/2); });
   document.getElementById('cropOk').onclick=()=>{ savePhotoCrop(img,sx,sy,cs); };
-  document.getElementById('cropCancel').onclick=()=>{ const p=pid; photoTarget=null; closeSheet(); if(p!=null&&P[p]) try{openDetail(p);}catch(e){} };
+  document.getElementById('cropCancel').onclick=()=>{ const p=pid, fromEdit=_cropFromEdit; photoTarget=null; _cropFromEdit=false; closeSheet(); if(fromEdit&&p!=null&&P[p]) try{openDetail(p);}catch(e){} }; // 詳細から写真編集に来た時だけ詳細へ戻る（新規取り込みのキャンセルで関係ない詳細が開いていた 2026-09-30 監査C25）
   const _delBtn=document.getElementById('cropDelete');
   if(_delBtn){ _delBtn.onclick=async ()=>{
     try{ delete state.photos[pid]; }catch(e){}
-    try{ await savePhotos(); }catch(e){}
+    let _ok=false; try{ _ok=await savePhotos(); }catch(e){}
     photoTarget=null; _cropFromEdit=false;
     closeSheet(); render(); save();
-    toast(t('tstPhotoDeleted'));
+    toast(_ok?t('tstPhotoDeleted'):t('tstPhotoDelFail')); // 端末に保存できなかった時は正直に（2026-09-30 監査C26）
   }; }
 }
 
@@ -5350,7 +5350,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930g'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930h'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
