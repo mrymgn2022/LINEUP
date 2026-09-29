@@ -2000,6 +2000,7 @@ function render(){ normSubs(); sanitizeTextMaps(); if(_autoPend){ _autoPend=fals
     pitch.appendChild(tok);
     tokenEls[i]=tok;
     attachDrag(tok,i);
+    tok.tabIndex=0; tok.setAttribute('role','button'); tok.setAttribute('aria-label',(s.pid!=null?nameOf(s.pid)+' – ':'')+s.role); // キーボード・読み上げ（2026-09-30 監査B29）
   });
   spreadFlanks();
   liftBottomLabels();
@@ -2922,18 +2923,21 @@ function tapReserveInSwap(targetPid){
    Sheet helpers
    ========================================================= */
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
+try{ sheet.inert=true; const _dw0=document.getElementById('drawer'); if(_dw0) _dw0.inert=true; }catch(e){} // 閉じている間はTab・読み上げの対象外（2026-09-30 監査E14）
 // 外部（画像検索の別タブ等）から復帰した直後は、シート/ドロワーをCSSアニメ無しで即表示する。
 // iOS PWAで「window.openから戻った直後に開くオーバーレイの遷移アニメ」がコンポジタごと固まる症状の対策（復帰4秒間 or 明示フラグ）。
 let _visReturnAt=0,_forceNoAnimSheet=false,_sheetLockUntil=0; // _sheetLockUntil: この時刻までスクリム/下スワイプで閉じない(PIN画面が連打の余韻タップで即消えるのを防ぐ)。openSheet毎に0へ戻し、openAdminPinだけ再設定。OK/キャンセルは直接closeSheetで通す
 function _noAnimNow(){ const f=_forceNoAnimSheet||(Date.now()-_visReturnAt<4000); _forceNoAnimSheet=false; return f; }
-function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0;
+function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0; try{ sheet.inert=false; }catch(e){}
   try{ const xb=document.getElementById('xiDoneBar'); if(xb) xb.remove(); }catch(e){} // XI完成バー(z:340)はシート(z:60)より上に描画され共有シート等に二重CTAで被る(2026-08-04監査)。オーバーレイを開いた時点で役目終了＝撤去
   body.innerHTML=html;body.scrollTop=0;sheet.classList.remove('expanded');
   const na=_noAnimNow(); if(na){ sheet.style.transition='none'; scrim.style.transition='none'; }
   sheet.style.transform='';scrim.classList.add('on');sheet.classList.add('on');
   if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
   _ovPush();}
-function closeSheet(){_shareConfirmOpen=false;scrim.classList.remove('on');sheet.classList.remove('on','expanded');sheet.style.transform='';}
+// 駒・ドロワー項目・ベンチカードは Enter / Space でタップと同じ（2026-09-30 監査A40/B29）
+try{ document.addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return; const el=e.target&&e.target.closest&&e.target.closest('.tok[data-i],.dwitem,.dwsave,.bcard[data-pid]'); if(!el||e.target.closest('input,textarea,select,button')) return; e.preventDefault(); if(el.classList.contains('tok')) onSlotTap(+el.dataset.i); else el.click(); }); }catch(e){}
+function closeSheet(){_shareConfirmOpen=false;scrim.classList.remove('on'); try{ sheet.inert=true; if(sheet.contains(document.activeElement)) document.activeElement.blur(); }catch(e){}sheet.classList.remove('on','expanded');sheet.style.transform='';}
 // Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
 // overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
 // history.back() はプログラムから呼ばない（高速開閉で暴発してページ外へ飛ぶ事故を避ける）＝安全側。手動で閉じた後はマーカーが1つ残り、次の「戻る」1回だけが吸収される（アプリは終了しない）。
@@ -5305,7 +5309,7 @@ let _resetDrawerGesture=null; // initDrawerGestures がジェスチャ状態リ�
 // ドロワー/スクリムに残ったインラインスタイル（スワイプ途中のtransform/opacity）を消し、開閉はCSSクラスだけで決まる状態に戻す。
 // PWAでOSが左端スワイプを横取りして pointerup が来ず、ジェスチャが固着した場合でも、開閉のたびに必ず自己修復する。
 function _drawerClearInline(){ try{ const d=document.getElementById('drawer'), sc=document.getElementById('dscrim'); if(d){ d.style.transition=''; d.style.transform=''; } if(sc){ sc.style.transition=''; sc.style.opacity=''; } }catch(e){} }
-function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)_resetDrawerGesture(); renderDrawer(); _drawerClearInline();
+function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)_resetDrawerGesture(); try{ document.getElementById('drawer').inert=false; }catch(e){} renderDrawer(); _drawerClearInline();
   try{ const xb=document.getElementById('xiDoneBar'); if(xb) xb.remove(); }catch(e){} // シートと同じ理由（ドロワーz:73より上に被る）
   const dw=document.getElementById('drawer'), ds=document.getElementById('dscrim');
   const na=(Date.now()-_visReturnAt<4000); if(na){ dw.style.transition='none'; ds.style.transition='none'; } // 復帰直後は無アニメ（openSheetと同じ対策）
@@ -5313,7 +5317,7 @@ function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)
   if(na){ setTimeout(()=>{ dw.style.transition=''; ds.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
   _ovPush(); }
 try{ document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; try{ if(swapSel){ cancelSwap(); return; } if(sheet.classList.contains('on')){ closeSheet(); return; } const dw=document.getElementById('drawer'); if(dw&&dw.classList.contains('on')) closeDrawer(); }catch(_){} }); }catch(e){} // Escで閉じる（2026-09-29）
-function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
+function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); try{ const _d=document.getElementById('drawer'); _d.inert=true; if(_d.contains(document.activeElement)) document.activeElement.blur(); }catch(e){} document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
 // Web版（通常のブラウザ）判定。インストール済みPWA / ネイティブ(Capacitor)では false → ストア誘導を出さない
 function isWebVersion(){
   try{
@@ -5351,7 +5355,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930n'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930o'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -5484,6 +5488,7 @@ function wireDrawer(){
       bl.addEventListener('pointerleave',cancel); bl.addEventListener('pointercancel',cancel);
       bl.addEventListener('contextmenu',e=>{ try{e.preventDefault();}catch(_){} }); } }
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
+  d.querySelectorAll('.dwitem,.dwsave').forEach(x=>{ if(!x.hasAttribute('tabindex')) x.tabIndex=0; if(!x.getAttribute('role')) x.setAttribute('role','button'); }); // キーボード操作（2026-09-30 監査A40）
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ if(!state.slots.some(s=>s&&s.pid!=null)){ toast(t('tstPlaceFirst')); return; } /* 空の盤面は保存しない（ヘッダーの保存と同じ 2026-09-29 監査D44） */ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDeleteTeam(el.dataset.del); });
