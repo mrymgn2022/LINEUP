@@ -1068,7 +1068,10 @@ const JAFN={"David Ospina|COL":"ダビド・オスピナ","Guillermo Ochoa|MEX":
 // ① Jリーグ在籍選手（P[5]=J1/J2/J3）: 文脈を問わず公式日本語名（日本人=漢字/外国人=カタカナ）。
 //    海外移籍で P[5] が変わると自動でローマ字表示に戻る（例: 佐藤龍之介→Valencia移籍でローマ字。運用ルール 2026-07-12）
 // ② 海外組の日本人（JAOV: 三笘・久保など全海外組）: 日本代表（国籍JPN編成）を作っている時だけ漢字
-function nameJa(pid){ if(LANG!=='ja'||pid==null||!P[pid]) return null; if(state.names&&state.names[pidToKey(pid)]) return null;
+// 日本人名（漢字・ひらがな始まり）は姓名のスペースを詰めて表示（2026-10-01 ユーザー決定: 平野遼・吉田麻也で統一）。カタカナの外国人名（サミュエル グスタフソン）はそのまま
+function jaCompact(v){ return (v&&/^[\p{sc=Han}\p{sc=Hiragana}々ヶ]/u.test(v))?v.replace(/[\s　]+/g,''):v; }
+function nameJa(pid){ const r=nameJaRaw(pid); return r?jaCompact(r):r; }
+function nameJaRaw(pid){ if(LANG!=='ja'||pid==null||!P[pid]) return null; if(state.names&&state.names[pidToKey(pid)]) return null;
   const p=P[pid], lg=p[5];
   if(lg==='J1'||lg==='J2'||lg==='J3'){ const j=J1JA[pidToKey(pid)]; if(j) return j; }
   if(natCode(p)!=='JPN') return null;
@@ -1120,9 +1123,10 @@ function squadShortName(pid){
   const c=state.names&&state.names[pidToKey(pid)]; if(c) return c; // ユーザー設定名はそのまま
   const kj=nameJa(pid);
   if(kj){ // 日本語名の盤面短縮（隣の駒と重なるため）: 個別表記(野澤/クールズ/キム ミンテ等)→姓(日本人=先頭/外国人=末尾)→先頭5字…。詳細画面はnameOf(full)で全文
-    if(kj.length<=6) return kj;
-    const ov=NAMEJA_SHORT[P[pid][0].trim()]||J1JA_DISP[kj]; if(ov) return ov;
-    const t=kj.split(/[\s　]+/);
+    const raw=nameJaRaw(pid)||kj; // 短縮の判定・姓の切り出しは辞書の原形（スペースあり）で行う＝表示だけ詰める
+    if(raw.length<=6) return kj;
+    const ov=NAMEJA_SHORT[P[pid][0].trim()]||J1JA_DISP[raw]; if(ov) return ov;
+    const t=raw.split(/[\s　]+/);
     if(t.length>1){ const s=(natCode(P[pid])==='JPN')?t[0]:t[t.length-1]; if(s.length<=8) return s; }
     if(kj.length<=9) return kj;      // 1語（分割不可）の名前は9字まで全文表示（ドレシェヴィッチ=8等・多語の姓8字許容と整合）
     return kj.slice(0,8)+'…'; }      // 本当に長い1語名のみ8字+…（従来5字→8字に緩和）
@@ -5369,7 +5373,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7688,7 +7692,7 @@ window.__selftest=function(){
         if(nameOf(_gus)!=='サミュエル グスタフソン')_m.push('外国人カナ');
         if(squadShortName(_gus)!=='グスタフソン')_m.push('盤面短縮');
         if(squadShortName(_dre)!=='ドレシェヴィッチ')_m.push('1語カナ名の過剰短縮');
-        if(nameOf(_hLB)!=='橋本 健人'||nameOf(_hDM)!=='橋本 拳人')_m.push('同名判別');
+        if(nameOf(_hLB)!=='橋本健人'||nameOf(_hDM)!=='橋本拳人')_m.push('同名判別'); // 2026-10-01: 日本人名は姓名スペースなしで表示
         if(nameOf(_sato)!=='Ryunosuke Sato')_m.push('海外移籍者が通常文脈で漢字');
         state.teamCond={nat:'JPN'}; state.flagByLeague=true;
         if(nameOf(_sato)!=='佐藤龍之介')_m.push('代表文脈の海外組が漢字にならない');
