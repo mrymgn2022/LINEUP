@@ -2053,6 +2053,7 @@ function isWideDock(){ try{ return window.matchMedia('(min-width:768px) and (min
 // → リサイズ/メディアクエリ変化で境界をまたいだら作り直す。
 let _wideDockNow=null;
 function syncWideDock(onlyOnChange){
+  try{ const _d=document.getElementById('drawer'); if(_d) _d.inert=!isWideDock()&&!_d.classList.contains('on'); }catch(e){} // 常設サイドバーは常に操作可能（2026-10-01 退行修正）
   try{
     const wide=isWideDock(), changed=(wide!==_wideDockNow);
     if(onlyOnChange && !changed) return;
@@ -2495,7 +2496,8 @@ function attachDrag(el,actor){
   }
   function arm(){
     if(swapSel){ swapSel=null; hideModeBar(); } // ドラッグを始めたら入れ替えモードは解除
-    armed=true; st0=scroller.scrollTop; const b=base(); bx0=b.x; by0=b.y; ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; { const _t=parseFloat(el.style.top); oy=isNaN(_t)?b.y:(100-_t); } // 縦も表示位置から掴む（下端の持ち上げ分で跳ねていた 2026-09-30 監査B35） _lmAtGrab=layoutMoved; // 表示位置から掴む（広がり分のジャンプ防止）
+    armed=true; st0=scroller.scrollTop; const b=base(); bx0=b.x; by0=b.y; ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; { const _t=parseFloat(el.style.top); oy=isNaN(_t)?b.y:(100-_t); } // 縦も表示位置から掴む（下端の持ち上げ分で跳ねていた 2026-09-30 監査B35）
+    _lmAtGrab=layoutMoved; // 表示位置から掴む（広がり分のジャンプ防止）※コメントの後ろに入って実行されていなかった（2026-10-01 退行修正）
     try{el.setPointerCapture(pid);}catch(_){}
     el.classList.add('drag');
     if(!scrollRAF) scrollRAF=requestAnimationFrame(autoScrollTick);
@@ -2797,14 +2799,7 @@ function morphPastePanel(b,pid){
 }
 photoInput.addEventListener('change',()=>{
   const f=photoInput.files&&photoInput.files[0]; if(!f||photoTarget==null)return;
-  const fr=new FileReader();
-  fr.onload=()=>{
-    const img=new Image();
-    img.onload=()=>beginPhotoImport(img); // ほぼ正方形＝即保存／縦長・横長＝位置調整シート（貼り付け経路と共通）
-    img.onerror=()=>{photoTarget=null;toast(t('tstPhotoFail'));};
-    img.src=fr.result;
-  };
-  fr.readAsDataURL(f);
+  importPhotoBlob(photoTarget,f); // 貼り付けと同じ経路＝大きな写真の縮小・透過の白背景・HEICの案内が効く（2026-10-01 修正漏れ）
   photoInput.value=''; // 同じファイルを選び直しても change が発火するように
 });
 // 指定オフセットで正方形にトリミングしつつ480pxへ縮小（容量節約）して保存
@@ -2955,7 +2950,7 @@ function tapReserveInSwap(targetPid){
    Sheet helpers
    ========================================================= */
 const scrim=document.getElementById('scrim'),sheet=document.getElementById('sheet'),body=document.getElementById('sheetBody');
-try{ sheet.inert=true; const _dw0=document.getElementById('drawer'); if(_dw0) _dw0.inert=true; }catch(e){} // 閉じている間はTab・読み上げの対象外（2026-09-30 監査E14）
+try{ sheet.inert=true; const _dw0=document.getElementById('drawer'); if(_dw0) _dw0.inert=!isWideDock(); }catch(e){} /* 広い画面ではドロワー＝常設サイドバーなので inert にしない（2026-10-01 退行修正） */ // 閉じている間はTab・読み上げの対象外（2026-09-30 監査E14）
 // 外部（画像検索の別タブ等）から復帰した直後は、シート/ドロワーをCSSアニメ無しで即表示する。
 // iOS PWAで「window.openから戻った直後に開くオーバーレイの遷移アニメ」がコンポジタごと固まる症状の対策（復帰4秒間 or 明示フラグ）。
 let _visReturnAt=0,_forceNoAnimSheet=false,_sheetLockUntil=0; // _sheetLockUntil: この時刻までスクリム/下スワイプで閉じない(PIN画面が連打の余韻タップで即消えるのを防ぐ)。openSheet毎に0へ戻し、openAdminPinだけ再設定。OK/キャンセルは直接closeSheetで通す
@@ -5352,7 +5347,7 @@ function openDrawer(){ recordEvent('first_action',true); if(_resetDrawerGesture)
   if(na){ setTimeout(()=>{ dw.style.transition=''; ds.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
   _ovPush(); }
 try{ document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; try{ if(swapSel){ cancelSwap(); return; } if(sheet.classList.contains('on')){ closeSheet(); return; } const dw=document.getElementById('drawer'); if(dw&&dw.classList.contains('on')) closeDrawer(); }catch(_){} }); }catch(e){} // Escで閉じる（2026-09-29）
-function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); try{ const _d=document.getElementById('drawer'); _d.inert=true; if(_d.contains(document.activeElement)) document.activeElement.blur(); }catch(e){} document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
+function closeDrawer(){ if(_resetDrawerGesture)_resetDrawerGesture(); try{ const _d=document.getElementById('drawer'); _d.inert=!isWideDock(); if(_d.contains(document.activeElement)) document.activeElement.blur(); }catch(e){} document.getElementById('drawer').classList.remove('on'); document.getElementById('dscrim').classList.remove('on'); _drawerClearInline(); }
 // Web版（通常のブラウザ）判定。インストール済みPWA / ネイティブ(Capacitor)では false → ストア誘導を出さない
 function isWebVersion(){
   try{
@@ -5390,7 +5385,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001f'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001h'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6519,11 +6514,11 @@ function startOriginal(){
     </div>`);
   // クリアの点灯/減光もピッカーと同じ作法（条件が1つでも効いている時だけ浮き上がる）
   const syncOtClear=()=>{ const b=document.getElementById('otClear'); if(!b) return;
-    const on=!!((acf.nat&&acf.nat!=='ALL')||(chosenLg&&chosenLg!=='ALL')||((document.getElementById('otClub')||{}).value));
+    let _pk=''; try{ _pk=otPickedClub; }catch(e){} const on=!!((acf.nat&&acf.nat!=='ALL')||(chosenLg&&chosenLg!=='ALL')||((document.getElementById('otClub')||{}).value)||_pk);
     b.style.opacity=on?'1':'.45'; b.style.color=on?'var(--ink)':''; b.style.borderColor=on?'var(--mut)':''; };
   document.getElementById('otForm').onchange=e=>{ chosenForm=e.target.value; formTouched=true; };
   const _otLgEl=document.getElementById('otLg');
-  if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); syncOtClear(); }); }
+  if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; try{ otPickedClub=''; }catch(e){} updateClubField(); syncOtClear(); }); } // リーグを変えたら候補で選んだクラブは無効（2026-10-01 退行修正）
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
   const otClubLg={}, otClubN={};
   P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(!c) return; if(!(c in otClubLg)||(!otClubLg[c]&&p[5])) otClubLg[c]=p[5]; otClubN[c]=(otClubN[c]||0)+1; } });
@@ -6558,7 +6553,7 @@ function startOriginal(){
     otPickedClub=club; otSearchEl.value=dispClub(club); otSug.innerHTML=''; syncOtClear();
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{ syncOtClear(); });
-  { const _cs=document.getElementById('otClub'); if(_cs) _cs.addEventListener('change',syncOtClear); }
+  { const _cs=document.getElementById('otClub'); if(_cs) _cs.addEventListener('change',()=>{ try{ otPickedClub=''; }catch(e){} syncOtClear(); }); } // クラブ欄を変えたら候補の選択は無効（2026-10-01）
   // 復元時：リーグ/人気クラブ指定があればクラブ欄を表示。前回選んだクラブも復元
   updateClubField();
   const _otClub=document.getElementById('otClub'); if(_otClub&&otLast.club) _otClub.value=otLast.club;
@@ -7398,7 +7393,7 @@ let tT;const toastEl=document.getElementById('toast');
 let _undo=null;
 function snapUndo(){ try{ _undo={raw:JSON.stringify(serializeTeam()),lm:layoutMoved,tid:state.teamId}; }catch(e){ _undo=null; } }
 function toastUndo(m){ toast(m); if(!_undo) return; const u=_undo; const b=document.createElement('button'); b.type='button'; b.className='tundo'; b.textContent=t('undo');
-  b.onclick=ev=>{ ev.stopPropagation(); if(_undo!==u) return; _undo=null; try{ applyRaw(resolveRaw(JSON.parse(u.raw))); state.teamId=u.tid; layoutMoved=u.lm; setFormLabel(); render(); save(); syncResetChip(); toast(t('tstUndone')); }catch(e){ toast(t('tstUndone')); } };
+  b.onclick=ev=>{ ev.stopPropagation(); if(_undo!==u) return; _undo=null; try{ const _cj=cleanJson; applyRaw(resolveRaw(JSON.parse(u.raw))); cleanJson=_cj; /* applyRaw は読込扱いで cleanJson を上書きする＝未保存の変更が保存済みに見えていた（2026-10-01 退行修正） */ state.teamId=u.tid; layoutMoved=u.lm; setFormLabel(); render(); save(); syncResetChip(); toast(t('tstUndone')); }catch(e){ toast(t('tstUndone')); } };
   toastEl.appendChild(b); toastEl.classList.add('act'); clearTimeout(tT); tT=setTimeout(()=>toastEl.classList.remove('on','act'),5000); }
 function toast(m){
   // 横位置は盤面(#pitch)の実測中心X（2026-07-27）。CSSの--appcx(.app列の中心)だと、縦スクロールバーが
@@ -9175,6 +9170,12 @@ window.__selftest=function(){
   const ph=await loadPhotos();
   if(ph&&typeof ph==='object')state.photos=ph;
   applyRaw(saved); // 表示フラグ・スタメン・ベンチ等をまとめて適用（初回起動）
+  // 再起動後も「未保存」を正しく判定する（applyRaw は読込扱いで cleanJson を今の盤面にする＝未保存の下書きが保存済みに見え、
+  // 深リンクや⚡で確認なしに上書きされていた 2026-10-01 退行修正）。一覧に無い下書き＝未保存、一覧にあっても中身が違えば未保存
+  try{ const _tm=state.teamId?getTeams().find(x=>x.id===state.teamId):null;
+    if(!_tm) cleanJson=null;
+    else { const core=o=>JSON.stringify({f:o.formation,s:(o.slots||[]).map(s=>[s.pid,s.sub,s.role,Math.round(s.x||0),Math.round(s.y||0)]),c:o.captain||null,n:o.teamName||null});
+      if(core(serializeTeam())!==core(_tm.data||{})) cleanJson='__force_dirty__'; } }catch(e){}
   render();
   // アプリを開いたまま別の共有リンク（#s=…）に来た時も確認を出す（同じタブ・PWAで無反応だった 2026-09-30 監査D34）
   try{ window.addEventListener('hashchange',()=>{ if(!/^#?s=/.test(location.hash||'')) return; const h0=location.hash; decodeSquadHash(h0).then(raw=>{ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} if(raw) openSharedSquadConfirm(raw); else toast(navigator.onLine===false?t('tstShareOffline'):t('tstShareBad')); }).catch(()=>{}); }); }catch(e){}
