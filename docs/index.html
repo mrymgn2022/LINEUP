@@ -5366,7 +5366,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930x'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930y'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7527,6 +7527,7 @@ window.__selftest=function(){
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
   // スナップショット（非破壊復元のため）
   const snapState=JSON.parse(JSON.stringify(state)); const snapPLen=P.length;
+  let snapLS_t=null,snapLS_a=null; try{ snapLS_t=localStorage.getItem('xi_teams_v1'); snapLS_a=localStorage.getItem('xi_auto_sig'); }catch(e){} // 保存一覧・自動配置の記録も最後に戻す（監査D36）
   let snapLS_s=null,snapLS_p=null,snapLS_b=null; try{ snapLS_s=localStorage.getItem('xi_state_v2'); snapLS_p=localStorage.getItem('xi_photos_v2'); snapLS_b=localStorage.getItem('xi_ap_badge_done'); }catch(e){} // _bはT73/T78が実openAutoSheetを呼びバッジ既読キーを立ててしまうため
   try{
     // T1: 全フォーメーションが11枠で構築できる
@@ -9142,6 +9143,7 @@ window.__selftest=function(){
          if(snapLS_b!=null)localStorage.setItem('xi_ap_badge_done',snapLS_b); else localStorage.removeItem('xi_ap_badge_done'); }catch(e){}
     try{ if(typeof syncApBadge==='function') syncApBadge(); }catch(e){} // バッジ表示もキー復元後の状態に同期
     try{ _keyMap=null; computeSquadDups(); render(); }catch(e){}
+    try{ if(snapLS_t!=null) localStorage.setItem('xi_teams_v1',snapLS_t); else localStorage.removeItem('xi_teams_v1'); memTeams=null; if(snapLS_a!=null) localStorage.setItem('xi_auto_sig',snapLS_a); else localStorage.removeItem('xi_auto_sig'); }catch(e){}
     window.__inSelftest=false;
   }
   const fails=R.filter(r=>!r.ok);
