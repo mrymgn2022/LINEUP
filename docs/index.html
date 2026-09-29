@@ -5347,7 +5347,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930d'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930e'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6872,7 +6872,7 @@ function maybeShowXiDoneBar(){
 }
 async function buildShareCanvas(){
   // Webフォントのロード完了を待ってから焼く（待たないと、タイミング次第でシステムフォントの画像になり盤面と字形が変わる）
-  try{ await Promise.all([document.fonts.load('700 20px Manrope'),document.fonts.load('800 20px Manrope'),document.fonts.load('600 20px Manrope'),document.fonts.load('20px "Bebas Neue"')]); }catch(e){}
+  try{ const _ext='AaŁłŞşŽžŐőĆćĞğ'; await Promise.all([document.fonts.load('700 20px Manrope',_ext),document.fonts.load('800 20px Manrope',_ext),document.fonts.load('600 20px Manrope',_ext),document.fonts.load('20px "Bebas Neue"',_ext)]); }catch(e){} // ラテン拡張（ł・ş等）のフォントも待つ（2026-09-30 監査D30）
   computeSquadDups(); // 同名選手の検出（イニシャル付与用）
   const photoImgs=await preloadPhotos();
   const flagImgs=await preloadFlags();
@@ -7040,8 +7040,7 @@ async function buildShareCanvas(){
     x.textAlign='left';
     if(it.fImg){
       const flagY=(nameBaseY-sz*0.34)-flagH/2;
-      x.drawImage(it.fImg,startX,flagY,flagW,flagH);
-      x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH);
+      try{ x.drawImage(it.fImg,startX,flagY,flagW,flagH); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(startX,flagY,flagW,flagH); }catch(e){} // 国旗が描けなくても画像作成は続ける（D31）
     }
     x.fillStyle='#eafff0';
     dsText(it.full,startX+(it.fImg?flagW+gap:0),nameBaseY); // 盤面と同じ二重影で描画
@@ -7051,7 +7050,7 @@ async function buildShareCanvas(){
     if(state.showMemo){const mt=dispMemo(s.pid); if(mt){ x.fillStyle='#7fd3ff';x.font='700 '+uniSub+'px Manrope,sans-serif';
       const _mfc=memoFlagCode(s.pid); const mImg=_mfc?flagImgs[FI[_mfc]]:null;
       if(mImg){ const fh=Math.round(uniSub*0.82),fw=Math.round(fh*4/3),gp=m(3),tw=x.measureText(mt).width,tot=fw+gp+tw,sx0=fx-tot/2,fyy=(infoY-uniSub*0.34)-fh/2;
-        const _sc=x.shadowColor; x.shadowColor='transparent'; x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); x.shadowColor=_sc;
+        const _sc=x.shadowColor; x.shadowColor='transparent'; try{ x.drawImage(mImg,sx0,fyy,fw,fh); x.lineWidth=1;x.strokeStyle='rgba(0,0,0,.4)';x.strokeRect(sx0,fyy,fw,fh); }catch(e){} x.shadowColor=_sc;
         x.textAlign='left'; dsText(mt,sx0+fw+gp,infoY); x.textAlign='center';
       } else { dsText(mt,fx,infoY); }
       infoY+=m(15); }}
