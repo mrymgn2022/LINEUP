@@ -4734,6 +4734,7 @@ function openCreatePlayer(slotIdx){
   //   ベンチ・ベンチ外の「＋」→「選手を新規作成」で作った選手が どこにも追加されず消えていた。
   //   → シートを開く前に呼び出し元の文脈を退避し、保存時にそれを使う（グローバルは触らない＝他経路に影響なし）。
   const _ctxBench=benchAddMode, _ctxOnPick=pickOnPick;
+  const _qv=(((document.getElementById('pq')||{}).value)||'').trim(); // 検索していた言葉（名前欄に下書き・キャンセルで検索へ戻す 2026-09-30 監査C21）
   const cf={nat:null}; let selPos=null, selFoot='';
   const posBtns=CP_POS.map(p=>`<div class="fchip2" data-cpos="${p}">${p}</div>`).join('');
   openSheet(`
@@ -4753,7 +4754,8 @@ function openCreatePlayer(slotIdx){
   attachNatFilter(document.querySelector('[data-natscope]'),cf,()=>{});
   document.getElementById('cpPos').onclick=e=>{const c=e.target.closest('[data-cpos]');if(!c)return;selPos=c.dataset.cpos;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');};
   document.getElementById('cpFoot').onclick=e=>{const c=e.target.closest('[data-foot]');if(!c)return;selFoot=(selFoot===c.dataset.foot)?'':c.dataset.foot;[...c.parentNode.children].forEach(x=>x.classList.remove('on'));if(selFoot)c.classList.add('on');};
-  document.getElementById('cpCancel').onclick=()=>{ if(pickReopen)pickReopen(); else closeSheet(); };
+  document.getElementById('cpCancel').onclick=()=>{ if(!pickReopen){ closeSheet(); return; } pickReopen(); const q2=document.getElementById('pq'); if(q2&&_qv&&q2.oninput){ q2.value=_qv; q2.oninput(); } };
+  { const nm=document.getElementById('cpName'); if(nm&&_qv&&!/^[\s\d]+$/.test(_qv)) nm.value=_qv; }
   document.getElementById('cpSave').onclick=()=>{
     const name=document.getElementById('cpName').value.trim();
     const nat=(cf.nat&&cf.nat!=='ALL')?cf.nat:null;
@@ -5344,7 +5346,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
