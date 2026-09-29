@@ -2254,13 +2254,13 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   el.addEventListener('pointerdown',e=>{
     sx=e.clientX; sy=e.clientY; lastX=e.clientX; lastY=e.clientY; psy=e.clientY;
     armed=false; didDrag=false; ptrId=e.pointerId;
-    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },300); } // タッチは0.3秒長押しでドラッグ（0.2秒はスクロールと取り違えた 2026-09-29）
+    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed&&!swapSel) arm(); },300); } // タッチは0.3秒長押しでドラッグ（0.2秒はスクロールと取り違えた 2026-09-29）
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
     if(!armed){
       // マウスは少し動いたらドラッグ開始。タッチは長押し前の移動＝スクロール（カードの上でも手動で縦スクロール）
-      if(e.pointerType==='mouse'&&(Math.abs(e.clientX-sx)>3||Math.abs(e.clientY-sy)>3)){ arm(); }
+      if(e.pointerType==='mouse'&&!swapSel&&(Math.abs(e.clientX-sx)>3||Math.abs(e.clientY-sy)>3)){ arm(); }
       else if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6){ disarmTimer(); didDrag=true; } // 移動＝スクロール意図（タップ誤発火も抑制）
       if(!armed){ if(didDrag){ scroller.scrollTop-=(e.clientY-psy); } psy=e.clientY; return; }
     }
@@ -2476,8 +2476,8 @@ function attachDrag(el,actor){
     sx=e.clientX;sy=e.clientY;moved=false;armed=false;pid=e.pointerId;
     lastX=sx;lastY=sy;psy=sy; // 自動スクロールの誤作動防止＋長押し前スクロール用に初期化
     rect=pitch.getBoundingClientRect();
-    if(e.pointerType==='mouse'){ e.preventDefault(); arm(); }   // マウスは即ドラッグ
-    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },300); } // タッチは0.3秒長押し（0.2秒はスクロールと取り違えた 2026-09-29）
+    if(e.pointerType==='mouse'){ e.preventDefault(); if(!swapSel) arm(); } // 入れ替えの相手を選んでいる間はドラッグを始めない＝タップだけ（2026-09-30 ユーザー指示）   // マウスは即ドラッグ
+    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved&&!swapSel) arm(); },300); } // タッチは0.3秒長押し（0.2秒はスクロールと取り違えた 2026-09-29）
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
@@ -5351,7 +5351,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930m'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930n'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6485,11 +6485,13 @@ function startOriginal(){
   const _otLgEl=document.getElementById('otLg');
   if(_otLgEl){ _otLgEl._lgextra=POP_ROW; wireLgSelect(_otLgEl, otF, ()=>{ chosenLg=otF.lg; updateClubField(); syncOtClear(); }); }
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
-  const otClubLg={};
-  P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(c&&!(c in otClubLg)) otClubLg[c]=p[5]; } });
-  const otAllClubs=Object.keys(otClubLg).sort();
+  const otClubLg={}, otClubN={};
+  P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(!c) return; if(!(c in otClubLg)||(!otClubLg[c]&&p[5])) otClubLg[c]=p[5]; otClubN[c]=(otClubN[c]||0)+1; } });
+  const otAllClubs=Object.keys(otClubLg).filter(c=>otClubN[c]>=11).sort((a,b)=>a.localeCompare(b)); // 11人未満は編成できないので候補に出さない（2026-09-30）
+  let otPickedClub=''; // 候補から選んだクラブ（リーグ欄が空のクラブでもクラブ欄の表示と無関係に条件として使う 2026-09-30 ユーザー報告）
   const otSearchEl=document.getElementById('otSearch'), otSug=document.getElementById('otSuggest');
   if(otSearchEl) otSearchEl.oninput=()=>{
+    otPickedClub=''; // 打ち直したら選択は無効
     const q=deaccent(otSearchEl.value.trim()).toLowerCase();
     if(!q){ otSug.innerHTML=''; return; }
     const qk=natNorm(q).replace(/[\s　・＝=･]+/g,''), jaQ=/[^\x00-\x7f]/.test(q);
@@ -6507,13 +6509,13 @@ function startOriginal(){
       const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
       updateClubField(); const cs=document.getElementById('otClub'); if(cs) cs.value='';
       const sc=document.querySelector('[data-natscope]'), ch=sc&&sc.querySelector('[data-natchip]'); if(ch){ ch.outerHTML=natChipHTML(acf); attachNatFilter(sc,acf,()=>{ syncOtClear(); }); }
-      otSearchEl.value=natDisp(code); otSug.innerHTML=''; syncOtClear(); return; } // 代表＝国籍条件で自動配置
+      otPickedClub=''; otSearchEl.value=natDisp(code); otSug.innerHTML=''; syncOtClear(); return; } // 代表＝国籍条件で自動配置
     const d=e.target.closest('[data-club]'); if(!d)return;
     const club=d.dataset.club; otF.lg=otClubLg[club]||'ALL'; otF.expand=lgExpandFor(otF.lg); otF.lgopen=false; chosenLg=otF.lg;
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
     updateClubField();
     const cs=document.getElementById('otClub'); if(cs) cs.value=club;
-    otSearchEl.value=club; otSug.innerHTML=''; syncOtClear();
+    otPickedClub=club; otSearchEl.value=club; otSug.innerHTML=''; syncOtClear();
   };
   attachNatFilter(document.querySelector('[data-natscope]'),acf,()=>{ syncOtClear(); });
   { const _cs=document.getElementById('otClub'); if(_cs) _cs.addEventListener('change',syncOtClear); }
@@ -6528,13 +6530,13 @@ function startOriginal(){
     const scope=document.querySelector('[data-natscope]'), chip=scope&&scope.querySelector('[data-natchip]');
     if(chip){ chip.outerHTML=natChipHTML(acf); attachNatFilter(scope,acf,()=>{ syncOtClear(); }); }
     const lgEl=document.getElementById('otLg'); if(lgEl) lgEl.innerHTML=lgSelectHTML(otF, POP_ROW);
-    const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField();
+    const cs=document.getElementById('otClub'); if(cs) cs.value=''; updateClubField(); otPickedClub='';
     const se=document.getElementById('otSearch'); if(se){ se.value=''; const sg=document.getElementById('otSuggest'); if(sg) sg.innerHTML=''; } // 検索欄も条件の一部＝一緒にクリア
     syncOtClear();
   };
   document.getElementById('otStart').onclick=()=>{
     const typed=(document.getElementById('otName').value||'').trim();
-    const chosenClub=(document.getElementById('otClub').value||'').trim();
+    const chosenClub=((document.getElementById('otClub')||{}).value||'').trim()||otPickedClub; // 候補で選んだクラブも条件に（クラブ欄が隠れていても）
     const useClub=!!chosenClub, useNat=acf.nat&&acf.nat!=='ALL';
     const useLg=(chosenLg!=='ALL'&&chosenLg!=='POP')&&!useClub; // クラブを選んだらリーグは「クラブ絞り込み用」とみなし配置条件に数えない。POP（人気クラブ）はリーグ扱いしない
     state.flagByLeague=false; // 既定は本人の国籍旗（国籍のみ指定のときだけ後でtrueにする）
@@ -7987,6 +7989,26 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e.message||e); }
       finally{ _undo=_u0; try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} try{ toastEl.classList.remove('on','act'); }catch(e){} }
       ok('undo_roundtrip',_pass,_msg); }
+    // T30g: 新規作成のチーム検索で、リーグ欄が空のクラブ（国旗なし候補）を選んでもそのクラブで配置される（2026-09-30 ユーザー報告: 有名選手の混成になっていた）
+    //       ＋入れ替えの相手を選んでいる間はドラッグを始めない
+    { let _pass=true,_msg=''; const _snap=JSON.stringify(serializeTeam()), _sw=swapSel;
+      try{
+        const cnt={}; P.forEach((p,i)=>{ if(!isCustomPid(i)&&!p[5]&&p[4].trim()){ const c=p[4].trim(); cnt[c]=(cnt[c]||0)+1; } });
+        const club=Object.keys(cnt).find(c=>cnt[c]>=11);
+        if(!club) throw new Error('検証前提: リーグ欄が空で11人以上のクラブが無い');
+        startOriginal();
+        const s=document.getElementById('otSearch'); if(!s) throw new Error('チーム検索欄が無い');
+        s.value=club; s.oninput();
+        const d=[...document.querySelectorAll('#otSuggest [data-club]')].find(x=>x.dataset.club===club); if(!d) throw new Error('候補に出ない: '+club);
+        d.click(); document.getElementById('otStart').click();
+        const bad=state.slots.filter(x=>x.pid!=null&&P[x.pid][4].trim()!==club).length;
+        if(bad) throw new Error(club+' を選んだのに別クラブの選手が'+bad+'人');
+        swapSel={t:'slot',i:0}; let armed=false; const tok=document.querySelectorAll('#pitch .tok')[1];
+        if(tok){ tok.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,cancelable:true,pointerId:77,pointerType:'mouse',button:0,clientX:1,clientY:1})); armed=tok.classList.contains('drag'); tok.dispatchEvent(new PointerEvent('pointercancel',{bubbles:true,pointerId:77,pointerType:'mouse'})); }
+        if(armed) throw new Error('入れ替え選択中にドラッグが始まった');
+      }catch(e){ _pass=false; _msg=String(e.message||e); }
+      finally{ swapSel=_sw; try{ closeSheet(); }catch(e){} try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} }
+      ok('team_search_blank_league_and_swap_lock',_pass,_msg); }
 
     // T30: CB利き足ルール（確定XIの無い自動配置で左CB=左利き優先。アーセナルの確定XIを一時的に外して検査）
     //      確定XI(CLUB_XI)はユーザーの盤面どおり＝最適化しない（2026-09-28）→ T30b
