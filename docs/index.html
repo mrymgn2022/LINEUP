@@ -608,6 +608,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
   z-index:90;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;box-shadow:var(--shadow);max-width:90%;text-align:center;
 }
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+#plist{min-height:46vh} /* 検索で件数が変わってもシートの高さが伸び縮みしない（2026-09-30 監査E36） */
 .toast.act{pointer-events:auto;padding:6px 6px 6px 18px}
 .toast .tundo{all:unset;margin-left:12px;padding:6px 12px;border-radius:999px;background:#0a0e0c;color:var(--lime);font-weight:800;cursor:pointer;white-space:nowrap}
 .hint{position:absolute;left:50%;top:46%;transform:translateX(-50%);text-align:center;color:rgba(255,255,255,.5);font-size:12px;pointer-events:none;width:80%}
@@ -1219,7 +1220,7 @@ const I18N = {
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', rescueA:'「', rescueB:'」では見つからなかったため、「', rescueC:'」の検索結果を表示しています',rescueTok:'」を短縮名とみなして検索しました', rescueKana:'」の表記のゆれを含めて検索しました', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ',shToggleHint:'左から：ポジション名 / 第2候補 / メモ / 国旗 / ベンチ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',reqPlayerQ:'検索した言葉：',
     changePlayer:'選手を変更', secondChoice:'第2候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第2候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
-    addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'この選手を入れ替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'ほかの選手に差し替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れる枠をタップ（点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第2候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
@@ -1301,7 +1302,7 @@ const I18N = {
     createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead',rescueTok:'” — matched as a short name', rescueKana:'” — matched with spelling variants', reqPlayer:'Request a player', shCustomize:'Customize image',shToggleHint:'From left: positions / 2nd choices / notes / flags / bench', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',reqPlayerQ:'Searched for: ',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
-    addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace this player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace with another player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap a flashing spot to place', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
@@ -5366,7 +5367,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930y'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930z'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
