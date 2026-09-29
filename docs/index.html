@@ -2236,7 +2236,7 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   el.addEventListener('pointerdown',e=>{
     sx=e.clientX; sy=e.clientY; lastX=e.clientX; lastY=e.clientY; psy=e.clientY;
     armed=false; didDrag=false; ptrId=e.pointerId;
-    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },200); } // タッチは0.2秒長押しでドラッグ
+    if(e.pointerType!=='mouse'){ timer=setTimeout(()=>{ if(sx!==undefined&&!armed) arm(); },300); } // タッチは0.3秒長押しでドラッグ（0.2秒はスクロールと取り違えた 2026-09-29）
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
@@ -2252,12 +2252,14 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   const end=e=>{
     disarmTimer();
     if(sx===undefined)return;
-    const wasArmed=armed;
+    const wasArmed=armed, _far=(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8);
     sx=undefined; armed=false; el.classList.remove('dragging');
     if(scrollRAF){cancelAnimationFrame(scrollRAF);scrollRAF=0;}
     if(ghost){ghost.remove();ghost=null;} highlightSlot(-1); clearAreas();
     try{el.releasePointerCapture(e.pointerId);}catch(_){}
     if(!wasArmed) return;                  // タップはclickで処理（pointercancel対策）
+    if(e.type==='pointercancel') return;   // 中断（着信・OSのジェスチャ）はドロップにしない（2026-09-29）
+    if(!_far){ cardTap(); return; }         // 長押しして動かさずに離した＝タップと同じ（盤面の駒と同じ作法 2026-09-29）
     const z=dropZone(e.clientX,e.clientY); if(!z)return;
     if(pool==='bench'){
       if(z.z==='slot') benchToSlot(pid,z.i);
@@ -2276,11 +2278,14 @@ function attachCardDrag(el,pid,pool){ // pool: 'bench' | 'reserve'
   // タップ＝click（タッチで確実に発火）。ドラッグ後のclickは抑制
   el.addEventListener('click',()=>{
     if(didDrag){ didDrag=false; return; }
+    cardTap();
+  });
+  function cardTap(){
     recordEvent('first_action',true); // ★計上漏れ修正(2026-08-05): ベンチ/ベンチ外のタップも"手を出した"。未計上だとベンチだけ触った人がバウンス扱いになる
     if(mktBenchSwap!=null){ if(pool==='bench') benchSwapMarket(pid); return; } // ベンチ交代モード：控えタップで交代
     if(swapSel){ pool==='bench'?tapBenchInSwap(pid):tapReserveInSwap(pid); }
     else { pool==='bench'?openBenchMenu(pid):openReserveMenu(pid); }
-  });
+  }
 }
 function benchToSlot(pid,slotIdx){
   const outgoing=state.slots[slotIdx].pid;
@@ -2420,7 +2425,7 @@ function dropTargetSlot(actor,px,py,rect){
   return tj;
 }
 function attachDrag(el,actor){
-  let sx,sy,ox,oy,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0,_lmAtGrab=false;
+  let sx,sy,ox,oy,bx0,by0,moved,armed,timer,pid,rect,lastX=0,lastY=0,scrollRAF=0,ghost=null,psy=0,_lmAtGrab=false;
   const base=()=>state.slots[actor];
   const scroller=document.getElementById('scroll');
   const benchEl=document.getElementById('bench');
@@ -2440,7 +2445,7 @@ function attachDrag(el,actor){
   }
   function arm(){
     if(swapSel){ swapSel=null; hideModeBar(); } // ドラッグを始めたら入れ替えモードは解除
-    armed=true; const b=base(); ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; oy=b.y; _lmAtGrab=layoutMoved; // 表示位置から掴む（広がり分のジャンプ防止）
+    armed=true; const b=base(); bx0=b.x; by0=b.y; ox=parseFloat(el.style.left); if(isNaN(ox))ox=b.x; oy=b.y; _lmAtGrab=layoutMoved; // 表示位置から掴む（広がり分のジャンプ防止）
     try{el.setPointerCapture(pid);}catch(_){}
     el.classList.add('drag');
     if(!scrollRAF) scrollRAF=requestAnimationFrame(autoScrollTick);
@@ -2453,7 +2458,7 @@ function attachDrag(el,actor){
     lastX=sx;lastY=sy;psy=sy; // 自動スクロールの誤作動防止＋長押し前スクロール用に初期化
     rect=pitch.getBoundingClientRect();
     if(e.pointerType==='mouse'){ e.preventDefault(); arm(); }   // マウスは即ドラッグ
-    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },200); } // タッチは0.2秒長押し
+    else { timer=setTimeout(()=>{ if(sx!==undefined&&!moved) arm(); },300); } // タッチは0.3秒長押し（0.2秒はスクロールと取り違えた 2026-09-29）
   });
   el.addEventListener('pointermove',e=>{
     if(sx===undefined)return;
@@ -2540,7 +2545,7 @@ function attachDrag(el,actor){
       state.slots[actor].x=ox;state.slots[actor].y=oy; render();
     }else{
       const s=state.slots[actor];
-      if(Math.abs(s.x-ox)<4&&Math.abs(s.y-oy)<4){ render(); save(); return; } /* 微調整は位置を保つ・ポジション名だけ変えない */ // 元の位置へ戻しただけ＝ポジション名は変えない（既定レイアウトの座標はroleFromXYの境界をまたぐことがある）
+      if(Math.abs(s.x-ox)<4&&Math.abs(s.y-oy)<4){ if(Math.abs(ox-bx0)>0.01){ s.x=bx0; s.y=by0; } render(); save(); return; } /* 外へ広げて表示中の駒は表示用の座標を保存しない（軽く触れただけで既定位置から外れ、広げ表示も効かなくなっていた 2026-09-29） */ /* 微調整は位置を保つ・ポジション名だけ変えない */ // 元の位置へ戻しただけ＝ポジション名は変えない（既定レイアウトの座標はroleFromXYの境界をまたぐことがある）
       const nr=dragRole(s.role,ox,oy,s.x,s.y);
       if(nr!==s.role){ s.role=nr; render(); toast(tRoleChanged(nr)); }
       save();
@@ -2549,11 +2554,12 @@ function attachDrag(el,actor){
       // 着地後の座標が掴んだ時と同じ＝この操作では位置を動かしていない（交代・ベンチ移動・キャンセル）
       // → ドラッグ中に立てた layoutMoved を掴む前の状態へ戻す
       const _sl=state.slots[actor];
-      if(_sl && Math.abs(_sl.x-ox)<0.01 && Math.abs(_sl.y-oy)<0.01){ layoutMoved=_lmAtGrab; }
+      if(_sl && ((Math.abs(_sl.x-ox)<0.01 && Math.abs(_sl.y-oy)<0.01)||(Math.abs(_sl.x-bx0)<0.01 && Math.abs(_sl.y-by0)<0.01))){ layoutMoved=_lmAtGrab; }
       syncResetChip();
     }
   });
-  el.addEventListener('pointercancel',()=>{ disarm(); stopScroll(); clearGhost(); highlightSlot(-1); el.classList.remove('drag'); sx=undefined; armed=false; });
+  el.addEventListener('pointercancel',()=>{ const _was=armed&&sx!==undefined; disarm(); stopScroll(); clearGhost(); highlightSlot(-1); el.classList.remove('drag'); sx=undefined; armed=false;
+    if(_was){ const s=base(); s.x=bx0; s.y=by0; layoutMoved=_lmAtGrab; render(); syncResetChip(); } }); // 中断は掴む前の位置へ戻す（途中の座標が残っていた 2026-09-29）
 }
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
 
@@ -5311,7 +5317,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929k'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929l'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
