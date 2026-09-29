@@ -4873,7 +4873,7 @@ function showModeBar(text,onCancel){
 function hideModeBar(){ const b=document.getElementById('modebar'); if(b)b.style.display='none'; }
 function cancelMarketMode(){ const was=(mktPlace!=null||mktBenchSwap!=null); mktPlace=null; mktBenchSwap=null; hideModeBar(); if(was){ render(); toast(t('tstCanceled')); } }
 // スタメンに入れる：11枠を点滅→タップした枠に配置
-function revealPitch(){ try{ const p=document.getElementById('pitch'); if(!p) return; const r=p.getBoundingClientRect(); if(r.top<0||r.bottom>window.innerHeight-70) p.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){} }
+function revealPitch(){ try{ const sc=document.querySelector('.scroll'), p=document.getElementById('pitch'); if(!sc||!p) return; const r=p.getBoundingClientRect(), sr=sc.getBoundingClientRect(); if(r.top<sr.top||r.bottom>Math.min(sr.bottom,window.innerHeight)-70) sc.scrollTo({top:Math.max(0,r.top-sr.top+sc.scrollTop-8),behavior:'smooth'}); }catch(e){} } // ★scrollIntoViewは使わない（.scrollだけ動かす＝benchScrollTargetと同じ作法）
 function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); mktPlace=pid; closeSheet(); render(); showModeBar(t('modePlaceXI')); revealPitch(); }
 function placeMarketIntoSlot(i){ const pid=mktPlace; mktPlace=null; hideModeBar(); state.bench=state.bench.filter(x=>x!==pid); assign(i,pid); }
 // ベンチに加える：空きがあれば自動配置、満杯なら控え全員を点滅→タップした控えと交代
@@ -5309,7 +5309,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929h'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929i'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7145,18 +7145,21 @@ function openShareFallback(imgUrl,shareText,file){
   const shNameEl=document.getElementById('shName');
   if(shNameEl){ let _rn; shNameEl.oninput=()=>{ state.teamName=(shNameEl.value||'').trim()||null; save();
     shareText=tShareCaption(teamDisplayName()); const cap=document.querySelector('.sharecap'); if(cap)cap.textContent=shareText;
-    clearTimeout(_rn); _rn=setTimeout(regen,250); }; }
+    clearTimeout(_rn); _rn=setTimeout(regen,250); refreshLink(900); }; }
   document.getElementById('shToggles').onclick=e=>{ const b=e.target.closest('[data-tg]'); if(!b)return;
     if(b.dataset.tg==='bench'){ state.showBench=(state.showBench===false); save(); } // 共有専用：ベンチを画像に載せるか
     else if(b.dataset.tg==='marks'){ state.showMarks=(state.showMarks===false); save(); } // 共有画像に負傷・カードを載せるか
     else { const el=document.getElementById(b.dataset.tg); if(el)el.click(); }            // それ以外は盤面ボタンと同処理
-    syncTg(); regen(); };
+    syncTg(); regen(); refreshLink(400); };
   // SNSフォーマット選択（自動/4:5/1:1/9:16）
   const syncFmt=()=>{ document.querySelectorAll('#shFmt [data-fmt]').forEach(b=>b.classList.toggle('on',(state.shareFmt||'feed')===b.dataset.fmt)); };
   syncFmt();
   document.getElementById('shFmt').onclick=e=>{ const b=e.target.closest('[data-fmt]'); if(!b)return; state.shareFmt=b.dataset.fmt; save(); syncFmt(); regen(); };
   // スカッド再現リンク（#s=...）を先に生成しておき、共有系ボタンのURLを「開くと同じスカッドが出るリンク」へ格上げ。生成失敗時はトップURLのまま
-  let squadLink=APP_URL; buildSquadLink().then(u=>{ if(u) squadLink=u; }).catch(()=>{});
+  let squadLink=null, _lk=0, _lkT=null;
+  const refreshLink=(ms)=>{ const my=++_lk; squadLink=null; clearTimeout(_lkT); _lkT=setTimeout(()=>{ buildSquadLink().then(u=>{ if(my===_lk&&u) squadLink=u; }).catch(()=>{}); },ms||0); }; // 古い生成結果で上書きしない（連番）・名前入力中は打ち終わってから1回だけ（2026-09-29 D21）
+  const syncLink=()=>{ try{ return APP_URL+(LANG==='en'?'/s/en/#s=':'/s/#s=')+'0.'+_b64uEnc(new TextEncoder().encode(JSON.stringify(serializeTeam()))); }catch(e){ return APP_URL; } }; // 通信なしで今すぐ作れる（長い）リンク
+  refreshLink(0);
   // ネイティブ「共有する」ボタンは廃止（X/Instagram/保存/リンクに集約。IG/iOS保存は内部でnavigator.share継続）
   const dlImg=()=>{const a=document.createElement('a');a.href=curUrl;a.download='squad-xi.png';a.click();};
   document.getElementById('shDl').onclick=()=>{
@@ -7169,7 +7172,7 @@ function openShareFallback(imgUrl,shareText,file){
   document.getElementById('shX').onclick=()=>{
     recordEvent('share_x');
     dlImg();
-    const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink);
+    const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink||syncLink());
     window.open(url,'_blank','noopener');
     toast(t('tstImgSavedX'));
   };
@@ -7190,7 +7193,7 @@ function openShareFallback(imgUrl,shareText,file){
     // 対策: ①シート表示時に事前生成済みならその場で書き込み ②未生成なら ClipboardItem(Promise) で
     // タップ権限を保持したまま非同期データを書き込む ③それでも失敗したら手動コピー用に必ずリンクを提示。
     try{
-      let u=(squadLink&&squadLink!==APP_URL)?squadLink:null;
+      let u=squadLink||null;
       if(u){ await navigator.clipboard.writeText(u); }
       else if(typeof ClipboardItem==='function'&&navigator.clipboard.write){
         const p=buildSquadLink().then(x=>{squadLink=x;return new Blob([x],{type:'text/plain'});});
