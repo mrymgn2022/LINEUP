@@ -29404,5 +29404,7 @@ const P=JSON.parse((`[
 ["Eseosa Sule","ST",20,"🇳🇬 NGA","St. Mirren","SC"],
 ["Louis Jackson","CB",20,"🏴󠁧󠁢󠁥󠁮󠁧󠁿 ENG","St. Mirren","SC"],
 ["Ismeal Kabia","RW",20,"🇸🇱 SLE","St. Mirren","SC"],
-["Nikolas Agrafiotis","ST",26,"🇷🇸 SRB","St. Mirren","SC"]
+["Nikolas Agrafiotis","ST",26,"🇷🇸 SRB","St. Mirren","SC"],
+["David Ospina","GK",38,"🇨🇴 COL","",""],
+["Guillermo Ochoa","GK",41,"🇲🇽 MEX","",""]
 ]`).replace(/^[ \t]*\/\/.*$/gm,''));
