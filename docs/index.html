@@ -5389,7 +5389,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001i'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001j'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6527,7 +6527,7 @@ function startOriginal(){
   // チーム検索：クラブ名で絞り込み→候補に所属リーグの国旗＋クラブ名。選ぶとクラブ条件にセット（代表チームはクラブ名検索のため対象外）
   const otClubLg={}, otClubN={};
   P.forEach((p,i)=>{ if(!isCustomPid(i)){ const c=p[4].trim(); if(!c) return; if(!(c in otClubLg)||(!otClubLg[c]&&p[5])) otClubLg[c]=p[5]; otClubN[c]=(otClubN[c]||0)+1; } });
-  const otAllClubs=Object.keys(otClubLg).filter(c=>otClubN[c]>=11).sort((a,b)=>a.localeCompare(b)); // 11人未満は編成できないので候補に出さない（2026-09-30）
+  const otAllClubs=Object.keys(otClubLg).filter(c=>otClubN[c]>=11&&otClubLg[c]).sort((a,b)=>a.localeCompare(b)); // 対象リーグ外（リーグ欄が空＝降格して名簿が昨季のまま・Without Club）は候補に出さない（2026-10-01 監査F-1） // 11人未満は編成できないので候補に出さない（2026-09-30）
   let otPickedClub=''; // 候補から選んだクラブ（リーグ欄が空のクラブでもクラブ欄の表示と無関係に条件として使う 2026-09-30 ユーザー報告）
   const otSearchEl=document.getElementById('otSearch'), otSug=document.getElementById('otSuggest');
   if(otSearchEl) otSearchEl.oninput=()=>{
@@ -8021,10 +8021,11 @@ window.__selftest=function(){
     { let _pass=true,_msg=''; const _snap=JSON.stringify(serializeTeam()), _sw=swapSel;
       try{
         const cnt={}; P.forEach((p,i)=>{ if(!isCustomPid(i)&&!p[5]&&p[4].trim()){ const c=p[4].trim(); cnt[c]=(cnt[c]||0)+1; } });
-        const club=Object.keys(cnt).find(c=>cnt[c]>=11);
-        if(!club) throw new Error('検証前提: リーグ欄が空で11人以上のクラブが無い');
+        const blank=Object.keys(cnt).find(c=>cnt[c]>=11);
         startOriginal();
         const s=document.getElementById('otSearch'); if(!s) throw new Error('チーム検索欄が無い');
+        if(blank){ s.value=blank; s.oninput(); if([...document.querySelectorAll('#otSuggest [data-club]')].some(x=>x.dataset.club===blank)) throw new Error('対象リーグ外のクラブが候補に出る: '+blank); } // 2026-10-01 監査F-1
+        const club='Brentford';
         s.value=club; s.oninput();
         const d=[...document.querySelectorAll('#otSuggest [data-club]')].find(x=>x.dataset.club===club); if(!d) throw new Error('候補に出ない: '+club);
         d.click(); document.getElementById('otStart').click();
