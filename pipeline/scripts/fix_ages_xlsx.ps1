@@ -14,7 +14,7 @@
 param([switch]$DryRun)
 $ErrorActionPreference='Stop'
 
-$ROOT = 'G:\共有ドライブ\Alfaras（株）\SquadXI'
+$ROOT = 'G:\共有ドライブ\Alfaras（株）\football lineup【2】'
 $XL   = Join-Path $ROOT '_internal\メンバーサイトマスター.xlsx'
 $IDX  = Join-Path $ROOT 'docs\index.html'
 
