@@ -1362,7 +1362,8 @@ function t(k){ const d=I18N[LANG]||I18N.ja; return (k in d)?d[k]:((k in I18N.ja)
 let _lastNoResQ='';
 // 検索して0件だった語句をワーカーへ送る（2026-08-06）。「何を探して見つからなかったか」＝追加すべき選手/チームの直接シグナル。
 // 送るのはこのイベントの時だけ（recordEventの第3引数）。ワーカー側も search_noresult 以外のqは捨てる。
-function noResultOnce(q){ q=(q||'').trim(); if(!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult',false,q.slice(0,40)); }
+let _imeOn=false; try{ document.addEventListener('compositionstart',()=>{ _imeOn=true; },true); document.addEventListener('compositionend',e=>{ _imeOn=false; try{ const el=e.target; if(el&&el.oninput) setTimeout(()=>{ try{ el.oninput({target:el}); }catch(_){} },0); }catch(_){} },true); }catch(e){} // 日本語変換の途中は検索語を送らない（2026-09-29 監査C28）
+function noResultOnce(q){ q=(q||'').trim(); if(_imeOn||!q||q===_lastNoResQ) return; _lastNoResQ=q; recordEvent('search_noresult',false,q.slice(0,40)); }
 function setLang(l){ if((l==='ja'||l==='en') && l!==LANG){ try{ retranslateAutoNames(l); }catch(e){} LANG=l; lsSet('xi_lang', l); try{ recordEvent('lang_switch',true); }catch(e){} try{ document.documentElement.lang=l; }catch(e){} try{ render(); }catch(e){} try{ const db=document.getElementById('demoBar'); if(db&&db.dataset.code) _showDemoBarNow(db.dataset.code); }catch(e){} try{ openDrawer(); }catch(e){} } } // lang_switch=利用者の明示切替のみ(自動判定はここを通らない)。LANG更新後に送るので lang 欄=切替先(2026-08-22)
 // 「▾ さらに N人」/「▾ Show N more」（一覧の続き読み込みラベル）
 function moreLabel(n){ return LANG==='en' ? ('▾ Show '+n+' more') : ('▾ さらに '+n+'人'); }
@@ -3952,7 +3953,7 @@ const RESCUE_MAX_TRIM=2, RESCUE_MIN_LEN=3;
 let _kanaFold=false; // 救済モードでのみ真＝カナの表記ゆれを畳んで照合する
 let _rescuedFrom=null,_rescuedTo=null,_rescueKind=''; // 直近の描画で救済したか（null=していない）。注記の表示にだけ使う
 let _lastRescueQ='';
-function rescuedOnce(q){ if(!q||q===_lastRescueQ) return; _lastRescueQ=q; recordEvent('search_rescued',false,q); } // 語句つき（2026-08-14 ユーザー指示。どの短縮名/タイポが救済されたかをレポートで見る。search_noresultと同じ40字切詰）
+function rescuedOnce(q){ if(_imeOn||!q||q===_lastRescueQ) return; _lastRescueQ=q; recordEvent('search_rescued',false,q); } // 語句つき（2026-08-14 ユーザー指示。どの短縮名/タイポが救済されたかをレポートで見る。search_noresultと同じ40字切詰）
 // f=フィルタ状態(pickFilter/mktFilter) / rebuild=候補配列を作り直す関数。
 // 見つかれば候補配列を返す（f.q は呼び出し前の値に必ず戻す＝入力欄と状態が食い違わない）。
 function trySearchRescue(f,rebuild){
@@ -4036,7 +4037,7 @@ function drawPickList(slotIdx){
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
-    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+    if(list._force||list.scrollTop+list.clientHeight>=list.scrollHeight-80){ list._force=false;
       const start=list._loaded;if(start>=pickCurIdx.length)return;
       const more=pickCurIdx.slice(start,start+PAGE);
       const s=document.getElementById('pickMore');
@@ -4046,7 +4047,7 @@ function drawPickList(slotIdx){
       if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
-  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;if(pickOnPick){pickOnPick(pid);}else if(benchAddMode)addPlayerToBench(pid);else assign(slotIdx,pid);};
+  list.onclick=e=>{if(e.target.closest&&e.target.closest('.loadmore')&&list.onscroll){list._force=true;list.onscroll();return;}const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;if(pickOnPick){pickOnPick(pid);}else if(benchAddMode)addPlayerToBench(pid);else assign(slotIdx,pid);};
 }
 // ベンチに追加（読込クラブをポジション順で優先表示）
 function openBenchAdd(clearAll){
@@ -4520,7 +4521,7 @@ function openSubPicker(slotIdx){
       const pids=state.bench;
       list.innerHTML=pids.length?pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join(''):'<div class="empty-msg">'+t('benchEmptyList')+'</div>';
       list.onscroll=null;
-      list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
+      list.onclick=e=>{if(e.target.closest&&e.target.closest('.loadmore')&&list.onscroll){list._force=true;list.onscroll();return;}const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
     }else{
       wireSubPickerFull(slotIdx);
     }
@@ -4570,7 +4571,7 @@ function drawSubFull(slotIdx){
   if(pickCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="pickMore">${moreLabel(pickCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,pickCurIdx.length);
   list.onscroll=()=>{
-    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+    if(list._force||list.scrollTop+list.clientHeight>=list.scrollHeight-80){ list._force=false;
       const start=list._loaded;if(start>=pickCurIdx.length)return;
       const more=pickCurIdx.slice(start,start+PAGE);
       const sm=document.getElementById('pickMore');
@@ -4580,7 +4581,7 @@ function drawSubFull(slotIdx){
       if(ns){const rem=pickCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
-  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
+  list.onclick=e=>{if(e.target.closest&&e.target.closest('.loadmore')&&list.onscroll){list._force=true;list.onscroll();return;}const row=e.target.closest('[data-pid]');if(!row)return;assignSub(slotIdx,+row.dataset.pid);};
 }
 function assignSub(slotIdx,pid){
   if(state.slots[slotIdx].pid===pid){ toast(t('tstSlotIsStarter')); return; } // 同枠のスタメンは第2候補にしない
@@ -4634,7 +4635,7 @@ function drawBenchList(slotIdx){
   if(!pids.length){list.innerHTML='<div class="empty-msg">'+t('benchEmptyList')+'</div>';return;}
   list.innerHTML=pids.slice().sort(suggestSort).map(pid=>prowHTML(pid,true)).join('');
   list.onscroll=null;
-  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;assign(slotIdx,+row.dataset.pid);};
+  list.onclick=e=>{if(e.target.closest&&e.target.closest('.loadmore')&&list.onscroll){list._force=true;list.onscroll();return;}const row=e.target.closest('[data-pid]');if(!row)return;assign(slotIdx,+row.dataset.pid);};
 }
 
 /* ---- チーム外から選手を追加：全選手検索（既定＝全チームの人気順） ---- */
@@ -4971,7 +4972,7 @@ function drawMkt(){
   if(mktCurIdx.length>PAGE) list.insertAdjacentHTML('beforeend',`<div class="loadmore" id="mktMore">${moreLabel(mktCurIdx.length-PAGE)}</div>`);
   list._loaded=Math.min(PAGE,mktCurIdx.length);
   list.onscroll=()=>{
-    if(list.scrollTop+list.clientHeight>=list.scrollHeight-80){
+    if(list._force||list.scrollTop+list.clientHeight>=list.scrollHeight-80){ list._force=false;
       const start=list._loaded;if(start>=mktCurIdx.length)return;
       const more=mktCurIdx.slice(start,start+PAGE);
       const s=document.getElementById('mktMore');
@@ -4981,7 +4982,7 @@ function drawMkt(){
       if(ns){const rem=mktCurIdx.length-list._loaded;if(rem<=0)ns.remove();else ns.textContent=moreLabel(rem);}
     }
   };
-  list.onclick=e=>{const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;recordSearch(pid);openDetail(pid,null);};
+  list.onclick=e=>{if(e.target.closest&&e.target.closest('.loadmore')&&list.onscroll){list._force=true;list.onscroll();return;}const row=e.target.closest('[data-pid]');if(!row)return;const pid=+row.dataset.pid;recordSearch(pid);openDetail(pid,null);};
 }
 
 // 右上「新規作成」：チーム名・フォーメーション・自動配置（国籍/クラブ）
@@ -5329,7 +5330,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929r'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929s'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
