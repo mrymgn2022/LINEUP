@@ -1232,7 +1232,7 @@ const I18N = {
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第2候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
-    tstMaxBench:'ベンチは最大15人です', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
+    tstMaxBench:'ベンチは最大9人です（それ以外はベンチ外へ）', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした',tstPhotoDelFail:'写真を消しましたが、端末への保存に失敗しました（次に開くと戻る場合があります）',tstPhotoHeic:'この形式（HEIC）は読み込めません。スクリーンショットかJPEG/PNGの画像でお試しください',tstMemoOnEmpty:'メモ表示をONにしました（メモはまだありません。駒をタップ→「メモを編集」）', tstPhotoHiddenUser:'保存しました（ユーザーモードのため盤面には表示されません。版数を長押しで通常モードへ）', swapPrompt:'入れ替える相手をタップ（ベンチ・ベンチ外も可）',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです',tstSubIsStarter:'その選手はスタメンです（第2候補はスタメン以外から選べます）', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
     tstSubCleared:'第2候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
@@ -1314,7 +1314,7 @@ const I18N = {
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
-    tstMaxBench:'The bench is full (max 15).', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
+    tstMaxBench:'The bench is full (max 9). Others go to reserves.', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
     tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image',tstPhotoDelFail:'Photo removed, but saving to this device failed (it may come back next time).',tstPhotoHeic:'HEIC images can’t be read. Try a screenshot or a JPEG/PNG image.',tstMemoOnEmpty:'Notes are on (no notes yet — tap a player → Edit note)', tstPhotoHiddenUser:'Saved — but hidden on the board in user mode. Long-press the version number to return to normal mode.', swapPrompt:'Tap who to swap with (bench & reserves too)',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot',tstSubIsStarter:'That player is already in the XI — pick a second choice from outside the XI', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
@@ -1789,6 +1789,7 @@ function applyRaw(saved){
   }else{
     buildSlots("4-3-3",false);
   }
+  capBench(); // 旧版（ベンチ最大15人）の保存・共有リンクも9人へ（外れた選手はベンチ外に残す 2026-10-01）
   layoutMoved=layoutDiffersFromDefault(); // 手で動かした配置なら読込後も「配置を整える」を出す（旧: 常に未移動扱い 2026-09-30 監査B16）
   setFormLabel();
   cleanJson=JSON.stringify(serializeTeam()); // 読込直後＝未保存の変更なし
@@ -1956,7 +1957,23 @@ function optimizeMidfield(){
   orderedSlots.forEach((s,k)=>{ s.pid=players[k]; }); // 最も守備的な枠←最も守備的な選手 …
 }
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
-function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人（スカッド全体の上限は50人）
+const BENCH_MAX=9; // ベンチ入りの上限（2026-10-01 ユーザー指示: 15→9。それ以外はベンチ外）
+// ベンチを上限人数に絞る＝GK1人＋市場価値の上位（ユーザー決定）→ポジション順。外れた選手はベンチ外へ（スカッドから消さない）
+function capBench(){ try{
+  const b=(state.bench||[]).filter((p,i,a)=>p!=null&&P[p]&&!inXI(p)&&a.indexOf(p)===i);
+  if(b.length<=BENCH_MAX){ state.bench=b; return; }
+  const mv=id=>mvScore(P[id]);
+  const gks=b.filter(id=>P[id][1]==='GK').sort((x,y)=>mv(y)-mv(x)), fld=b.filter(id=>P[id][1]!=='GK').sort((x,y)=>mv(y)-mv(x));
+  const keep=[]; if(gks.length) keep.push(gks[0]);
+  for(const id of fld){ if(keep.length>=BENCH_MAX) break; keep.push(id); }
+  for(const id of gks.slice(1)){ if(keep.length>=BENCH_MAX) break; keep.push(id); } // フィールドが足りない時だけGKを足す
+  const ks=new Set(keep), over=b.filter(id=>!ks.has(id));
+  state.bench=keep.sort(benchPosSort);
+  if(!Array.isArray(state.reserveAdds)) state.reserveAdds=[];
+  if(Array.isArray(state.excluded)) state.excluded=state.excluded.filter(x=>!over.includes(x));
+  const rs=new Set(reserveIds()); over.forEach(id=>{ if(!rs.has(id)&&!state.reserveAdds.includes(id)) state.reserveAdds.push(id); });
+}catch(e){} }
+function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=BENCH_MAX; } // 控えは最大15人（スカッド全体の上限は50人）
 function benchReturn(pid){
   if(pid==null) return;
   if(inXI(pid)) return;
@@ -2330,7 +2347,7 @@ function benchToSlot(pid,slotIdx){
     // 控え選手が居た「その場所」に先発を入れる（末尾に飛ばさない）
     if(outgoing!=null&&outgoing!==pid) state.bench[bi]=outgoing; else state.bench.splice(bi,1);
   }else{
-    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<15) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
+    if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<BENCH_MAX) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
   }
   render();save();
   toast(outgoing!=null?shortName(P[pid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[pid][0])));
@@ -2343,7 +2360,7 @@ function reserveBenchSwap(reservePid,benchPid){ // ベンチ外⇄ベンチ（�
   render();save();toast(shortName(P[reservePid][0])+' ⇄ '+shortName(P[benchPid][0]));
 }
 function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあれば追加）
-  if(state.bench.filter(b=>!inXI(b)).length>=15){ toast(t('tstMaxBench')); return; }
+  if(state.bench.filter(b=>!inXI(b)).length>=BENCH_MAX){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(reservePid)) state.bench.push(reservePid);
   render();save();toast(tToBench(shortName(P[reservePid][0])));
 }
@@ -4102,7 +4119,7 @@ function openBenchAdd(clearAll){
 }
 function addPlayerToBench(pid){
   if(inXI(pid)||state.bench.includes(pid)){ closeSheet(); toast(t('tstAlreadyListed')); return; } // 既にスタメン/ベンチ＝何もしていないのに「追加しました」と出ていた（2026-09-29 監査B38）
-  if(state.bench.filter(b=>!inXI(b)).length>=15){ toast(t('tstMaxBench')); return; }
+  if(state.bench.filter(b=>!inXI(b)).length>=BENCH_MAX){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(pid)&&!inXI(pid)) state.bench.push(pid);
   closeSheet();render();save();toast(tAddedBench(shortName(P[pid][0])));
 }
@@ -4942,7 +4959,7 @@ function startMarketPlace(pid){ swapSel=null; mktBenchSwap=null; hideModeBar(); 
 function placeMarketIntoSlot(i){ const pid=mktPlace; mktPlace=null; hideModeBar(); state.bench=state.bench.filter(x=>x!==pid); assign(i,pid); }
 // ベンチに加える：空きがあれば自動配置、満杯なら控え全員を点滅→タップした控えと交代
 function startMarketBench(pid){ swapSel=null; mktPlace=null; mktBenchSwap=null; hideModeBar();
-  if(state.bench.filter(b=>!inXI(b)).length<15){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(tAddedBench(squadShortName(pid))); return; }
+  if(state.bench.filter(b=>!inXI(b)).length<BENCH_MAX){ if(!state.bench.includes(pid))state.bench.push(pid); closeSheet(); render(); save(); toast(tAddedBench(squadShortName(pid))); return; }
   mktBenchSwap=pid; closeSheet(); render(); showModeBar(t('modeSwapSub'));
 }
 function benchSwapMarket(targetPid){ const pid=mktBenchSwap; mktBenchSwap=null; hideModeBar();
@@ -5373,7 +5390,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001d'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6063,7 +6080,7 @@ function hydrateSiteSquad(raw){
     for(const id of mates){ if(reserve.length+bench.length-fixed.length>=cap) break;
       if(!hasFixed && bench.length<15) bench.push(id); else reserve.push(id); }
     state.bench=bench.sort(benchPosSort);
-    state.reserveAdds=reserve; state.reserveOrder=[]; // 深リンクも自動配置と同条件（前チームの並び順を持ち越さない）
+    state.reserveAdds=reserve; state.reserveOrder=[]; capBench(); // 深リンクも自動配置と同条件（前チームの並び順を持ち越さない）
     autoView(); /* 第2候補は自動で付けない(2026-09-29) */  // 深リンクに明示sub(バックアップの第2候補)があれば尊重。無ければ従来通り自動割当（表示は showSub=false なので「2nd」を押すまで出ない）
   }catch(e){}
 }
@@ -6203,7 +6220,7 @@ function autoFillFrom(ids){
     if(P[id][1]==='GK') benchGK++;
     benchSet.add(id);
   }
-  state.bench=ensureBenchGK([...benchSet],_rest,fullXI).sort(benchPosSort); // 表示はポジション順（選出は市場価値・GK最大2最低1）
+  state.bench=ensureBenchGK([...benchSet],_rest,fullXI).sort(benchPosSort); capBench(); // 表示はポジション順（選出は市場価値・GK最大2最低1）
   state.slots.forEach(s=>{ s.sub=null; }); autoView(); // 第2候補は自動で付けない・表示は名前と国旗だけ（2026-09-29）
 }
 // 配置中の選手のメモ欄へ所属クラブ名を自動入力（国籍縛りチーム用。安定キーで保存）
@@ -6420,7 +6437,7 @@ function autoFillNationality(code,form,name){
       state.slots.forEach(s=>{ s.sub=null; }); autoView(); // 第2候補は自動で付けない（利用者が追加したものだけ 2026-09-29）
       // ベンチ外: 招集26人の外にユーザーが手動で加えた選手（WC_XI[code].extra）。並びは reserveIds が GK→ST 順に整える（2026-07-31）
       state.reserveAdds=(fx.extra||[]).map(keyToPid).filter(v=>v!=null&&!used.has(v)&&!state.bench.includes(v));
-      state.reserveOrder=[];
+      state.reserveOrder=[]; capBench();
       recordEvent('autobuild'); // ★計上漏れ修正(2026-08-05): 予想XI/保存盤面の直接貼り経路。プール経路はautoFillFrom内で計上済み＝二重計上なし
     }else{
       autoFillFrom(pool); // 招集26人プール内で従来ロジック（適性×市場価値）
@@ -6727,7 +6744,7 @@ function placeClubSquad(club,name){
     const cur0=curatedBench(club,used);
     let rest0=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
     if(fullXI0){ let gk=0; rest0=rest0.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
-    state.bench=(cur0||ensureBenchGK(rest0.slice(0,15),rest0,fullXI0)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ（MV補充しない）。無ければMV上位15人でGK最大2・最低1
+    state.bench=(cur0||ensureBenchGK(rest0.slice(0,15),rest0,fullXI0)).sort(benchPosSort); capBench(); // CLUB_BENCHがあれば厳密にそれだけ（MV補充しない）。無ければMV上位15人でGK最大2・最低1
     state.loadedClub=club; state.teamName=name||club; state.teamInfo=null;
     state.teamCond=null; state.teamId=null; state.captain=null;
     applyClubNames(club); // 盤面の表示名の上書き（例: Kolo Muani）
@@ -6752,7 +6769,7 @@ function placeClubSquad(club,name){
   const cur=curatedBench(club,used);
   let rest=ids.filter(id=>!used.has(id)).sort((a,b)=>mvScore(P[b])-mvScore(P[a]));
   if(fullXI){ let gk=0; rest=rest.filter(id=>{ if(P[id][1]==='GK'){ gk++; return gk<=2; } return true; }); }
-  state.bench=(cur||ensureBenchGK(rest.slice(0,15),rest,fullXI)).sort(benchPosSort); // CLUB_BENCHがあれば厳密にそれだけ。無ければ市場価値の上位15人(GK最大2・最低1)、表示はポジション順
+  state.bench=(cur||ensureBenchGK(rest.slice(0,15),rest,fullXI)).sort(benchPosSort); capBench(); // CLUB_BENCHがあれば厳密にそれだけ。無ければ市場価値の上位15人(GK最大2・最低1)、表示はポジション順
   state.loadedClub=club;
   state.teamName=name||club;
   state.teamInfo=null;
@@ -6955,7 +6972,7 @@ async function buildShareCanvas(){
     yAdj.set(s,Math.round(cy)); });
   const pitchBottom=py+ph;
   const tokY=s=>yAdj.get(s);
-  const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,15):[]; // ベンチ最大15人（非表示時は載せない）
+  const benchPids=showBench?state.bench.filter(pid=>!inXI(pid)).slice(0,BENCH_MAX):[]; // ベンチ最大15人（非表示時は載せない）
   const bCols=3, bRowH=98, bHeadH=70, bGap=44;
   const bRows=Math.ceil(benchPids.length/bCols);
   const benchH=benchPids.length?(bHeadH+bRows*bRowH):0;
@@ -7532,6 +7549,11 @@ window.__selftest=function(){
   window.__inSelftest=true; // テスト中はレンダー副作用（共有誘導トースト等）を抑止
   const R=[]; const ok=(name,cond,msg)=>R.push({name,ok:!!cond,msg:cond?'':(msg||'failed')});
   const noDup=arr=>{ const f=arr.filter(x=>x!=null); return new Set(f).size===f.length; };
+  // ベンチ9人化（2026-10-01）: 指定ベンチから capBench と同じ規則（GK1＋市場価値上位）で選ばれるはずのキー
+  const _capKeys=keys=>{ const ids=keys.map(k=>typeof k==='number'?k:keyToPid(k)).filter(v=>v!=null&&!inXI(v)); if(ids.length<=BENCH_MAX) return ids.map(pidToKey);
+    const mv=id=>mvScore(P[id]); const g=ids.filter(i=>P[i][1]==='GK').sort((a,b)=>mv(b)-mv(a)), fl=ids.filter(i=>P[i][1]!=='GK').sort((a,b)=>mv(b)-mv(a)); const k=[]; if(g.length)k.push(g[0]);
+    for(const i of fl){ if(k.length>=BENCH_MAX)break; k.push(i);} for(const i of g.slice(1)){ if(k.length>=BENCH_MAX)break; k.push(i);} return k.map(pidToKey); };
+  const _sameSet=(a,b)=>a.length===b.length&&b.every(x=>a.indexOf(x)>=0);
   // スナップショット（非破壊復元のため）
   const snapState=JSON.parse(JSON.stringify(state)); const snapPLen=P.length;
   let snapLS_t=null,snapLS_a=null; try{ snapLS_t=localStorage.getItem('xi_teams_v1'); snapLS_a=localStorage.getItem('xi_auto_sig'); }catch(e){} // 保存一覧・自動配置の記録も最後に戻す（監査D36）
@@ -8129,7 +8151,7 @@ window.__selftest=function(){
           slots:FORM[CLUB_XI['Paris Saint-Germain'].form].map((r,i)=>({role:r[0],x:r[1],y:r[2],pid:CLUB_XI['Paris Saint-Germain'].keys[i],sub:null})),
           formation:CLUB_XI['Paris Saint-Germain'].form});
         applyRaw(resolveRaw(JSON.parse(JSON.stringify(raw2)))); hydrateSiteSquad(raw2);
-        const keepOK=(state.bench.length===_psgBench.length);   // 15人へ埋め戻さない＝定義通りの人数のまま
+        const keepOK=(state.bench.length===Math.min(BENCH_MAX,_psgBench.length)); // 埋め戻さない・9人を超える指定は9人に絞る（2026-10-01）   // 15人へ埋め戻さない＝定義通りの人数のまま
         _pass=clubOK&&nameOK&&jaOK&&dispOK&&subOK&&geoOK&&keepOK;
         _msg=_pass?'':('club='+clubOK+' name='+nameOK+' ja='+jaOK+' disp='+dispOK+' sub='+subOK+' geo='+geoOK+' keep='+keepOK+'('+state.bench.length+')');
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
@@ -8141,7 +8163,7 @@ window.__selftest=function(){
         _keyMap=null; buildKeyMap();
         buildSlots(CLUB_XI['Real Madrid'].form,false);
         placeClubSquad('Real Madrid','RM-test');
-        const bk=state.bench.map(pidToKey), want=CLUB_BENCH['Real Madrid'];
+        const bk=state.bench.map(pidToKey), want=_capKeys(CLUB_BENCH['Real Madrid']); // 9人に絞った形（2026-10-01）
         const sameSet=(bk.length===want.length)&&want.every(k=>bk.indexOf(k)>=0);
         const CAR='Daniel Carvajal|ESP';
         const notBench=bk.indexOf(CAR)<0 && !state.slots.some(s=>s.pid!=null&&pidToKey(s.pid)===CAR);
@@ -8160,7 +8182,7 @@ window.__selftest=function(){
         const CLUB='Paris Saint-Germain';
         buildSlots(CLUB_XI[CLUB].form,false);
         placeClubSquad(CLUB,'PSG-test');
-        const want=CLUB_BENCH[CLUB], bk=state.bench.map(pidToKey);
+        const want=_capKeys(CLUB_BENCH[CLUB]), bk=state.bench.map(pidToKey); // 9人に絞った形（2026-10-01）
         const exact=(bk.length===want.length)&&want.every(k=>bk.indexOf(k)>=0); // 定義通りちょうど・MV補充なし
         // CLUB_NAMES は総なめで検証する。選手名を直書きすると移籍のたびにテストが腐る
         // （2026-08-03 コロ・ムアニ PSG→ユベントスで実際に腐った）。
@@ -8478,7 +8500,7 @@ window.__selftest=function(){
           const _curated=(typeof CLUB_BENCH!=='undefined'&&CLUB_BENCH[c])?true:false;
           const _srt=_b.slice().sort(benchPosSort);
           if(_b.some((v,i)=>v!==_srt[i])){ _bad.push(c+':未整列'); continue; }
-          if(_curated){ if(_b.length<CLUB_BENCH[c].length) _bad.push(c+':指定'+CLUB_BENCH[c].length+'人中'+_b.length+'人しか出ない'); continue; } // GK数は問わない（指定が正）が、脱落は検出する
+          if(_curated){ const _need=Math.min(BENCH_MAX,CLUB_BENCH[c].filter(k=>{ const p=keyToPid(k); return p!=null&&!inXI(p); }).length); if(_b.length<_need) _bad.push(c+':指定から'+_need+'人のはずが'+_b.length+'人'); const _rk=reserveIds().map(pidToKey), _bk=_b.map(pidToKey); const _lost=CLUB_BENCH[c].filter(k=>{ const p=keyToPid(k); return p!=null&&!inXI(p)&&_bk.indexOf(k)<0&&_rk.indexOf(k)<0; }); if(_lost.length) _bad.push(c+':指定の控えが消えた '+_lost.slice(0,2).join(',')); continue; } // 9人を超える指定はベンチ外に残る（2026-10-01） // GK数は問わない（指定が正）が、脱落は検出する
           if(_gk>2){ _bad.push(c+':GK'+_gk); continue; }
           const _squadGK=P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][4].trim()===c&&P[i][1]==='GK').length;
           if(_gk===0&&_squadGK>=2) _bad.push(c+':GK0(在籍'+_squadGK+')');
@@ -8584,7 +8606,7 @@ window.__selftest=function(){
           autoFillNationality(_c,_fx.form,_c);
           const _xi=state.slots.map(s=>s.pid!=null?pidToKey(s.pid):null);
           if(_xi.join('|')!==_fx.keys.join('|')) _bad.push(_c+':XI不一致');
-          if(state.bench.map(pidToKey).join('|')!==_fx.bench.join('|')) _bad.push(_c+':ベンチ不一致');
+          if(!_sameSet(state.bench.map(pidToKey),_capKeys(_fx.bench))) _bad.push(_c+':ベンチ不一致'); // 指定ベンチを9人に絞った形（2026-10-01）
           if(Array.isArray(_fx.subs)){
             const _sb=state.slots.map(s=>s.sub!=null?pidToKey(s.sub):null);
             if(_sb.join('|')!==_fx.subs.map(x=>x||null).join('|')) _bad.push(_c+':第2候補不一致');
