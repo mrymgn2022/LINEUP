@@ -1136,7 +1136,8 @@ function marksHTML(pid){ const m=markOf(pid); let h=''; if(m.yc>0){ h+='<span cl
 // プレミアム未加入時の金の南京錠（メニューでテキスト「（プレミアム）」の代わりに表示。タップでプレミアム画面へ）
 const _ICN_GOLDLOCK=' <svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;margin-left:6px" aria-label="プレミアム"><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="#e0a92e" stroke-width="2.2"/><rect x="5" y="10" width="14" height="10" rx="2.5" fill="#ffd470" stroke="#b8862a" stroke-width="1.2"/><circle cx="12" cy="14.3" r="1.7" fill="#6e5212"/><rect x="11.15" y="14.6" width="1.7" height="3.6" rx="0.85" fill="#6e5212"/></svg>';
 let _keyMap=null;
-function buildKeyMap(){ _keyMap={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; }
+let _baseIdx=null; // 名前|国籍 → 該当する選手（カスタム除く）。キーが変わった保存データの代替照合用（2026-09-29）
+function buildKeyMap(){ _keyMap={}; _baseIdx={}; for(let i=0;i<P.length;i++){ const k=pidToKey(i); if(k!=null&&!(k in _keyMap)) _keyMap[k]=i; if(!isCustomPid(i)&&P[i]){ const b=P[i][0].trim()+'|'+(natCode(P[i])||''); (_baseIdx[b]||(_baseIdx[b]=[])).push(i); } }
   // 互換: uid導入前に保存されたカスタム選手（キー=名前|国籍[|クラブ|POS]）も解決できるよう別名を張る（先勝ち）
   for(let i=customBaseLen;i<P.length;i++){ const p=P[i]; if(!p)continue; const base=p[0].trim()+'|'+(natCode(p)||''); if(!(base in _keyMap)) _keyMap[base]=i; const ext=base+'|'+(p[4]||'').trim()+'|'+(p[1]||''); if(!(ext in _keyMap)) _keyMap[ext]=i; }
 }
@@ -1144,17 +1145,36 @@ function keyToPid(key){
   if(key==null) return null;
   if(typeof key==='number') return (key>=0&&key<P.length)?key:null; // 旧形式(index)の後方互換
   if(!_keyMap) buildKeyMap();
-  return (key in _keyMap)?_keyMap[key]:null;
+  if(key in _keyMap) return _keyMap[key];
+  return keyFallback(key);
 }
+// 保存時のキーで見つからない選手の代替照合（2026-09-29 監査P0-2）。同名選手の拡張キー「名前|国籍|クラブ|POS」は移籍やポジション修正で変わり、
+// 同名選手の追加・削除で「名前|国籍」と拡張キーが入れ替わるため、保存スカッド・写真・メモから選手が黙って消えていた。
+// 名前|国籍 で候補を探し、1人ならその選手、複数ならクラブ一致→ポジション一致で1人に絞れた時だけ採用（決め打ちはしない）。
+function keyFallback(key){
+  if(typeof key!=='string'||key.startsWith('CU|')||!_baseIdx) return null;
+  const parts=key.split('|'); if(parts.length!==2&&parts.length!==4) return null;
+  const c=_baseIdx[parts[0]+'|'+parts[1]]; if(!c||!c.length) return null;
+  if(c.length===1) return c[0];
+  if(parts.length===4){
+    const byClub=c.filter(i=>(P[i][4]||'').trim()===parts[2]); if(byClub.length===1) return byClub[0];
+    const byPos=c.filter(i=>P[i][1]===parts[3]); if(byPos.length===1) return byPos[0];
+  }
+  return null;
+}
+// キーで持つ表（愛称・メモ）を、今のキーへ付け替える（代替照合で見つかった選手の分だけ）
+function migrateKeyed(m){ if(!m||typeof m!=='object') return m; for(const k of Object.keys(m)){ const pid=keyToPid(k); if(pid==null) continue; const nk=pidToKey(pid); if(nk&&nk!==k&&!(nk in m)){ m[nk]=m[k]; delete m[k]; } } return m; }
 // localStorageフォールバック（実機/ブラウザで再起動後も保持。サンドボックスでは例外を握りつぶす）
 function lsSet(k,v){ try{ if(window.localStorage){ localStorage.setItem(k,v); } return true; }catch(e){ return false; } } // 書込成功でtrue（容量超過QuotaExceeded等はfalse）
 // 写真の主保存先はIndexedDB（localStorageの約5MB制限で「写真は付くのに保存失敗」となる問題の恒久対策 2026-07-17）
 function idbOpen(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('squadxi',1);
   r.onupgradeneeded=()=>{ try{ r.result.createObjectStore('kv'); }catch(e){} };
   r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); r.onblocked=()=>rej(new Error('blocked')); }catch(e){ rej(e); } }); }
-function idbSet(k,v){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; })); }
-function idbGet(k){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readonly'); const rq=tx.objectStore('kv').get(k); rq.onsuccess=()=>{ db.close(); res(rq.result); }; rq.onerror=()=>{ db.close(); rej(rq.error); }; })); }
-function idbDel(k){ return idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').delete(k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; })); }
+function idbTimeout(p,ms){ return Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('idb timeout')),ms))]); } // 容量超過はabortで届く・固まる端末もある（2026-09-29）
+function idbSet(k,v){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),15000); }
+function idbGet(k){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readonly'); const rq=tx.objectStore('kv').get(k); rq.onsuccess=()=>{ db.close(); res(rq.result); }; rq.onerror=()=>{ db.close(); rej(rq.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),4000); }
+function idbDel(k){ return idbTimeout(idbOpen().then(db=>new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').delete(k); tx.oncomplete=()=>{ db.close(); res(true); }; tx.onerror=()=>{ db.close(); rej(tx.error); }; tx.onabort=()=>{ db.close(); rej(tx.error||new Error('abort')); }; })),8000); }
+let _orphanPhotos={}; // 今のDBで解決できない選手の写真（他スカッドのカスタム選手・退団選手など）。保存時に捨てない
 let _photosJson=null; // 最後に保存/読込した写真JSON（バックアップのls欠落時フォールバック）
 function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):null; }catch(e){ return null; } }
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
@@ -1650,17 +1670,21 @@ async function save(){
   const data=serializeTeam();
   const json=JSON.stringify(data);
   try{ if(window.storage){ await window.storage.set('xi_state_v2',json,false); } }catch(e){}
-  lsSet('xi_state_v2',json);
+  const _ok=lsSet('xi_state_v2',json);
   memFallback=data;
+  if(!_ok&&!window.__saveWarned){ window.__saveWarned=true; try{ toast(LANG==='en'?'Could not save on this device (storage full or private mode). Export a backup to keep your work.':'端末に保存できませんでした（容量不足かプライベートモード）。バックアップを書き出して作業を残してください'); }catch(e){} } // 2026-09-29 まで無通知だった
 }
 async function savePhotos(){
-  const keyed={}; for(const pid in state.photos){ const k=pidToKey(+pid); if(k!=null) keyed[k]=state.photos[pid]; }
+  const keyed=Object.assign({},_orphanPhotos); for(const pid in state.photos){ const k=pidToKey(+pid); if(k!=null) keyed[k]=state.photos[pid]; } // 今は解決できない選手の写真も捨てずに書き戻す（2026-09-29）
   const json=JSON.stringify({v:3,photos:keyed});
   try{ if(window.storage){ await window.storage.set('xi_photos_v2',json,false); } }catch(e){}
   memPhotos=state.photos; _photosJson=json;
   let idbOk=false; try{ idbOk=await idbSet('xi_photos_v2',json); }catch(e){}
-  const lsOk=lsSet('xi_photos_v2',json);                     // 副系（容量に収まる間はバックアップ経路も従来どおり）
-  if(idbOk && !lsOk){ try{ localStorage.removeItem('xi_photos_v2'); }catch(e){} } // 古い断片を残さない（読込はIndexedDB優先なので安全）
+  let lsOk=false;
+  // 2026-09-29: IndexedDBに入ったら localStorage へは書かない（写真が約5MBの枠を食い、スカッド保存が失敗していた）。
+  // IndexedDBが使えない端末だけ localStorage を使い、IndexedDBの古い写真は消す（次回起動で古い写真に戻るのを防ぐ）。
+  if(idbOk){ try{ localStorage.removeItem('xi_photos_v2'); }catch(e){} }
+  else { lsOk=lsSet('xi_photos_v2',json); try{ await idbDel('xi_photos_v2'); }catch(e){} }
   return idbOk||lsOk;
 }
 // 保存データ(キー形式v3)を現在のindexへ解決。データ更新で番号がズレても正しい選手に復元。複数チーム読込でも使う。
@@ -1669,6 +1693,8 @@ function resolveRaw(raw){
   if(raw.v>=3){
     if(Array.isArray(raw.custom)) raw.custom.forEach(injectCustomDef); // このスカッドのカスタム選手をPへ復元（キー解決の前に）
     _keyMap=null; buildKeyMap();
+    { const _miss=(raw.slots||[]).filter(s=>s&&s.pid!=null&&keyToPid(s.pid)==null).length+(raw.bench||[]).filter(k=>k!=null&&keyToPid(k)==null).length;
+      if(_miss) setTimeout(()=>{ try{ toast(LANG==='en'?(_miss+' player(s) could not be found after a data update and were left out.'):('データ更新で見つからない選手が'+_miss+'人いたため、外して表示しています')); }catch(e){} },2600); }
     raw=Object.assign({},raw,{
       slots:(raw.slots||[]).map(s=>({role:s.role,x:s.x,y:s.y,pid:keyToPid(s.pid),sub:keyToPid(s.sub)})),
       bench:(raw.bench||[]).map(keyToPid).filter(v=>v!=null),
@@ -1695,13 +1721,13 @@ async function loadPhotos(){
   if(!raw){ try{ if(window.storage){ const r=await window.storage.get('xi_photos_v2',false); if(r&&r.value) raw=JSON.parse(r.value); } }catch(e){} }
   if(!raw){ const s=lsGet('xi_photos_v2'); if(s){ try{ raw=JSON.parse(s); _photosJson=s; }catch(e){} } }
   if(!raw) return memPhotos;
-  if(raw.v>=3&&raw.photos){ if(!_keyMap) buildKeyMap(); const out={}; for(const k in raw.photos){ const i=keyToPid(k); if(i!=null) out[i]=raw.photos[k]; } return out; }
+  if(raw.v>=3&&raw.photos){ if(!_keyMap) buildKeyMap(); const out={}; _orphanPhotos={}; for(const k in raw.photos){ const i=keyToPid(k); if(i!=null) out[i]=raw.photos[k]; else _orphanPhotos[k]=raw.photos[k]; } return out; }
   return raw; // 旧形式(index-keyed)
 }
 // 解決済み保存データ(saved)をstateへ適用。初回起動・複数チーム読込の両方で使う（呼び出し側でrender()）。
 function applyRaw(saved){
-  state.names=(saved&&saved.names&&typeof saved.names==='object')?saved.names:{};
-  state.memos=(saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{};
+  state.names=migrateKeyed((saved&&saved.names&&typeof saved.names==='object')?saved.names:{});
+  state.memos=migrateKeyed((saved&&saved.memos&&typeof saved.memos==='object')?saved.memos:{});
   state.marks=(saved&&saved.marks&&typeof saved.marks==='object')?saved.marks:{};
   state.showMarks=saved?(saved.showMarks!==false):true;
   state.hideRoles=!!(saved&&saved.hideRoles);
@@ -1744,13 +1770,16 @@ function isAdminDevice(){ return appMode()==='admin'; }
 function teamCap(){ return (isPaidUser()||isAdminDevice())?Infinity:FREE_TEAM_LIMIT; }
 function getTeams(){
   if(memTeams) return memTeams;
-  const s=lsGet('xi_teams_v1'); if(s){ try{ const a=JSON.parse(s); if(Array.isArray(a)){ memTeams=a; return a; } }catch(e){} }
+  const s=lsGet('xi_teams_v1'); if(s){ try{ const a=JSON.parse(s); if(Array.isArray(a)){ memTeams=a; return a; } }catch(e){} try{ localStorage.setItem('xi_teams_v1_corrupt_'+Date.now(),s); }catch(e){} } // 壊れていたら上書き前に退避（2026-09-29）
   memTeams=[]; return memTeams;
 }
-function setTeams(arr){ memTeams=arr; const j=JSON.stringify(arr); const ok=lsSet('xi_teams_v1',j); try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} return ok; }
+// 別タブ・別ウィンドウ（PWAとブラウザの併用など）で保存一覧が変わったら、次に読むとき最新を読み直す（古い一覧で上書きして巻き戻るのを防ぐ）
+try{ window.addEventListener('storage',e=>{ if(!e.key||e.key==='xi_teams_v1') memTeams=null; }); }catch(e){}
+function setTeams(arr){ const j=JSON.stringify(arr); const ok=lsSet('xi_teams_v1',j); memTeams=ok?arr:null; /* 書けなかった変更は一覧に残さない（次に読むとき端末の実データを読み直す）2026-09-29 */ try{ if(window.storage) window.storage.set('xi_teams_v1',j,false); }catch(e){} return ok; }
 function teamThumbName(){ return (typeof teamDisplayName==='function'&&teamDisplayName())||state.teamName||defaultTeamName(); }
 // 現在のスカッドを一覧へ保存。teamId一致→上書き、無ければ同名→上書き、それ以外→追加。上限超過は 'limit'。
 function saveCurrentTeam(){
+  const _prevTeamId=state.teamId; // 保存に失敗したら元に戻す
   const teams=getTeams(); const data=serializeTeam();
   let ok, kind;
   if(state.teamId){ const i=teams.findIndex(t=>t.id===state.teamId); if(i>=0){ teams[i]={id:state.teamId,name:teamThumbName(),ts:Date.now(),data}; ok=setTeams(teams); kind='updated'; } }
@@ -1769,8 +1798,9 @@ function saveCurrentTeam(){
     teams.unshift({id,name:teamThumbName(),ts:Date.now(),data});
     ok=setTeams(teams); save(); kind='added';
   }
-  if(!ok){ recordEvent('save_fail'); return 'error'; } // localStorage書込失敗（容量超過）。今まで silent だったので実際に何人が保存できていないか不明だった
+  if(!ok){ state.teamId=_prevTeamId; save(); recordEvent('save_fail'); return 'error'; } // localStorage書込失敗（容量超過）。今まで silent だったので実際に何人が保存できていないか不明だった
   cleanJson=JSON.stringify(serializeTeam()); recordSquadSave();
+  try{ if(!window.__persistAsked&&navigator.storage&&navigator.storage.persist){ window.__persistAsked=true; navigator.storage.persisted().then(p=>{ if(!p) return navigator.storage.persist(); }).catch(()=>{}); } }catch(e){} // 端末の保存データが自動削除されにくくする（2026-09-29）
   recordEvent('save'); // ファネル：手動保存（＝離脱時の自動カウントと区別できるようにする）
   return kind;
 }
@@ -1892,11 +1922,13 @@ function optimizeMidfield(){
 // スタメンから外れた選手を控えに戻す（クラブ読込時のみ。第二候補に再選択できるように）
 function benchFull(){ return state.bench.filter(b=>!inXI(b)).length>=15; } // 控えは最大15人（スカッド全体の上限は50人）
 function benchReturn(pid){
-  if(pid==null||!state.loadedClub) return;
+  if(pid==null) return;
   if(inXI(pid)) return;
-  if(benchFull()) return; // 満員なら控えに戻さない（同クラブなのでベンチ外に表示される）
-  if(!state.bench.includes(pid)) state.bench.push(pid);
+  if(state.loadedClub&&!benchFull()){ if(!state.bench.includes(pid)) state.bench.push(pid); return; }
+  keepInReserve(pid); // 自由編成・控えが満員・クラブ外の選手は、消さずにベンチ外へ（2026-09-29 監査P0-9）
 }
+// ベンチ外に表示されない選手（クラブ外・自由編成・カスタム）を、ベンチ外の手動追加に入れて失わないようにする
+function keepInReserve(pid){ if(pid==null||inXI(pid)||state.bench.includes(pid)) return; if(!state.reserveAdds) state.reserveAdds=[]; if(!reserveIds().includes(pid)&&!state.reserveAdds.includes(pid)) state.reserveAdds.push(pid); }
 
 function render(){ normSubs(); sanitizeTextMaps();
   _checkXIComplete(); // ファネル：スタメン11人が揃った瞬間を1回だけ記録（onceガードで重複しない）
@@ -2262,6 +2294,7 @@ function benchToSlot(pid,slotIdx){
 function reserveBenchSwap(reservePid,benchPid){ // ベンチ外⇄ベンチ（その控えの位置に入る）
   const bi=state.bench.indexOf(benchPid); if(bi<0)return;
   state.bench[bi]=reservePid;
+  state.slots.forEach(s=>{ if(s.sub===benchPid) s.sub=null; }); keepInReserve(benchPid); // 外れた控えを消さない・第2候補も外す（2026-09-29）
   render();save();toast(shortName(P[reservePid][0])+' ⇄ '+shortName(P[benchPid][0]));
 }
 function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあれば追加）
@@ -2271,6 +2304,7 @@ function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあ�
 }
 function benchToReserve(pid){ // ベンチ→ベンチ外（控えから外す＝同クラブなら自動でベンチ外に）
   state.bench=state.bench.filter(b=>b!==pid);
+  state.slots.forEach(s=>{ if(s.sub===pid) s.sub=null; }); keepInReserve(pid); // クラブ外・自由編成の選手も消さない（2026-09-29 監査P0-8）
   render();save();toast(tToReserve(shortName(P[pid][0])));
 }
 function benchSwap(a,b){ // ベンチ内の2人をドラッグで入れ替え（並び順を交換）
@@ -5221,7 +5255,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929b'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929c'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   if(navigator.onLine===false){ try{ toast(LANG==='en'?'You are offline — connect to the internet and try again.':'オフラインです。ネット接続後にもう一度お試しください'); }catch(e){} return; } // キャッシュ全削除→再読込のため、オフラインで実行すると復帰不能になる
@@ -5603,9 +5637,9 @@ function buildSideRail(){
      r.innerHTML=qcard+(FEATURED_ENABLED?'<div class="srcard"><div class="srh">'+t('featTransfer')+'</div>'+rows+'<div class="srmore" data-sr="transfer">'+t('srSeeAll')+' ›</div></div>'
       +'<div class="srcard"><div class="srh">'+t('featSquad')+'</div><button class="srbtn" data-sr="squad">'+t('srOpenSquad')+'</button></div>':'')
       +'<button class="srbtn" data-sr="help" style="padding:11px">'+t('help')+'</button>';
-    r.onclick=e=>{ const cl=e.target.closest('[data-srclub]'); if(cl){ recordEvent('rail_club',false,String(cl.dataset.srclub).slice(0,40)); loadClub(cl.dataset.srclub); return; } const el=e.target.closest('[data-sr]'); if(!el) return;
+    r.onclick=e=>{ const cl=e.target.closest('[data-srclub]'); if(cl){ recordEvent('rail_club',false,String(cl.dataset.srclub).slice(0,40)); { const _c=cl.dataset.srclub; guardUnsaved(()=>loadClub(_c),'auto'); } return; } const el=e.target.closest('[data-sr]'); if(!el) return;
       const k=el.dataset.sr;
-      if(k==='allteams'){ recordEvent('rail_all',true); openAutoSheet(); } else if(k==='transfer') openFeatured('transfer');
+      if(k==='allteams'){ recordEvent('rail_all',true); guardUnsaved(()=>openAutoSheet(),'auto'); } else if(k==='transfer') openFeatured('transfer');
       else if(k==='squad') openFeatured('squad');
       else if(k==='help') openInfoPage('help'); };
     document.body.appendChild(r);
@@ -5615,11 +5649,11 @@ buildSideRail();
 
 // バックアップ：保存チーム・現在のスカッド・写真をJSON1ファイルに書き出し／読み込み。
 // Web版は端末保存(localStorage)が消える可能性があるため、機種変更・データ消去前の退避用。
-const BACKUP_KEYS=['xi_teams_v1','xi_state_v2','xi_photos_v2'];
+const BACKUP_KEYS=['xi_teams_v1','xi_state_v2','xi_photos_v2','xi_usermeta_v1']; // 手入力の身長・利き足・生年月日も含める（2026-09-29）
 // バックアップ本文（JSON文字列）を作る。保存データが無ければ空文字。
 function backupText(){
   const out={app:'SquadXI',v:1,ts:Date.now(),data:{}};
-  BACKUP_KEYS.forEach(k=>{ let v=lsGet(k); if(v==null && k==='xi_photos_v2') v=_photosJson; if(v!=null) out.data[k]=v; }); // 写真はIndexedDB主のためls欠落時はセッションキャッシュから
+  BACKUP_KEYS.forEach(k=>{ let v=(k==='xi_photos_v2')?(_photosJson||lsGet(k)):lsGet(k); if(v!=null) out.data[k]=v; }); // 写真の正はIndexedDB（読込/保存時のJSON） // 写真はIndexedDB主のためls欠落時はセッションキャッシュから
   return Object.keys(out.data).length ? JSON.stringify(out) : '';
 }
 // テキスト（ファイル or 貼り付け）から復元。ファイル選択を使わないのでiOSホーム画面アプリでも動く。
@@ -5637,14 +5671,22 @@ function restoreFromBackupText(text){
       <button class="bigbtn" id="rstOk">${t('rstConfirm')}</button>
       <button class="bigbtn ghost" id="rstCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('rstOk').onclick=()=>{ try{ keys.forEach(k=>lsSet(k, j.data[k])); Promise.resolve().then(()=>idbDel('xi_photos_v2')).catch(()=>{}).then(()=>{ toast(t('tstRestored')); setTimeout(()=>location.reload(),700); }); }catch(e){ toast(t('tstReadFail')); } }; // 復元時はIndexedDB側の写真を破棄（古い写真が優先されるのを防ぐ）
+  document.getElementById('rstOk').onclick=async()=>{ // 2026-09-29: 写真はIndexedDBへ書き戻す（旧実装は写真が localStorage に入り切らないと全部消えるのに「復元しました」と出ていた）
+    const bad=keys.filter(k=>{ const v=j.data[k]; if(typeof v!=='string') return true; try{ JSON.parse(v); return false; }catch(e){ return true; } });
+    if(bad.length){ toast(t('tstReadFail')); return; } // 中身が壊れていたら何も書き換えない
+    const fails=[];
+    for(const k of keys){ const v=j.data[k];
+      if(k==='xi_photos_v2'){ let ok=false; try{ ok=await idbSet(k,v); }catch(e){} if(ok){ try{ localStorage.removeItem(k); }catch(e){} } else { ok=lsSet(k,v); } if(!ok) fails.push(k); }
+      else if(!lsSet(k,v)) fails.push(k); }
+    if(fails.length){ toast(LANG==='en'?'Some data could not be restored (storage full). Free up space and try again.':'一部のデータを復元できませんでした（容量不足）。空きを作ってから、もう一度お試しください'); setTimeout(()=>location.reload(),3200); return; }
+    toast(t('tstRestored')); setTimeout(()=>location.reload(),700); }; // 復元時はIndexedDB側の写真を破棄（古い写真が優先されるのを防ぐ）
   document.getElementById('rstCancel').onclick=()=>{ closeSheet(); };
 }
 async function exportBackup(){
   try{
     const bt=backupText();
     if(!bt){ toast(t('tstNoSaveData')); return; } // 空ファイルを作らせない
-    const fname='squadxi-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    const _d=new Date(); const fname='squadxi-backup-'+_d.getFullYear()+'-'+String(_d.getMonth()+1).padStart(2,'0')+'-'+String(_d.getDate()).padStart(2,'0')+'.json'; // 端末の日付（UTCだと日本の朝は前日になる）
     // スマホ/ホーム画面アプリ：共有シート経由（ファイルに保存・自分宛メール等）が簡単で確実
     const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
     const mobileish=standalone||(window.matchMedia&&window.matchMedia('(pointer:coarse)').matches);
@@ -5922,7 +5964,7 @@ function openConfirmSave(proceed,mode){
       <button class="bigbtn ghost" id="csSkip">${t(mode==='load'?'skipAndLoad':mode==='auto'?'skipAndAuto':'skipAndNew')}</button>
       <button class="bigbtn ghost" id="csCancel">${t('cancel')}</button>
     </div>`);
-  document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } if(r==='error'){ toast(t('tstSaveFail')); closeSheet(); return; } /* 保存失敗時は先へ進めない（作業消失防止） */ toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
+  document.getElementById('csSave').onclick=()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog({pending:()=>{ const _r=saveCurrentTeam(); if(_r==='error'){ toast(t('tstSaveFail')); return; } if(_r!=='limit'){ toast(t('tstSaved2')); closeSheet(); proceed(); } }}); return; } if(r==='error'){ toast(t('tstSaveFail')); closeSheet(); return; } /* 保存失敗時は先へ進めない（作業消失防止） */ toast(r==='updated'?t('tstOverwritten'):t('tstSaved2')); closeSheet(); proceed(); };
   document.getElementById('csSkip').onclick=()=>{ closeSheet(); proceed(); };
   document.getElementById('csCancel').onclick=()=>{ closeSheet(); };
 }
@@ -7152,7 +7194,7 @@ function clearSquad(){
   };
   document.getElementById('clrSave').onclick=()=>{ // 現在のスカッドを保存してから盤面を消す
     const r=saveCurrentTeam();
-    if(r==='limit'){ openLimitDialog({pending:()=>{ if(saveCurrentTeam()!=='limit'){ doClear(); closeSheet(); toast(t('tstSavedCleared')); } }}); return; }
+    if(r==='limit'){ openLimitDialog({pending:()=>{ const _r=saveCurrentTeam(); if(_r==='error'){ toast(t('tstSaveFail')); return; } if(_r!=='limit'){ doClear(); closeSheet(); toast(t('tstSavedCleared')); } }}); return; }
     if(r==='error'){ toast(t('tstSaveFail')); return; } // 保存失敗時は盤面を消さない（作業消失防止）
     doClear(); closeSheet(); toast(t('tstSavedCleared'));
   };
@@ -7758,6 +7800,21 @@ window.__selftest=function(){
         LANG=_lang;
       }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
       ok('tr_fee_lang',_pass,_msg); }
+    // T30c: データ消失の回帰（2026-09-29 監査P0）。①同名選手のキーが移籍/ポジション修正で変わっても解決 ②外した・ベンチ外へ動かした選手が消えない
+    { let _pass=true,_msg=''; const _bk={bench:state.bench.slice(),ra:(state.reserveAdds||[]).slice(),lc:state.loadedClub,slots:state.slots.map(s=>({pid:s.pid,sub:s.sub}))};
+      try{
+        let _n=0; for(const b of [...dupBaseKeys()].slice(0,30)){ const pids=(_baseIdx&&_baseIdx[b])||[]; for(const pid of pids){ const p=pidToKey(pid).split('|'); if(p.length!==4) continue;
+          if(pids.filter(i=>P[i][1]===p[3]).length===1){ _n++; if(keyToPid(p[0]+'|'+p[1]+'|Moved FC|'+p[3])!==pid){ _pass=false; _msg+=' 移籍後に解決できない:'+pidToKey(pid); } } } }
+        if(_n===0){ _pass=false; _msg+=' 検査対象なし'; }
+        if(keyToPid('Nobody At All|XXX')!==null){ _pass=false; _msg+=' 架空キーが解決された'; }
+        const a=keyToPid('Lionel Messi|ARG'), b=keyToPid('Kylian Mbappé|FRA');
+        state.loadedClub=null; state.reserveAdds=[]; state.bench=[a]; benchToReserve(a);
+        if(!reserveIds().includes(a)){ _pass=false; _msg+=' ベンチ外へ動かした選手が消えた'; }
+        state.bench=[]; state.slots[10].pid=b; const out=state.slots[10].pid; state.slots[10].pid=null; benchReturn(out);
+        if(!reserveIds().includes(b)){ _pass=false; _msg+=' 外した選手が消えた（自由編成）'; }
+      }catch(e){ _pass=false; _msg=String(e&&e.stack||e); }
+      state.bench=_bk.bench; state.reserveAdds=_bk.ra; state.loadedClub=_bk.lc; _bk.slots.forEach((s,i)=>{ if(state.slots[i]){ state.slots[i].pid=s.pid; state.slots[i].sub=s.sub; } });
+      ok('dataloss_regression',_pass,_msg); }
     // T30: CB利き足ルール（確定XIの無い自動配置で左CB=左利き優先。アーセナルの確定XIを一時的に外して検査）
     //      確定XI(CLUB_XI)はユーザーの盤面どおり＝最適化しない（2026-09-28）→ T30b
     { let _pass=true,_msg=''; const _cxA=(typeof CLUB_XI!=='undefined')?CLUB_XI['Arsenal']:null;
@@ -8909,7 +8966,7 @@ window.__selftest=function(){
       // 流入元を記録（人気集計のsrc属性）：自サイトのXIリンク=site(:ページ)、通常の共有リンク=share。確認ダイアログの採否に関わらず「そこから来た」事実で付与
       try{ _popSrc = sharedRaw.st ? ('site'+((typeof sharedRaw.pg==='string'&&/^[a-z0-9_-]{1,40}$/i.test(sharedRaw.pg))?(':'+sharedRaw.pg):'')) : 'share'; }catch(e){}
       // 自サイト発リンク(st=1)は基本ノー確認で展開。ただし未保存の作りかけ盤面(名前付き保存でない＆駒あり)がある時だけ確認を挟む（作業の消失防止）
-      const unsavedWork = !!(state.slots && state.slots.some(s=>s&&s.pid!=null) && state.teamId==null);
+      const unsavedWork = isDirty(); // 保存済みスカッドの未保存の編集も対象（2026-09-29）
       if(sharedRaw.st && !unsavedWork){ _xiBarOnEdit=true; _xiEditSig=null; const r=Object.assign({},sharedRaw,{teamId:null}); applyRaw(resolveRaw(r)); hydrateSiteSquad(sharedRaw); save(); render(); toast(sharedRaw.teamName?(sharedRaw.teamName+(LANG==='en'?' loaded':'を読み込みました')):(LANG==='en'?'Squad loaded':'スカッドを読み込みました')); }
       else openSharedSquadConfirm(sharedRaw); }
     try{ const _q=new URLSearchParams(location.search); const _sv=(_q.get('src')||'').toLowerCase(); if(/^[a-z0-9_-]{1,40}$/.test(_sv)){ _popSrc='site:'+_sv; } if(FEATURED_ENABLED&&_q.get('open')==='transfers'){ setTimeout(function(){ try{ openFeatured('transfer'); }catch(e){} },700); } }catch(e){} // サイドバー導線: srcタグ+注目の移籍直行
