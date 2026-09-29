@@ -2052,6 +2052,7 @@ function applyStaticLang(){
   const hn=document.getElementById('hint'); if(hn) hn.textContent=t('hint');
   const sb=document.getElementById('statbar'); if(sb){ sb.title=t('tipAnalysis'); const sp=sb.querySelectorAll('span'); if(sp.length) sp[sp.length-1].textContent=t('squadAnalysis'); }
   const sk=document.querySelector('.sp-skip'); if(sk) sk.textContent=t('skip');
+  { const al=(sel,v)=>{ const el=document.querySelector(sel); if(el) el.setAttribute('aria-label',v); }; al('#resetChip',t('tipReset')); al('#benchJump',LANG==='en'?'Go to bench':'ベンチへ'); al('#drawer',t('tipMenu')); al('#annwrap',t('announcements')); al('nav',LANG==='en'?'Site navigation':'サイト内ナビゲーション'); } // 読み上げラベルも言語追随（2026-09-29 監査A19/E29）
   // アイコン(div)をキーボードでも操作可能に（Enter/Space=クリック）。一度だけ配線。
   if(!window._iconKeyBound){ window._iconKeyBound=true; document.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){ const el=e.target&&e.target.closest&&e.target.closest('.icon[role="button"]'); if(el){ e.preventDefault(); el.click(); } } }); }
 }
@@ -5343,7 +5344,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929w'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929x'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6858,7 +6859,7 @@ function maybeShowXiDoneBar(){
     bar.appendChild(mk(en?'Save':'保存する',()=>{ const r=saveCurrentTeam(); if(r==='limit'){ openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); } else { toast(t('tstSaved2')); } },true));
     bar.appendChild(mk(en?'Share':'画像で共有',()=>{ shareLineup(); },false));
     const x=document.createElement('button');
-    x.textContent='×';
+    x.textContent='×'; x.setAttribute('aria-label',en?'Close':'閉じる'); // 2026-09-29 監査A20
     x.style.cssText='border:0;background:transparent;color:#7d9389;font-size:16px;cursor:pointer;padding:2px 4px';
     x.onclick=()=>bar.remove();
     bar.appendChild(x);
