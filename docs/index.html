@@ -1222,7 +1222,7 @@ const I18N = {
     tstSaveFail:'保存できませんでした（端末の空き容量不足か、写真が多すぎる可能性）', tstShareBad:'このリンクを開けませんでした（URLが壊れているか期限切れの可能性）', tstShareOffline:'オフラインのため共有スカッドを読み込めませんでした', rstTitle:'バックアップを復元', rstBody:'現在保存されている{n}件のスカッドと写真・入力データを、このバックアップで置き換えます。<br>※現在のデータは元に戻せません。先に「バックアップを作成」で書き出しておくことをおすすめします。', rstConfirm:'復元する',
     tstNoSaveData:'保存データがありません。先にスカッドを保存してください', tstExported:'バックアップを書き出しました', tstExportFail:'書き出しに失敗しました', tstFileReadFail:'ファイルを読み込めませんでした',
     tstCopiedKeep:'コピーしました。メモ等に貼り付けて保管を', tstSelectCopy:'上の枠のテキストを全選択してコピーしてください', tstTextEmpty:'テキストが空です。バックアップを貼り付けてください',
-    tstSaved2:'保存しました',tstSameNameOver:'同じ名前の「{n}」に上書き保存しました', tstGenerating:'画像を生成中…', tstGenFail:'画像の生成に失敗しました', tstImgSaved:'画像を保存しました', tstImgSavedX:'画像を保存しました。Xの投稿画面で画像を添付してください', tstImgSavedIG:'画像を保存しました。Instagramアプリで投稿してください',
+    tstSaved2:'保存しました',tstSameNameOver:'同じ名前の「{n}」に上書き保存しました', tstGenerating:'画像を生成中…', tstGenFail:'画像の生成に失敗しました', tstImgSaved:'画像を保存しました',tstImgSavedIos:'画像は「ファイル」アプリに保存されます',tstImgSavedXIos:'画像は「ファイル」アプリに保存されます。Xの投稿画面で添付してください', tstImgSavedX:'画像を保存しました。Xの投稿画面で画像を添付してください', tstImgSavedIG:'画像を保存しました。Instagramアプリで投稿してください',
     tstCopied:'コピーしました', tstCopyFail:'コピーできませんでした', tstPlaceFirst:'まず選手を配置してください',
     tstRolesOff:'ポジション名を非表示（名前を大きく表示）', tstRolesOn:'ポジション名を表示', tstFlagsOn:'国旗を表示', tstFlagsOff:'国旗を非表示', tstSubOn:'第2候補を表示', tstSubOff:'第2候補を非表示', tstMemoOn:'メモを表示', tstMemoOff:'メモを非表示',
     tstAlreadyDefault:'既に既定の配置です', tstResetLayout:'既定の配置に戻しました',
@@ -1304,7 +1304,7 @@ const I18N = {
     tstSaveFail:'Couldn’t save — your device storage may be full or you have too many photos.', tstShareBad:'Couldn’t open this shared lineup — the link may be broken or expired.', tstShareOffline:'You’re offline, so the shared lineup couldn’t load.', rstTitle:'Restore backup', rstBody:'This replaces your {n} saved squad(s), photos and entries with this backup.<br>Note: your current data can’t be recovered — we recommend exporting it first via “Create backup”.', rstConfirm:'Restore',
     tstNoSaveData:'No saved data. Save a squad first.', tstExported:'Backup exported', tstExportFail:'Export failed', tstFileReadFail:'Could not read the file',
     tstCopiedKeep:'Copied. Paste it somewhere safe to keep it.', tstSelectCopy:'Select all the text above and copy it.', tstTextEmpty:'The text is empty. Paste your backup.',
-    tstSaved2:'Saved',tstSameNameOver:'Saved over your squad "{n}"', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved', tstImgSavedX:'Image saved. Attach it to your X post.', tstImgSavedIG:'Image saved. Post it from the Instagram app.',
+    tstSaved2:'Saved',tstSameNameOver:'Saved over your squad "{n}"', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved',tstImgSavedIos:'The image goes to the Files app',tstImgSavedXIos:'The image goes to the Files app. Attach it to your X post.', tstImgSavedX:'Image saved. Attach it to your X post.', tstImgSavedIG:'Image saved. Post it from the Instagram app.',
     tstCopied:'Copied', tstCopyFail:'Could not copy', tstPlaceFirst:'Place some players first',
     tstRolesOff:'Position labels hidden (bigger names)', tstRolesOn:'Position labels shown', tstFlagsOn:'Flags shown', tstFlagsOff:'Flags hidden', tstSubOn:'Second choice shown', tstSubOff:'Second choice hidden', tstMemoOn:'Notes shown', tstMemoOff:'Notes hidden',
     tstAlreadyDefault:'Already the default layout', tstResetLayout:'Reset to the default layout',
@@ -1642,8 +1642,9 @@ function _showDemoBarNow(code){
     let top=58; try{ const tb=document.querySelector('.topbar'); if(tb){ const r=tb.getBoundingClientRect(); if(r.bottom>0) top=Math.round(r.bottom)+6; } }catch(e){}
     b.style.cssText='position:fixed;left:50%;transform:translateX(-50%);top:'+top+'px;z-index:940;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.55);border-radius:999px;padding:7px 12px 7px 14px;font-size:12px;line-height:1.4;display:flex;align-items:center;gap:8px;max-width:92vw;white-space:nowrap;box-shadow:0 4px 18px rgba(0,0,0,.35)';
     const nm=dispClub(code);
-    b.innerHTML='<span style="overflow:hidden;text-overflow:ellipsis">'+(LANG==='en'?('Sample: '+nm+' predicted XI — edit freely!'):('サンプル: '+nm+'の予想スタメン｜自由に編集できます'))+'</span><button style="all:unset;cursor:pointer;font-size:15px;padding:0 3px;color:#caff3a">×</button>';
+    b.innerHTML='<span style="overflow:hidden;text-overflow:ellipsis">'+(LANG==='en'?('Sample: '+nm+' predicted XI — edit freely!'):('サンプル: '+nm+'の予想スタメン｜自由に編集できます'))+'</span><button aria-label="'+(LANG==='en'?'Close':'閉じる')+'" style="all:unset;cursor:pointer;font-size:18px;line-height:1;min-width:32px;min-height:32px;margin:-8px -8px -8px 0;display:flex;align-items:center;justify-content:center;color:#caff3a">×</button>';
     b.querySelector('button').onclick=()=>b.remove();
+    setTimeout(()=>{ try{ if(b.isConnected){ b.style.transition='opacity .6s'; b.style.opacity='0'; setTimeout(()=>{ try{ b.remove(); }catch(e){} },650); } }catch(e){} },7000); // 前線中央の駒を隠し続けないよう7秒で消す（2026-09-29 監査E3）
     document.body.appendChild(b);
   }catch(e){}
 }
@@ -5317,7 +5318,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0929l'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0929m'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -7175,14 +7176,14 @@ function openShareFallback(imgUrl,shareText,file){
     // iOSでは a[download] が写真アプリに入らず「ファイル」/プレビュー行きになるため、
     // 共有シートを開いて「画像を保存」→写真アプリ直行の2タップにする（PC/Androidは従来どおり直ダウンロード）
     if(isIOSDevice()&&canNative&&curFile){ navigator.share({files:[curFile]}).catch(()=>{}); return; }
-    dlImg();toast(t('tstImgSaved'));
+    dlImg();toast(t(isIOSDevice()?'tstImgSavedIos':'tstImgSaved'));
   };
   document.getElementById('shX').onclick=()=>{
     recordEvent('share_x');
     dlImg();
     const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(shareText)+'&url='+encodeURIComponent(squadLink||syncLink());
     window.open(url,'_blank','noopener');
-    toast(t('tstImgSavedX'));
+    toast(t(isIOSDevice()?'tstImgSavedXIos':'tstImgSavedX'));
   };
   document.getElementById('shIG').onclick=()=>{
     // モバイル：OSの共有シートを開き、そこからInstagramを選んで直接投稿（以前の window.open は
