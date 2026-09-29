@@ -14,7 +14,7 @@
 use strict; use warnings;
 
 my $DRY = grep { $_ eq '--dry' } @ARGV;
-my $ROOT = 'G:/共有ドライブ/Alfaras（株）/football lineup【2】';
+my $ROOT = 'G:/共有ドライブ/Alfaras（株）/SquadXI';
 my $docs = "$ROOT/docs";
 
 sub slurp { my $p=shift; open my $f,'<:raw',$p or die "$p: $!"; local $/; my $c=<$f>; close $f; $c }
