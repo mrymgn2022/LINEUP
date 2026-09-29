@@ -699,6 +699,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 @keyframes sp-dot{0%{opacity:0;transform:scale(0)}65%{transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
 @keyframes sp-pulse{0%,100%{opacity:.55}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){#splash *{animation-duration:.01s!important}}
+/* スマホ横向きは盤面の半分ほどしか見えない→縦向きの案内（2026-09-30 ユーザー決定。ホーム画面のアプリ版は縦固定なのでブラウザ利用時だけ） */
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){ body::after{content:'スマホは縦向きでのご利用がおすすめです';position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:95;background:rgba(10,14,12,.92);color:#eafff0;border:1px solid rgba(202,255,58,.5);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;pointer-events:none;white-space:nowrap} html:lang(en) body::after{content:'Best viewed in portrait mode'} }
 
 /* ---------- お知らせモーダル ---------- */
 .annwrap{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;transition:opacity .25s}
@@ -864,13 +866,13 @@ window.__pjsFail=function(){
 <script src="data/players.js" charset="utf-8" onerror="__pjsFail()"></script>
 
 <script>
-/* 起動スプラッシュ：タップで即スキップ／約2.8秒で自動的に消える */
+/* 起動スプラッシュ：タップで即スキップ／約1.2秒で自動的に消える（2026-09-30 ユーザー決定：2.8秒→1.2秒。ロゴのアニメは約1.1秒で出そろう） */
 (function(){
   var sp=document.getElementById('splash'); if(!sp) return;
   var done=false;
   function hide(){ if(done)return; done=true; sp.classList.add('out'); setTimeout(function(){ if(sp&&sp.parentNode) sp.style.display='none'; try{ maybeShowAnnouncement(); }catch(e){} },520); } // スプラッシュ後にお知らせ
   sp.addEventListener('pointerdown',hide);
-  var t=setTimeout(hide,2800);
+  var t=setTimeout(hide,1200);
   window.addEventListener('pagehide',function(){ clearTimeout(t); });
 })();
 /* =========================================================
@@ -5367,7 +5369,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930z'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001a'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
