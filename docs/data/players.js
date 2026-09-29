@@ -10343,7 +10343,6 @@ const P=JSON.parse((`[
 ["Eneko Jauregi","ST",29,"🇪🇸 ESP","Málaga CF","LL"],
 ["Pablo Arriaza","CM",22,"🇪🇸 ESP","CD Estepona FS",""],
 ["Moussa Diarra","CB",24,"🇲🇱 MLI","Atlético Malagueño",""],
-["Juan Cruz","LW",26,"🇦🇷 ARG","Málaga CF","LL"],
 ["Juan Soriano","GK",28,"🇪🇸 ESP","Académico Viseu FC","PT"],
 ["Miguel San Román","GK",28,"🇪🇸 ESP","Cultural Leonesa",""],
 ["Lalo Aguilar","CB",24,"🇪🇸 ESP","CD Leganés","S2"],
