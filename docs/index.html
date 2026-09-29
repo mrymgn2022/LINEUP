@@ -2604,8 +2604,11 @@ function importPhotoBlob(pid,blob){
   photoTarget=pid; _cropFromEdit=false;
   const url=URL.createObjectURL(blob);
   const img=new Image();
-  img.onload=()=>{ try{URL.revokeObjectURL(url);}catch(e){} beginPhotoImport(img); };
-  img.onerror=()=>{ try{URL.revokeObjectURL(url);}catch(e){} photoTarget=null; _forceNoAnimSheet=false; toast(t((/hei[cf]/i.test(blob&&blob.type||'')||/.hei[cf]$/i.test(blob&&blob.name||''))?'tstPhotoHeic':'tstPhotoFail')); }; // HEICは理由を言う（2026-09-29 監査C41）
+  img.onload=()=>{ try{URL.revokeObjectURL(url);}catch(e){}
+    const _w=img.naturalWidth||img.width, _h=img.naturalHeight||img.height;
+    if(Math.max(_w,_h)>2000){ _imgToScaledBlob(img,b=>{ if(!b){ beginPhotoImport(img); return; } const u2=URL.createObjectURL(b), im2=new Image(); im2.onload=()=>{ try{URL.revokeObjectURL(u2);}catch(e){} beginPhotoImport(im2); }; im2.onerror=()=>{ try{URL.revokeObjectURL(u2);}catch(e){} beginPhotoImport(img); }; im2.src=u2; }); return; } // 大きな写真は先に縮小（iOSのメモリ不足対策 2026-09-30 監査C22）
+    beginPhotoImport(img); };
+  img.onerror=()=>{ try{URL.revokeObjectURL(url);}catch(e){} photoTarget=null; _forceNoAnimSheet=false; toast(t((/hei[cf]/i.test(blob&&blob.type||'')||/\.hei[cf]$/i.test(blob&&blob.name||''))?'tstPhotoHeic':'tstPhotoFail')); }; // HEICは理由を言う（2026-09-29 監査C41）
   img.src=url;
 }
 // 挿入<img>→縮小Blob化の共通処理。大きなWeb画像をフルサイズでcanvas化+PNGエンコードすると
@@ -2614,7 +2617,7 @@ function _imgToScaledBlob(im,cb){
   try{
     const w=im.naturalWidth||im.width, h=im.naturalHeight||im.height; if(!w||!h){ cb(null); return; }
     const MAX=1400, sc=Math.min(1,MAX/Math.max(w,h)), cw=Math.max(1,Math.round(w*sc)), ch=Math.max(1,Math.round(h*sc));
-    const c=document.createElement('canvas'); c.width=cw; c.height=ch; c.getContext('2d').drawImage(im,0,0,cw,ch);
+    const c=document.createElement('canvas'); c.width=cw; c.height=ch; const _cx=c.getContext('2d'); _cx.fillStyle='#fff'; _cx.fillRect(0,0,cw,ch); _cx.drawImage(im,0,0,cw,ch); // 透過PNGの背景を白に（黒くなっていた 2026-09-30 監査C23）
     c.toBlob(b=>cb(b),'image/jpeg',0.9);
   }catch(e){ cb(null); } // 外部URL画像はcanvas汚染(SecurityError)で落ちる→null
 }
@@ -2787,7 +2790,7 @@ function savePhotoCrop(img,sx,sy,cropSize){
   const ctx=c.getContext('2d'); try{ctx.imageSmoothingQuality='high';}catch(e){}
   let uri=null;
   // iOS等で canvas が汚染されている／メモリ不足だと toDataURL は例外か空文字を返す。黙って握り潰さず失敗を伝える。
-  try{ ctx.drawImage(img,sx,sy,src,src,0,0,S,S); uri=c.toDataURL('image/jpeg',0.82); }catch(e){ uri=null; }
+  try{ ctx.fillStyle='#fff'; ctx.fillRect(0,0,S,S); ctx.drawImage(img,sx,sy,src,src,0,0,S,S); uri=c.toDataURL('image/jpeg',0.82); }catch(e){ uri=null; } // 透過部分は白（監査C23）
   if(!uri||uri.length<64){ closeSheet(); toast(t('tstPhotoFail')); return; }
   state.photos[photoTarget]=uri;
   recordEvent('photo_add',true); // 機能利用の計測(2026-08-22)。画像も選手名も送らない・1セッション1回
@@ -5347,7 +5350,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='0930f'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='0930g'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
