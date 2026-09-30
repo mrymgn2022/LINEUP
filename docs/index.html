@@ -5440,7 +5440,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001u'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001v'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6869,7 +6869,7 @@ function openSquadAnalysis(scope){
     const oldest=withAge.length?[...withAge].sort((a,b)=>b[2]-a[2])[0]:null;
     const nat={};
     list.forEach(p=>{const key=p[3].trim();nat[key]=(nat[key]||0)+1;});
-    const natTop=Object.entries(nat).sort((a,b)=>b[1]-a[1]).map(e=>flagHTML(e[0])+(e[1]>1?' ×'+e[1]:'')).join('　');
+    const natTop=Object.entries(nat).sort((a,b)=>b[1]-a[1]).map(e=>'<span style="display:inline-flex;align-items:center;gap:5px;white-space:nowrap">'+flagHTML(e[0])+(e[1]>1?'<span>×'+e[1]+'</span>':'')+'</span>').join(''); // 国ごとに1かたまり（折り返しても国旗どうしがくっつかない 2026-10-01）
     const natCount=Object.keys(nat).length;
     const captIn=state.captain!=null&&list.indexOf(P[state.captain])>=0;
     const captP=(captIn&&P[state.captain])?escAttr(squadShortName(state.captain)):t('saNone');
@@ -6886,7 +6886,7 @@ function openSquadAnalysis(scope){
         <div class="dcell"><div class="dk">${t('saCaptain')}</div><div class="dv" style="font-size:18px">${captP}</div></div>
         <div class="dcell"><div class="dk">${t('saYoungest')}</div><div class="dv" style="font-size:18px">${youngest?escAttr(squadShortName(P.indexOf(youngest))):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${youngest?youngest[2]+ageU:''}</div></div>
         <div class="dcell"><div class="dk">${t('saOldest')}</div><div class="dv" style="font-size:18px">${oldest?escAttr(squadShortName(P.indexOf(oldest))):'–'}</div><div class="dk" style="margin-top:3px;text-transform:none;letter-spacing:0">${oldest?oldest[2]+ageU:''}</div></div>
-        <div class="dcell full"><div class="dk">${t('saNat')} (${natCount}${LANG==='en'?'':'カ国'})</div><div class="dv" style="font-size:16px">${natTop}</div></div>
+        <div class="dcell full"><div class="dk">${t('saNat')} (${natCount}${LANG==='en'?'':'カ国'})</div><div class="dv" style="font-size:16px;display:flex;flex-wrap:wrap;align-items:center;gap:9px 15px;margin-top:6px">${natTop}</div></div>
       </div>`;
   }
   openSheet(`
