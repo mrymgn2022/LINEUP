@@ -331,7 +331,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .bench .bh span{font-size:11px;color:var(--mut)}
 .bench .bh i{margin-left:auto;font-style:normal;font-size:11px;color:var(--lime-dim);letter-spacing:1px}
 .bgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} /* 2026-10-01 3列固定＝9人が3×3でそろう（5＋4／4＋4＋1は見栄えが悪い） */
-.bcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:8px 6px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-width:0;cursor:pointer;transition:.12s} /* 横長：写真と名前をまとめて中央寄せ */
+.bcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:8px 6px 8px 9px;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;min-width:0;cursor:pointer;transition:.12s} /* 横長：左揃え＝写真の位置がそろう（2026-10-01 ユーザー指示。中央寄せは名前の長さで写真がずれた） */
 .bcard:active{transform:scale(.95);background:var(--panel2)}
 .bav{width:38px;height:38px;border-radius:50%;background:linear-gradient(160deg,#1d2722,#10160f);border:2px solid var(--line);display:grid;place-items:center;color:var(--mut);overflow:hidden}
 .bav svg{width:22px;height:22px;opacity:.85}
@@ -343,8 +343,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .btx{min-width:0;flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
 .bcard .bn{font-size:13px;font-weight:800;text-align:left;white-space:nowrap;max-width:100%;overflow:hidden;line-height:1.15} /* 「…」にしない：fitBenchNames が文字を小さくする／入らなければ2行 */
 .bcard .bn.wrap2{white-space:normal;overflow-wrap:anywhere;hyphens:manual;-webkit-hyphens:manual;text-wrap:balance;font-size:10.5px;line-height:1.1}
-@media (max-width:420px){ .bav{width:34px;height:34px} .bcard{gap:6px;padding:8px 5px} .bavw .bflag{font-size:12px} }
-@media (max-width:360px){ .bcard[data-pid]{flex-direction:column;gap:5px;padding:9px 4px} .bcard[data-pid] .btx{align-items:center;max-width:100%} .bcard[data-pid] .bn{text-align:center} } /* 狭い画面は写真の下に名前 */
+@media (max-width:420px){ .bav{width:34px;height:34px} .bcard{gap:6px;padding:8px 5px 8px 7px} .bavw .bflag{font-size:12px} }
+@media (max-width:360px){ .bcard[data-pid]{flex-direction:column;justify-content:center;gap:5px;padding:9px 4px} .bcard[data-pid] .btx{align-items:center;max-width:100%} .bcard[data-pid] .bn{text-align:center} } /* 狭い画面は写真の下に名前 */
 .bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
 .bcard .bv{font-size:11px;color:var(--mut);font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;min-height:15px}
 .bcard .bv .fi{font-size:15px;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35)}
@@ -5435,7 +5435,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001r'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001s'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
