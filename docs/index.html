@@ -1204,7 +1204,7 @@ function lsGet(k){ try{ return (window.localStorage)?localStorage.getItem(k):nul
 /* ---------- 多言語(i18n)：navigator.language自動判定＋手動トグル。既定=日本語ベース、未訳キーは日本語にフォールバック ---------- */
 const I18N = {
   ja: {
-    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し・名前のタップ）', helpGNameT:'表示名を変える', helpGNameD:'駒をタップし、メニュー上部の名前（✎）をタップすると、短縮名や愛称に変更できます（例：Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'29,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'盤面から外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'主なボタンと機能', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'右端の「◀」から開く4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'メニューの「現在のスカッドを保存」から（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'盤面の11人をすべて外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'空いている枠をタップすると選手検索が開く', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'駒を動かすと盤面右下に出る「配置を整える」で既定位置へ', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpDDisp:'POS・2nd・メモ・国旗の4つをまとめて開く／しまう', helpSoon:'新しい画面に合わせて、使い方ページを作り直しています。<br>もう少しだけお待ちください。', helpSecMenu:'メニューの中身', helpDNewTeam:'盤面を作り直す。クラブ・国籍・リーグからの自動配置もここから', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'ファイルに書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'ファイルから読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
+    helpSecVideo:'動画で見る', helpVideoPlay:'タップで再生', featTapZoom:'タップで拡大（全画面）', helpSecGesture:'ボタンのない操作（ドラッグ・長押し・名前のタップ）', helpGNameT:'表示名を変える', helpGNameD:'駒をタップし、メニュー上部の名前（✎）をタップすると、短縮名や愛称に変更できます（例：Vinicius Junior → ヴィニシウス）。盤面が見やすくなります。', helpVideoOpen:'YouTubeで開く（全画面・高画質）', helpSecPiece:'駒をタップしてできること', helpPieceLead:'盤面の選手をタップするとメニューが開きます。アイコンは日本語・英語どちらでも同じです。', helpDSwap:'盤面の2人を入れ替える', helpDChange:'29,000人のデータベースから選び直す', helpDPhoto:'端末の画像から顔写真を設定', helpDSearchImg:'画像検索→長押しでコピー→貼り付けが最速', helpDPaste:'コピーした画像をそのまま駒へ', helpNCaptain:'キャプテン', helpDCaptain:'Cマークを付ける／外す', helpDMemo:'駒の下に一言（背番号・所属など）', helpDDetail:'身長・利き足・生年月日を見る', helpNRemove:'スタメンから外す', helpDRemove:'枠が空になり、また選び直せる', helpSecTop:'主なボタンと機能', helpSecToggle:'表示の切り替え（盤面の見え方）', helpToggleLead:'右端の「◀」から開く4つ。盤面の見え方を変えるだけで、スカッドの中身は変わりません。', helpDFormation:'4-3-3・3-4-2-1 など。選ぶと駒の配置が組み替わります', helpDSave:'メニューの「現在のスカッドを保存」から（最大10）', helpDShare:'画像を作ってX・Instagramへ／リンクでも共有できる。ベンチを画像に含めるかもここで選べます', helpDClear:'スタメン・ベンチ・ベンチ外をすべて外して空にする', helpDMemoTg:'駒の下のメモを出す／隠す', helpDMenu:'保存・切り替え・各ページ', helpDSearch:'空いている枠をタップすると選手検索が開く', helpDStats:'平均年齢・国籍の内訳などを見る', helpDReset:'駒を動かすと盤面右下に出る「配置を整える」で既定位置へ', helpDSub:'各ポジションの2番手を駒の下に表示', helpDBench:'控えの一覧を出す／隠す', helpDDisp:'POS・2nd・メモ・国旗の4つをまとめて開く／しまう', helpSoon:'新しい画面に合わせて、使い方ページを作り直しています。<br>もう少しだけお待ちください。', helpSecMenu:'メニューの中身', helpDNewTeam:'盤面を作り直す。クラブ・国籍・リーグからの自動配置もここから', helpNRename:'名前を変更', helpNDelete:'スカッドを削除', helpDBackup:'全スカッドを書き出し／読み込み', helpNLang:'言語', helpDLang:'日本語 ⇄ English', helpSecBackup:'バックアップ（機種変更・データ移行）', helpNExport:'バックアップを書き出す', helpDExport:'全スカッドと写真を1ファイルに', helpNImport:'バックアップを読み込む', helpDImport:'書き出したファイルを取り込む', helpNRestore:'テキストから復元', helpDRestore:'バックアップの中身を貼り付けて戻す', 
     newTeam:'スカッドを新規作成', savedTeams:'保存したスカッド', myTeam:'マイスカッド', editing:'編集中・', editingBadge:'編集中', saved:'保存',
     noSaved:'まだ保存したスカッドはありません。<br>下の「現在のスカッドを保存」で追加できます。',
     saveCurrent:'現在のスカッドを保存', overwrite:'このスカッドを上書き保存',
@@ -1227,17 +1227,17 @@ const I18N = {
     createPlayer:'＋ 選手を新規作成', noMatch:'該当する選手がいません', noMatchHint:'名字だけ・名前だけでもヒットします。国籍・リーグの絞り込みが原因のこともあります。', rescueA:'「', rescueB:'」では見つからなかったため、「', rescueC:'」の検索結果を表示しています',rescueTok:'」を短縮名とみなして検索しました', rescueKana:'」の表記のゆれを含めて検索しました', reqPlayer:'選手をリクエスト', shCustomize:'表示をカスタマイズ',shToggleHint:'左から：ポジション名 / 第2候補 / メモ / 国旗 / ベンチ', reqPlayerSubj:'選手追加のリクエスト', reqPlayerBody:'追加してほしい選手：\n（選手名・所属クラブをご記入ください）',reqPlayerQ:'検索した言葉：',
     changePlayer:'選手を変更', secondChoice:'第2候補を選ぶ', fromAll:'全選手から', curSecond:'現在の第2候補：', release:'解除', benchEmptyList:'ベンチに選手がいません',
     badgeInXI:'●起用中', badgeBench:'●ベンチ', badgeReserve:'●ベンチ外', badgeCustom:'自作', alreadyInXI:'すでにスタメン起用中', outsideSwap:'チーム外の選手と交代',
-    addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'ほかの選手に差し替える', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
+    addChangePhoto:'写真を追加 / 変更', editPhotoItem:'写真を編集', photoDevice:'端末の写真から選ぶ', changeTransfer:'ほかの選手と交代', removeFromXI:'スタメンから外す', addToXIBtn:'スタメンに入れる', removeFromBench:'ベンチから外す', addToBenchBtn:'ベンチ（控え）に加える',
     playerProfile:'選手プロフィール', dkPos:'ポジション', dkAge:'年齢', dkHeight:'身長', dkFoot:'利き足', dkLeague:'リーグ', dkNat:'国籍', webSearchPhoto:'この選手の画像をネット検索',
     cancel:'キャンセル', modePlaceXI:'入れる枠をタップ（点滅中）', modeSwapSub:'交代する控えをタップ（控えが点滅中）',
     viewDetails:'選手の詳細を見る', swapPlayers:'選手を入れ替える', editNote:'メモを編集', injCard:'負傷・カード', captainOn:'キャプテンに指定', captainOff:'キャプテンを解除', subLabelPrefix:'第2候補：', removeFromTeam:'スカッドから外す', tstRemovedFromTeam:'スカッドから外しました', addWord:'追加',
     injury:'負傷', cards:'カード', cardsNote:'（イエロー／レッドは同時不可）', cNone:'なし', cYellow:'イエロー', cRed:'レッド', ycCount:'イエロー枚数（最大15）', ycHint:'2枚以上で四角の右上に ×枚数 を表示',
     allCountries:'すべての国', fifaTop20:'FIFAランキング上位20', natOthers:'その他（五十音）', noneFound:'該当なし', natLabel:'国籍', natSearchPh:'国名で検索（日本語・英語可）…',
-    tstMaxBench:'ベンチは最大9人です（それ以外はベンチ外へ）', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
+    tstMaxBench:'ベンチは最大9人です。控えと入れ替えるか、ベンチ外に追加してください', addToReserve:'ベンチ外に追加', tstAlreadyListed:'すでにスカッドにいます', tstMaxSquad:'スカッドは全体で最大50人です', tstPosSwapped:'ポジションを入れ替えました', tstWebOpened:'ネット検索を開きました。画像を長押しコピー→アプリに戻ると貼り付けできます', pastePromptTitle:'コピーした画像を貼り付け', pasteShort:'貼り付け',
     tstPhotoSet:'写真を設定しました', tstPhotoFail:'画像を読み込めませんでした',tstPhotoDelFail:'写真を消しましたが、端末への保存に失敗しました（次に開くと戻る場合があります）',tstPhotoHeic:'この形式（HEIC）は読み込めません。スクリーンショットかJPEG/PNGの画像でお試しください',tstMemoOnEmpty:'メモ表示をONにしました（メモはまだありません。駒をタップ→「メモを編集」）', tstPhotoHiddenUser:'保存しました（ユーザーモードのため盤面には表示されません。版数を長押しで通常モードへ）', swapPrompt:'入れ替える相手をタップ（ベンチ・ベンチ外も可）',
     tstSwapCanceled:'入れ替えを取消しました', tstSwapped:'入れ替えました', tstSlotIsStarter:'その選手はこの枠のスタメンです',tstSubIsStarter:'その選手はスタメンです（第2候補はスタメン以外から選べます）', tstRemoved:'外しました', tstBenchRemoved:'ベンチから外しました',
     tstSubCleared:'第2候補を解除しました', tstCaptainOff:'キャプテンを解除しました', tstNameReq:'名前を入力してください', tstPosReq:'ポジションを選んでください', tstNatReq:'国籍を選んでください',
-    tstNameUpdated:'表示名を更新しました',tstNameReset:'元の名前に戻しました', tstMemoSaved:'メモを保存しました', tstMemoDeleted:'メモを削除しました', tstXIFull:'スタメンが11人埋まっています。誰かを外してください', tstCanceled:'キャンセルしました',
+    tstNameUpdated:'表示名を更新しました',tstSquadRenamed:'スカッド名を変更しました',tstNameReset:'元の名前に戻しました', tstMemoSaved:'メモを保存しました', tstMemoDeleted:'メモを削除しました', tstXIFull:'スタメンが11人埋まっています。誰かを外してください', tstCanceled:'キャンセルしました',
     tstNotBackup:'Squad XI のバックアップではありません', tstBackupEmpty:'このバックアップにはデータが入っていません（空かもしれません）', tstRestored:'復元しました。再読み込みします…', tstReadFail:'テキストを読み込めませんでした（内容が壊れている可能性）',
     tstSaveFail:'保存できませんでした（端末の空き容量不足か、写真が多すぎる可能性）', tstShareBad:'このリンクを開けませんでした（URLが壊れているか期限切れの可能性）', tstShareOffline:'オフラインのため共有スカッドを読み込めませんでした', rstTitle:'バックアップを復元', rstBody:'現在保存されている{n}件のスカッドと写真・入力データを、このバックアップで置き換えます。<br>※現在のデータは元に戻せません。先に「バックアップを書き出す」で書き出しておくことをおすすめします。', rstConfirm:'復元する',
     tstNoSaveData:'保存データがありません。先にスカッドを保存してください', tstExported:'バックアップを書き出しました', tstExportFail:'書き出しに失敗しました', tstFileReadFail:'ファイルを読み込めませんでした',
@@ -1252,7 +1252,7 @@ const I18N = {
     clubHelp:'クラブを選ぶと、その実在編成（スタメン・控え・ベンチ外）をそのまま配置します（国籍・リーグより優先）。選ばなければ、そのリーグの主力選手で自動配置します。',
     clearConds:'× 条件をクリア', autoBuild:'自動配置 →', autoBuildHelp:'条件を選ぶと、その条件に合う主力選手を適性ポジションへ自動配置します。何も選ばなければ、全選手の中から主力選手で自動配置します。',
     noTeamsFound:'該当するチームがありません', tstNoMatchConds:'条件に合う選手がいません。条件を見直してください',
-    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', saveAndAuto:'保存して自動配置', skipAndAuto:'保存せず自動配置', clearTitle:'盤面を空にする', clearBody:'盤面の選手をすべて外します（保存済みのスカッドは消えません）。<br>※保存していない盤面は元に戻せません。', clearConfirm:'空にする',deleteConfirm:'削除する', saveAndDelete:'保存してから空にする', tstCleared:'盤面を空にしました',tstShareImgFail:'画像を作れませんでした。もう一度お試しください',undo:'元に戻す',tstUndone:'元に戻しました',tstUndoFail:'元に戻せませんでした', tstSavedCleared:'保存して削除しました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'ドラッグで移動、ピンチ／スライダーで拡大して、円に入る範囲を決めてください。', cropZoom:'拡大', cropSet:'この位置で設定', deletePhotoBtn:'写真を削除（標準の表示に戻す）', tstPhotoDeleted:'写真を削除しました。標準の表示に戻ります', modeToNormal:'通常モードに戻しました', modeToUser:'ユーザーモード（統計オフ・ユーザー視点）', modeToAdmin:'管理者モードにしました', adminPinTitle:'管理者PINを入力', pinNg:'PINが違います', pastePhoto:'コピーした画像を貼り付け', tstPasteNoImage:'クリップボードに画像がありません。画像を長押し→「コピー」してからもう一度', tstPasteFail:'この環境では貼り付けを使えません。「写真を追加」から選んでください', pasteBoxTitle:'画像を貼り付け', pasteBoxHelp:'下の枠を長押しして「ペースト」を選ぶと、コピーした画像を取り込めます。', pasteBoxPh:'ここを長押し →「ペースト」', tstPasteBoxNoImage:'画像が貼り付けられませんでした。先に画像を長押し→「コピー」してください',
+    unsavedTitle:'未保存のスカッド', unsavedBody:'いま編集中のスカッドはまだ保存されていません。保存しますか？', saveAndNew:'保存して新規作成', skipAndNew:'保存せず新規作成', saveAndLoad:'保存して読み込み', skipAndLoad:'保存せず読み込み', saveAndAuto:'保存して自動配置', skipAndAuto:'保存せず自動配置', clearTitle:'盤面を空にする', clearBody:'盤面の選手をすべて外します（保存済みのスカッドは消えません）。<br>※空にした直後は、通知の「元に戻す」で戻せます。', clearConfirm:'空にする',deleteConfirm:'削除する', saveAndDelete:'保存してから空にする', tstCleared:'盤面を空にしました',tstShareImgFail:'画像を作れませんでした。もう一度お試しください',undo:'元に戻す',tstUndone:'元に戻しました',tstUndoFail:'元に戻せませんでした', tstSavedCleared:'保存して盤面を空にしました', deleteTeamTitle:'スカッドを削除', deleteTeamBody:'選択したスカッドを削除します。<br>※削除したスカッドは元に戻せません。', cropTitle:'写真の位置調整', cropHelp:'ドラッグで移動、ピンチ／スライダーで拡大して、円に入る範囲を決めてください。', cropZoom:'拡大', cropSet:'この位置で設定', deletePhotoBtn:'写真を削除（標準の表示に戻す）', tstPhotoDeleted:'写真を削除しました。標準の表示に戻ります', modeToNormal:'通常モードに戻しました', modeToUser:'ユーザーモード（統計オフ・ユーザー視点）', modeToAdmin:'管理者モードにしました', adminPinTitle:'管理者PINを入力', pinNg:'PINが違います', pastePhoto:'コピーした画像を貼り付け', tstPasteNoImage:'クリップボードに画像がありません。画像を長押し→「コピー」してからもう一度', tstPasteFail:'この環境では貼り付けを使えません。「写真を追加」から選んでください', pasteBoxTitle:'画像を貼り付け', pasteBoxHelp:'下の枠を長押しして「ペースト」を選ぶと、コピーした画像を取り込めます。', pasteBoxPh:'ここを長押し →「ペースト」', tstPasteBoxNoImage:'画像が貼り付けられませんでした。先に画像を長押し→「コピー」してください',
     createPlayerTitle:'選手を新規作成', cpHelp:'未掲載の選手を自分で追加できます。<b>名前・国籍・ポジション</b>は必須、その他は任意です。',
     fieldName:'名前', required:'必須', egName:'例：山田太郎', clubPh:'所属クラブ（任意）', egAge:'例：24', fieldHeightCm:'身長(cm)', egHeight:'例：180',
     heightHelp:'未入力なら、スカッド分析の平均身長の計算から除外されます。', createThisPlayer:'この選手を作成',
@@ -1266,7 +1266,7 @@ const I18N = {
     helpS5T:'スカッドを保存・切り替え', helpS5D:'メニューで保存（最大10スカッド）。作ったスカッドの切り替えもここから。',
     helpS6D:'全選手を注目順などで一覧。誰がいるか眺めたり、そのまま起用できます。',
     helpS7T:'選手をカスタム', helpS7D:'駒をタップ → 写真追加・キャプテン・第2候補・メモ・入れ替え。名前はメニュー上部の✎で短縮や愛称に変更。写真は「画像をネット検索 → 長押しでコピー → 貼り付け」が最速。位置はドラッグで調整できます。',
-    helpS8T:'位置を微調整', helpS8D:'駒を長押ししてドラッグで移動。⟲（整列リセット）でいつでも既定の配置に戻せます。',
+    helpS8T:'位置を微調整', helpS8D:'駒を長押ししてドラッグで移動。⟲（配置を整える）でいつでも既定の配置に戻せます。',
     helpSec3:'画面のボタン', legMenu:'メニュー', legMenuD:'スカッドの保存・切り替え、各ページ', legNewD:'自動配置でスカッドを作る', legSearchD:'全選手を一覧から探す', legResetD:'動かした駒を既定の配置へ',
     legPos:'ポジション名', legPosD:'駒の下の役職表示を ON/OFF', legSub:'第2候補', legSubD:'控え候補の表示を ON/OFF',
     helpTipLabel:'ヒント', helpTipBody:'未保存のまま新規作成しようとすると確認が出ます。保存し忘れても、アプリを閉じれば次回そのまま続きから始められます。',
@@ -1275,7 +1275,7 @@ const I18N = {
     backupTitle:'バックアップ', bkWarn:'⚠ 作ったスカッドや写真は<b>この端末の中だけ</b>に保存されています。機種変更・アプリ削除・ブラウザのデータ消去で<b>消えることがあります</b>。バックアップはその保険です。',
     bkExport:'バックアップを書き出す', bkImport:'バックアップを読み込む', bkImportHelp:'前に書き出したファイルを選ぶと、その中身に戻します。<b style="color:var(--ink)">機種変更や、データが消えたときの復元</b>に。別の端末のファイルも読み込めます。<br>⚠ 今のデータは、読み込んだ内容に<b style="color:var(--ink)">置き換わります</b>。',
     bkIosTitle:'iPhoneのホーム画面アプリでうまくいかない時<br>＝コピー＆貼り付け方式', bkIosHelp:'ホーム追加アプリはファイル選択でうまく動かないことがあります（iOSの仕様）。その場合はこちら。ファイルを使わないので確実です。',
-    bkTextPh:'ここにバックアップのテキストを貼り付けて「テキストから復元」を押す', bkCopyOut:'現在のデータをテキストで出す（コピー）', bkTextRestore:'上のテキストから復元', bkTextHelp:'「コピー」を押したらメモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「テキストから復元」。',
+    bkTextPh:'ここにバックアップのテキストを貼り付けて「上のテキストから復元」を押す', bkCopyOut:'現在のデータをテキストで出す（コピー）', bkTextRestore:'上のテキストから復元', bkTextHelp:'「現在のデータをテキストで出す（コピー）」を押したら、メモアプリ等に貼り付けて保管。復元時は、その文字列をこの枠に貼り付けて「上のテキストから復元」。',
     fbBody:'未掲載の選手の追加依頼や、不具合・改善のご要望があれば、下記メールまでお気軽にご連絡ください。', fbMailBtn:'support@squadxi.futbol にメール', fbFallback:'ボタンが開かない場合は、<b style="color:var(--ink)">support@squadxi.futbol</b> 宛に直接お送りください。',
     premTitle:'プレミアム（近日公開）', premBody:'プレミアムでは、負傷・カードマーカー、スカッドの無制限保存、広告非表示などを提供予定です。\n公開までもうしばらくお待ちください。',
     limitTitle:'保存できる上限です', goUnlimited:'プレミアムにする', deleteToFree:'保存済みを削除して空ける', deleteSaved:'保存済みを削除', deleteSavedHint:'削除すると新しいスカッドを保存できます', noSavedTeams:'保存済みのスカッドはありません',
@@ -1283,10 +1283,10 @@ const I18N = {
     featPredicted:'予想', featSquadDesc:'注目試合の予想スタメンを随時更新。', featSquadNote:'※キックオフ24時間前から表示します', featSquadEmpty:'本日の注目試合はありません。<br>キックオフ24時間前から表示されます。',
     featTransferDesc:'高額移籍金、ビッグネームの移籍を随時更新。', featTransferNote:'※データベースへの反映まで時間がかかる場合があります', featComingSoon:'近日公開予定です。',
     featPreviewLabel:'試合の見どころ', featXIPending:'予想スタメン準備中', kickoffLabel:'キックオフ（日本時間）', freeWord:'フリー',
-    saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'オリジナル'
+    saTabXI:'スタメン', saTabAll:'スタメン＋ベンチ', saNoXI:'スタメンに選手がいません', saSquadSize:'登録人数', saAvgAge:'平均年齢', saAvgHeight:'平均身長', saCaptain:'キャプテン', saNone:'未設定', saYoungest:'最年少', saOldest:'最年長', saNat:'国籍', saOriginal:'マイスカッド'
   },
   en: {
-    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Hidden actions (drag, long-press, tap the name)', helpGNameT:'Change the display name', helpGNameD:'Tap a player, then tap the name (✎) at the top of the menu to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens the menu shown below. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 29,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from pitch', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons & features', helpSecToggle:'Display toggles', helpToggleLead:'The four behind the ◀ button on the right. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'From “Save current squad” in the menu (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove all 11 players and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDMenu:'Save, switch and all pages', helpDSearch:'Tap any empty spot to open player search', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Move a player, then tap “Reset layout” (bottom-right of the pitch)', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpDDisp:'Open or tuck away the four display toggles', helpSoon:'We&#39;re rebuilding this guide for the new look.<br>Coming soon.', helpSecMenu:'Inside the menu', helpDNewTeam:'Start over — auto-place by club, nation or league from here', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export to a file', helpDExport:'All squads and photos in one file', helpNImport:'Import from a file', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
+    helpSecVideo:'Watch the video', helpVideoPlay:'Tap to play', featTapZoom:'Tap to enlarge (fullscreen)', helpSecGesture:'Hidden actions (drag, long-press, tap the name)', helpGNameT:'Change the display name', helpGNameD:'Tap a player, then tap the name (✎) at the top of the menu to shorten it or use a nickname (e.g. Vinicius Junior → Vinicius). Keeps the pitch readable.', helpVideoOpen:'Open on YouTube (fullscreen / HD)', helpSecPiece:'Tap a player on the pitch', helpPieceLead:'Tapping a player opens the menu shown below. The icons are the same in every language.', helpDSwap:'Swap two players on the pitch', helpDChange:'Pick anyone from the 29,000-player database', helpDPhoto:'Set a face photo from your device', helpDSearchImg:'Search images → long-press to copy → paste is fastest', helpDPaste:'Paste a copied image straight onto the player', helpNCaptain:'Captain', helpDCaptain:'Add or remove the C mark', helpDMemo:'A short note under the player (number, club…)', helpDDetail:'Height, preferred foot, date of birth', helpNRemove:'Remove from the XI', helpDRemove:'The slot empties so you can pick again', helpSecTop:'Buttons & features', helpSecToggle:'Display toggles', helpToggleLead:'The four behind the ◀ button on the right. They only change how the pitch looks - your squad stays the same.', helpDFormation:'4-3-3, 3-4-2-1 and more. Picking one rearranges the players', helpDSave:'From “Save current squad” in the menu (up to 10)', helpDShare:'Make an image for X / Instagram, or share a link. You can also choose whether to include the bench', helpDClear:'Remove everyone (XI, bench and reserves) and start from an empty pitch', helpDMemoTg:'Show or hide the notes under each player', helpDMenu:'Save, switch and all pages', helpDSearch:'Tap any empty spot to open player search', helpDStats:'Average age, nationality breakdown and more', helpDReset:'Move a player, then tap “Reset layout” (bottom-right of the pitch)', helpDSub:'Show each position\'s second choice under the player', helpDBench:'Show or hide the bench', helpDDisp:'Open or tuck away the four display toggles', helpSoon:'We&#39;re rebuilding this guide for the new look.<br>Coming soon.', helpSecMenu:'Inside the menu', helpDNewTeam:'Start over — auto-fill by club, nation or league from here', helpNRename:'Rename', helpNDelete:'Delete squad', helpDBackup:'Export or import every squad', helpNLang:'Language', helpDLang:'English \u21c4 \u65e5\u672c\u8a9e', helpSecBackup:'Backup (new phone / moving data)', helpNExport:'Export backup', helpDExport:'All squads and photos in one file', helpNImport:'Import backup', helpDImport:'Load a file you exported', helpNRestore:'Restore from text', helpDRestore:'Paste backup text to restore', 
     newTeam:'Create a squad', savedTeams:'Saved squads', myTeam:'My Squad', editing:'editing · ', editingBadge:'Editing', saved:'saved',
     noSaved:'No saved squads yet.<br>Add one with “Save current squad” below.',
     saveCurrent:'Save current squad', overwrite:'Overwrite this squad',
@@ -1302,29 +1302,29 @@ const I18N = {
     hint:'Tap an empty spot to add a player · long-press and drag to fine-tune, overlap two to swap',
     squadAnalysis:'Squad analysis', tipAnalysis:'Tap for detailed squad analysis', scrollBench:'▾ Scroll down for the bench ▾', skip:'Tap to skip',
     bench:'Bench', reserves:'Reserves', tapMenuDrag:'Tap for menu · long-press to drag', dragToBench:'Long-press to drag to the bench',
-    total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>＋</b>. Auto-filling by club fills the bench too.',
+    total:'Total', starters:'Starters', subsWord:'Subs', benchEmpty:'No substitutes yet. Add them with <b>+</b>. Auto-filling by club fills the bench too.',
     place:'Place a player', benchAddTitle:'Add to bench', searchName:'Search by player name…', searchNameClub:'Search by player or club…', clearFilters:'× Clear filters',
     posAll:'All', allLeagues:'All leagues', popClubs:'Popular clubs', lgSearchPh:'Search by country or league', allClubs:'All clubs',
     sortSuggest:'Suggested', sortPop:'Popular',
-    createPlayer:'＋ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead',rescueTok:'” — matched as a short name', rescueKana:'” — matched with spelling variants', reqPlayer:'Request a player', shCustomize:'Customize image',shToggleHint:'From left: positions / 2nd choices / notes / flags / bench', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',reqPlayerQ:'Searched for: ',
+    createPlayer:'+ Create a player', noMatch:'No matching players', noMatchHint:'Try just the first or last name. Nationality/league filters may also be hiding results.', rescueA:'No results for “', rescueB:'” — showing results for “', rescueC:'” instead',rescueTok:'” — matched as a short name', rescueKana:'” — matched with spelling variants', reqPlayer:'Request a player', shCustomize:'Customize image',shToggleHint:'From left: positions / 2nd choices / notes / flags / bench', reqPlayerSubj:'Player request', reqPlayerBody:'Player to add:\n(name and club, please)',reqPlayerQ:'Searched for: ',
     changePlayer:'Change player', secondChoice:'Choose a second choice', fromAll:'From all players', curSecond:'Current second choice: ', release:'Clear', benchEmptyList:'No players on the bench',
     badgeInXI:'●In XI', badgeBench:'●Bench', badgeReserve:'●Reserves', badgeCustom:'Custom', alreadyInXI:'Already in the XI', outsideSwap:'Swap with an outside player',
-    addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Replace with another player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
+    addChangePhoto:'Add / change photo', editPhotoItem:'Edit photo', photoDevice:'Choose from your photos', changeTransfer:'Swap with another player', removeFromXI:'Remove from XI', addToXIBtn:'Add to the XI', removeFromBench:'Remove from bench', addToBenchBtn:'Add to bench',
     playerProfile:'Player profile', dkPos:'Position', dkAge:'Age', dkHeight:'Height', dkFoot:'Preferred foot', dkLeague:'League', dkNat:'Nationality', webSearchPhoto:'Search the web for this player’s photo',
     cancel:'Cancel', modePlaceXI:'Tap a flashing spot to place', modeSwapSub:'Tap the sub to swap out (subs are flashing)',
     viewDetails:'View player details', swapPlayers:'Swap players', editNote:'Edit note', injCard:'Injury / cards', captainOn:'Make captain', captainOff:'Remove captain', subLabelPrefix:'Second choice: ', removeFromTeam:'Remove from squad', tstRemovedFromTeam:'Removed from the squad', addWord:'Add',
     injury:'Injury', cards:'Cards', cardsNote:'(yellow / red cannot be combined)', cNone:'None', cYellow:'Yellow', cRed:'Red', ycCount:'Yellow count (max 15)', ycHint:'From 2, a ×count shows at the top-right of the badge',
     allCountries:'All countries', fifaTop20:'FIFA Top 20', natOthers:'Others (A–Z)', noneFound:'No matches', natLabel:'Nationality', natSearchPh:'Search by country…',
-    tstMaxBench:'The bench is full (max 9). Others go to reserves.', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
+    tstMaxBench:'The bench is full (max 9). Swap with a sub or add to reserves.', addToReserve:'Add to reserves', tstAlreadyListed:'Already in this squad', tstMaxSquad:'Squad is full (max 50 players in total).', tstPosSwapped:'Positions swapped', tstWebOpened:'Opened web search. Long-press & copy an image, then return here to paste it.', pastePromptTitle:'Paste the copied image', pasteShort:'Paste',
     tstPhotoSet:'Photo set', tstPhotoFail:'Could not load the image',tstPhotoDelFail:'Photo removed, but saving to this device failed (it may come back next time).',tstPhotoHeic:'HEIC images can’t be read. Try a screenshot or a JPEG/PNG image.',tstMemoOnEmpty:'Notes are on (no notes yet — tap a player → Edit note)', tstPhotoHiddenUser:'Saved — but hidden on the board in user mode. Long-press the version number to return to normal mode.', swapPrompt:'Tap who to swap with (bench & reserves too)',
     tstSwapCanceled:'Swap canceled', tstSwapped:'Swapped', tstSlotIsStarter:'That player is already the starter in this slot',tstSubIsStarter:'That player is already in the XI — pick a second choice from outside the XI', tstRemoved:'Removed', tstBenchRemoved:'Removed from the bench',
     tstSubCleared:'Second choice cleared', tstCaptainOff:'Captain removed', tstNameReq:'Please enter a name', tstPosReq:'Please choose a position', tstNatReq:'Please choose a nationality',
-    tstNameUpdated:'Display name updated',tstNameReset:'Back to the original name', tstMemoSaved:'Note saved', tstMemoDeleted:'Note deleted', tstXIFull:'The XI already has 11. Remove someone first.', tstCanceled:'Canceled',
+    tstNameUpdated:'Display name updated',tstSquadRenamed:'Squad renamed',tstNameReset:'Back to the original name', tstMemoSaved:'Note saved', tstMemoDeleted:'Note deleted', tstXIFull:'The XI already has 11. Remove someone first.', tstCanceled:'Canceled',
     tstNotBackup:'This isn’t a Squad XI backup.', tstBackupEmpty:'This backup contains no data (it may be empty).', tstRestored:'Restored. Reloading…', tstReadFail:'Could not read the text (it may be corrupted).',
     tstSaveFail:'Couldn’t save — your device storage may be full or you have too many photos.', tstShareBad:'Couldn’t open this shared lineup — the link may be broken or expired.', tstShareOffline:'You’re offline, so the shared lineup couldn’t load.', rstTitle:'Restore backup', rstBody:'This replaces your {n} saved squad(s), photos and entries with this backup.<br>Note: your current data can’t be recovered — we recommend exporting it first via “Export backup”.', rstConfirm:'Restore',
     tstNoSaveData:'No saved data. Save a squad first.', tstExported:'Backup exported', tstExportFail:'Export failed', tstFileReadFail:'Could not read the file',
     tstCopiedKeep:'Copied. Paste it somewhere safe to keep it.', tstSelectCopy:'Select all the text above and copy it.', tstTextEmpty:'The text is empty. Paste your backup.',
-    tstSaved2:'Saved',tstSameNameOver:'Saved over your squad "{n}"', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved',tstImgSavedIos:'The image goes to the Files app',tstImgSavedXIos:'The image goes to the Files app. Attach it to your X post.', tstImgSavedX:'Image saved. Attach it to your X post.', tstImgSavedIG:'Image saved. Post it on Instagram.',
+    tstSaved2:'Saved',tstSameNameOver:'Saved over your squad “{n}”', tstGenerating:'Generating image…', tstGenFail:'Failed to generate the image', tstImgSaved:'Image saved',tstImgSavedIos:'The image goes to the Files app',tstImgSavedXIos:'The image goes to the Files app. Attach it to your X post.', tstImgSavedX:'Image saved. Attach it to your X post.', tstImgSavedIG:'Image saved. Post it on Instagram.',
     tstCopied:'Copied', tstCopyFail:'Could not copy', tstPlaceFirst:'Place some players first',
     tstRolesOff:'Position labels hidden (bigger names)', tstRolesOn:'Position labels shown', tstFlagsOn:'Flags shown', tstFlagsOff:'Flags hidden', tstSubOn:'Second choice shown', tstSubOff:'Second choice hidden', tstMemoOn:'Notes shown', tstMemoOff:'Notes hidden',
     tstAlreadyDefault:'Already the default layout', tstResetLayout:'Reset to the default layout',
@@ -1332,32 +1332,32 @@ const I18N = {
     nameHelp:'Optional. If you pick only a club or only a nationality, that name (e.g. Arsenal, Japan) is filled in automatically.',
     autoConds:'Auto-fill conditions (optional, combinable)', teamSearch:'Team search', railQuick:'Quick start', railAll:'All teams', teamSearchPh:'Search by team (e.g. Barcelona, Schalke)', clubLabel:'Club',
     clubHelp:'Pick a club to place its real squad (XI, subs, reserves) as-is — this takes priority over nationality and league. Otherwise the top players in that league are placed automatically.',
-    clearConds:'× Clear conditions', autoBuild:'Auto-fill →', autoBuildHelp:'Pick conditions and matching players are auto-placed into fitting positions. Pick nothing to auto-place top players from the whole database.',
+    clearConds:'× Clear conditions', autoBuild:'Auto-fill →', autoBuildHelp:'Pick conditions and matching players are auto-filled into fitting positions. Pick nothing to auto-fill top players from the whole database.',
     noTeamsFound:'No teams found', tstNoMatchConds:'No players match. Adjust the conditions.',
-    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', saveAndAuto:'Save and auto-pick', skipAndAuto:'Auto-pick without saving', clearTitle:'Clear the board', clearBody:'This removes every player from the board (saved squads are not affected).<br>Note: an unsaved board can’t be restored.', clearConfirm:'Clear',deleteConfirm:'Delete', saveAndDelete:'Save, then clear', tstCleared:'Board cleared',tstShareImgFail:'Couldn’t create the image. Please try again.',undo:'Undo',tstUndone:'Undone',tstUndoFail:'Couldn’t undo', tstSavedCleared:'Saved and cleared', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag to move, pinch or use the slider to zoom, then set the area inside the circle.', cropZoom:'Zoom', cropSet:'Use this position', deletePhotoBtn:'Remove photo (restore default)', tstPhotoDeleted:'Photo removed - restored to default', modeToNormal:'Back to normal mode', modeToUser:'User mode (stats off)', modeToAdmin:'Admin mode on', adminPinTitle:'Enter admin PIN', pinNg:'Wrong PIN', pastePhoto:'Paste a copied image', tstPasteNoImage:'No image on the clipboard. Copy an image first, then try again.', tstPasteFail:'Paste isn’t available here — use “Add photo” instead.', pasteBoxTitle:'Paste an image', pasteBoxHelp:'Long-press the box below and choose “Paste” to import the copied image.', pasteBoxPh:'Long-press here → “Paste”', tstPasteBoxNoImage:'No image was pasted. Copy an image first (long-press → Copy).',
+    unsavedTitle:'Unsaved squad', unsavedBody:'Your current squad hasn’t been saved yet. Save it?', saveAndNew:'Save and create new', skipAndNew:'Create new without saving', saveAndLoad:'Save and load', skipAndLoad:'Load without saving', saveAndAuto:'Save, then Auto XI', skipAndAuto:'Auto XI without saving', clearTitle:'Clear the board', clearBody:'This removes every player from the board (saved squads are not affected).<br>Right after clearing, you can tap “Undo” in the notice.', clearConfirm:'Clear',deleteConfirm:'Delete', saveAndDelete:'Save, then clear', tstCleared:'Board cleared',tstShareImgFail:'Couldn’t create the image. Please try again.',undo:'Undo',tstUndone:'Undone',tstUndoFail:'Couldn’t undo', tstSavedCleared:'Saved, then cleared the board', deleteTeamTitle:'Delete squad', deleteTeamBody:'This deletes the selected squad.<br>Note: a deleted squad can’t be restored.', cropTitle:'Adjust photo position', cropHelp:'Drag to move, pinch or use the slider to zoom, then set the area inside the circle.', cropZoom:'Zoom', cropSet:'Use this position', deletePhotoBtn:'Remove photo (restore default)', tstPhotoDeleted:'Photo removed - restored to default', modeToNormal:'Back to normal mode', modeToUser:'User mode (stats off)', modeToAdmin:'Admin mode on', adminPinTitle:'Enter admin PIN', pinNg:'Wrong PIN', pastePhoto:'Paste a copied image', tstPasteNoImage:'No image on the clipboard. Copy an image first, then try again.', tstPasteFail:'Paste isn’t available here — use “Add photo” instead.', pasteBoxTitle:'Paste an image', pasteBoxHelp:'Long-press the box below and choose “Paste” to import the copied image.', pasteBoxPh:'Long-press here → “Paste”', tstPasteBoxNoImage:'No image was pasted. Copy an image first (long-press → Copy).',
     createPlayerTitle:'Create a player', cpHelp:'Add a player who isn’t listed. <b>Name, nationality and position</b> are required; the rest are optional.',
     fieldName:'Name', required:'required', egName:'e.g. John Smith', clubPh:'Club (optional)', egAge:'e.g. 24', fieldHeightCm:'Height (cm)', egHeight:'e.g. 180',
     heightHelp:'If left blank, this player is excluded from the average-height calculation in squad analysis.', createThisPlayer:'Create this player',
     editDisplayName:'Edit display name', origName:'Original name: ', renameHelp:'Shorten a long name or use a nickname.<br>Save empty to revert to the original.', save:'Save', resetToOrig:'Reset to original', renameTeamTitle:'Edit squad name',
     memoPh:'e.g. Back from injury / Up for sale / New signing', deleteNote:'Delete note',
     helpSub:'Getting started', helpIntro:'Build your own <b>starting XI</b> and <b>share it as an image</b>. Just three steps to begin.',
-    helpSec1:'3 easy steps', helpS1T:'Pick a team — auto-placed', helpS1D:'Tap ⚡ AUTO XI at the top and load Arsenal, England and more in one tap. Prefer to build your own? Use “Create a squad” in the menu and pick a formation.',
+    helpSec1:'3 easy steps', helpS1T:'Pick a team — auto-filled', helpS1D:'Tap ⚡ AUTO XI at the top and load Arsenal, England and more in one tap. Prefer to build your own? Use “Create a squad” in the menu and pick a formation.',
     helpS2T:'Swap players', helpS2D:'Tap a player for its menu, or tap an empty spot to search. Filter by name, position, nationality, league or club.',
     helpS3T:'Share as an image', helpS3D:'Tap SHARE (top-right) to create an image → post to X or Instagram, or save it.',
-    helpSec2:'Go further', helpS4T:'Auto-fill in one tap', helpS4D:'From ＋ (top-right), pick a club, nationality or league to auto-place 11 players — “Real Madrid”, “Japan” and more in one tap.',
+    helpSec2:'Go further', helpS4T:'Auto-fill in one tap', helpS4D:'From + (top-right), pick a club, nationality or league to auto-fill 11 players — “Real Madrid”, “Japan” and more in one tap.',
     helpS5T:'Save & switch squads', helpS5D:'Save from the menu (up to 10 squads). Switch between your squads there too.',
     helpS6D:'Browse all players and more. See who’s available and add them straight in.',
     helpS7T:'Customize players', helpS7D:'Tap a player → add a photo, set captain, second choice, notes, or swap. Tap the name (✎) at the top of the menu to shorten it or set a nickname. Fastest way to add a photo: web-search the image → long-press to copy → paste it in the app, then drag to position.',
-    helpS8T:'Fine-tune positions', helpS8D:'Long-press and drag a player to move them. ⟲ (reset layout) restores the default arrangement anytime.',
-    helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch squads, and all pages', legNewD:'Build a squad via auto-place', legSearchD:'Find players from the full list', legResetD:'Return moved players to the default positions',
+    helpS8T:'Fine-tune positions', helpS8D:'Long-press and drag a player to move them. ⟲ (Reset layout) restores the default arrangement anytime.',
+    helpSec3:'On-screen buttons', legMenu:'Menu', legMenuD:'Save & switch squads, and all pages', legNewD:'Build a squad via auto-fill', legSearchD:'Find players from the full list', legResetD:'Return moved players to the default positions',
     legPos:'Position labels', legPosD:'Toggle the position labels under players', legSub:'Second choice', legSubD:'Toggle the backup-player display',
     helpTipLabel:'Tip', helpTipBody:'If you try to create a new squad with unsaved changes, you’ll be asked to confirm. Even if you forget to save, closing the app lets you pick up where you left off next time.',
-    previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link', shareLinkBtn:'Copy squad link', tstLinkCopied:'Link copied — opening it shows this exact squad', helpS9T:'Share squads as a link', helpS9D:'In the share screen, "Copy squad link" creates a URL that reproduces your exact squad. Paste it on X or in a chat — anyone who taps it sees your XI instantly.', shOpenTitle:'Shared squad', shOpenBody:'You received a squad via a shared link. Show it on the board?<br>Note: your current board will be replaced (saved squads are untouched).', shOpenGo:'Show squad',shSaveGo:'Save current squad, then show',
-    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'For X 4:5 (no timeline crop)', fmtFeedU:'X<br>best', fmtSqTitle:'Square 1:1', fmtSqU:'Insta<br>post', fmtStoryTitle:'Instagram Stories / TikTok 9:16', fmtStoryU:'Stories<br>Insta・TikTok',
+    previewWord:'Preview', tipBench:'Toggle bench (subs)', tipMarks:'Toggle injuries / cards', shareBtn:'Share', shareOnX:'Share on X', saveImage:'Save image', copyCapLink:'Copy caption + link', shareLinkBtn:'Copy squad link', tstLinkCopied:'Link copied — opening it shows this exact squad', helpS9T:'Share squads as a link', helpS9D:'In the share screen, “Copy squad link” creates a URL that reproduces your exact squad. Paste it on X or in a chat — anyone who taps it sees your XI instantly.', shOpenTitle:'Shared squad', shOpenBody:'You received a squad via a shared link. Show it on the board?<br>Note: your current board will be replaced (saved squads are untouched).', shOpenGo:'Show squad',shSaveGo:'Save current squad, then show',
+    fmtAuto:'Auto', fmtAutoTitle:'Tall as needed (everything)', fmtAutoU:'Standard<br>all shown', fmtFeedTitle:'For X 4:5 (no timeline crop)', fmtFeedU:'X<br>best', fmtSqTitle:'Square 1:1', fmtSqU:'Insta<br>post', fmtStoryTitle:'Instagram Stories / TikTok 9:16', fmtStoryU:'Stories<br>Insta / TikTok',
     backupTitle:'Backup', bkWarn:'⚠ Your squads and photos are stored <b>only on this device</b>. They <b>can be lost</b> if you change devices, delete the app, or clear your browser data. A backup is your safety net.',
     bkExport:'Export backup', bkImport:'Import backup', bkImportHelp:'Pick a file you exported earlier to restore its contents. Use this to <b style="color:var(--ink)">move to a new device or recover lost data</b>. Files from another device work too.<br>⚠ Your current data will be <b style="color:var(--ink)">replaced</b> by what you load.',
     bkIosTitle:'If it doesn’t work in the iPhone home-screen app<br>= copy & paste method', bkIosHelp:'Home-screen apps sometimes can’t use file pickers (an iOS limitation). Use this instead — no file needed, so it always works.',
-    bkTextPh:'Paste your backup text here, then press “Restore from text”', bkCopyOut:'Export data as text (copy)', bkTextRestore:'Restore from the text above', bkTextHelp:'Press “Copy”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from text”.',
+    bkTextPh:'Paste your backup text here, then press “Restore from the text above”', bkCopyOut:'Export data as text (copy)', bkTextRestore:'Restore from the text above', bkTextHelp:'Press “Export data as text (copy)”, then paste it into a notes app to keep it. To restore, paste that text into this box and press “Restore from the text above”.',
     fbBody:'For requests to add a player who isn’t listed, or to report a bug or suggest an improvement, feel free to email us below.', fbMailBtn:'Email support@squadxi.futbol', fbFallback:'If the button doesn’t open, email <b style="color:var(--ink)">support@squadxi.futbol</b> directly.',
     premTitle:'Premium (coming soon)', premBody:'Premium will include injury / card markers, unlimited saved squads, ad-free and more.\nComing soon.',
     limitTitle:'Save limit reached', goUnlimited:'Go Premium', deleteToFree:'Delete a saved squad to free space', deleteSaved:'Delete saved squads', deleteSavedHint:'Delete some to save a new squad', noSavedTeams:'No saved squads',
@@ -1365,7 +1365,7 @@ const I18N = {
     featPredicted:'Predicted', featSquadDesc:'Predicted line-ups for featured matches, updated regularly.', featSquadNote:'Shown from 24 hours before kickoff.', featSquadEmpty:'No featured matches today.<br>They appear from 24 hours before kickoff.',
     featTransferDesc:'Big-money moves and big-name transfers, updated regularly.', featTransferNote:'It may take some time for these transfers to appear in the player database.', featComingSoon:'Coming soon.',
     featPreviewLabel:'Match preview', featXIPending:'Predicted XI coming soon', kickoffLabel:'kickoff (UK time)', freeWord:'Free',
-    saTabXI:'Starting XI', saTabAll:'XI + bench', saNoXI:'No players in the XI', saSquadSize:'Squad size', saAvgAge:'Avg. age', saAvgHeight:'Avg. height', saCaptain:'Captain', saNone:'None', saYoungest:'Youngest', saOldest:'Oldest', saNat:'Nationalities', saOriginal:'Original'
+    saTabXI:'Starting XI', saTabAll:'XI + bench', saNoXI:'No players in the XI', saSquadSize:'Squad size', saAvgAge:'Avg. age', saAvgHeight:'Avg. height', saCaptain:'Captain', saNone:'None', saYoungest:'Youngest', saOldest:'Oldest', saNat:'Nationalities', saOriginal:'My squad'
   }
 };
 let LANG = (function(){ try{ const s=lsGet('xi_lang'); if(s==='ja'||s==='en') return s; return String(navigator.language||navigator.userLanguage||'').toLowerCase().indexOf('ja')===0?'ja':'en'; }catch(e){ return 'ja'; } })();
@@ -1874,9 +1874,11 @@ function openRenameTeam(id){
     <div class="controls">
       <input class="search" id="rtIn" maxlength="24" autocomplete="off" placeholder="${escAttr(t('myTeam'))}" value="${escAttr(tm.name||'')}">
     </div>
-    <button class="bigbtn" id="rtSave">${t('save')}</button>`);
+    <button class="bigbtn" id="rtSave">${t('save')}</button>
+    <button class="bigbtn ghost" id="rtCancel">${t('cancel')}</button>`);
   const inp=document.getElementById('rtIn'); setTimeout(()=>{ try{inp.focus();}catch(e){} },120);
-  const doSave=()=>{ renameTeamInList(id,(inp.value||'').trim()); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstNameUpdated')); };
+  document.getElementById('rtCancel').onclick=()=>{ closeSheet(); openDrawer(); }; // キャンセル（2026-10-01 監査A-13）
+  const doSave=()=>{ renameTeamInList(id,(inp.value||'').trim()); closeSheet(); try{render();}catch(e){} openDrawer(); toast(t('tstSquadRenamed')); };
   document.getElementById('rtSave').onclick=doSave;
   inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); doSave(); } });
 }
@@ -2353,30 +2355,30 @@ function benchToSlot(pid,slotIdx){
     if(outgoing!=null&&outgoing!==pid&&!state.bench.includes(outgoing)&&state.bench.filter(b=>!inXI(b)).length<BENCH_MAX) state.bench.push(outgoing); // 満員なら押し込まない(ベンチ外へ)
   }
   render();save();
-  toast(outgoing!=null?shortName(P[pid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[pid][0])));
+  toast(outgoing!=null?squadShortName(pid)+' ⇄ '+squadShortName(outgoing):tUsed(squadShortName(pid)));
 }
 /* ---- ベンチ外（控え外。同クラブでスタメンにも控えにもいない選手）との入れ替え ---- */
 function reserveBenchSwap(reservePid,benchPid){ // ベンチ外⇄ベンチ（その控えの位置に入る）
   const bi=state.bench.indexOf(benchPid); if(bi<0)return;
   state.bench[bi]=reservePid;
   state.slots.forEach(s=>{ if(s.sub===benchPid) s.sub=null; }); keepInReserve(benchPid); // 外れた控えを消さない・第2候補も外す（2026-09-29）
-  render();save();toast(shortName(P[reservePid][0])+' ⇄ '+shortName(P[benchPid][0]));
+  render();save();toast(squadShortName(reservePid)+' ⇄ '+squadShortName(benchPid));
 }
 function reserveToBench(reservePid){ // ベンチ外→ベンチ（空きがあれば追加）
   if(state.bench.filter(b=>!inXI(b)).length>=BENCH_MAX){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(reservePid)) state.bench.push(reservePid);
-  render();save();toast(tToBench(shortName(P[reservePid][0])));
+  render();save();toast(tToBench(squadShortName(reservePid)));
 }
 function benchToReserve(pid){ // ベンチ→ベンチ外（控えから外す＝同クラブなら自動でベンチ外に）
   state.bench=state.bench.filter(b=>b!==pid);
   state.slots.forEach(s=>{ if(s.sub===pid) s.sub=null; }); keepInReserve(pid); // クラブ外・自由編成の選手も消さない（2026-09-29 監査P0-8）
-  render();save();toast(tToReserve(shortName(P[pid][0])));
+  render();save();toast(tToReserve(squadShortName(pid)));
 }
 function benchSwap(a,b){ // ベンチ内の2人をドラッグで入れ替え（並び順を交換）
   const ia=state.bench.indexOf(a), ib=state.bench.indexOf(b);
   if(ia<0||ib<0||ia===ib) return;
   state.bench[ia]=b; state.bench[ib]=a;
-  render();save();toast(shortName(P[a][0])+' ⇄ '+shortName(P[b][0]));
+  render();save();toast(squadShortName(a)+' ⇄ '+squadShortName(b));
 }
 function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（入れ替え＝外れた先発はベンチ外へ）
   const outgoing=state.slots[slotIdx].pid;
@@ -2387,7 +2389,7 @@ function reserveToSlot(reservePid,slotIdx){ // ベンチ外→スタメン（入
     state.excluded=state.excluded.filter(x=>x!==outgoing); // 除外済みでも再表示
     if(!reserveIds().includes(outgoing)&&!state.reserveAdds.includes(outgoing)) state.reserveAdds.push(outgoing); // クラブ外の選手もベンチ外に残す
   }
-  render();save();toast(outgoing!=null?shortName(P[reservePid][0])+' ⇄ '+shortName(P[outgoing][0]):tUsed(shortName(P[reservePid][0])));
+  render();save();toast(outgoing!=null?squadShortName(reservePid)+' ⇄ '+squadShortName(outgoing):tUsed(squadShortName(reservePid)));
 }
 // ドラッグのドロップ先を判定（スロット / ベンチのカード・領域 / ベンチ外のカード・領域）
 function dropZone(x,y){
@@ -2572,7 +2574,7 @@ function attachDrag(el,actor){
         state.slots[actor].x=bx0; state.slots[actor].y=by0;
         state.excluded=state.excluded.filter(x=>x!==mp);
         if(!reserveIds().includes(mp)&&!state.reserveAdds.includes(mp)) state.reserveAdds.push(mp);
-        render();save();toast(tToReserve(shortName(P[mp][0])));
+        render();save();toast(tToReserve(squadShortName(mp)));
         return;
       } // 座標を元に戻してから交代（render/save/toastはbenchToSlot内）
       // それ以外（ベンチの余白）＝控えへ追加。満員なら追加せず元の位置へ戻す
@@ -2581,7 +2583,7 @@ function attachDrag(el,actor){
       state.slots[actor].pid=null; state.slots[actor].sub=null;
       state.slots[actor].x=bx0; state.slots[actor].y=by0;   // 空きスロットは元位置へ戻す
       if(!state.bench.includes(mp)) state.bench.push(mp);
-      render();save();toast(tToBench(shortName(P[mp][0])));
+      render();save();toast(tToBench(squadShortName(mp)));
       return;
     }
     rect=pitch.getBoundingClientRect();   // 自動スクロール後のズレを補正
@@ -4125,7 +4127,7 @@ function addPlayerToBench(pid){
   if(inXI(pid)||state.bench.includes(pid)){ closeSheet(); toast(t('tstAlreadyListed')); return; } // 既にスタメン/ベンチ＝何もしていないのに「追加しました」と出ていた（2026-09-29 監査B38）
   if(state.bench.filter(b=>!inXI(b)).length>=BENCH_MAX){ toast(t('tstMaxBench')); return; }
   if(!state.bench.includes(pid)&&!inXI(pid)) state.bench.push(pid);
-  closeSheet();render();save();toast(tAddedBench(shortName(P[pid][0])));
+  closeSheet();render();save();toast(tAddedBench(squadShortName(pid)));
 }
 /* ---- ベンチ外に追加（控えが満員の時の＋。どのクラブ/どんなスカッドでもベンチ外を使えるように） ---- */
 function openReserveAdd(){ openOutsideSwap(t('addToReserve'),addPlayerToReserve,false); }
@@ -4135,7 +4137,7 @@ function addPlayerToReserve(pid){
   if(_tot>=50){ toast(t('tstMaxSquad')); return; } // スカッド全体(XI+ベンチ+ベンチ外)で最大50人
   state.excluded=state.excluded.filter(x=>x!==pid);
   state.reserveAdds.push(pid);
-  closeSheet();render();save();toast(tToReserve(shortName(P[pid][0])));
+  closeSheet();render();save();toast(tToReserve(squadShortName(pid)));
 }
 // ベンチ外＝読込クラブで、スタメンにも控えにもいない選手（並びは内部基準で固定）
 function clubOtherIds(){
@@ -4650,7 +4652,7 @@ function assignSub(slotIdx,pid){
   if(inXI(pid)){ toast(t('tstSubIsStarter')); return; } // 他の枠の先発も第2候補にしない（選んでも自動で外れて何も起きなかった 2026-09-30 監査B11）
   state.slots[slotIdx].sub=pid;
   closeSheet();render();save();
-  toast(tSubSet(shortName(P[pid][0])));
+  toast(tSubSet(squadShortName(pid)));
 }
 
 /* ---- Bench-first picker (チーム読込後) ---- */
@@ -4746,7 +4748,7 @@ function replaceReservePlayer(oldPid,newPid){
   state.bench=state.bench.filter(b=>b!==newPid);
   if(!state.reserveAdds.includes(newPid)) state.reserveAdds.push(newPid);
   state.slots.forEach(s=>{ if(s.sub===oldPid)s.sub=null; });
-  closeSheet();render();save();toast(tSwapArrow(shortName(P[oldPid][0]),shortName(P[newPid][0])));
+  closeSheet();render();save();toast(tSwapArrow(squadShortName(oldPid),squadShortName(newPid)));
 }
 
 /* ---- カスタム選手（未掲載の選手をユーザーが作成。このスカッド内だけで生存。
@@ -4864,11 +4866,13 @@ function openMemo(pid){
     <h2>${t('editNote')} <span>${escAttr(nameOf(pid,true))}</span></h2>
     <div class="controls">
       <input class="search" id="memoIn" maxlength="16" autocomplete="off" placeholder="${t('memoPh')}" value="${escAttr(cur)}">
-      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">${LANG==='en'?'A short note shown under the token (max 16 chars).<br>Visible when the notes '+ICN.memo+' button in the header is on.':'駒の下に表示される短いメモ（最大16文字）。<br>ヘッダーのメモ'+ICN.memo+'ボタンが点灯しているときに表示されます。'}</div>
+      <div style="font-size:11px;color:var(--mut);margin:9px 2px 0;line-height:1.7">${LANG==='en'?'A short note shown under the player (max 16 chars).<br>Visible when the notes '+ICN.memo+' button (open with ◀ above the pitch) is on.':'駒の下に表示される短いメモ（最大16文字）。<br>盤面上の◀で開くメモ'+ICN.memo+'ボタンが点灯しているときに表示されます。'}</div>
     </div>
     <button class="bigbtn" id="memoSave">${t('save')}</button>
-    <button class="bigbtn ghost" id="memoClear">${t('deleteNote')}</button>`);
+    <button class="bigbtn ghost" id="memoClear">${t('deleteNote')}</button>
+    <button class="bigbtn ghost" id="memoCancel">${t('cancel')}</button>`);
   const inp=document.getElementById('memoIn');
+  document.getElementById('memoCancel').onclick=()=>closeSheet(); // キャンセル（2026-10-01 監査A-11）
   setTimeout(()=>{try{inp.focus();}catch(_){}} ,120);
   document.getElementById('memoSave').onclick=()=>applyMemo(pid,inp.value);
   document.getElementById('memoClear').onclick=()=>applyMemo(pid,'');
@@ -5399,7 +5403,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001l'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001m'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -5981,7 +5985,7 @@ function openHelp(){
       ${ic(ui('btnShare'),t('tipShare'),t('helpDShare'))}
       ${ic(uiSel('#btnFormation .fhex',tx('4-3-3')),t('formation'),t('helpDFormation'))}
       ${ic(ui('btnClear'),t('tipClear'),t('helpDClear'))}
-      ${ic(ICN.stats,t('tipAnalysis'),t('helpDStats'))}<!-- 2026-08-04: ヘッダーから消えた新規作成/保存/検索/整列の4タイルは削除（実在しないボタンを載せない・ユーザー指摘）。保存→メニューの中身、検索/整列→ボタンのない操作 へ移設 -->
+      ${ic(ICN.stats,t('squadAnalysis'),t('helpDStats'))}<!-- 2026-08-04: ヘッダーから消えた新規作成/保存/検索/整列の4タイルは削除（実在しないボタンを載せない・ユーザー指摘）。保存→メニューの中身、検索/整列→ボタンのない操作 へ移設 -->
       ${div}
       ${sec(t('helpSecToggle'))}
       <div style="margin:-4px 16px 12px;font-size:12px;color:var(--mut);line-height:1.7">${t('helpToggleLead')}</div>
@@ -6825,7 +6829,7 @@ function openSquadAnalysis(scope){
     const natTop=Object.entries(nat).sort((a,b)=>b[1]-a[1]).map(e=>flagHTML(e[0])+(e[1]>1?' ×'+e[1]:'')).join('　');
     const natCount=Object.keys(nat).length;
     const captIn=state.captain!=null&&list.indexOf(P[state.captain])>=0;
-    const captP=(captIn&&P[state.captain])?shortName(P[state.captain][0]):t('saNone');
+    const captP=(captIn&&P[state.captain])?escAttr(squadShortName(state.captain)):t('saNone');
     const ageU=LANG==='en'?'':'歳';
     // スタメンは「11人で当たり前」なので人数セルなし。全体は総数のみ表示。
     const countCell = scope==='xi'
@@ -6924,7 +6928,7 @@ function maybeShowXiDoneBar(){
     bar.id='xiDoneBar';
     bar.style.cssText='position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:340;background:#111a14;border:1px solid rgba(202,255,58,.4);border-radius:14px;padding:10px 12px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 22px rgba(0,0,0,.5);max-width:94vw';
     const msg=document.createElement('span');
-    msg.textContent=en?'XI complete!':'XI完成！';
+    msg.textContent=en?'XI complete!':'スタメン完成！';
     msg.style.cssText='color:#eafff0;font-weight:800;font-size:13px;white-space:nowrap';
     const mk=(label,fn,primary)=>{ const b=document.createElement('button');
       b.textContent=label;
