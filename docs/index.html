@@ -3785,7 +3785,7 @@ function lgSelectHTML(f=pickFilter, extra=''){
   const flag=(f.lg!=='ALL'&&f.lg!=='POP')?lgFlag(f.lg):'';
   return `<div class="lgsel ${open?'open':''}">`+
     `<div class="lgsel-btn" data-lgtoggle>${flag}<span>${lgSelLabel(f)}</span><b class="lgcar">${open?'▴':'▾'}</b></div>`+
-    (open?`<div class="lgsel-panel"><input class="lgsel-q" placeholder="${t('lgSearchPh')}" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
+    (open?`<div class="lgsel-panel"><input class="lgsel-q" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="${t('lgSearchPh')}" value="${(f.lgq||'').replace(/"/g,'&quot;')}"><div class="lgsel-list">${lgSelRows(f,extra)}</div></div>`:'')+
   `</div>`;
 }
 // 国でまとめた縦リスト。検索q一致でフィルタ、複数部門は▾で展開（検索中は自動展開）
@@ -3919,8 +3919,10 @@ function extraNameHit(p,q){
   const nm=deaccLower(p[0]);
   // (1) 記号・空白・ドイツ語式綴りの違いを畳んで比較（n'golo/ngolo・de bruyne/debruyne・o'reilly・mueller/muller・st pauli）。短い入力には掛けない
   const qc=q.replace(/[^a-z0-9]/g,'');
-  if(qc.length>=4){ const nc=nm.replace(/[^a-z0-9]/g,''); if(nc.includes(qc)||germanFold(nc).includes(germanFold(qc))) return true;
-    const cc=deaccLower(p[4]).replace(/[^a-z0-9]/g,''); if(cc.includes(qc)) return true; }
+  if(qc.length>=4){ // 詰めた比較も畳み込みも「語の頭から」一致した時だけ（noel→Arnold 等の誤ヒットを防ぐ 2026-10-01 監査C-5）
+    const atWordStart=(str,needle,fold)=>{ const ws=str.split(/[^a-z0-9]+/).filter(Boolean).map(w=>fold?germanFold(w):w); const joined=ws.join(''); let pos=0; for(const w of ws){ if(joined.startsWith(needle,pos)) return true; pos+=w.length; } return false; };
+    if(atWordStart(nm,qc,false)||atWordStart(nm,germanFold(qc),true)) return true;
+    if(atWordStart(deaccLower(p[4]),qc,false)) return true; }
   // (2) 語順・ハイフン違い（son heung-min / heungmin son / kim min-jae / mitoma kaoru）。各語が名前のどれかの語と完全一致した時だけ
   if(q.indexOf(' ')>0){ const qt=q.split(' ').map(t=>t.replace(/[^a-z0-9]/g,'')).filter(Boolean);
     if(qt.length>=2&&qt.every(t=>t.length>=2)){ const parts=nm.split(/\s+/); const nt=new Set(); parts.forEach(w=>{ nt.add(w.replace(/[^a-z0-9]/g,'')); w.split(/[.'\-]+/).forEach(x=>{ if(x) nt.add(x); }); });
@@ -3932,10 +3934,14 @@ function extraNameHit(p,q){
 }
 // 一致の質（並び順用）: 0=名前の語の頭から一致 1=名前のどこかに一致 2=クラブ名だけ一致
 function matchQuality(p,q){ if(!q) return 0; const nm=deaccLower(p[0]);
-  if(nm.startsWith(q)||nm.split(/[\s.'\-]+/).some(t=>t.startsWith(q))) return 0;
+  // 0=語が完全一致（messi→Lionel Messi・ngolo→N'Golo・名前全体の一致）／1=語の頭から一致／2=名前のどこか／3=クラブ名だけ（2026-10-01 完全一致を最上位に）
+  const qc=q.replace(/[^a-z0-9]/g,''); const words=nm.split(/[\s\-]+/).map(w=>w.replace(/[^a-z0-9]/g,'')).filter(Boolean);
+  if(qc&&(words.includes(qc)||nm.replace(/[^a-z0-9]/g,'')===qc)) return 0;
+  if(nm.startsWith(q)||nm.split(/[\s.'\-]+/).some(t=>t.startsWith(q))) return 1;
   const c=p[4].trim(); const clubOnly=(deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)||((CLUB_KANA[c]||[]).length&&/[^\x00-\x7f]/.test(q)&&extraNameHit([c,'','','',c],q)));
-  if(nm.includes(q)||(/[^\x00-\x7f]/.test(q)&&jaNameHit(p,q))||(!clubOnly&&extraNameHit(p,q))) return 1;
-  return clubOnly?2:1; }
+  if(!clubOnly&&extraNameHit(p,q)) return 1;
+  if(nm.includes(q)||(/[^\x00-\x7f]/.test(q)&&jaNameHit(p,q))) return 2;
+  return clubOnly?3:2; }
 function qualitySort(ids,q){ const r=new Map(); ids.forEach((i,k)=>r.set(i,matchQuality(P[i],q)*1e6+k)); return ids.slice().sort((a,b)=>r.get(a)-r.get(b)); } // 並び済みの順を保ったまま一致の質でまとめる
 function playerMatches(p){
   if(!inLgFilter(p,pickFilter.lg))return false;
@@ -4366,10 +4372,10 @@ function natsInData(){ const s=new Set(); for(let i=0;i<P.length;i++){ if(isCust
 // 漢字を含む国名の読み（ひらがなで国籍を探せるように 2026-09-29 監査C29）
 const NATYOMI={JPN:'にほん にっぽん',KOR:'かんこく',CHN:'ちゅうごく',PRK:'きたちょうせん',NIR:'きたあいるらんど',USA:'あめりかがっしゅうこく',RSA:'みなみあふりか',EQG:'せきどうぎにあ',CTA:'ちゅうおうあふりかきょうわこく',COD:'こんごみんしゅきょうわこく',CGO:'こんごきょうわこく',DOM:'どみにかきょうわこく',FRO:'ふぇろーしょとう',GUF:'ふらんすりょうぎあな',MKD:'きたまけどにあ',SSD:'みなみすーだん',UAE:'あらぶしゅちょうこくれんぽう',HKG:'ほんこん',TLS:'ひがしちもーる'};
 function natOptionsHTML(q){
-  const present=natsInData(); q=(q||'').trim().toLowerCase(); const qk=natNorm(q);
+  const present=natsInData(); q=(q||'').normalize('NFKC').trim().toLowerCase(); const qk=natNorm(q).replace(/[・･＝=\s]+/g,''); // 半角カナ・中黒の省略も可（2026-10-01 監査C-9）
   // 日本語名（かな正規化）・英語名・コードのいずれかにヒットすれば一致（例: "Japan"でも"日本"でも"JPN"でもOK）
   const qa=deaccent(q).toLowerCase();
-  const m=c=>!q||natNorm(NATJA[c]||'').includes(qk)||natNorm(NATYOMI[c]||'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||deaccent(NATNAME[c]||'').toLowerCase().includes(qa)||c.toLowerCase().includes(q);
+  const m=c=>!q||natNorm(NATJA[c]||'').replace(/[・･＝=\s]+/g,'').includes(qk)||natNorm(NATYOMI[c]||'').replace(/\s+/g,'').includes(qk)||(NATNAME[c]||'').toLowerCase().includes(q)||deaccent(NATNAME[c]||'').toLowerCase().includes(qa)||c.toLowerCase().includes(q);
   const top=NAT_TOP.filter(c=>present.has(c)&&m(c));
   const rest=[...present].filter(c=>!NAT_TOP.includes(c)&&m(c)).sort((a,b)=> LANG==='en' ? (NATNAME[a]||a).localeCompare(NATNAME[b]||b) : natJa(a).localeCompare(natJa(b),'ja'));
   const row=c=>`<div class="natrow" data-nat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span><span>${natDisp(c)}</span></div>`;
@@ -4387,7 +4393,7 @@ function attachNatFilter(scope,f,redraw){
   if(!chip||!panel)return;
   chip.onclick=()=>{
     if(panel.style.display!=='none'){ panel.style.display='none'; return; }
-    panel.innerHTML=`<input class="search natq" placeholder="${t('natSearchPh')}" autocomplete="off"><div class="natlist">${natOptionsHTML('')}</div>`;
+    panel.innerHTML=`<input class="search natq" placeholder="${t('natSearchPh')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"><div class="natlist">${natOptionsHTML('')}</div>`;
     panel.style.display='block';
     const inp=panel.querySelector('.natq'), lst=panel.querySelector('.natlist');
     inp.oninput=()=>{ lst.innerHTML=natOptionsHTML(inp.value); };
@@ -4587,7 +4593,7 @@ function openSubPicker(slotIdx){
       [...c.parentNode.children].forEach(x=>x.classList.remove('on'));c.classList.add('on');
       const te=document.getElementById('transferExtra');
       if(c.dataset.bm==='bench'){ te.style.display='none'; drawSub(); }
-      else{ te.style.display='block'; pickFilter=basePickFilter();
+      else{ te.style.display='block'; pickFilter=basePickFilter(); { const _q=document.getElementById('pq'); if(_q&&_q.value.trim()) pickFilter.q=normQuery(_q.value); } // 欄に残った文字を条件にも（ずれていた 2026-10-01 監査C16）
         document.getElementById('posF').innerHTML=posChips();document.getElementById('lgF').innerHTML=lgChips();syncClubField('clubF',pickFilter);
         wireSubPickerFull(slotIdx); }
     };
@@ -4620,6 +4626,7 @@ function drawSubFull(slotIdx){
   pickCurIdx=_buildSub();
   if(!pickCurIdx.length){ const _r=trySearchRescue(pickFilter,_buildSub); if(_r) pickCurIdx=_r; } // 0件は末尾を削って救済
   sortSuggestFast(pickCurIdx); // ★性能修正: suggestSort と同順のまま高速化（比較器内でmvScoreを再計算しない）
+  if(pickFilter.q) pickCurIdx=qualitySort(pickCurIdx,pickFilter.q); // 他のピッカーと同じく一致の質を先に（2026-10-01 監査C-6）
   if(!pickCurIdx.length){ noResultOnce(pickFilter.q); // 名前を打ったのに0件＝欲しい選手が居ない/見つけられない（離脱の直接原因になりうる）
     list.innerHTML=noMatchHTML('pickClear');return;}
   list.innerHTML=rescueNoteHTML()+pickCurIdx.slice(0,PAGE).map(i=>prowHTML(i)).join('');
@@ -4651,6 +4658,7 @@ function openBenchPicker(slotIdx){
   pickFilter=basePickFilter();
   const role=state.slots[slotIdx].role;
   pickRole=role; pickOnPick=null;
+  pickReopen=()=>openBenchPicker(slotIdx); // 戻り先をこのピッカーに（前に開いた無関係なピッカーが開いていた 2026-10-01 監査C15）
   const blen=state.bench.length;
   openSheet(`
     <h2>${t('changePlayer')} <span>${role}</span></h2>
@@ -4677,7 +4685,7 @@ function openBenchPicker(slotIdx){
       drawBenchList(slotIdx);
     }else{
       te.style.display='block';
-      pickFilter=basePickFilter();
+      pickFilter=basePickFilter(); { const _q=document.getElementById('pq'); if(_q&&_q.value.trim()) pickFilter.q=normQuery(_q.value); } // 欄の文字を条件にも（監査C16）
       document.getElementById('posF').innerHTML=posChips();
       document.getElementById('lgF').innerHTML=lgChips();
       syncClubField('clubF',pickFilter);
@@ -4785,10 +4793,10 @@ function openCreatePlayer(slotIdx){
     <h2>${t('createPlayerTitle')}</h2>
     <div class="detail">
       <div style="font-size:11px;color:var(--mut);margin:0 2px 10px;line-height:1.6">${t('cpHelp')}</div>
-      <div class="formfield"><label>${t('fieldName')} <i>${t('required')}</i></label><input class="search" id="cpName" maxlength="32" placeholder="${t('egName')}" autocomplete="off"></div>
+      <div class="formfield"><label>${t('fieldName')} <i>${t('required')}</i></label><input class="search" id="cpName" maxlength="32" placeholder="${t('egName')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
       <div class="formfield"><label>${t('dkPos')} <i>${t('required')}</i></label><div class="fchipgrid" id="cpPos">${posBtns}</div></div>
       <div class="formfield"><label>${t('natLabel')} <i>${t('required')}</i></label>${natFilterHTML(cf)}</div>
-      <div class="formfield"><label>${t('clubLabel')} <i>${t('optional')}</i></label><input class="search" id="cpClub" maxlength="32" placeholder="${t('clubPh')}" autocomplete="off"></div>
+      <div class="formfield"><label>${t('clubLabel')} <i>${t('optional')}</i></label><input class="search" id="cpClub" maxlength="32" placeholder="${t('clubPh')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
       <div class="formfield"><label>${t('dkAge')} <i>${t('optional')}</i></label><input class="search" id="cpAge" type="number" inputmode="numeric" min="15" max="50" placeholder="${t('egAge')}" autocomplete="off"></div>
       <div class="formfield"><label>${t('fieldHeightCm')} <i>${t('optional')}</i></label><input class="search" id="cpHt" type="number" inputmode="numeric" min="140" max="220" placeholder="${t('egHeight')}" autocomplete="off"><div style="font-size:11px;color:var(--mut);margin:4px 2px 0;line-height:1.5">${t('heightHelp')}</div></div>
       <div class="formfield"><label>${t('dkFoot')} <i>${t('optional')}</i></label><div class="fchipgrid" id="cpFoot"><div class="fchip2" data-foot="右">${LANG==='en'?'Right':'右'}</div><div class="fchip2" data-foot="左">${LANG==='en'?'Left':'左'}</div><div class="fchip2" data-foot="両">${LANG==='en'?'Both':'両'}</div></div></div>
@@ -5391,7 +5399,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001k'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001l'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -6500,7 +6508,7 @@ function startOriginal(){
       <!-- 以下は選手ピッカーと同じ並び（検索→リーグ→クラブ→国籍）。2026-07-28にユーザー指示で統一 -->
       <div class="formfield">
         <label>${t('teamSearch')}</label>
-        <input class="search" id="otSearch" placeholder="${t('teamSearchPh')}" autocomplete="off">
+        <input class="search" id="otSearch" placeholder="${t('teamSearchPh')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         <div id="otSuggest" class="otsuggest"></div>
       </div>
       <div class="formfield">
@@ -6538,9 +6546,9 @@ function startOriginal(){
     if(!q){ otSug.innerHTML=''; return; }
     const qk=natNorm(q).replace(/[\s　・＝=･]+/g,''), jaQ=/[^\x00-\x7f]/.test(q);
     const kanaHit=c=>jaQ&&qk.length>=2&&(CLUB_KANA[c]||[]).some(a=>natNorm(a).replace(/[\s　・＝=･]+/g,'').includes(qk)); // 海外クラブのカタカナ・ひらがな（2026-09-30 監査A35）
-    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)||kanaHit(c)).slice(0,12);
+    const ms=otAllClubs.filter(c=>deaccLower(c).includes(q)||(CLUB_JA[c]||'').includes(q)||(jaQ&&qk.length>=2&&natNorm(CLUB_JA[c]||'').replace(/[\s　・＝=･]+/g,'').includes(qk))||kanaHit(c)).slice(0,12);
     // 代表チームも候補に（国籍条件にセットする）。日本語名・読み・英語名・コードで引く
-    const nats=[...natsInData()].filter(c=>natNorm(NATJA[c]||'').includes(natNorm(q))||natNorm(NATYOMI[c]||'').includes(natNorm(q))||deaccent(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase()===q).slice(0,4);
+    const _nq=natNorm(q.normalize('NFKC')).replace(/[・･＝=\s]+/g,''); const nats=[...natsInData()].filter(c=>natNorm(NATJA[c]||'').replace(/[・･＝=\s]+/g,'').includes(_nq)||natNorm(NATYOMI[c]||'').replace(/\s+/g,'').includes(_nq)||deaccent(NATNAME[c]||'').toLowerCase().includes(q)||c.toLowerCase()===q).slice(0,4);
     const natRows=nats.map(c=>`<div class="otsug" data-otnat="${c}"><span class="fi fi-${FI[c]||'xx'}"></span> ${escAttr(natDisp(c))}${LANG==='en'?' (national team)':'代表'}</div>`).join('');
     const clubRows=ms.map(c=>`<div class="otsug" data-club="${escAttr(c)}">${lgFlag(otClubLg[c])}${escAttr(dispClub(c))}</div>`).join('');
     otSug.innerHTML=(natRows||clubRows)?natRows+clubRows:'<div class="otsug-empty">'+t('noTeamsFound')+'</div>';
