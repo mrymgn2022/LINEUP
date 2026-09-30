@@ -2198,7 +2198,7 @@ function renderBench(){
     const p=P[pid],ph=photoOf(pid);
     return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}${mktBenchSwap!=null?' pickbench':''}" data-pid="${pid}" draggable="false">
       ${benchAvatar(pid,ph)}
-      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}${benchMemo(pid)}</div>
+      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}</div>
     </div>`;
   }).join('');
   const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
@@ -2215,7 +2215,7 @@ function renderBench(){
     const p=P[pid],ph=photoOf(pid);
     return `<div class="bcard ocard${(swapSel&&swapSel.t==='reserve'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
       ${benchAvatar(pid,ph)}
-      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}${benchMemo(pid)}</div>
+      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}</div>
     </div>`;
   }).join('');
   const reserveAddCard = benchFull() ? `<div class="bcard add" id="reserveAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>` : ''; // 控え満員時のみ: ベンチ外へ直接追加できる＋
@@ -2235,8 +2235,6 @@ function benchAvatar(pid,ph){
   const f=state.showFlags?flagHTMLForPid(pid):''; const badge=!f?'':(f.charAt(0)==='<'?f.replace('class="fi ','class="fi bflag '):`<i class="bflag txt">${escAttr(f)}</i>`);
   return `<div class="bavw"><div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>${badge}</div>`;
 }
-// 所属クラブ（メモ位置の表示）＝盤面と同じくメモボタンに連動。クラブ編成では出さない（全員同じクラブ）
-function benchMemo(pid){ if(!state.showMemo||state.loadedClub) return ''; const m=dispMemo(pid); return m?`<div class="bclub">${escAttr(m)}</div>`:''; }
 // ベンチの名前は「…」で切らない（盤面用の短縮が…付きなら全文を使い、幅は fitBenchNames で合わせる）
 function benchName(pid){ const s=squadShortName(pid); return (s&&s.slice(-1)==='…')?nameOf(pid):s; }
 // 長い名前は幅に収まるまで文字を小さく（最小9px）。それでも入らなければ2行で全文
@@ -5437,7 +5435,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001p'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001q'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -8125,7 +8123,7 @@ window.__selftest=function(){
       finally{ _undo=_u0; state.hideRoles=_hr; state.showFlags=_sf; try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} try{ render(); }catch(e){} }
       ok('bench_card_row_flag_pos_fit',_pass,_msg); }
 
-    // T30j: ベンチの国旗は国旗ボタン・所属クラブはメモボタンに連動。代表・自由編成（プレミア選抜のようなリーグ条件も）は所属クラブ表示ONが既定、クラブ編成はOFF（2026-10-01）
+    // T30j: ベンチの国旗は国旗ボタンに連動。所属クラブはベンチ・ベンチ外には出さず盤面だけ（ユーザー指示）。代表・自由編成（プレミア選抜のようなリーグ条件も）は盤面の所属クラブ表示ONが既定、クラブ編成はOFF（2026-10-01）
     { let _pass=true,_msg=''; const _snap=JSON.stringify(serializeTeam()), _u0=_undo, _sf=state.showFlags, _sm=state.showMemo, _hr=state.hideRoles;
       const nClub=()=>document.querySelectorAll('#bench .bcard[data-pid] .bclub').length, nCard=()=>document.querySelectorAll('#bench .bgrid .bcard[data-pid]').length;
       try{
@@ -8136,14 +8134,14 @@ window.__selftest=function(){
         state.showMemo=true; render(); if(nClub()) throw new Error('クラブ編成のベンチに所属クラブが出る');
         autoFillNationality('JPN','4-2-3-1','日本'); clearAutoClubMemos(); fillClubMemos(); autoView(); state.flagByLeague=true; render();
         if(!state.showMemo) throw new Error('代表で所属クラブ表示が既定OFF');
-        if(nClub()<nCard()) throw new Error('代表のベンチに所属クラブが出ない '+nClub()+'/'+nCard());
-        fitBenchNames(); { const cut=[...document.querySelectorAll('#bench .bcard[data-pid] .bclub')].filter(el=>{ if(el.classList.contains('wrap2')||!el.getBoundingClientRect().width) return false; const rg=document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect().width>el.getBoundingClientRect().width+0.5; }); if(cut.length) throw new Error('所属クラブ名が切れている: '+cut[0].textContent); }
+        if(nClub()) throw new Error('ベンチに所属クラブが出る（スタメンだけに出す）');
+        { const s1=state.slots.find(s=>s.pid!=null); if(!s1||!dispMemo(s1.pid)) throw new Error('代表の盤面に所属クラブが出ない'); }
         state.showMemo=false; render(); if(nClub()) throw new Error('メモOFFでもベンチに所属クラブ');
         buildSlots('4-3-3',false); state.loadedClub=null; state.teamName='PL-test'; state.teamInfo=null; state.teamCond={nat:null,lg:'PL'}; state.flagByLeague=false;
         autoFillFrom(P.map((p,i)=>i).filter(i=>!isCustomPid(i)&&P[i][5]==='PL')); render();
         if(!state.showMemo) throw new Error('プレミア選抜（自由編成）で所属クラブ表示が既定OFF');
         const s0=state.slots.find(s=>s.pid!=null); if(!s0||dispMemo(s0.pid)!==shortClub(P[s0.pid][4].trim())) throw new Error('プレミア選抜の盤面に所属クラブが出ない');
-        if(nClub()<nCard()) throw new Error('プレミア選抜のベンチに所属クラブが出ない');
+        if(nClub()) throw new Error('プレミア選抜のベンチに所属クラブが出る');
       }catch(e){ _pass=false; _msg=String(e.message||e); }
       finally{ _undo=_u0; state.showFlags=_sf; state.showMemo=_sm; state.hideRoles=_hr; try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} try{ syncMemoBtn(); syncFlagBtn(); render(); }catch(e){} }
       ok('bench_flag_club_follow_buttons',_pass,_msg); }
