@@ -816,8 +816,8 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 <input type="file" accept="image/*" id="photoInput" style="display:none">
 
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet"><div class="grabzone" id="grabzone"><div class="grab"></div></div><div id="sheetBody"></div></div>
-<div class="toast" id="toast"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grabzone" id="grabzone"><div class="grab"></div></div><div id="sheetBody"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="dscrim" id="dscrim"></div>
 <aside class="drawer" id="drawer" aria-label="メニュー"></aside>
 <div class="annwrap" id="annwrap" aria-label="お知らせ"></div>
@@ -2968,7 +2968,7 @@ function openSheet(html){benchAddMode=false;subFilterOn=false;_sheetLockUntil=0;
   if(na){ setTimeout(()=>{ sheet.style.transition=''; scrim.style.transition=''; },120); } // rAFは非表示タブで発火しないため使わない
   _ovPush();}
 // 駒・ドロワー項目・ベンチカードは Enter / Space でタップと同じ（2026-09-30 監査A40/B29）
-try{ document.addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return; const el=e.target&&e.target.closest&&e.target.closest('.tok[data-i],.dwitem,.dwsave,.bcard[data-pid]'); if(!el||e.target.closest('input,textarea,select,button')) return; e.preventDefault(); if(el.classList.contains('tok')) onSlotTap(+el.dataset.i); else el.click(); }); }catch(e){}
+try{ document.addEventListener('keydown',e=>{ if(e.key!=='Enter'&&e.key!==' '&&e.key!=='Spacebar') return; const el=e.target&&e.target.closest&&e.target.closest('.tok[data-i],.dwitem,.dwsave,.dwedit,.dwtrash,.dwteam,.dwnew,.dwx,.bcard[data-pid],#shFmt [data-fmt]'); if(!el||e.target.closest('input,textarea,select,button')) return; e.preventDefault(); if(el.classList.contains('tok')) onSlotTap(+el.dataset.i); else el.click(); }); }catch(e){}
 function closeSheet(){_shareConfirmOpen=false;scrim.classList.remove('on'); try{ sheet.inert=true; if(sheet.contains(document.activeElement)) document.activeElement.blur(); }catch(e){}sheet.classList.remove('on','expanded');sheet.style.transform='';}
 // Android/PWAの「戻る」で、開いているシート/ドロワーを閉じる（アプリを終了させない）。
 // overlayを開いたら履歴マーカーを1つだけ積む（既にあれば再利用）。戻る=popstateでマーカーを消費し、開いているoverlayを閉じる。
@@ -5403,7 +5403,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001m'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001n'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -5490,7 +5490,7 @@ function drawerHTML(){
       <div class="tn">${escAttr(shortTeamName(tm.name)||t('myTeam'))}<small>${LANG==='en'?t('saved')+' '+fmtTeamDate(tm.ts):fmtTeamDate(tm.ts)+' '+t('saved')}</small></div>
       ${tm.id===state.teamId?`<span class="curbadge">${t('editingBadge')}</span>`:''}
       <div class="dwedit" data-rename="${tm.id}" aria-label="${t('renameTeamTitle')}">${ICN.pencil}</div>
-      <div class="dwtrash" data-del="${tm.id}" aria-label="${t('tstDeleted')}">${ICN.trash}</div>
+      <div class="dwtrash" data-del="${tm.id}" aria-label="${t('helpNDelete')}">${ICN.trash}</div>
     </div>`).join('') : `<div class="dwempty">${t('noSaved')}</div>`;
   const curInList = state.teamId && teams.some(tm=>tm.id===state.teamId);
   const saveRow = `<div class="dwsave" id="dwSaveBtn">${_ICN_SAVE}${curInList?t('overwrite'):t('saveCurrent')}</div>`;
@@ -5536,7 +5536,7 @@ function wireDrawer(){
       bl.addEventListener('pointerleave',cancel); bl.addEventListener('pointercancel',cancel);
       bl.addEventListener('contextmenu',e=>{ try{e.preventDefault();}catch(_){} }); } }
   d.querySelector('#dwNew').onclick=()=>{ closeDrawer(); newTeamFlow(); };
-  d.querySelectorAll('.dwitem,.dwsave').forEach(x=>{ if(!x.hasAttribute('tabindex')) x.tabIndex=0; if(!x.getAttribute('role')) x.setAttribute('role','button'); }); // キーボード操作（2026-09-30 監査A40）
+  d.querySelectorAll('.dwitem,.dwsave,.dwteam,.dwedit,.dwtrash,.dwnew,.dwx').forEach(x=>{ if(!x.hasAttribute('tabindex')) x.tabIndex=0; if(!x.getAttribute('role')) x.setAttribute('role','button'); }); // キーボード操作（2026-09-30 監査A40）
   const sb=d.querySelector('#dwSaveBtn'); if(sb) sb.onclick=()=>{ if(!state.slots.some(s=>s&&s.pid!=null)){ toast(t('tstPlaceFirst')); return; } /* 空の盤面は保存しない（ヘッダーの保存と同じ 2026-09-29 監査D44） */ const r=saveCurrentTeam(); if(r==='limit'){ closeDrawer(); openLimitDialog(); } else if(r==='error'){ toast(t('tstSaveFail')); openDrawer(); } else { toast(r==='updated'?t('tstOverwritten'):t('tstSaved')); openDrawer(); } };
   d.querySelectorAll('[data-team]').forEach(el=>el.onclick=e=>{ if(e.target.closest('[data-del]')||e.target.closest('[data-rename]'))return; const id=el.dataset.team; closeDrawer(); guardUnsaved(()=>loadTeamFromList(id).then(()=>toast(t('tstLoaded'))),'load'); });
   d.querySelectorAll('[data-del]').forEach(el=>el.onclick=e=>{ e.stopPropagation(); confirmDeleteTeam(el.dataset.del); });
@@ -7201,7 +7201,7 @@ function openShareFallback(imgUrl,shareText,file){
   openSheet(`
     <h2>${t('tipShare')} <span>${t('previewWord')}</span></h2>
     <div class="detail">
-      <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="lineup" style="max-height:50vh"></div>
+      <div class="shareprev"><img id="sharePrevImg" src="${imgUrl}" alt="${LANG==='en'?'Lineup image':'スタメン画像'}" style="max-height:50vh"></div>
 
 
       <div class="sharebtns">
@@ -7224,7 +7224,7 @@ function openShareFallback(imgUrl,shareText,file){
         <div class="fmtcard" data-fmt="story" title="${t('fmtStoryTitle')}"><div class="fmtsh" style="width:14px;height:24px"></div><div class="fmtr">9:16</div><div class="fmtu">${t('fmtStoryU')}</div></div>
         <div class="fmtcard" data-fmt="auto" title="${t('fmtAutoTitle')}"><div class="fmtsh" style="width:10px;height:24px"></div><div class="fmtr">${t('fmtAuto')}</div><div class="fmtu">${t('fmtAutoU')}</div></div>
       </div>
-      <div class="formfield" style="margin:0 16px 8px"><input class="search" id="shName" maxlength="24" placeholder="${escAttr(t('teamName'))}" value="${escAttr(teamDisplayName()||'')}" autocomplete="off"></div>
+      <div class="formfield" style="margin:0 16px 8px"><input class="search" id="shName" maxlength="24" aria-label="${escAttr(t('teamName'))}" placeholder="${escAttr(t('teamName'))}" value="${escAttr(teamDisplayName()||'')}" autocomplete="off"></div>
       </div>
       <button class="bigbtn" id="shDl">${t('saveImage')}</button>
       <button class="bigbtn ghost" id="shLink">${t('shareLinkBtn')}</button>
@@ -7250,6 +7250,7 @@ function openShareFallback(imgUrl,shareText,file){
   // SNSフォーマット選択（自動/4:5/1:1/9:16）
   const syncFmt=()=>{ document.querySelectorAll('#shFmt [data-fmt]').forEach(b=>b.classList.toggle('on',(state.shareFmt||'feed')===b.dataset.fmt)); };
   syncFmt();
+  document.querySelectorAll('#shToggles [data-tg],#shFmt [data-fmt]').forEach(x=>{ x.tabIndex=0; x.setAttribute('role','button'); if(!x.getAttribute('aria-label')&&x.title) x.setAttribute('aria-label',x.title); }); // キーボード・読み上げ（2026-10-01 監査A-18）
   document.getElementById('shFmt').onclick=e=>{ const b=e.target.closest('[data-fmt]'); if(!b)return; state.shareFmt=b.dataset.fmt; save(); syncFmt(); regen(); };
   // スカッド再現リンク（#s=...）を先に生成しておき、共有系ボタンのURLを「開くと同じスカッドが出るリンク」へ格上げ。生成失敗時はトップURLのまま
   let squadLink=null, _lk=0, _lkT=null;
