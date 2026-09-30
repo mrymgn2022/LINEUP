@@ -330,23 +330,30 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .bench .bh b{font-family:'Bebas Neue',system-ui,sans-serif;font-size:21px;letter-spacing:1.5px;color:var(--ink)}
 .bench .bh span{font-size:11px;color:var(--mut)}
 .bench .bh i{margin-left:auto;font-style:normal;font-size:11px;color:var(--lime-dim);letter-spacing:1px}
-.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px}
-.bcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:11px 7px 9px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:.12s}
+.bgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} /* 2026-10-01 3列固定＝9人が3×3でそろう（5＋4／4＋4＋1は見栄えが悪い） */
+.bcard{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:8px 6px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;min-width:0;cursor:pointer;transition:.12s} /* 横長：写真と名前をまとめて中央寄せ */
 .bcard:active{transform:scale(.95);background:var(--panel2)}
-.bav{width:46px;height:46px;border-radius:50%;background:linear-gradient(160deg,#1d2722,#10160f);border:2px solid var(--line);display:grid;place-items:center;color:var(--mut);overflow:hidden}
+.bav{width:38px;height:38px;border-radius:50%;background:linear-gradient(160deg,#1d2722,#10160f);border:2px solid var(--line);display:grid;place-items:center;color:var(--mut);overflow:hidden}
 .bav svg{width:22px;height:22px;opacity:.85}
 .bav.photo{background-size:cover;background-position:center 20%;border-color:var(--lime)}
 .bav.photo svg{display:none}
-.bcard .bn{font-size:11px;font-weight:800;text-align:center;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.bavw{position:relative;flex:0 0 auto;line-height:0}
+.bavw .bflag{position:absolute;right:-5px;bottom:-1px;font-size:13px;border-radius:2px;box-shadow:0 0 0 1.5px #0a0e0c} /* 国旗＝共有画像と同じく顔写真の右下 */
+.bavw .bflag.txt{font-size:8px;font-weight:800;line-height:1;padding:1px 2px;background:#10160f;color:var(--mut);font-style:normal}
+.btx{min-width:0;flex:0 1 auto;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.bcard .bn{font-size:13px;font-weight:800;text-align:left;white-space:nowrap;max-width:100%;overflow:hidden;line-height:1.15} /* 「…」にしない：fitBenchNames が文字を小さくする／入らなければ2行 */
+.bcard .bn.wrap2{white-space:normal;overflow-wrap:anywhere;hyphens:manual;-webkit-hyphens:manual;text-wrap:balance;font-size:10.5px;line-height:1.1}
+@media (max-width:420px){ .bav{width:34px;height:34px} .bcard{gap:6px;padding:8px 5px} .bavw .bflag{font-size:12px} }
+@media (max-width:360px){ .bcard[data-pid]{flex-direction:column;gap:5px;padding:9px 4px} .bcard[data-pid] .btx{align-items:center;max-width:100%} .bcard[data-pid] .bn{text-align:center} } /* 狭い画面は写真の下に名前 */
 .bcard .bp{font-family:'Bebas Neue';font-size:12px;letter-spacing:.5px;color:var(--lime-dim);line-height:.9}
 .bcard .bv{font-size:11px;color:var(--mut);font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;min-height:15px}
 .bcard .bv .fi{font-size:15px;border-radius:2px;box-shadow:0 0 0 .5px rgba(0,0,0,.35)}
 .bcard .bv.withclub{gap:4px;width:100%;max-width:100%;min-height:15px}
 .bcard .bv.withclub .fi{font-size:11px}
-.bcard .bclub{font-size:11px;font-weight:800;color:#7fd3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bcard .bclub{font-size:10px;font-weight:800;color:#7fd3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:100%}
 .bcard[data-pid]{touch-action:none}
 .bcard.dragging{opacity:.35}
-.bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:96px}
+.bcard.add{justify-content:center;border-style:dashed;border-color:var(--line);background:transparent;min-height:54px;gap:6px}
 .bcard.add:active{background:rgba(255,255,255,.03)}
 .bcard.add .addplus{font-size:28px;font-weight:800;line-height:1;color:var(--lime)}
 .bcard.add .addlbl{font-size:11px;color:var(--mut);font-weight:700}
@@ -365,7 +372,7 @@ header .icon{width:44px;height:44px;border-radius:12px} /* 上段の主要ナビ
 .modebar span{white-space:normal;line-height:1.35;overflow-wrap:anywhere;min-width:0} /* 2026-09-29: 2行打ち切り(…)で案内が読めなかった→全文を折り返す */ /* 長い英語説明も2行で全文表示（末尾"…点滅中"が切れない） */
 .modebar button{background:var(--lime);color:#0a0e0c;border:0;border-radius:999px;padding:7px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
 /* ベンチ外 */
-.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:9px;padding-bottom:4px}
+.rgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding-bottom:4px}
 .reservehead{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
 
 .bgrid.dropon,.rgrid.dropon{outline:2px dashed var(--lime);outline-offset:3px;border-radius:12px;background:rgba(199,255,79,.06)}
@@ -2189,10 +2196,8 @@ function renderBench(){
   const cards=list.map(pid=>{
     const p=P[pid],ph=photoOf(pid);
     return `<div class="bcard${(swapSel&&swapSel.t==='bench'&&swapSel.pid===pid)?' swapsel':''}${mktBenchSwap!=null?' pickbench':''}" data-pid="${pid}" draggable="false">
-      <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${escAttr(squadShortName(pid))}</div>
-      <div class="bp">${p[1]}</div>
-      <div class="bv${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?' withclub':''}">${flagHTMLForPid(pid)}${(state.flagByLeague||freeBuildMode())&&(p[4]||'').trim()?`<span class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</span>`:''}</div>
+      ${benchAvatar(pid,ph)}
+      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}${(state.flagByLeague||freeBuildMode())&&shortClub((p[4]||'').trim())?`<div class="bclub">${escAttr(shortClub((p[4]||'').trim()))}</div>`:''}</div>
     </div>`;
   }).join('');
   const addCard=benchFull()?'':`<div class="bcard add" id="benchAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>`; // 控え15人で＋を隠す
@@ -2208,10 +2213,8 @@ function renderBench(){
   const ocards=others.map(pid=>{
     const p=P[pid],ph=photoOf(pid);
     return `<div class="bcard ocard${(swapSel&&swapSel.t==='reserve'&&swapSel.pid===pid)?' swapsel':''}" data-pid="${pid}" draggable="false">
-      <div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>
-      <div class="bn">${escAttr(squadShortName(pid))}</div>
-      <div class="bp">${p[1]}</div>
-      <div class="bv">${flagHTMLForPid(pid)}</div>
+      ${benchAvatar(pid,ph)}
+      <div class="btx"><div class="bn">${escAttr(benchName(pid))}</div>${state.hideRoles?'':`<div class="bp">${p[1]}</div>`}</div>
     </div>`;
   }).join('');
   const reserveAddCard = benchFull() ? `<div class="bcard add" id="reserveAdd"><div class="addplus"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></div><div class="addlbl">${t('addWord')}</div></div>` : ''; // 控え満員時のみ: ベンチ外へ直接追加できる＋
@@ -2224,6 +2227,34 @@ function renderBench(){
   const add=document.getElementById('benchAdd'); if(add) add.onclick=openBenchAdd;
   const sbb=document.getElementById('statbarBench'); if(sbb) sbb.onclick=()=>openSquadAnalysis('all');
   const radd=document.getElementById('reserveAdd'); if(radd) radd.onclick=openReserveAdd;
+  scheduleFitBench();
+}
+// ベンチ・ベンチ外カードの部品（2026-10-01 横長3列・国旗は顔写真の右下バッジ）
+function benchAvatar(pid,ph){
+  const f=flagHTMLForPid(pid); const badge=!f?'':(f.charAt(0)==='<'?f.replace('class="fi ','class="fi bflag '):`<i class="bflag txt">${escAttr(f)}</i>`);
+  return `<div class="bavw"><div class="bav${ph?' photo':''}" ${ph?`style="background-image:url('${ph}')"`:''}>${SIL}</div>${badge}</div>`;
+}
+// ベンチの名前は「…」で切らない（盤面用の短縮が…付きなら全文を使い、幅は fitBenchNames で合わせる）
+function benchName(pid){ const s=squadShortName(pid); return (s&&s.slice(-1)==='…')?nameOf(pid):s; }
+// 長い名前は幅に収まるまで文字を小さく（最小9px）。それでも入らなければ2行で全文
+function fitBenchNames(){ try{
+  document.querySelectorAll('#bench .bcard[data-pid] .bn').forEach(el=>{
+    if(el.dataset.full!=null) el.textContent=el.dataset.full; else el.dataset.full=el.textContent; // 2行用に入れたハイフン位置を戻してから測る
+    el.classList.remove('wrap2'); el.style.fontSize='';
+    if(!el.getBoundingClientRect().width) return;
+    const rg=document.createRange(); rg.selectNodeContents(el);
+    const over=()=>rg.getBoundingClientRect().width>el.getBoundingClientRect().width+0.05;
+    let fs=parseFloat(getComputedStyle(el).fontSize)||13, n=0;
+    while(over()&&fs>9&&n<40){ fs-=0.5; el.style.fontSize=fs+'px'; n++; }
+    if(over()){ el.style.fontSize=''; el.classList.add('wrap2'); el.textContent=el.dataset.full.replace(/[A-Za-zÀ-ɏ]{8,}/g,w=>w.split('').join('­')); } // 長い1語はハイフンで分ける（語の途中で無言で折れない）
+  });
+}catch(e){} }
+let _fitBenchRaf=0, _fitBenchW=-1, _fitBenchRO=null;
+function scheduleFitBench(){
+  if(_fitBenchRaf) cancelAnimationFrame(_fitBenchRaf);
+  _fitBenchRaf=requestAnimationFrame(()=>{ _fitBenchRaf=0; fitBenchNames(); });
+  if(!_fitBenchRO&&typeof ResizeObserver!=='undefined'){ const b=document.getElementById('bench'); if(b){ _fitBenchRO=new ResizeObserver(()=>{ const w=Math.round(b.clientWidth); if(w!==_fitBenchW){ _fitBenchW=w; scheduleFitBench(); } }); _fitBenchRO.observe(b); } } // 幅が変わった時だけ測り直す（回転・サイドバー開閉）
+  try{ if(document.fonts&&document.fonts.status!=='loaded') document.fonts.ready.then(()=>scheduleFitBench()); }catch(e){}
 }
 /* ---- ベンチ → ピッチ ドラッグ交代 ---- */
 let dropTarget=-1;
@@ -5403,7 +5434,7 @@ function storeBadgesHTML(){
 }
 // バックアップ（書き出し/読み込み）をドロワーに表示するか。あまり使わない機能のためプライバシーポリシー直上に配置（2026-07-14）。非表示にしたい時はfalseに（機能一式は残置）
 const SHOW_BACKUP=true;
-const BUILD='1001n'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
+const BUILD='1001o'; const FEATURED_ENABLED=false; // ★注目スカッド/注目移籍はアプリでは廃止(2026-08-13ユーザー決定)。プレミアムUI撤去(94907ec)と同方式＝UIのみ非表示・データ層(FEATURED_SQUADS/FEATURED_TRANSFERS/TR_CLUB_NAT/transferSig)温存。trueに戻せばメニュー項目・シート・右レール・未読ドット・?open=transfers が全て復活する。理由: 開封数は無計測＝効果の上限が母数から見て小さい一方、更新(金額転記・国旗・NEW管理)は毎回の移籍反映で最重量の事故源だった。移籍情報の掲示はサイトのサイドバーとSNS素材へ、DB即時更新(fotmobスクショ→DB)は従来どおり。 // ドロワー末尾に表示する版数。iOS PWAはキャッシュが強く「修正が端末に届いているか」が判別不能になりがち→ユーザーが版を確認/報告できるように常設。長押し=この端末の収集オン/オフ
 // SW/キャッシュを全部消して最新版を取りに行く（iOS PWA向けの手動更新の逃げ道）
 async function forceUpdateApp(){
   let _online=(navigator.onLine!==false); if(_online){ try{ const _r=await fetch('./sw.js?ping='+Date.now(),{cache:'no-store'}); _online=!!(_r&&_r.ok); }catch(e){ _online=false; } } // 実際に取れるか確かめてから（Wi-Fiでも外に出られない場合がある）
@@ -8069,6 +8100,26 @@ window.__selftest=function(){
       }catch(e){ _pass=false; _msg=String(e.message||e); }
       finally{ _undo=_u0; try{ closeSheet(); }catch(e){} try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} }
       ok('bench_remove_keeps_player_and_club_kana',_pass,_msg); }
+
+    // T30i: ベンチ・ベンチ外のカード＝国旗は顔写真の右下・ポジションはPOSボタン連動・長い名前も「…」にしない（2026-10-01）
+    { let _pass=true,_msg=''; const _snap=JSON.stringify(serializeTeam()), _u0=_undo, _hr=state.hideRoles;
+      try{
+        placeClubSquad('Arsenal','Arsenal');
+        state.hideRoles=true; render(); fitBenchNames();
+        const cards=[...document.querySelectorAll('#bench .bcard[data-pid]')];
+        if(cards.length<9) throw new Error('検証前提: ベンチ・ベンチ外のカードが少ない '+cards.length);
+        if(document.querySelector('#bench .bcard[data-pid] .bp')) throw new Error('POSオフなのにポジションが出ている');
+        if(cards.some(c=>!c.querySelector('.bavw .bflag'))) throw new Error('国旗バッジが無いカードがある');
+        const lp=state.bench[0]; state.names[pidToKey(lp)]='アレクサンダーアーノルドテストながいなまえ'; render(); fitBenchNames();
+        const bad=[...document.querySelectorAll('#bench .bcard[data-pid] .bn')].filter(el=>{ if(/…/.test(el.textContent)) return true; if(el.classList.contains('wrap2')||!el.getBoundingClientRect().width) return false; const rg=document.createRange(); rg.selectNodeContents(el); return rg.getBoundingClientRect().width>el.getBoundingClientRect().width+0.5; });
+        delete state.names[pidToKey(lp)];
+        if(bad.length) throw new Error('名前が切れている: '+bad.map(e=>e.textContent).slice(0,3).join(','));
+        state.hideRoles=false; render();
+        const nb=document.querySelectorAll('#bench .bcard[data-pid] .bp').length;
+        if(nb!==document.querySelectorAll('#bench .bcard[data-pid]').length) throw new Error('POSオンでポジションが出ないカードがある');
+      }catch(e){ _pass=false; _msg=String(e.message||e); }
+      finally{ _undo=_u0; state.hideRoles=_hr; try{ applyRaw(resolveRaw(JSON.parse(_snap))); }catch(e){} try{ render(); }catch(e){} }
+      ok('bench_card_row_flag_pos_fit',_pass,_msg); }
 
     // T30: CB利き足ルール（確定XIの無い自動配置で左CB=左利き優先。アーセナルの確定XIを一時的に外して検査）
     //      確定XI(CLUB_XI)はユーザーの盤面どおり＝最適化しない（2026-09-28）→ T30b
